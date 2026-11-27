@@ -27,8 +27,8 @@ because a subdirectory's `robots.txt` does not control the domain root.
 
 ## Google Analytics 4
 
-Analytics is currently **off**. No ID has been supplied, no Google tag loads,
-and the analytics consent controls are not displayed.
+Analytics is on only when a measurement ID is supplied. Without one, no Google
+tag loads and the analytics consent controls are not displayed.
 
 1. Open [Google Analytics](https://analytics.google.com/) and create a property
    named **MultiVerse** (or select an existing property).
