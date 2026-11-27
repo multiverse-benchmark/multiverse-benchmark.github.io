@@ -1,0 +1,12 @@
+{
+  "id": "generic_media",
+  "name": "Media Search",
+  "icon": "./icons/generic_media.svg",
+  "iconBackground": "linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)",
+  "description": "Search and play media content",
+  "backendService": "generic_media",
+  "defaultWindow": {
+    "width": 900,
+    "height": 700
+  }
+}

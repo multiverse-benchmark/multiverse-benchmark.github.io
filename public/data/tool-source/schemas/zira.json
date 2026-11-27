@@ -1,0 +1,2485 @@
+[
+  {
+    "name": "add_attachment",
+    "description": "Add an attachment to an issue from a file path.\n\nCreates a new attachment associated with the specified issue by reading\na file from the filesystem. Automatically handles MIME type detection,\nfile size validation, encoding, and checksum generation. The attachment\nis stored in the database with full metadata and the issue is updated\nto reference the new attachment.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "issue_id_or_key": {
+          "description": "The unique identifier or key of the target issue.\nMust be a non-empty string that exists in the database.",
+          "type": "string",
+          "nullable": false
+        },
+        "file_path": {
+          "description": "Filesystem path to the file to attach. The file will\nbe read from disk and the filename will be extracted from the path.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "issue_id_or_key",
+        "file_path"
+      ]
+    }
+  },
+  {
+    "name": "assign_issue_to_user",
+    "description": "Assign an issue to a user.\n\n        This method assigns an issue to a specific user. The assignee can be\na user or can be set to 'Unassigned' or empty string to unassign the issue.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "issue_id": {
+          "description": "The unique identifier of the issue to assign.",
+          "type": "string",
+          "nullable": false
+        },
+        "assignee": {
+          "description": "The assignee information. Can be empty to unassign.",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "name": {
+              "description": "The assignee's username (e.g., 'jdoe'). Use 'Unassigned' or empty string '' to unassign the issue. None values are normalized to 'Unassigned'.",
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "issue_id",
+        "assignee"
+      ]
+    }
+  },
+  {
+    "name": "bulk_delete_issues",
+    "description": "Delete multiple issues in bulk.\n\n        This method validates all issue IDs first and deletes them in a single operation.\nIf any issue IDs are invalid or do not exist, all invalid IDs will be reported in the error message.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "issue_ids": {
+          "description": "A list of issue IDs to delete. All IDs must reference existing issues.",
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "issue_ids"
+      ]
+    }
+  },
+  {
+    "name": "create_group",
+    "description": "Create a new group.\n\nThis method creates a new group with the specified name. The group\nwill initially have no members.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the group to create. Cannot be empty or whitespace-only.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "create_issue",
+    "description": "Create a new issue in Zira.\n\n        This method creates a new issue with the specified fields. The issue will be\n        assigned a unique ID and stored in the system. Only project and summary are\nrequired fields.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "description": "A dictionary containing the issue fields.",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "project": {
+              "description": "The project key the issue belongs to. Must reference an existing project. Cannot be empty or whitespace-only.",
+              "type": "string",
+              "nullable": false
+            },
+            "summary": {
+              "description": "A brief one-line description of the issue. Cannot be empty or whitespace-only.",
+              "type": "string",
+              "nullable": false
+            },
+            "issuetype": {
+              "description": "The type of issue (e.g., 'BUG', 'TASK', 'STORY', 'SUBTASK'). Defaults to 'TASK' if not provided. Stored as uppercase.",
+              "type": "string",
+              "nullable": true,
+              "default": "TASK"
+            },
+            "description": {
+              "description": "A detailed description of the issue. Defaults to empty string if not provided.",
+              "type": "string",
+              "nullable": true,
+              "default": ""
+            },
+            "priority": {
+              "description": "The priority of the issue (e.g., 'High', 'Medium', 'Low'). Defaults to 'Low' if not provided.",
+              "type": "string",
+              "nullable": true,
+              "default": "Low"
+            },
+            "status": {
+              "description": "The status of the issue (e.g., 'To Do', 'Open', 'In Progress', 'Resolved', 'Closed', 'Done'). Defaults to 'Open' if not provided.",
+              "type": "string",
+              "nullable": true,
+              "default": "Open"
+            },
+            "assignee": {
+              "description": "The user assigned to the issue. Must be an object with 'name' key. Defaults to None (unassigned) if not provided.",
+              "type": "object",
+              "nullable": true,
+              "default": {
+                "name": "Unassigned"
+              },
+              "properties": {
+                "name": {
+                  "description": "The assignee's username (e.g., 'jdoe').",
+                  "type": "string",
+                  "nullable": false
+                }
+              },
+              "required": [
+                "name"
+              ]
+            },
+            "components": {
+              "description": "IDs of Components associated with the issue. Each component must exist and belong to the project.",
+              "type": "array",
+              "nullable": true,
+              "default": [],
+              "items": {
+                "type": "string"
+              }
+            },
+            "due_date": {
+              "description": "The due date of the issue. Supported formats: YYYY-MM-DD, YYYY-MM-DDTHH:MM:SS, MM/DD/YYYY, DD/MM/YYYY. Normalized to YYYY-MM-DD.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "comments": {
+              "description": "A list of comments to add to the issue.",
+              "type": "array",
+              "nullable": true,
+              "default": [],
+              "items": {
+                "type": "string"
+              }
+            },
+            "created": {
+              "description": "The creation timestamp in ISO format (e.g., '2025-07-09T10:30:00'). Defaults to current timestamp if not provided.",
+              "type": "string",
+              "nullable": true
+            },
+            "labels": {
+              "description": "A list of labels/tags for the issue (e.g., [\"bug\", \"urgent\"]).",
+              "type": "array",
+              "nullable": true,
+              "default": [],
+              "items": {
+                "type": "string"
+              }
+            },
+            "resolution": {
+              "description": "The resolution ID of the issue (e.g., \"RES-1\", \"RES-2\"). Use get_all_resolutions to retrieve available resolution IDs. Defaults to None if not provided.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "startDate": {
+              "description": "The date when work on the issue started. Supported formats: YYYY-MM-DD, YYYY-MM-DDTHH:MM:SS, MM/DD/YYYY, DD/MM/YYYY. Normalized to YYYY-MM-DD.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "closedDate": {
+              "description": "The date when the issue was closed. Supported formats: YYYY-MM-DD, YYYY-MM-DDTHH:MM:SS, MM/DD/YYYY, DD/MM/YYYY. Normalized to YYYY-MM-DD.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "parent": {
+              "description": "The ID of the parent issue if this is a subtask. Example: \"ISSUE-1\".",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "fixVersion": {
+              "description": "List of version objects representing target fix versions.",
+              "type": "array",
+              "nullable": true,
+              "default": [],
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "description": "The version ID.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            },
+            "affectedVersion": {
+              "description": "List of version objects representing affected versions.",
+              "type": "array",
+              "nullable": true,
+              "default": [],
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "description": "The version ID.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          },
+          "required": [
+            "project",
+            "summary"
+          ]
+        }
+      },
+      "required": [
+        "fields"
+      ]
+    }
+  },
+  {
+    "name": "create_issue_link",
+    "description": "Create a new issue link in Zira.\n\nThis method creates a new issue link between two issues. The link will be\nassigned a unique ID and stored in the system. Both issues must exist in\nthe database for the link to be created successfully.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "The type of issue link to create. Valid types are determined by the system configuration (e.g., 'Blocks', 'Duplicates'). The available types can be retrieved from the issue_link_types database.",
+          "type": "string",
+          "nullable": false
+        },
+        "inwardIssue": {
+          "description": "The inward (source) issue reference.",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "key": {
+              "description": "The key of the inward issue. Must be a non-empty string.",
+              "type": "string",
+              "nullable": false
+            }
+          },
+          "required": [
+            "key"
+          ]
+        },
+        "outwardIssue": {
+          "description": "The outward (target) issue reference.",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "key": {
+              "description": "The key of the outward issue. Must be a non-empty string.",
+              "type": "string",
+              "nullable": false
+            }
+          },
+          "required": [
+            "key"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "inwardIssue",
+        "outwardIssue"
+      ]
+    }
+  },
+  {
+    "name": "create_issue_type",
+    "description": "Create a new issue type in Zira.\n\nThis method creates a new issue type with the specified name and description.\nThe issue type's ID can be optionally specified; otherwise, the name is used as the ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "description": "The description of the issue type. Cannot be empty if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "type": {
+          "description": "The type of issue type. Use 'subtask' to create a subtask type, otherwise defaults to 'standard'.",
+          "type": "string",
+          "nullable": true,
+          "default": "standard"
+        },
+        "name": {
+          "description": "The name of the issue type. Cannot be empty. Must be unique.",
+          "type": "string",
+          "nullable": false
+        },
+        "id": {
+          "description": "The unique identifier. If not provided, name is used. Stored as uppercase.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "create_project",
+    "description": "Create a new project.\n\nThis method creates a new project with the given key and name.\nOptionally, a project lead can be assigned.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "proj_key": {
+          "description": "The key of the project. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "proj_name": {
+          "description": "The name of the project. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "proj_lead": {
+          "description": "The name of the project lead. Must be a valid user name if provided.",
+          "type": "string",
+          "nullable": true
+        }
+      },
+      "required": [
+        "proj_key",
+        "proj_name"
+      ]
+    }
+  },
+  {
+    "name": "create_project_component",
+    "description": "Create a new component in a Zira project.\n\nThis method creates a new component within a specified project. Components\nare used to group issues within a project and can be assigned to specific\nteam members.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "description": "The key of the project where the component will be created. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "name": {
+          "description": "The name of the component. Must be a non-empty string with a maximum length of 255 characters.",
+          "type": "string",
+          "nullable": false
+        },
+        "description": {
+          "description": "A description of the component's purpose. Maximum length is 1000 characters.",
+          "type": "string",
+          "nullable": true
+        },
+        "owner": {
+          "description": "The username of the component owner/lead. If provided, must be a valid user in the system.",
+          "type": "string",
+          "nullable": true
+        }
+      },
+      "required": [
+        "project",
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "create_user",
+    "description": "Create a new user with all required fields.\n\nValidates the input payload and creates a user object with the provided\ndata and sensible defaults.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "payload": {
+          "description": "A dictionary containing the user's details.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "The username for the new user.",
+              "type": "string",
+              "nullable": false
+            },
+            "emailAddress": {
+              "description": "The user's primary email address. The email address is normalized by stripping whitespace and converting to lowercase before storage. This ensures consistent duplicate detection and lookup.",
+              "type": "string",
+              "nullable": false
+            },
+            "displayName": {
+              "description": "The name to display in the UI. If not provided, defaults to the username.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "profile": {
+              "description": "A dictionary for profile info.",
+              "type": "object",
+              "nullable": true,
+              "default": null,
+              "properties": {
+                "bio": {
+                  "description": "The user's biography.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "joined": {
+                  "description": "The date the user joined in 'YYYY-MM-DD' format (e.g., '2022-01-15'). Cannot be a future date.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                }
+              },
+              "required": []
+            },
+            "groups": {
+              "description": "A list of group names. Each must reference an existing group.",
+              "type": "array",
+              "nullable": true,
+              "default": [],
+              "items": {
+                "type": "string"
+              }
+            },
+            "settings": {
+              "description": "A dictionary for user settings.",
+              "type": "object",
+              "nullable": true,
+              "default": null,
+              "properties": {
+                "theme": {
+                  "description": "The user's theme preference. Defaults to 'light'.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": "light"
+                },
+                "notifications": {
+                  "description": "The user's notification preference. Defaults to True.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": true
+                }
+              },
+              "required": []
+            }
+          },
+          "required": [
+            "name",
+            "emailAddress"
+          ]
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    }
+  },
+  {
+    "name": "create_version",
+    "description": "Create a new version.\n\nCreates a new version for a project. Versions help organize issues by release\ncycle and track progress toward releases.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the version. Required.",
+          "type": "string",
+          "nullable": false
+        },
+        "project": {
+          "description": "The project key/ID this version belongs to. Required.",
+          "type": "string",
+          "nullable": false
+        },
+        "description": {
+          "description": "Description of the version.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "archived": {
+          "description": "Whether the version is archived.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "released": {
+          "description": "Whether the version is released.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "release_date": {
+          "description": "The release date in YYYY-MM-DD format.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "user_release_date": {
+          "description": "The user-friendly release date.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "id": {
+          "description": "Custom ID for the version. Auto-generated if not provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "move_unfixed_issues_to": {
+          "description": "URL for moving unfixed issues. Auto-generated if not provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "overdue": {
+          "description": "Whether the version is overdue.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "start_date": {
+          "description": "The start date of the version in YYYY-MM-DD format.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "user_start_date": {
+          "description": "The user-friendly start date.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "name",
+        "project"
+      ]
+    }
+  },
+  {
+    "name": "create_webhooks",
+    "description": "Create new webhooks in the system.\n\nThis method creates new webhooks with the provided configurations. Each webhook\nwill be assigned a unique ID and stored in the system. Webhooks are used to\nreceive notifications when specific events occur in Zira.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "webhooks": {
+          "description": "A list of webhook configurations to create. Must contain at least one webhook.",
+          "type": "array",
+          "nullable": false,
+          "minItems": 1,
+          "items": {
+            "description": "A webhook configuration.",
+            "type": "object",
+            "properties": {
+              "url": {
+                "description": "The HTTP endpoint URL that will receive webhook POST requests. Must start with http:// or https://.",
+                "type": "string",
+                "nullable": false
+              },
+              "events": {
+                "description": "List of event types to subscribe to. Valid: issue_created, issue_updated, issue_deleted, issue_assigned, project_created, project_updated, project_deleted, user_created, user_updated, user_deleted. Note: Duplicate event names are automatically deduplicated.",
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "issue_created",
+                    "issue_updated",
+                    "issue_deleted",
+                    "issue_assigned",
+                    "project_created",
+                    "project_updated",
+                    "project_deleted",
+                    "user_created",
+                    "user_updated",
+                    "user_deleted"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "url",
+              "events"
+            ]
+          }
+        }
+      },
+      "required": [
+        "webhooks"
+      ]
+    }
+  },
+  {
+    "name": "crop_temporary_avatar",
+    "description": "Crop a temporary avatar in Zira.\n\nThis method allows cropping a temporary avatar to the desired dimensions\nbefore making it permanent. This is typically used after uploading a\ntemporary avatar to adjust its appearance.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "avatar_id": {
+          "description": "The unique identifier of the temporary avatar to crop. Must reference an existing temporary avatar.",
+          "type": "string",
+          "nullable": false
+        },
+        "cropDimensions": {
+          "description": "A dictionary containing the crop dimensions.",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "x": {
+              "description": "The x-coordinate of the top-left corner (must be >= 0).",
+              "type": "integer",
+              "nullable": false
+            },
+            "y": {
+              "description": "The y-coordinate of the top-left corner (must be >= 0).",
+              "type": "integer",
+              "nullable": false
+            },
+            "width": {
+              "description": "The width of the crop area (must be > 0).",
+              "type": "integer",
+              "nullable": false
+            },
+            "height": {
+              "description": "The height of the crop area (must be > 0).",
+              "type": "integer",
+              "nullable": false
+            }
+          },
+          "required": [
+            "x",
+            "y",
+            "width",
+            "height"
+          ]
+        }
+      },
+      "required": [
+        "avatar_id",
+        "cropDimensions"
+      ]
+    }
+  },
+  {
+    "name": "delete_attachment",
+    "description": "Delete an attachment and remove all references from issues.\n\nPermanently removes an attachment from the system, including the file data\nand all references to it from issues. This operation cannot be undone.\nThe function performs a complete cleanup by removing both the attachment\nrecord and all issue references to ensure data consistency.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the attachment to delete.\nMust be a positive integer or a string representation of a positive integer.",
+          "anyOf": [
+            {
+              "description": "Attachment ID as a string",
+              "type": "string"
+            },
+            {
+              "description": "Attachment ID as an integer",
+              "type": "integer"
+            }
+          ],
+          "nullable": false
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "delete_component_by_id",
+    "description": "Delete a component from a project.\n\nThis method permanently removes a component from a project. Optionally,\nissues assigned to the component can be moved to another component.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "comp_id": {
+          "description": "The unique identifier of the component to delete.",
+          "type": "string",
+          "nullable": false
+        },
+        "moveIssuesTo": {
+          "description": "The ID of the component to move existing issues to. If not provided, issues will remain unassigned.",
+          "type": "string",
+          "nullable": true
+        }
+      },
+      "required": [
+        "comp_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_group_by_name",
+    "description": "Delete an existing group.\n\nThis method permanently removes a group from the system. All users\nin the group will lose their group-based permissions. Exactly one of groupname or groupId must be provided.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "groupname": {
+          "description": "The name of the group to delete (case-insensitive). Cannot be used with groupId parameter. Cannot be empty or whitespace-only.",
+          "type": "string",
+          "nullable": true
+        },
+        "groupId": {
+          "description": "The ID of the group to delete. Cannot be used with groupname parameter. Cannot be empty or whitespace-only.",
+          "type": "string",
+          "nullable": true
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "delete_issue_by_id",
+    "description": "Delete an existing issue.\n\nThis method permanently removes an issue from the system and performs a cascade delete\nto maintain database consistency by automatically removing all associated attachments\nand issue links. Optionally, subtasks can also be deleted based on the delete_subtasks parameter.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "issue_id": {
+          "description": "The unique identifier of the issue to delete.",
+          "type": "string",
+          "nullable": false
+        },
+        "delete_subtasks": {
+          "description": "Whether to delete subtasks. If False and subtasks exist, deletion fails. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        }
+      },
+      "required": [
+        "issue_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_project_by_key",
+    "description": "Delete a project.\n\nThis method deletes a project and all its associated components, issues, and versions.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "project_key": {
+          "description": "The key of the project. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "project_key"
+      ]
+    }
+  },
+  {
+    "name": "delete_user_by_username_or_key",
+    "description": "Delete a user by username or key.\n\nDeletes a user from the database. If username is provided, attempts to look up\nthe user's key first. If username lookup fails but a key was also provided,\nfalls back to using the key parameter. Performs integrity checks before deletion.\nPrevents deletion if the user owns or is assigned to any records.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "description": "The username of the user to delete. Cannot be an empty string. If provided, the function attempts username lookup first, with fallback to key if available. One of username or key must be provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "key": {
+          "description": "The key (account_id) of the user to delete. Cannot be an empty string. Used as fallback if username lookup fails, or used directly if username is not provided. One of username or key must be provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "delete_version_by_id",
+    "description": "Delete a version. Optionally move issues referencing this version to another version.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "ver_id": {
+          "description": "The ID of the version to delete. Cannot be empty.",
+          "type": "string",
+          "nullable": false
+        },
+        "move_fix_issues_to": {
+          "description": "The ID of the version to move fixed issues to. If provided, all issues with this version as fixVersion will have it replaced with the target version.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "move_affected_issues_to": {
+          "description": "The ID of the version to move affected issues to. If provided, all issues with this version as affectedVersion will have it replaced with the target version.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "ver_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_webhooks_by_ids",
+    "description": "Delete webhooks by their IDs.\n\nThis method deletes one or more webhooks identified by their IDs.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "webhookIds": {
+          "description": "The IDs of the webhooks to delete. Must contain at least one ID.",
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "webhookIds"
+      ]
+    }
+  },
+  {
+    "name": "download_attachment",
+    "description": "Download attachment content to a local file in the current directory.\n\nDownloads the specified attachment and saves it to the current directory using\nthe attachment's original filename. This function handles both binary and text\nattachments based on the attachment's stored encoding format ('base64' or 'text').\n\nThe function retrieves the attachment data directly from the database and\nthen processes it according to its encoding:\n- Base64 encoded attachments (binary files) are decoded and written as binary files\n- Text encoded attachments are written as UTF-8 text files",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the attachment to download.\nCan be provided as an integer or string representation of the attachment ID.\nMust be a positive integer that exists in the database.",
+          "anyOf": [
+            {
+              "description": "Attachment ID as a string",
+              "type": "string"
+            },
+            {
+              "description": "Attachment ID as an integer",
+              "type": "integer"
+            }
+          ],
+          "nullable": false
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "find_groups_for_picker",
+    "description": "Search for groups matching a query string.\n\nThis method searches for groups whose names contain the specified query string.\nSupports filtering by user membership, exclusions by name or ID, case sensitivity,\nand pagination via maxResults.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "The search string to match against group names. If None or empty, all groups will be returned.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "exclude": {
+          "description": "Group names to exclude from results. Cannot be used together with excludeId parameter.",
+          "type": "array",
+          "nullable": true,
+          "default": null,
+          "items": {
+            "description": "Group name to exclude from results. Must be a list of valid group names.",
+            "type": "string",
+            "nullable": false
+          }
+        },
+        "excludeId": {
+          "description": "Group IDs to exclude from results. Cannot be used together with exclude parameter.",
+          "type": "array",
+          "nullable": true,
+          "default": null,
+          "items": {
+            "description": "Group ID to exclude from results. Must be a list of valid group IDs.",
+            "type": "string",
+            "nullable": false
+          }
+        },
+        "maxResults": {
+          "description": "Maximum number of groups to return. Must be between 1 and 1000. Defaults to 20.",
+          "type": "integer",
+          "nullable": true,
+          "default": 20
+        },
+        "caseInsensitive": {
+          "description": "Whether the query search should be case-insensitive. Defaults to False (case-sensitive) to match Zira API behavior.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "accountId": {
+          "description": "The account ID (UUID key) of the user to find groups for. Returns only groups that contain this user. Cannot be empty or whitespace-only if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "find_users",
+    "description": "Finds users by a string search against their name, display name, and email.\n\nProvides a general-purpose search for users with pagination and filtering\nby active status. The search is case-insensitive.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "search_string": {
+          "description": "The search string to match against user fields (name, displayName, email). Cannot be empty or whitespace-only.",
+          "type": "string",
+          "nullable": false
+        },
+        "startAt": {
+          "description": "The index of the first user to return. Must be non-negative.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0
+        },
+        "maxResults": {
+          "description": "The maximum number of users to return. Must be between 1 and 1000.",
+          "type": "integer",
+          "nullable": true,
+          "default": 50
+        },
+        "includeActive": {
+          "description": "If True, active users are included in results.",
+          "type": "boolean",
+          "nullable": true,
+          "default": true
+        },
+        "includeInactive": {
+          "description": "If True, inactive users are included in results.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        }
+      },
+      "required": [
+        "search_string"
+      ]
+    }
+  },
+  {
+    "name": "get_all_dashboards",
+    "description": "Retrieve a list of dashboards from Zira.\n\nThis method returns a list of all dashboards in the system, with optional\npagination support. Dashboards are used to display various Zira data and\nmetrics in a customizable layout.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "startAt": {
+          "description": "The index of the first dashboard to return. Must be non-negative.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0
+        },
+        "maxResults": {
+          "description": "The maximum number of dashboards to return. Must be positive if provided. If not specified, all dashboards will be returned.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_all_filters",
+    "description": "Retrieve all filters from Zira.\n\nThis method returns a list of all filters in the system. Filters in Zira\nare used to save and share search queries, allowing users to quickly\naccess commonly used issue searches.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_all_issue_link_types",
+    "description": "Retrieve all issue link types from Zira.\n\nThis method returns a list of all issue link types defined in the system.\nIssue link types are used to categorize and manage relationships between issues.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_all_issue_types",
+    "description": "Retrieve all issue types from Zira.\n\nThis method returns a list of all issue types defined in the system.\nIssue types are used to categorize and manage issues in Zira.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_all_permission_schemes",
+    "description": "Get all permission schemes.\n\nThis method returns all permission schemes in the system.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_all_permissions",
+    "description": "Get all permissions configured in the Zira system.\n\nThis method returns all permissions available in the system, indicating\nwhat actions the current user can perform.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_all_priorities",
+    "description": "Get all priorities configured in the Zira system.\n\nThis method returns all priorities available for use in issue creation and updates.\nPriorities indicate the importance or urgency level of issues, helping teams\nprioritize their work effectively.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_all_project_categories",
+    "description": "Get all project categories.\n\nThis method returns all project categories configured in the system.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_all_projects",
+    "description": "Get all projects.\n\nThis method returns all projects in the system.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_all_resolutions",
+    "description": "Get all resolutions configured in the Zira system.\n\nThis method returns all resolutions available for use when closing issues.\nResolutions indicate how an issue was resolved, such as 'Fixed', 'Won't Fix',\nor 'Duplicate'.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_all_roles",
+    "description": "Get all roles.\n\nThis method returns all roles in the system, including both project roles\nand application roles. If no roles exist, the 'roles' array will be empty.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_all_security_levels",
+    "description": "Get all security levels.\n\nThis method returns all security levels configured in the Zira system.\nSecurity levels are used to restrict access to issues based on user permissions.\nIf no security levels exist, an empty list is returned.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_all_settings",
+    "description": "Retrieve all unique user settings from the system.\n\nThis method returns all unique settings across all users. Settings include\nuser preferences like theme and notification options.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_all_status_categories",
+    "description": "Get all status categories.\n\nThis method returns all status categories configured in the Zira system.\nStatus categories group related statuses together and determine their\nvisual representation in Zira.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_all_statuses",
+    "description": "Get all workflow statuses configured in the Zira system.\n\nThis method returns all statuses available in the system. Statuses represent\nthe possible states an issue can be in during its workflow lifecycle.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_all_webhooks",
+    "description": "Retrieve all webhooks from the system.\n\nThis method returns all webhooks currently configured in the system.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_all_workflows",
+    "description": "Retrieve all workflows from Zira.\n\nThis method returns all workflows in the system. Workflows define\nhow issues move through different statuses from creation to completion.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_application_properties",
+    "description": "Retrieve application properties from Zira.\n\nThis method allows fetching either all application properties or a specific property\nby its key.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "description": "The key of the specific property to retrieve. If not provided, all application properties will be returned. Examples: 'siteName', 'maintenanceMode'. Case-sensitive.",
+          "type": "string",
+          "nullable": true
+        },
+        "permissionLevel": {
+          "description": "The permission level to filter accessible properties. Must be one of: 'ADMIN' (returns all properties), 'USER' (returns non-admin properties), or 'ANONYMOUS' (returns only public properties). If not provided, all properties are returned.",
+          "type": "string",
+          "nullable": true,
+          "enum": [
+            "ADMIN",
+            "USER",
+            "ANONYMOUS"
+          ]
+        },
+        "keyFilter": {
+          "description": "A substring filter for property keys. Only properties whose keys contain this substring (case-insensitive) will be returned. Ignored if 'key' is provided.",
+          "type": "string",
+          "nullable": true
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_application_role_by_key",
+    "description": "Retrieve a specific application role by its key.\n\nThis method returns detailed information about a specific application role\nidentified by its unique key.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "description": "The unique identifier of the application role to retrieve.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "key"
+      ]
+    }
+  },
+  {
+    "name": "get_application_roles",
+    "description": "Retrieve all application roles from Zira.\n\nThis method returns a list of all application roles defined in the system.\nApplication roles are used to control access to specific Zira features and functionality.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_attachment_content",
+    "description": "Get attachment content from the database.\n\nRetrieves the attachment content. If the attachment record exists but has no content\n(null or missing), returns an empty string.\nAll attachments are stored as base64-encoded strings for consistency and JSON\nserializability. Use base64 decoding on the returned content to get the original\nfile data.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the attachment to retrieve.\nCan be provided as an integer or string representation of the attachment ID.\nMust be a positive integer that exists in the database.",
+          "anyOf": [
+            {
+              "description": "Attachment ID as a string",
+              "type": "string"
+            },
+            {
+              "description": "Attachment ID as an integer",
+              "type": "integer"
+            }
+          ],
+          "nullable": false
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_attachment_metadata",
+    "description": "Get attachment metadata without file content.\n\nReturns metadata information for an attachment.\nThis is useful for getting file information (name, size, type, etc.)",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the attachment. Must be a positive\ninteger or a string representation of a positive integer.",
+          "anyOf": [
+            {
+              "description": "Attachment ID as a string",
+              "type": "string"
+            },
+            {
+              "description": "Attachment ID as an integer",
+              "type": "integer"
+            }
+          ],
+          "nullable": false
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_component_by_id",
+    "description": "Retrieve a component by its ID.\n\nThis method returns detailed information about a specific component\nidentified by its unique ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "comp_id": {
+          "description": "The unique identifier of the component to retrieve. Cannot be empty.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "comp_id"
+      ]
+    }
+  },
+  {
+    "name": "get_current_user_permissions",
+    "description": "Get the current user's permissions.\n\nThis method returns the permissions of the current user from the database.\nThe permissions are returned as a list of permission keys that the user has access to.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_current_user_preferences",
+    "description": "Get the current user's preferences.\n\nThis method returns the preferences of the current user from the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_dashboard_by_id",
+    "description": "Retrieve a specific dashboard by its ID.\n\nThis method returns detailed information about a specific dashboard\nidentified by its unique ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "dash_id": {
+          "description": "The unique identifier of the dashboard to retrieve. Cannot be empty or whitespace-only.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "dash_id"
+      ]
+    }
+  },
+  {
+    "name": "get_filter_by_id",
+    "description": "Retrieve a specific filter by its ID.\n\nThis method returns detailed information about a specific filter\nidentified by its unique ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "filter_id": {
+          "description": "The unique identifier of the filter to retrieve. Cannot be empty.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "filter_id"
+      ]
+    }
+  },
+  {
+    "name": "get_group_by_name",
+    "description": "Retrieve a specific group by its name or ID.\n\nThis method returns detailed information about a specific group\nidentified by either its name or groupId.\nExactly one of groupname or groupId must be provided.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "groupname": {
+          "description": "The name of the group to retrieve (case-insensitive). Cannot be empty or whitespace-only.",
+          "type": "string",
+          "nullable": true
+        },
+        "groupId": {
+          "description": "The ID of the group to retrieve. Cannot be empty or whitespace-only.",
+          "type": "string",
+          "nullable": true
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_issue_by_id",
+    "description": "Retrieve a specific issue by its ID.\n\n        This method returns detailed information about a specific issue\nidentified by its unique ID, including any attachments associated with the issue.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "issue_id": {
+          "description": "The unique identifier of the issue to retrieve (e.g., \"ISSUE-1\").",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "issue_id"
+      ]
+    }
+  },
+  {
+    "name": "get_issue_create_metadata",
+    "description": "Get the create metadata for projects and issue types.\n\n        This method returns metadata about projects and their available issue types\n        that can be used for creating new issues. The response can be filtered by\nproject keys and issue type names.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "projectKeys": {
+          "description": "Comma-separated project keys to filter results. If None, all projects returned. Non-existent keys are silently ignored.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "issueTypeNames": {
+          "description": "Comma-separated issue type names to filter results. If None, all types returned. Case-insensitive. Non-existent types are silently ignored.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_issue_link_type_by_id",
+    "description": "Retrieve a specific issue link type by its ID.\n\nThis method returns detailed information about a specific issue link type\nidentified by its unique ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "link_type_id": {
+          "description": "The unique identifier of the issue link type to retrieve. Cannot be empty.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "link_type_id"
+      ]
+    }
+  },
+  {
+    "name": "get_issue_type_by_id",
+    "description": "Retrieve a specific issue type by its ID.\n\nThis method returns detailed information about a specific issue type\nidentified by its unique ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "type_id": {
+          "description": "The unique identifier of the issue type to retrieve. Cannot be empty.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "type_id"
+      ]
+    }
+  },
+  {
+    "name": "get_jql_autocomplete_suggestions",
+    "description": "Retrieve JQL (Zira Query Language) autocomplete data for query assistance.\n\nThis method returns autocomplete suggestions that help users construct valid JQL queries.\nThe data includes available field names, operators, and reserved words that can be used\nin JQL expressions for searching and filtering issues in Zira.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_permission_scheme_by_id",
+    "description": "Get a permission scheme by id.\n\nThis method returns a permission scheme by id from the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "scheme_id": {
+          "description": "The unique identifier of the permission scheme to retrieve. Cannot be empty.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "scheme_id"
+      ]
+    }
+  },
+  {
+    "name": "get_priority_by_id",
+    "description": "Get a specific priority by its ID.\n\nThis method retrieves detailed information about a single priority identified\nby its unique ID. Use this to validate priority IDs or get priority details\nfor display purposes.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "priority_id": {
+          "description": "The unique identifier of the priority to retrieve. Must be a non-empty string matching an existing priority ID in the database. Examples: 'High', 'Medium', 'Low'. Case-sensitive.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "priority_id"
+      ]
+    }
+  },
+  {
+    "name": "get_project_avatars_by_key",
+    "description": "Get all avatars for a project.\n\nThis function returns all avatars with type 'project' that belong to the given project key.\nAvatars without a project_key field are treated as shared and returned for all projects.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "project_key": {
+          "description": "The key of the project. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "project_key"
+      ]
+    }
+  },
+  {
+    "name": "get_project_by_key",
+    "description": "Get a project by key.\n\nThis method retrieves a specific project using its key.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "project_key": {
+          "description": "The key of the project. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "project_key"
+      ]
+    }
+  },
+  {
+    "name": "get_project_category_by_id",
+    "description": "Get a specific project category by its ID.\n\nThis method retrieves detailed information about a single project category\nidentified by its unique ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "cat_id": {
+          "description": "The unique identifier of the project category to retrieve (e.g., 'CAT-1'). Case-sensitive.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "cat_id"
+      ]
+    }
+  },
+  {
+    "name": "get_project_components_by_key",
+    "description": "Get all components for a project.\n\nThis method returns all components for a project.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "project_key": {
+          "description": "The key of the project. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "project_key"
+      ]
+    }
+  },
+  {
+    "name": "get_reindex_status",
+    "description": "Get the current status of the reindex operation.\n\nThis method returns comprehensive information about any ongoing or completed reindex operation,\nincluding progress details, timestamps, and configuration. Historical data is preserved.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_resolution_by_id",
+    "description": "Get a specific resolution by its ID.\n\nThis method retrieves detailed information about a single resolution identified\nby its unique ID. Use this to validate resolution IDs or get resolution details\nfor display purposes.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "res_id": {
+          "description": "The unique identifier of the resolution to retrieve. Must be a non-empty string matching an existing resolution ID in the database. Examples: 'RES-1', 'RES-2'. Case-sensitive.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "res_id"
+      ]
+    }
+  },
+  {
+    "name": "get_role_by_id",
+    "description": "Get a role by id.\n\nThis method returns a role by id, searching both project roles and application roles.\nIf the role is not found, a ValueError is raised.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "role_id": {
+          "description": "The unique identifier of the role to retrieve. Must be a non-empty string. For project roles, use IDs like R-1, R-2. For application roles, use keys like admin, user. Cannot be empty or whitespace-only.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "role_id"
+      ]
+    }
+  },
+  {
+    "name": "get_security_level_by_id",
+    "description": "Get a security level by its ID.\n\nThis method retrieves detailed information about a single security level\nidentified by its unique ID. Use this to validate security level IDs or\nget security level details for display purposes.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "sec_id": {
+          "description": "The unique identifier of the security level to retrieve. Must be a non-empty string matching an existing security level ID in the database. Case-sensitive.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "sec_id"
+      ]
+    }
+  },
+  {
+    "name": "get_server_info",
+    "description": "Get server information.\n\nRetrieves comprehensive server information including version, URLs, build details,\nand current server time. This endpoint provides essential metadata about the\nZira server instance.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_status_by_id",
+    "description": "Get a specific workflow status by its ID.\n\nThis method retrieves detailed information about a single status identified\nby its unique ID. Use this to validate status IDs or get status details\nfor display purposes.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "status_id": {
+          "description": "The unique identifier of the status to retrieve. Must be a non-empty string matching an existing status ID in the database. Examples: 'Open', 'Closed'. Case-sensitive.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "status_id"
+      ]
+    }
+  },
+  {
+    "name": "get_status_category_by_id",
+    "description": "Get a status category by its ID.\n\nThis method retrieves detailed information about a single status category\nidentified by its unique ID. Use this to validate status category IDs or\nget status category details for display purposes.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "cat_id": {
+          "description": "The unique identifier of the status category to retrieve. Must be a non-empty string matching an existing status category ID in the database. Case-sensitive.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "cat_id"
+      ]
+    }
+  },
+  {
+    "name": "get_user_avatars_by_username",
+    "description": "Get all avatars for a user.\n\nThis function returns all avatars with type 'user' that belong to the given username.\nAvatars associated with a project (having a non-null project_key) are excluded from the results.\nAvatars without a username field are treated as shared and returned for all users.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "description": "The username of the user whose avatars to retrieve. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "username"
+      ]
+    }
+  },
+  {
+    "name": "get_user_by_username_or_account_id",
+    "description": "Get a user by username or account_id(key).\n\nRetrieves a single user from the database. If account_id is provided, the lookup\nis exclusive (no fallback to username). Groups are dynamically computed from DB[\"groups\"].",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "description": "The username of the user to retrieve. Only one of username or account_id should be provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "account_id": {
+          "description": "The account ID (key) of the user to retrieve. Only one of username or account_id should be provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_version_by_id",
+    "description": "Get a version by ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "ver_id": {
+          "description": "The ID of the version to get. Cannot be empty.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "ver_id"
+      ]
+    }
+  },
+  {
+    "name": "get_version_related_issue_counts_by_id",
+    "description": "Get the related issue counts for a version.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "ver_id": {
+          "description": "The ID of the version to get issue counts for. Cannot be empty.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "ver_id"
+      ]
+    }
+  },
+  {
+    "name": "list_issue_attachments",
+    "description": "List all attachments associated with an issue.\n\nRetrieves metadata for all attachments that are currently associated with the\nspecified issue. The function automatically handles orphaned references by\nskipping attachments that were deleted but still have references in the issue.\nReturns an empty list if the issue has no attachments. The attachments are\nreturned in the order they appear in the issue's attachment list.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "issue_id_or_key": {
+          "description": "The unique identifier or key of the issue to query.\nMust be a non-empty string that exists in the database.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "issue_id_or_key"
+      ]
+    }
+  },
+  {
+    "name": "perform_bulk_issue_operations",
+    "description": "Performs bulk operations on multiple Zira issues.\n\n        This function allows updating multiple issues in a single operation.\n        Each update can modify fields including: assignee, status, priority, summary, description, labels, resolution, startDate, closedDate, project, components, issuetype, parent, due_date, comments, fixVersion, and affectedVersion.\nAdditionally, issues can be deleted with optional subtask deletion.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "issueUpdates": {
+          "description": "A list of issue updates to perform.",
+          "type": "array",
+          "nullable": false,
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "issueId": {
+                "description": "The ID of the issue to update or delete.",
+                "type": "string",
+                "nullable": false
+              },
+              "fields": {
+                "description": "Fields to update. Individual field parameters take precedence.",
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "summary": {
+                    "description": "New summary.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "description": {
+                    "description": "New description.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "priority": {
+                    "description": "New priority.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "status": {
+                    "description": "New status.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "assignee": {
+                    "description": "Assignee info.",
+                    "type": "object",
+                    "nullable": true,
+                    "properties": {
+                      "name": {
+                        "description": "Assignee username.",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ]
+                  },
+                  "issuetype": {
+                    "description": "New issue type.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "project": {
+                    "description": "New project key.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "components": {
+                    "description": "New component IDs.",
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "due_date": {
+                    "description": "Due date. Supported formats: YYYY-MM-DD, YYYY-MM-DDTHH:MM:SS, MM/DD/YYYY, DD/MM/YYYY.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "comments": {
+                    "description": "Replacement comments.",
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "labels": {
+                    "description": "Replacement labels.",
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "resolution": {
+                    "description": "Resolution status.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "startDate": {
+                    "description": "Start date. Supported formats: YYYY-MM-DD, YYYY-MM-DDTHH:MM:SS, MM/DD/YYYY, DD/MM/YYYY.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "closedDate": {
+                    "description": "Closed date. Supported formats: YYYY-MM-DD, YYYY-MM-DDTHH:MM:SS, MM/DD/YYYY, DD/MM/YYYY.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "parent": {
+                    "description": "Parent issue ID.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "fixVersion": {
+                    "description": "Target fix versions.",
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "description": "The version ID.",
+                          "type": "string",
+                          "nullable": false
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ]
+                    }
+                  },
+                  "affectedVersion": {
+                    "description": "Affected versions.",
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "description": "The version ID.",
+                          "type": "string",
+                          "nullable": false
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ]
+                    }
+                  }
+                },
+                "required": []
+              },
+              "assignee": {
+                "description": "Direct assignee (takes precedence).",
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "name": {
+                    "description": "Assignee username.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              },
+              "status": {
+                "description": "Direct status (takes precedence).",
+                "type": "string",
+                "nullable": true
+              },
+              "priority": {
+                "description": "Direct priority (takes precedence).",
+                "type": "string",
+                "nullable": true
+              },
+              "summary": {
+                "description": "Direct summary (takes precedence).",
+                "type": "string",
+                "nullable": true
+              },
+              "description": {
+                "description": "Direct description (takes precedence).",
+                "type": "string",
+                "nullable": true
+              },
+              "labels": {
+                "description": "Direct labels (takes precedence).",
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "resolution": {
+                "description": "Direct resolution (takes precedence).",
+                "type": "string",
+                "nullable": true
+              },
+              "startDate": {
+                "description": "Direct start date (takes precedence).",
+                "type": "string",
+                "nullable": true
+              },
+              "closedDate": {
+                "description": "Direct closed date (takes precedence).",
+                "type": "string",
+                "nullable": true
+              },
+              "delete": {
+                "description": "Whether to delete this issue.",
+                "type": "boolean",
+                "nullable": true,
+                "default": false
+              },
+              "deleteSubtasks": {
+                "description": "Whether to delete subtasks when deleting.",
+                "type": "boolean",
+                "nullable": true,
+                "default": false
+              }
+            },
+            "required": [
+              "issueId"
+            ]
+          }
+        }
+      },
+      "required": [
+        "issueUpdates"
+      ]
+    }
+  },
+  {
+    "name": "search_issues_for_picker",
+    "description": "Search for issues based on a query string and/or JQL.\n\n        This method searches for issues based on a text query string and/or JQL (Zira Query Language).\nThe search is case-insensitive for text queries. JQL filtering is applied first, then text filtering.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "Text query to search in issue summaries and IDs. Case-insensitive. None means no text filtering. Empty string matches all.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "currentJQL": {
+          "description": "JQL expression to filter issues before text search. Valid searchable fields: id, project, summary, description, issuetype, status, priority, assignee, labels, components, resolution, parent, created, updated, due_date, startDate, closedDate. Field names must match exactly as listed. Using any other field will raise a ValueError.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "currentIssueKey": {
+          "description": "Issue key to exclude from results. Cannot be empty if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "showSubTasks": {
+          "description": "Whether to include subtasks. If False, issues with issuetype \"Subtask\" are excluded.",
+          "type": "boolean",
+          "nullable": true,
+          "default": true
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "search_issues_jql",
+    "description": "Search for issues based on JQL query.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "jql": {
+          "description": "The JQL query to search for issues. If None or empty, returns all accessible issues.\nStrings with spaces must be enclosed in single (') or double (\") quotes.\nValue comparisons are case-insensitive (e.g., `status = \"open\"` matches \"Open\").\nField names must match exactly as shown below (e.g., `status` works, `STATUS` does not).\n\nValid searchable fields (using any other field will raise a ValueError):\n- `id` (issue ID, e.g., `id = \"ISSUE-123\"`, `id = \"DEMO-1\"`)\n- `project` (project key, e.g., `project = \"DEMO\"`, `project = \"PROJ\"`)\n- `summary` (text, e.g., `summary ~ \"critical bug\"` or `summary = \"Exact phrase\"`)\n- `description` (text, e.g., `description ~ \"detailed steps\"`)\n- `issuetype` (e.g., `issuetype = \"Bug\"`, `issuetype = \"Task\"`, `issuetype = \"Story\"`)\n- `status` (e.g., `status = \"To Do\"`, `status = \"Open\"`, `status = \"In Progress\"`, `status = \"Resolved\"`, `status = \"Closed\"`, `status = \"Done\"`)\n- `priority` (e.g., `priority = \"Highest\"`, `priority = \"High\"`, `priority = \"Medium\"`, `priority = \"Low\"`, `priority = \"Lowest\"`)\n- `assignee` (username, e.g., `assignee = \"jdoe\"`, `assignee != \"jdoe\"`, `assignee IN (\"jdoe\", \"asmith\")`, `assignee IS EMPTY`)\n- `labels` (label value, e.g., `labels = \"bug\"` or `labels IN (\"bug\", \"urgent\")`)\n- `components` (component ID, e.g., `components = \"CMP-1\"` or `components IN (\"CMP-1\", \"CMP-2\")`)\n- `resolution` (resolution ID, e.g., `resolution = \"RES-1\"`, `resolution = \"RES-2\"`). Use `resolution IS EMPTY` for unresolved issues. Use get_all_resolutions to retrieve available IDs.\n- `parent` (parent issue ID for subtasks, e.g., `parent = \"PARENT-1\"`, `parent IS EMPTY`, `parent IS NOT EMPTY`)\n- `created` (e.g., `created >= \"2024-01-01\"`, `created = \"2024-01-01T12:00:00\"`). Supported formats: `YYYY-MM-DD`, `YYYY-MM-DDTHH:MM:SS`, `YYYY-MM-DDTHH:MM:SS.ffffff`, `DD.MM.YYYY`. Unsupported: relative dates (\"-24h\", \"now()\"), slash-separated dates (\"2024/01/01\").\n- `updated` (e.g., `updated >= \"2024-01-01\"`, `updated < \"2024-06-01\"`). Supported formats: `YYYY-MM-DD`, `YYYY-MM-DDTHH:MM:SS`, `YYYY-MM-DDTHH:MM:SS.ffffff`, `DD.MM.YYYY`.\n- `due_date` (e.g., `due_date >= \"2024-01-01\"`, `due_date IS EMPTY`). Supported formats: `YYYY-MM-DD`, `YYYY-MM-DDTHH:MM:SS`, `YYYY-MM-DDTHH:MM:SS.ffffff`, `DD.MM.YYYY`.\n- `startDate` (e.g., `startDate >= \"2024-01-01\"`, `startDate IS NOT EMPTY`). Supported formats: `YYYY-MM-DD`, `YYYY-MM-DDTHH:MM:SS`, `YYYY-MM-DDTHH:MM:SS.ffffff`, `DD.MM.YYYY`.\n- `closedDate` (e.g., `closedDate >= \"2024-01-01\"`, `closedDate IS EMPTY`). Supported formats: `YYYY-MM-DD`, `YYYY-MM-DDTHH:MM:SS`, `YYYY-MM-DDTHH:MM:SS.ffffff`, `DD.MM.YYYY`.\n\nSupported operators:\n- `=` (equals), `!=` (not equals)\n- `~` (contains), `!~` (does not contain)\n- `<`, `<=`, `>`, `>=` (comparison operators for dates/numbers)\n- `IN` (e.g., `priority IN (\"High\", \"Low\")`)\n- `NOT IN` (e.g., `status NOT IN (\"Closed\", \"Done\")`)\n- `IS EMPTY`, `IS NOT EMPTY` (for null/empty checks)\n- `IS NULL`, `IS NOT NULL` (aliases for empty checks)\n\nCombining conditions:\n- Use `AND` and `OR` for multiple conditions (e.g., `project = \"DEMO\" AND status = \"Open\"`).\n- `AND` has higher precedence than `OR`.\n- Parentheses `()` for explicit grouping (e.g., `(project = \"DEMO\" OR project = \"PROJ\") AND status = \"Open\"`).\n\nOrdering results:\n- Use `ORDER BY fieldName [ASC|DESC]` (e.g., `ORDER BY created DESC`).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "start_at": {
+          "description": "The index of the first issue to return. Defaults to 0.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0
+        },
+        "max_results": {
+          "description": "The maximum number of issues to return. Defaults to 50.",
+          "type": "integer",
+          "nullable": true,
+          "default": 50
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "start_reindex",
+    "description": "Start a reindex operation in Zira.\n\nThis method initiates a reindex operation which rebuilds the search indexes in Zira.\nThe reindex can be performed in either FOREGROUND or BACKGROUND mode with additional\noptions for indexing specific content types.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "reindex_type": {
+          "description": "The type of reindex to perform. 'FOREGROUND' blocks other operations, 'BACKGROUND' runs concurrently.",
+          "type": "string",
+          "enum": [
+            "FOREGROUND",
+            "BACKGROUND"
+          ],
+          "nullable": false,
+          "default": "FOREGROUND"
+        },
+        "index_change_history": {
+          "description": "Whether changeHistory should be reindexed. Not relevant for FOREGROUND mode where it's always reindexed.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "index_worklogs": {
+          "description": "Whether worklogs should be reindexed. Not relevant for FOREGROUND mode where they're always reindexed.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "index_comments": {
+          "description": "Whether comments should be reindexed. Not relevant for FOREGROUND mode where they're always reindexed.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "update_application_property_by_id",
+    "description": "Update an application property in Zira.\n\nThis method allows modifying the value of an existing application property\nor creating a new one if it doesn't exist.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The identifier/key of the property to update. Must be a non-empty string. Examples: 'siteName', 'maintenanceMode'.",
+          "type": "string",
+          "nullable": false
+        },
+        "value": {
+          "description": "The new value to set for the property.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "id",
+        "value"
+      ]
+    }
+  },
+  {
+    "name": "update_component_by_id",
+    "description": "Update an existing component.\n\nThis method allows updating the name, description, and/or owner of an existing\ncomponent. At least one of name, description, or owner must be provided.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "comp_id": {
+          "description": "The unique identifier of the component to update.",
+          "type": "string",
+          "nullable": false
+        },
+        "name": {
+          "description": "The new name for the component. Cannot be empty or whitespace-only. Maximum length is 255 characters.",
+          "type": "string",
+          "nullable": true
+        },
+        "description": {
+          "description": "The new description for the component. Pass an empty string to clear. Maximum length is 1000 characters.",
+          "type": "string",
+          "nullable": true
+        },
+        "owner": {
+          "description": "The new owner username for the component. Pass an empty string to unassign. If provided (and not empty), must be a valid user in the system.",
+          "type": "string",
+          "nullable": true
+        }
+      },
+      "required": [
+        "comp_id"
+      ]
+    }
+  },
+  {
+    "name": "update_current_user_preferences",
+    "description": "Update the current user's preferences.\n\nThis method updates the preferences of the current user with the provided values.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "description": "The preferences to update. Must contain one or more of the allowed preference fields.",
+          "type": "object",
+          "properties": {
+            "theme": {
+              "description": "The theme preference for the user.",
+              "type": "string",
+              "enum": [
+                "light",
+                "dark",
+                "auto"
+              ],
+              "nullable": true
+            },
+            "notifications": {
+              "description": "The notification preference for the user.",
+              "type": "string",
+              "enum": [
+                "enabled",
+                "disabled"
+              ],
+              "nullable": true
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "value"
+      ]
+    }
+  },
+  {
+    "name": "update_filter_by_id",
+    "description": "Update an existing filter.\n\nThis method allows updating various properties of an existing filter including\nname, JQL query, description, favorite status, and editability. At least one\nparameter (other than filter_id) must be provided for the update to proceed.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "filter_id": {
+          "description": "The unique identifier of the filter to update. Cannot be empty.",
+          "type": "string",
+          "nullable": false
+        },
+        "name": {
+          "description": "The new name for the filter. Cannot be empty if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "jql": {
+          "description": "The new JQL query for the filter. Cannot be empty if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "description": {
+          "description": "The new description of the filter.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "favorite": {
+          "description": "Whether the filter should be marked as favorite.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "editable": {
+          "description": "Whether the filter should be editable.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "filter_id"
+      ]
+    }
+  },
+  {
+    "name": "update_group_members_by_name",
+    "description": "Update the members of an existing group.\n\nThis method allows updating the list of users in a specific group.\nThe group must exist before it can be updated.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "groupname": {
+          "description": "The name of the group to update (case-insensitive). Cannot be empty or whitespace-only.",
+          "type": "string",
+          "nullable": false
+        },
+        "users": {
+          "description": "Complete list of usernames for the group. This replaces all existing members. Duplicates will be removed automatically.",
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "groupname",
+        "users"
+      ]
+    }
+  },
+  {
+    "name": "update_issue_by_id",
+    "description": "Update an existing issue.\n\n        This method allows updating the fields of an existing issue.\nOnly the provided fields will be updated.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "issue_id": {
+          "description": "The unique identifier of the issue to update.",
+          "type": "string",
+          "nullable": false
+        },
+        "fields": {
+          "description": "The fields to update. Only provided fields will be modified. If None, no updates are performed.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "summary": {
+              "description": "The new summary of the issue. If provided, replaces the existing summary.",
+              "type": "string",
+              "nullable": true
+            },
+            "description": {
+              "description": "The new description. If provided, replaces the existing description. Can be an empty string to clear the description.",
+              "type": "string",
+              "nullable": true
+            },
+            "priority": {
+              "description": "The new priority (e.g., High, Medium, Low). Pass None to clear the priority.",
+              "type": "string",
+              "nullable": true
+            },
+            "status": {
+              "description": "The new status (e.g., To Do, Open, In Progress, Resolved, Closed, Done). Pass None to clear the status.",
+              "type": "string",
+              "nullable": true
+            },
+            "assignee": {
+              "description": "New assignee. Use {'name': 'Unassigned'} or {'name': ''} to unassign.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "name": {
+                  "description": "The assignee's username.",
+                  "type": "string",
+                  "nullable": false
+                }
+              },
+              "required": [
+                "name"
+              ]
+            },
+            "issuetype": {
+              "description": "The new issue type.",
+              "type": "string",
+              "nullable": true
+            },
+            "project": {
+              "description": "The new project key. Moving between projects may affect components.",
+              "type": "string",
+              "nullable": true
+            },
+            "components": {
+              "description": "New list of component IDs. REPLACES all existing components. An empty list clears components.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string"
+              }
+            },
+            "due_date": {
+              "description": "The due date. Supported formats: YYYY-MM-DD, YYYY-MM-DDTHH:MM:SS, MM/DD/YYYY, DD/MM/YYYY. Normalized to YYYY-MM-DD.",
+              "type": "string",
+              "nullable": true
+            },
+            "comments": {
+              "description": "List of comments. REPLACES all existing comments. An empty list clears comments.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string"
+              }
+            },
+            "labels": {
+              "description": "List of labels. REPLACES all existing labels. Empty list clears labels.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string"
+              }
+            },
+            "resolution": {
+              "description": "The resolution ID (e.g., \"RES-1\", \"RES-2\"). Use get_all_resolutions to retrieve available IDs.",
+              "type": "string",
+              "nullable": true
+            },
+            "startDate": {
+              "description": "Start date. Supported formats: YYYY-MM-DD, YYYY-MM-DDTHH:MM:SS, MM/DD/YYYY, DD/MM/YYYY. Normalized to YYYY-MM-DD.",
+              "type": "string",
+              "nullable": true
+            },
+            "closedDate": {
+              "description": "Closed date. Supported formats: YYYY-MM-DD, YYYY-MM-DDTHH:MM:SS, MM/DD/YYYY, DD/MM/YYYY. Normalized to YYYY-MM-DD.",
+              "type": "string",
+              "nullable": true
+            },
+            "parent": {
+              "description": "Parent issue ID for subtasks.",
+              "type": "string",
+              "nullable": true
+            },
+            "fixVersion": {
+              "description": "List of target fix versions. REPLACES all existing fix versions. Pass an empty list to clear.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "description": "The version ID.",
+                    "type": "string",
+                    "nullable": false
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            },
+            "affectedVersion": {
+              "description": "List of affected versions. REPLACES all existing affected versions. Pass an empty list to clear.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "description": "The version ID.",
+                    "type": "string",
+                    "nullable": false
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "issue_id"
+      ]
+    }
+  },
+  {
+    "name": "upload_avatar",
+    "description": "Upload a new avatar to Zira.\n\nThis method allows uploading a new avatar image to be used in Zira.\nThe avatar can be used for users, projects, or other entities.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "filetype": {
+          "description": "The type of avatar being uploaded.",
+          "type": "string",
+          "enum": [
+            "user",
+            "project",
+            "system"
+          ],
+          "nullable": false
+        },
+        "filename": {
+          "description": "The name of the file being uploaded. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "username": {
+          "description": "The username of the user this avatar belongs to. Required when filetype is 'user'. Ignored for other filetypes.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "project_key": {
+          "description": "The project key this avatar belongs to. Required when filetype is 'project'. Ignored for other filetypes.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "filetype",
+        "filename"
+      ]
+    }
+  },
+  {
+    "name": "upload_temporary_avatar",
+    "description": "Upload a temporary avatar to Zira.\n\nThis method allows uploading a temporary avatar that can be used for preview\nbefore making it permanent. Temporary avatars are typically used during the\navatar selection process.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "filetype": {
+          "description": "The type of avatar being uploaded.",
+          "type": "string",
+          "enum": [
+            "user",
+            "project",
+            "system"
+          ],
+          "nullable": false
+        },
+        "filename": {
+          "description": "The name of the file being uploaded. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "username": {
+          "description": "The username of the user this avatar belongs to. Required when filetype is 'user'. Ignored for other filetypes.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "project_key": {
+          "description": "The project key this avatar belongs to. Required when filetype is 'project'. Ignored for other filetypes.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "filetype",
+        "filename"
+      ]
+    }
+  },
+  {
+    "name": "validate_license",
+    "description": "Validate a license key against the database.\n\nThis method validates a license key by checking if it exists in the system's\nlicense database and returns the validation status with decoded information.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "license": {
+          "description": "The license key to validate. Must be a non-empty string, cannot be whitespace-only.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "license"
+      ]
+    }
+  }
+]

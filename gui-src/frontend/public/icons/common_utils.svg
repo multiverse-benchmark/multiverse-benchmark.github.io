@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Outer gear teeth -->
+  <path d="M32 4L36 8L44 6L46 14L54 14L54 22L62 24L60 32L62 40L54 42L54 50L46 50L44 58L36 56L32 60L28 56L20 58L18 50L10 50L10 42L2 40L4 32L2 24L10 22L10 14L18 14L20 6L28 8L32 4Z" fill="white" fill-opacity="0.15"/>
+
+  <!-- Main gear body -->
+  <circle cx="32" cy="32" r="20" fill="white" fill-opacity="0.2"/>
+
+  <!-- Inner circle -->
+  <circle cx="32" cy="32" r="12" fill="white" fill-opacity="0.1"/>
+
+  <!-- Dashboard grid inside gear -->
+  <rect x="24" y="24" width="7" height="7" rx="1.5" fill="white" fill-opacity="0.9"/>
+  <rect x="33" y="24" width="7" height="7" rx="1.5" fill="white" fill-opacity="0.6"/>
+  <rect x="24" y="33" width="7" height="7" rx="1.5" fill="white" fill-opacity="0.6"/>
+  <rect x="33" y="33" width="7" height="7" rx="1.5" fill="white" fill-opacity="0.9"/>
+
+  <!-- Subtle highlight -->
+  <circle cx="32" cy="32" r="19" stroke="white" stroke-opacity="0.3" stroke-width="1" fill="none"/>
+</svg>

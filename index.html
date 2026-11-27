@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ffffff" />
+    <script>
+      // Apply the colour theme before styles render: light, unless the visitor chose dark with the
+      // switch in the header (remembered in this browser). Same script in index.html,
+      // deep-dive.html, and coming-soon.html; src/lib/colorTheme.ts holds the same names and values.
+      (() => {
+        let saved;
+        try { saved = localStorage.getItem('multiverse-color-theme'); } catch {}
+        const dark = saved === 'dark';
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        if (dark) document.querySelector('meta[name="theme-color"]').content = '#101216';
+      })();
+    </script>
+    <meta name="description" content="MultiVerse benchmarks AI agents on real-world delegation across 35 simulated services. Explore tasks, tool APIs, evaluation results, and the leaderboard." />
+    <meta property="og:title" content="MultiVerse: A Trustworthy Tool-Use Benchmark for Real-World Task Delegation under Harnesses" />
+    <meta property="og:description" content="A tool-use benchmark for AI agents across 35 simulated services. Explore tasks, tool APIs, evaluation results, and the leaderboard." />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/x-icon" href="./favicon.ico?v=purple-parallel" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/svg+xml" href="/src/assets/multiverse-service-orbit-icon.svg" sizes="any" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=purple-parallel" sizes="180x180" />
+    <title>MultiVerse · Tool-use benchmark for AI agents</title>
+  </head>
+  <body>
+    <div id="root">
+      <main>
+        <h1>MultiVerse: A Trustworthy Tool-Use Benchmark for Real-World Task Delegation under Harnesses</h1>
+        <p>MultiVerse evaluates AI agents on tasks across 35 simulated real-world services. Its four task settings cover single-turn delegation, instruction following, multi-turn clarification, and their combination.</p>
+        <p>Explore task requests, reference solutions, tool APIs, service states, and evaluation results across agent harnesses.</p>
+        <nav aria-label="Explore MultiVerse"><a href="./deep-dive.html">Task explorer, result explorer, design dimensions, dataset statistics, and tool APIs</a></nav>
+        <noscript><p>Enable JavaScript to use the interactive leaderboard.</p></noscript>
+      </main>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/src/lib/analytics.ts"></script>
+  </body>
+</html>

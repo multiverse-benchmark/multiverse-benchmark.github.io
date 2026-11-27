@@ -1,0 +1,12 @@
+{
+  "id": "messages",
+  "name": "Messages",
+  "icon": "./icons/messages.svg",
+  "iconBackground": "linear-gradient(135deg, #34C759 0%, #30D158 100%)",
+  "description": "Send text messages",
+  "backendService": "messages",
+  "defaultWindow": {
+    "width": 600,
+    "height": 700
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "linkedup",
+  "name": "Linkedup",
+  "icon": "./icons/linkedup.svg",
+  "iconBackground": "linear-gradient(135deg, #B91C1C 0%, #7F1D1D 100%)",
+  "description": "Linkedup",
+  "backendService": "linkedup",
+  "defaultWindow": {
+    "width": 1000,
+    "height": 700
+  }
+}

@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Base styles of the site: the document, the header and footer, and the frame
+ * of a page section (width, spacing, numbered title). Colours, type, and radii
+ * come from the tokens in components/paper/paper.css. What belongs to one
+ * component is styled next to that component.
+ */
+
+:root {
+  font-family: var(--mv-body);
+  font-optical-sizing: auto;
+  font-synthesis: none;
+  color: var(--mv-ink);
+  background: var(--mv-page);
+  --ink: var(--mv-ink);
+  --green: var(--mv-purple);
+  --line: var(--mv-line);
+
+  /* Colours of the utility-class components (dialog, tabs, badges), as "H S% L%". */
+  --background: 0 0% 100%;
+  --foreground: 228 12% 8%;
+  --card: 0 0% 100%;
+  --card-foreground: 228 12% 8%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 228 12% 8%;
+  --primary: 228 70% 51%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 224 40% 98%;
+  --secondary-foreground: 225 5% 29%;
+  --muted: 218 33% 95%;
+  --muted-foreground: 220 6% 38%;
+  --accent: 226 100% 97%;
+  --accent-foreground: 228 70% 43%;
+  --destructive: 0 75% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 223 14% 90%;
+  --input: 223 14% 90%;
+  --ring: 228 70% 51%;
+  --radius: .65rem;
+  --border-default: #e5e7eb;
+}
+
+:root[data-theme='dark'] {
+  --border-default: var(--mv-line);
+  --background: 220 16% 8%;
+  --foreground: 223 23% 94%;
+  --card: 220 17% 10%;
+  --card-foreground: 223 23% 94%;
+  --popover: 220 17% 10%;
+  --popover-foreground: 223 23% 94%;
+  --primary: 226 100% 78%;
+  --primary-foreground: 220 16% 8%;
+  --secondary: 222 16% 13%;
+  --secondary-foreground: 220 14% 79%;
+  --muted: 222 16% 16%;
+  --muted-foreground: 219 11% 65%;
+  --accent: 225 41% 18%;
+  --accent-foreground: 226 100% 85%;
+  --destructive: 5 78% 72%;
+  --destructive-foreground: 220 16% 8%;
+  --border: 222 13% 19%;
+  --input: 222 13% 19%;
+  --ring: 226 100% 78%;
+}
+
+/* A border without a colour of its own (the utility class "border") takes the line colour of the theme. */
+*, ::before, ::after { box-sizing: border-box; border-color: var(--border-default); }
+html { scroll-behavior: smooth; scroll-padding-top: 95px; }
+body { margin: 0; }
+a { color: inherit; text-decoration: none; }
+button, a, input, select { -webkit-tap-highlight-color: transparent; }
+button { font: inherit; cursor: pointer; }
+button, a { touch-action: manipulation; }
+button:focus-visible, a:focus-visible { outline: 3px solid var(--mv-purple); outline-offset: 5px; }
+::selection { background: var(--mv-accent-light); color: var(--mv-ink); }
+
+/* ---- page width ----------------------------------------------------------- */
+
+.page-width { max-width: 1240px; margin: 0 auto; padding-left: 40px; padding-right: 40px; }
+@media (min-width: 1450px) { .page-width { max-width: 1320px; } }
+@media (max-width: 1100px) { .page-width { padding-left: 30px; padding-right: 30px; } }
+@media (max-width: 800px) { .page-width { padding-left: 24px; padding-right: 24px; } }
+@media (max-width: 600px) { .page-width { padding-left: 22px; padding-right: 22px; } }
+
+/* ---- header ---------------------------------------------------------------- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: 88px;
+  border-bottom: 1px solid var(--mv-header-line);
+  background: var(--mv-header);
+  backdrop-filter: blur(18px);
+}
+.nav-wrap { display: flex; align-items: center; gap: 25px; max-width: 1320px; height: 100%; margin: auto; padding: 0 40px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+/* The links sit at the right, before the theme switch, and stay on one line until the menu collapses. */
+.nav-links { display: flex; align-items: center; gap: 30px; margin-left: auto; color: var(--mv-ink-2); font-size: 13px; font-weight: 450; white-space: nowrap; }
+.nav-links a:hover { color: var(--mv-purple); }
+/* A link to another page of the site carries a small arrow. */
+.site-header .nav-link--out,
+.site-header .nav-link--back { display: inline-flex; align-items: center; gap: 5px; }
+.site-header .nav-link--out { color: var(--mv-purple-dark); font-weight: 650; }
+/* The buttons at the right end of the bar: the theme switch and, on small screens, the menu. */
+.nav-tools { display: flex; align-items: center; gap: 10px; }
+.theme-switch {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--mv-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--mv-ink-2);
+}
+.theme-switch:hover { border-color: var(--mv-line-strong); background: var(--mv-tint); color: var(--mv-ink); }
+.theme-switch:focus-visible { outline-offset: 2px; }
+.mobile-menu { display: none; padding: 0; border: 0; background: none; }
+.skip-link { position: fixed; left: 15px; top: -80px; z-index: 100; padding: 10px; background: var(--mv-card); }
+.skip-link:focus { top: 10px; }
+
+@media (min-width: 801px) and (max-width: 1100px) {
+  .nav-wrap { gap: 18px; padding-inline: 24px; }
+  .nav-links { gap: 14px; font-size: 11px; }
+}
+@media (max-width: 800px) {
+  .site-header { height: 75px; }
+  .nav-wrap { padding: 0 24px; }
+  .nav-links { display: none; }
+  .nav-links.open {
+    position: absolute;
+    top: 75px;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 25px;
+    border-bottom: 1px solid var(--line);
+    background: var(--mv-page);
+    font-size: 13px;
+  }
+  .nav-tools { margin-left: auto; }
+  .mobile-menu { display: block; color: var(--mv-purple-dark); }
+}
+@media (max-width: 600px) {
+  .site-header { height: 69px; }
+  .nav-wrap { gap: 16px; padding: 0 20px; }
+  .nav-links.open { top: 69px; }
+}
+
+/* ---- buttons and small labels ---------------------------------------------- */
+
+.primary-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  padding: 15px 22px;
+  border-radius: 999px;
+  background: var(--mv-button);
+  color: var(--mv-button-ink);
+  font-size: 12px;
+  font-weight: 500;
+  transition: background .2s, transform .2s;
+}
+.primary-button:hover { background: var(--mv-button-hover); transform: translateY(-2px); }
+.text-button { display: inline-flex; align-items: center; gap: 10px; color: var(--mv-purple); font-size: 12px; font-weight: 550; }
+.eyebrow { display: flex; align-items: center; gap: 9px; color: var(--mv-ink-3); font-size: 10px; font-weight: 550; letter-spacing: 1.4px; }
+.status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--mv-purple); }
+.setting-code { min-width: 31px; padding: 3px 5px; border: 1px solid var(--mv-line-strong); border-radius: 4px; font-size: 8px; letter-spacing: .3px; text-align: center; }
+@media (max-width: 600px) {
+  .eyebrow { font-size: 9px; letter-spacing: 1px; }
+  .setting-code { font-size: 7px; }
+}
+
+/* ---- page sections --------------------------------------------------------- */
+
+/* One surface, and a document's rhythm between sections. */
+.section-space { padding-top: 60px; padding-bottom: 64px; }
+
+/* A section opens with a plain numbered title and a lead paragraph (SectionHeading.tsx). */
+.section-heading { margin-bottom: 30px; }
+.section-title {
+  margin: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 27px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+.section-title-number { margin-right: 14px; color: var(--mv-ink-3); font-variant-numeric: tabular-nums; font-weight: 400; }
+.section-heading > p { max-width: 800px; margin: 12px 0 0; color: var(--mv-ink-2); font-size: 15px; line-height: 1.75; }
+
+@media (max-width: 600px) {
+  .section-space { padding-top: 44px; padding-bottom: 46px; }
+  .section-title { font-size: 23px; }
+}
+
+/* ---- footer ----------------------------------------------------------------- */
+
+.site-footer { background: var(--mv-footer); color: var(--mv-footer-ink); }
+.footer-main { display: flex; align-items: center; gap: 60px; padding-top: 40px; padding-bottom: 38px; }
+.footer-main > p { color: var(--mv-footer-ink-2); font-size: 10px; line-height: 1.8; }
+.footer-main > a:last-child { display: flex; align-items: center; gap: 8px; margin-left: auto; color: var(--mv-footer-ink); font-size: 9px; }
+.footer-bottom { display: flex; justify-content: space-between; padding-top: 17px; padding-bottom: 20px; border-top: 1px solid var(--mv-footer-line); color: var(--mv-footer-ink-2); font-size: 8px; }
+
+@media (max-width: 800px) {
+  .footer-main { gap: 30px; }
+  .footer-main > p { max-width: 220px; }
+}
+@media (max-width: 600px) {
+  .footer-main { flex-wrap: wrap; gap: 20px; padding-top: 30px; padding-bottom: 25px; }
+  .footer-main > p { order: 3; width: 100%; max-width: none; margin: 0; }
+  .footer-main > a:last-child { font-size: 8px; }
+  .footer-bottom { flex-wrap: wrap; gap: 10px; font-size: 7px; }
+  .footer-bottom > span:nth-child(2) { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *:before, *:after { animation: none !important; transition: none !important; }
+}

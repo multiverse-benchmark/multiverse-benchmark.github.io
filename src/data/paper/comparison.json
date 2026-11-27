@@ -1,0 +1,477 @@
+{
+  "schemaVersion": 1,
+  "columns": [
+    {
+      "id": "realWorldTools",
+      "label": "Real-world tools",
+      "principle": 1,
+      "group": "realism",
+      "kind": "mark"
+    },
+    {
+      "id": "services",
+      "label": "# Services",
+      "principle": 2,
+      "group": "realism",
+      "kind": "bucket"
+    },
+    {
+      "id": "tools",
+      "label": "# Tools",
+      "principle": 2,
+      "group": "realism",
+      "kind": "bucket"
+    },
+    {
+      "id": "toolsPerTask",
+      "label": "# Tools/task",
+      "principle": 2,
+      "group": "realism",
+      "kind": "bucket"
+    },
+    {
+      "id": "servicesPerTask",
+      "label": "# Services/task",
+      "principle": 2,
+      "group": "realism",
+      "kind": "bucket"
+    },
+    {
+      "id": "userSimulator",
+      "label": "User simulator",
+      "principle": 3,
+      "group": "realism",
+      "kind": "mark"
+    },
+    {
+      "id": "steering",
+      "label": "Category-wise steering evaluation",
+      "principle": 4,
+      "group": "realism",
+      "kind": "mark"
+    },
+    {
+      "id": "crossHarness",
+      "label": "Cross-harness evaluation",
+      "principle": 5,
+      "group": "realism",
+      "kind": "mark"
+    },
+    {
+      "id": "hiddenTest",
+      "label": "Hidden test set",
+      "principle": 6,
+      "group": "trustworthy",
+      "kind": "mark"
+    },
+    {
+      "id": "stateVerification",
+      "label": "Service-state verification",
+      "principle": 7,
+      "group": "trustworthy",
+      "kind": "mark"
+    },
+    {
+      "id": "selfContained",
+      "label": "Self-contained",
+      "principle": 8,
+      "group": "trustworthy",
+      "kind": "mark"
+    },
+    {
+      "id": "infraIsolation",
+      "label": "Infra-error isolation",
+      "principle": 9,
+      "group": "trustworthy",
+      "kind": "mark"
+    },
+    {
+      "id": "validatedSimulator",
+      "label": "Validated user simulator",
+      "principle": 10,
+      "group": "trustworthy",
+      "kind": "mark"
+    },
+    {
+      "id": "validatedEvaluation",
+      "label": "Validated evaluation",
+      "principle": 10,
+      "group": "trustworthy",
+      "kind": "mark"
+    },
+    {
+      "id": "tasks",
+      "label": "# Tasks",
+      "principle": 11,
+      "group": "trustworthy",
+      "kind": "bucket"
+    }
+  ],
+  "bucketRules": {
+    "services": {
+      "low": "< 6",
+      "mid": "6 to 15",
+      "high": "16 or more"
+    },
+    "tools": {
+      "low": "< 100",
+      "mid": "100 to 500",
+      "high": "> 500"
+    },
+    "toolsPerTask": {
+      "low": "< 20",
+      "mid": "20 to 50",
+      "high": "> 50"
+    },
+    "servicesPerTask": {
+      "low": "1",
+      "mid": "2 to 5",
+      "high": "6 or more"
+    },
+    "tasks": {
+      "low": "< 300",
+      "mid": "300 to 999",
+      "high": "1,000 or more"
+    }
+  },
+  "groups": [
+    {
+      "id": "widely-used",
+      "title": "Widely used benchmarks",
+      "rows": [
+        {
+          "name": "GDPval",
+          "ours": false,
+          "values": {
+            "realWorldTools": "na",
+            "services": "na",
+            "tools": "na",
+            "toolsPerTask": "na",
+            "servicesPerTask": "na",
+            "userSimulator": "no",
+            "steering": "no",
+            "crossHarness": "no",
+            "hiddenTest": "yes",
+            "stateVerification": "no",
+            "selfContained": "no",
+            "infraIsolation": "na",
+            "validatedSimulator": "na",
+            "validatedEvaluation": "yes",
+            "tasks": "high"
+          },
+          "counts": {
+            "tasks": "1,320"
+          }
+        },
+        {
+          "name": "Terminal-Bench 2.0",
+          "ours": false,
+          "values": {
+            "realWorldTools": "yes",
+            "services": "na",
+            "tools": "na",
+            "toolsPerTask": "na",
+            "servicesPerTask": "na",
+            "userSimulator": "no",
+            "steering": "partial",
+            "crossHarness": "partial",
+            "hiddenTest": "no",
+            "stateVerification": "yes",
+            "selfContained": "no",
+            "infraIsolation": "partial",
+            "validatedSimulator": "na",
+            "validatedEvaluation": "partial",
+            "tasks": "low"
+          },
+          "counts": {
+            "tasks": "89"
+          }
+        },
+        {
+          "name": "Agents' Last Exam",
+          "ours": false,
+          "values": {
+            "realWorldTools": "yes",
+            "services": "na",
+            "tools": "na",
+            "toolsPerTask": "na",
+            "servicesPerTask": "na",
+            "userSimulator": "no",
+            "steering": "partial",
+            "crossHarness": "partial",
+            "hiddenTest": "yes",
+            "stateVerification": "yes",
+            "selfContained": "no",
+            "infraIsolation": "yes",
+            "validatedSimulator": "na",
+            "validatedEvaluation": "partial",
+            "tasks": "high"
+          },
+          "counts": {
+            "tasks": "1,490"
+          }
+        },
+        {
+          "name": "MCP-Atlas",
+          "ours": false,
+          "values": {
+            "realWorldTools": "yes",
+            "services": "high",
+            "tools": "mid",
+            "toolsPerTask": "low",
+            "servicesPerTask": "na",
+            "userSimulator": "no",
+            "steering": "no",
+            "crossHarness": "no",
+            "hiddenTest": "yes",
+            "stateVerification": "no",
+            "selfContained": "no",
+            "infraIsolation": "partial",
+            "validatedSimulator": "na",
+            "validatedEvaluation": "partial",
+            "tasks": "high"
+          },
+          "counts": {
+            "services": "36",
+            "tools": "220",
+            "toolsPerTask": "15.2",
+            "tasks": "1,000"
+          }
+        },
+        {
+          "name": "BFCL v4",
+          "ours": false,
+          "values": {
+            "realWorldTools": "partial",
+            "services": "na",
+            "tools": "high",
+            "toolsPerTask": "low",
+            "servicesPerTask": "na",
+            "userSimulator": "no",
+            "steering": "partial",
+            "crossHarness": "no",
+            "hiddenTest": "no",
+            "stateVerification": "yes",
+            "selfContained": "no",
+            "infraIsolation": "no",
+            "validatedSimulator": "na",
+            "validatedEvaluation": "no",
+            "tasks": "high"
+          },
+          "counts": {
+            "tools": "3,417",
+            "toolsPerTask": "3",
+            "tasks": "5,090"
+          }
+        },
+        {
+          "name": "τ³-bench",
+          "ours": false,
+          "values": {
+            "realWorldTools": "no",
+            "services": "low",
+            "tools": "mid",
+            "toolsPerTask": "low",
+            "servicesPerTask": "low",
+            "userSimulator": "yes",
+            "steering": "partial",
+            "crossHarness": "partial",
+            "hiddenTest": "no",
+            "stateVerification": "yes",
+            "selfContained": "yes",
+            "infraIsolation": "partial",
+            "validatedSimulator": "yes",
+            "validatedEvaluation": "partial",
+            "tasks": "mid"
+          },
+          "counts": {
+            "services": "4",
+            "tools": "105",
+            "toolsPerTask": "16",
+            "servicesPerTask": "1",
+            "tasks": "375"
+          }
+        }
+      ]
+    },
+    {
+      "id": "closest",
+      "title": "Closest benchmarks",
+      "rows": [
+        {
+          "name": "Toolathlon",
+          "ours": false,
+          "values": {
+            "realWorldTools": "yes",
+            "services": "high",
+            "tools": "high",
+            "toolsPerTask": "high",
+            "servicesPerTask": "mid",
+            "userSimulator": "no",
+            "steering": "partial",
+            "crossHarness": "no",
+            "hiddenTest": "no",
+            "stateVerification": "yes",
+            "selfContained": "no",
+            "infraIsolation": "partial",
+            "validatedSimulator": "na",
+            "validatedEvaluation": "partial",
+            "tasks": "low"
+          },
+          "counts": {
+            "services": "32",
+            "tools": "604",
+            "toolsPerTask": "69.9",
+            "servicesPerTask": "3.4",
+            "tasks": "108"
+          }
+        },
+        {
+          "name": "AppWorld",
+          "ours": false,
+          "values": {
+            "realWorldTools": "yes",
+            "services": "mid",
+            "tools": "mid",
+            "toolsPerTask": "na",
+            "servicesPerTask": "high",
+            "userSimulator": "no",
+            "steering": "partial",
+            "crossHarness": "partial",
+            "hiddenTest": "partial",
+            "stateVerification": "yes",
+            "selfContained": "yes",
+            "infraIsolation": "no",
+            "validatedSimulator": "na",
+            "validatedEvaluation": "partial",
+            "tasks": "mid"
+          },
+          "counts": {
+            "services": "9",
+            "tools": "457",
+            "servicesPerTask": "9",
+            "tasks": "750"
+          }
+        },
+        {
+          "name": "HANDBOOK.md",
+          "ours": false,
+          "values": {
+            "realWorldTools": "yes",
+            "services": "low",
+            "tools": "low",
+            "toolsPerTask": "high",
+            "servicesPerTask": "mid",
+            "userSimulator": "no",
+            "steering": "partial",
+            "crossHarness": "no",
+            "hiddenTest": "no",
+            "stateVerification": "yes",
+            "selfContained": "yes",
+            "infraIsolation": "yes",
+            "validatedSimulator": "na",
+            "validatedEvaluation": "partial",
+            "tasks": "low"
+          },
+          "counts": {
+            "services": "5",
+            "tools": "82",
+            "toolsPerTask": "82",
+            "servicesPerTask": "5",
+            "tasks": "65"
+          }
+        },
+        {
+          "name": "AutomationBench",
+          "ours": false,
+          "values": {
+            "realWorldTools": "yes",
+            "services": "high",
+            "tools": "mid",
+            "toolsPerTask": "na",
+            "servicesPerTask": "na",
+            "userSimulator": "no",
+            "steering": "partial",
+            "crossHarness": "no",
+            "hiddenTest": "yes",
+            "stateVerification": "yes",
+            "selfContained": "yes",
+            "infraIsolation": "partial",
+            "validatedSimulator": "na",
+            "validatedEvaluation": "no",
+            "tasks": "mid"
+          },
+          "counts": {
+            "services": "47",
+            "tools": "~500",
+            "tasks": "600"
+          }
+        },
+        {
+          "name": "GAIA2",
+          "ours": false,
+          "values": {
+            "realWorldTools": "no",
+            "services": "mid",
+            "tools": "mid",
+            "toolsPerTask": "high",
+            "servicesPerTask": "high",
+            "userSimulator": "no",
+            "steering": "partial",
+            "crossHarness": "partial",
+            "hiddenTest": "yes",
+            "stateVerification": "partial",
+            "selfContained": "yes",
+            "infraIsolation": "partial",
+            "validatedSimulator": "na",
+            "validatedEvaluation": "yes",
+            "tasks": "high"
+          },
+          "counts": {
+            "services": "12",
+            "tools": "101",
+            "toolsPerTask": "101",
+            "servicesPerTask": "12",
+            "tasks": "1,120"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ours",
+      "title": "This work",
+      "rows": [
+        {
+          "name": "MultiVerse",
+          "ours": true,
+          "values": {
+            "realWorldTools": "yes",
+            "services": "high",
+            "tools": "high",
+            "toolsPerTask": "high",
+            "servicesPerTask": "high",
+            "userSimulator": "yes",
+            "steering": "yes",
+            "crossHarness": "yes",
+            "hiddenTest": "yes",
+            "stateVerification": "yes",
+            "selfContained": "yes",
+            "infraIsolation": "yes",
+            "validatedSimulator": "yes",
+            "validatedEvaluation": "yes",
+            "tasks": "mid"
+          },
+          "counts": {
+            "services": "35",
+            "tools": "809",
+            "toolsPerTask": "148.5",
+            "servicesPerTask": "6",
+            "tasks": "796"
+          }
+        }
+      ]
+    }
+  ],
+  "otherBenchmarksReviewed": 33,
+  "warnings": []
+}

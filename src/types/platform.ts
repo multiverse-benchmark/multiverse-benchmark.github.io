@@ -1,0 +1,89 @@
+/**
+ * The data of the leaderboard, in the shape its components draw
+ * (src/components/leaderboard). The data comes from the result files that
+ * ship with the site (src/lib/resultsBoard.ts). A run has optional fields
+ * that those files leave empty (parameters, context length, steps).
+ */
+
+export type ParameterRange = "any" | "small" | "medium" | "large" | "xlarge";
+export type ContextLengthRange = "any" | "4k" | "8k" | "32k" | "128k+";
+
+/** How a benchmark task is posed. Mutually exclusive. */
+export type TaskSettingId =
+  | "single-turn"
+  | "multi-turn"
+  | "instruction-following"
+  | "multi-turn-instruction-following";
+export type TaskSettingFilter = "all" | TaskSettingId;
+
+export interface TaskSettingStats {
+  samples: number; // scored samples
+  passed: number;
+  failed: number;
+  skipped: number; // infrastructure skips, excluded from the success rate
+  unscored: number;
+  successRate: number; // 0-1
+  avgSteps: number;
+  /** The rate as its source prints it (one decimal), where the source prints one. */
+  rateText?: string;
+  /** Standard deviation across runs as its source prints it, for a mean of several runs. */
+  sdText?: string | null;
+  /** Absolute 95% task-bootstrap confidence limits, in percent (0-100). */
+  ci95?: [number, number];
+}
+
+export interface TaskSettingOption {
+  id: TaskSettingId;
+  code: string; // ST, MT, IF or MTIF
+  label: string;
+  description: string;
+  models: number; // ranked models with scored samples; 0 = no results yet
+  samples: number;
+}
+
+export interface HarnessOption {
+  id: string; // "none" (the bare harness) or a harness type
+  label: string;
+  models: number; // ranked models using it; 0 = no results yet
+}
+
+/** One run: a model under one harness on one result set. */
+export interface MultiverseModel {
+  id?: number;
+  rank: number;
+  modelKey?: string; // shared by a model's runs on different harnesses
+  name: string;
+  provider: string;
+  scaffold: string;
+  harnessType?: string | null;
+  isOpenWeights: boolean;
+  /** The overall number, "Average": the equal-weight mean of the task settings. */
+  successRate: number;
+  /** The average as its source prints it (one decimal), where the source prints one. */
+  rateText?: string;
+  /** Standard deviation of the average across runs as its source prints it. */
+  sdText?: string | null;
+  /** Absolute 95% task-bootstrap confidence limits for the average, in percent (0-100). */
+  ci95?: [number, number];
+  avgSteps: number;
+  submittedAt: string;
+  parameters: number; // in billions; 0 = unknown
+  activeParameters?: number; // for MoE models
+  isMoE: boolean;
+  contextLength: number; // in thousands (e.g., 128 = 128K); 0 = unknown
+  samplesTotal?: number;
+  samplesWithSteps?: number;
+  samplesScored?: number;
+  samplesSkipped?: number;
+  samplesUnscored?: number;
+  taskSettings?: Partial<Record<TaskSettingId, TaskSettingStats>>;
+}
+
+export interface LeaderboardFilters {
+  search: string;
+  category: "general" | "strict-api" | "open-weights";
+  parameters: ParameterRange;
+  contextLength: ContextLengthRange;
+  taskSetting: TaskSettingFilter;
+  harness: string[]; // selected harness ids; empty = all
+}

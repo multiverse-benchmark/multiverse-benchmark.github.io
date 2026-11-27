@@ -1,0 +1,12 @@
+{
+  "id": "clock",
+  "name": "Clock",
+  "icon": "./icons/clock.svg",
+  "iconBackground": "linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)",
+  "description": "Alarms, timers, and stopwatch",
+  "backendService": "clock",
+  "defaultWindow": {
+    "width": 500,
+    "height": 600
+  }
+}

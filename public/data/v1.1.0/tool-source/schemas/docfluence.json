@@ -1,0 +1,1888 @@
+[
+  {
+    "name": "add_content_labels",
+    "description": "Adds labels to a content item. If the content does not have existing labels,\na new entry is created. Returns the updated list of labels.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The ID of the content to add labels to. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "labels": {
+          "description": "List of labels to add. Must contain at least one label. All elements must be strings.",
+          "type": "array",
+          "items": {
+            "description": "A label name",
+            "type": "string"
+          },
+          "nullable": false,
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "labels"
+      ]
+    }
+  },
+  {
+    "name": "add_content_restriction",
+    "description": "Add a user or group restriction to content for a specific operation.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the content item. Must be a non-empty string (min_length=1). Whitespace is automatically trimmed.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^[0-9]+$"
+        },
+        "operationKey": {
+          "description": "The operation type. Must be either \"read\" or \"update\". Whitespace is automatically trimmed.",
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "read",
+            "update"
+          ]
+        },
+        "subjectType": {
+          "description": "The subject type. Must be either \"user\" or \"group\". Whitespace is automatically trimmed.",
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "user",
+            "group"
+          ]
+        },
+        "subjectKey": {
+          "description": "The username or group name to restrict. Must be a non-empty string (min_length=1). Whitespace is automatically trimmed.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "operationKey",
+        "subjectType",
+        "subjectKey"
+      ]
+    }
+  },
+  {
+    "name": "convert_content_body",
+    "description": "Converts a content body from one format to another.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "to": {
+          "description": "The target format to convert to. Valid values are:- \"view\": For viewing the content. Strips 'ac:' namespace prefix from Docfluence macro tags (e.g., <ac:link> → <link>). Handles both regular and self-closing tags.- \"export_view\": For exporting the content. Transforms ac: tags to div elements with class names (e.g., <ac:link> → <div class='ac-link'>). Self-closing tags like <ac:image/> are converted to properly closed divs (<div class='ac-image'></div>).- \"editor\": For editing the content. Wraps content in editor-specific markup.- \"storage\": For storing the content. Ensures proper Docfluence storage format markup.",
+          "type": "string",
+          "enum": [
+            "view",
+            "export_view",
+            "editor",
+            "storage",
+            "styled_view"
+          ],
+          "nullable": false
+        },
+        "body": {
+          "description": "The content body to convert, containing: representation (str) - The current format of the content; value (str) - The actual content value.",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "representation": {
+              "description": "The current format of the content",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1,
+              "enum": [
+                "view",
+                "export_view",
+                "editor",
+                "storage",
+                "styled_view"
+              ]
+            },
+            "value": {
+              "description": "The actual content value. Must be a non-empty string (min_length=1).",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1
+            }
+          },
+          "required": [
+            "representation",
+            "value"
+          ]
+        }
+      },
+      "required": [
+        "to",
+        "body"
+      ]
+    }
+  },
+  {
+    "name": "create_content",
+    "description": "Creates new content.\n\nThis function creates a new content item (page, blogpost, and comment) with the specified\ndetails and stores it in the database. It handles both basic content creation and special\ncases like comments with ancestor relationships.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "description": "The complete specification for the new content item to be created. Required fields: type (str): Content type, must be one of page, blogpost, comment. title (str): Content title, must be a non-empty string. spaceKey (str): Space key where content will be created, must be a non-empty string and exist in database. Optional fields: status (str): Content status, defaults to current. body (Dict): Content body with storage format. createdBy (str): Username of creator, defaults to unknown. postingDay (str): Posting day for blogposts in YYYY-MM-DD format, required for blogpost type. ancestors (List[str]): List of ancestor content IDs, must be non-empty for comment type. The structure must conform to ContentInput validation.",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "type": {
+              "description": "Content type. Must be one of: 'page', 'blogpost', 'comment'",
+              "type": "string",
+              "nullable": false,
+              "enum": [
+                "page",
+                "blogpost",
+                "comment"
+              ]
+            },
+            "title": {
+              "description": "Content title. Non-empty after trimming; maximum 500 characters.",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "spaceKey": {
+              "description": "Space key where content will be created. Alphanumeric (A–Z, a–z, 0–9) only, 1–50 characters; must exist in the database.",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1,
+              "maxLength": 50,
+              "pattern": "^[A-Za-z0-9]+$"
+            },
+            "status": {
+              "description": "Content status. Must be one of: 'current', 'draft', 'archived', 'trashed'. Defaults to 'current' if not provided.",
+              "type": "string",
+              "nullable": true,
+              "default": "current",
+              "enum": [
+                "current",
+                "draft",
+                "archived",
+                "trashed"
+              ]
+            },
+            "body": {
+              "description": "Content body with storage format. Contains storage object with required value property (str): The content value in storage format, and optional representation property (str): The representation type, defaults to storage if not provided. Defaults to empty storage if body is not provided.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "storage": {
+                  "description": "Storage format object containing the content's value and representation type. Required property: value (str): The content value in storage format. Optional property: representation (Optional[str]): The representation type (e.g., storage, view), defaults to storage if not provided, can be null when not explicitly set.",
+                  "type": "object",
+                  "nullable": false,
+                  "properties": {
+                    "value": {
+                      "description": "The content value in storage format.",
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "representation": {
+                      "description": "The representation type (Allowed values: \"storage\", \"view\", \"editor\", \"export_view\", \"styled_view\"). When the storage object is provided but representation is omitted, it defaults to \"storage\". This field is optional within the storage object.",
+                      "type": "string",
+                      "nullable": true,
+                      "default": "storage",
+                      "enum": [
+                        "storage",
+                        "view",
+                        "editor",
+                        "export_view",
+                        "styled_view"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "value"
+                  ]
+                }
+              },
+              "required": [
+                "storage"
+              ]
+            },
+            "createdBy": {
+              "description": "Username of the content creator. Defaults to \"unknown\" if not provided.",
+              "type": "string",
+              "nullable": true,
+              "default": "unknown"
+            },
+            "postingDay": {
+              "description": "Posting day for blog posts in \"YYYY-MM-DD\" format (e.g., \"2024-01-15\"). Required when type is \"blogpost\". Must not be a future date. For other content types (page, comment), this field is ignored if provided.",
+              "type": "string",
+              "nullable": true
+            },
+            "ancestors": {
+              "description": "List of ancestor content IDs (numeric strings, digits only). Required (must be a non-empty list) when type is 'comment'.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "description": "Docfluence content id for an existing content item (digits only).",
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[0-9]+$"
+              }
+            }
+          },
+          "required": [
+            "type",
+            "title",
+            "spaceKey"
+          ]
+        }
+      },
+      "required": [
+        "body"
+      ]
+    }
+  },
+  {
+    "name": "create_content_attachments",
+    "description": "Adds an attachment to a piece of content.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the parent content to add the attachment to. Must be a non-empty numeric string that matches an existing content ID in the database.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^\\d+$"
+        },
+        "file": {
+          "description": "The relative location and name of the attachment file to be added to the content. The basename (stored as the attachment title) must not exceed 500 characters. Maximum file size is 50 MB.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "minorEdit": {
+          "description": "If set to true, no notification email or activity stream will be generated when the attachment is added.",
+          "type": "boolean",
+          "nullable": false
+        },
+        "comment": {
+          "description": "The comment for the attachment that is being added. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "status": {
+          "description": "The status of the attachment being added. Valid values: current, draft, archived, trashed. Defaults to \"current\".",
+          "type": "string",
+          "nullable": true,
+          "default": "current",
+          "enum": [
+            "current",
+            "draft",
+            "archived",
+            "trashed"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "file",
+        "minorEdit"
+      ]
+    }
+  },
+  {
+    "name": "create_content_property",
+    "description": "Creates a new property for a specified content item.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the content. Must be a non-empty string (min_length=1).",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "body": {
+          "description": "A dictionary representing the new content property to be created for the content item.",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "key": {
+              "description": "The property key (must be unique for this content; must not contain ':' reserved for composite storage keys).",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1,
+              "pattern": "^[^:]+$"
+            },
+            "value": {
+              "nullable": true,
+              "default": null,
+              "description": "The property value. Can be any JSON type.",
+              "anyOf": [
+                {
+                  "description": "Text value.",
+                  "type": "string"
+                },
+                {
+                  "description": "Numeric value.",
+                  "type": "number"
+                },
+                {
+                  "description": "Integer value.",
+                  "type": "integer"
+                },
+                {
+                  "description": "Boolean value.",
+                  "type": "boolean"
+                },
+                {
+                  "description": "Circular reference",
+                  "type": "object"
+                },
+                {
+                  "description": "Circular reference",
+                  "type": "array",
+                  "items": {}
+                }
+              ]
+            }
+          },
+          "required": [
+            "key"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "body"
+      ]
+    }
+  },
+  {
+    "name": "create_content_property_for_key",
+    "description": "Creates a new content property for a specified key.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the content. Must be a non-empty numeric string (matches Content.id).",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^\\d+$"
+        },
+        "key": {
+          "description": "The key for the property. Non-empty string; must not contain ':' (reserved for composite storage keys).",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^[^:]+$"
+        },
+        "body": {
+          "description": "Property payload object",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "value": {
+              "nullable": true,
+              "default": null,
+              "description": "The property value. Can be any JSON type.",
+              "anyOf": [
+                {
+                  "description": "Text value.",
+                  "type": "string"
+                },
+                {
+                  "description": "Numeric value.",
+                  "type": "number"
+                },
+                {
+                  "description": "Integer value.",
+                  "type": "integer"
+                },
+                {
+                  "description": "Boolean value.",
+                  "type": "boolean"
+                },
+                {
+                  "description": "Circular reference",
+                  "type": "object"
+                },
+                {
+                  "description": "Circular reference",
+                  "type": "array",
+                  "items": {}
+                }
+              ]
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "id",
+        "key",
+        "body"
+      ]
+    }
+  },
+  {
+    "name": "create_private_space",
+    "description": "Creates a new private space visible and updatable only by the current user or admins.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "description": "The properties required to create a new private space.",
+          "type": "object",
+          "properties": {
+            "key": {
+              "description": "The unique identifier for the space. Must be composed of only alphanumeric characters (A-Z, 0-9) and no more than 50 characters in length. Leading/trailing whitespace is trimmed.",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1,
+              "maxLength": 50,
+              "pattern": "^\\s*[A-Za-z0-9]+\\s*$"
+            },
+            "name": {
+              "description": "The display name of the space. Maximum length 200 characters.",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "description": {
+              "description": "An optional description of the space. Maximum length 1000 characters. Defaults to empty string.",
+              "type": "string",
+              "nullable": true,
+              "default": "",
+              "maxLength": 1000
+            }
+          },
+          "required": [
+            "key",
+            "name"
+          ]
+        }
+      },
+      "required": [
+        "body"
+      ]
+    }
+  },
+  {
+    "name": "create_space",
+    "description": "Creates and returns a new space dictionary from the provided data.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "description": "A dictionary representing the properties for the new space. Required fields: name (str) - The display name of the space (max 200 characters); key (str) - The key for the space, must be alphanumeric (A-Z, 0-9) and no more than 50 characters. Optional fields: description (str) - The description of the space (max 1000 characters), defaults to empty string.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "The display name of the space. Maximum length 200 characters.",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "key": {
+              "description": "The key for the space. Must be composed of only alphanumeric characters (A-Z, 0-9) and no more than 50 characters in length. Leading/trailing whitespace is trimmed. Stored as uppercase.",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1,
+              "maxLength": 50,
+              "pattern": "^\\s*[A-Za-z0-9]+\\s*$"
+            },
+            "description": {
+              "description": "The description of the space. Maximum length 1000 characters. Defaults to empty string.",
+              "type": "string",
+              "nullable": true,
+              "default": "",
+              "maxLength": 1000
+            }
+          },
+          "required": [
+            "name",
+            "key"
+          ]
+        }
+      },
+      "required": [
+        "body"
+      ]
+    }
+  },
+  {
+    "name": "create_user",
+    "description": "Create a new Docfluence user.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "description": "Unique username for the new user.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "displayName": {
+          "description": "Display name shown in the UI. Defaults to a title-cased form of username when omitted.",
+          "type": "string",
+          "nullable": true,
+          "maxLength": 200
+        },
+        "groups": {
+          "description": "Initial group memberships. Each group name must exist in the database.",
+          "type": "array",
+          "nullable": true,
+          "default": [],
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "username"
+      ]
+    }
+  },
+  {
+    "name": "delete_content",
+    "description": "Deletes a content item from the system.\n\nThis function trashes or purges content based on its ContentType and ContentStatus,\nfollowing the official Docfluence API behavior:\n\n**Three Cases:**\n\n1. **Trashable content with status \"current\"**:\n- Content is trashed (soft delete)\n- Status changed from \"current\" to \"trashed\"\n- Content remains in database\n- All descendant content (comments, attachments, child pages) is also trashed\n\n2. **Trashable content with status \"trashed\" + status parameter \"trashed\"**:\n- Content is purged (permanently deleted)\n- All associated data cascade deleted (properties, labels, history)\n\n3. **Non-trashable content (draft, archived)**:\n- Content is deleted permanently without being trashed\n- All associated data cascade deleted\n\n**Trashable vs Non-trashable:**\n- Trashable: Content with status \"current\" or \"trashed\"\n- Non-trashable: Content with status \"draft\" or \"archived\"",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the content to delete. Must be a numeric string representing a valid content ID in the system (e.g., \"1\", \"42\", \"12345\").",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^\\d+$"
+        },
+        "status": {
+          "description": "Optional query parameter that controls deletion behavior. When provided, must be \"trashed\" (optional leading/trailing whitespace is trimmed) to permanently delete already-trashed content. If not provided, the deletion behavior depends on the current status of the content. Defaults to None if not provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "enum": [
+            "trashed"
+          ]
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "delete_content_labels",
+    "description": "Deletes labels from a content item. If a specific label is provided,\nonly that label is deleted. Otherwise, all labels are deleted.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The ID of the content from which labels should be deleted. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "label": {
+          "description": "Optional specific label to delete. If not provided, all labels for the content are deleted. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "delete_content_property",
+    "description": "Deletes a property from a content item identified by its key.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the content. Must be a non-empty numeric string that matches an existing content ID in the database.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^\\d+$"
+        },
+        "key": {
+          "description": "The key of the property to delete. Non-empty string; must not contain ':' (reserved for composite storage keys).",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^[^:]+$"
+        }
+      },
+      "required": [
+        "id",
+        "key"
+      ]
+    }
+  },
+  {
+    "name": "delete_space",
+    "description": "Deletes a space and all associated content, tracking the deletion task.\n\nDeletes the space identified by spaceKey, along with all content items in that space, and returns a task dictionary that tracks the deletion process.\nNote: The deletion task is marked as complete immediately.\nSpaces can only be deleted by space creator or admins",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spaceKey": {
+          "description": "The unique identifier of the space to delete. Must be a non-empty alphanumeric string (A-Z, 0-9), max 50 characters. Leading/trailing whitespace is trimmed.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "maxLength": 50,
+          "pattern": "^\\s*[A-Za-z0-9]+\\s*$"
+        }
+      },
+      "required": [
+        "spaceKey"
+      ]
+    }
+  },
+  {
+    "name": "delete_user",
+    "description": "Delete a Docfluence user.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "description": "Username of the user to delete.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "maxLength": 100
+        }
+      },
+      "required": [
+        "username"
+      ]
+    }
+  },
+  {
+    "name": "get_content_attachments",
+    "description": "Returns attachments for a specific content item with optional filtering and pagination.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the parent content.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "start": {
+          "description": "The starting index for pagination. Defaults to 0. Minimum=0.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0,
+          "minimum": 0
+        },
+        "limit": {
+          "description": "The maximum number of attachments to return. Defaults to 50. Minimum=1, Maximum=1000.",
+          "type": "integer",
+          "nullable": true,
+          "default": 50,
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "filename": {
+          "description": "Filter attachments by filename. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "mediaType": {
+          "description": "Filter attachments by media type. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_content_children",
+    "description": "Returns a mapping of direct children content grouped by type.\n\nThis function retrieves all direct children of a content item by searching for content\nthat has the specified item as their immediate parent (ancestor). Results are grouped\nby content type (page, blogpost, comment, attachment) for easy access.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier of the parent content item. Must be a non-empty string. Whitespace is automatically trimmed.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "expand": {
+          "description": "A comma-separated list of additional fields to include in the response for each child content item. Valid fields: 'space' (expands space information), 'version' (expands version details), 'history' (expands content history), 'body' (includes content body), 'metadata' (includes additional metadata). Multiple fields can be requested (e.g., 'space,version'). If None or empty, children are returned with only base fields. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "parentVersion": {
+          "description": "The version number of the parent content to consider for version-specific child queries. Must be non-negative. A value of 0 returns all children (default behavior). When set to N > 0, returns only children that were created before or during the time when the parent was at version N. The filtering uses timestamp-based estimation, assuming versions are spread evenly across the parent's lifetime. Defaults to 0.",
+          "type": "integer",
+          "nullable": false,
+          "default": 0,
+          "minimum": 0
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_content_children_by_type",
+    "description": "Returns direct children content of a specified type.\n\nThis function retrieves all direct children of a content item by searching for content\nthat has the specified item as their immediate parent (last in ancestors array). Results are\nfiltered by type and support pagination.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier of the parent content. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "child_type": {
+          "description": "The type of child content to retrieve. Must be one of: 'page', 'blogpost', 'comment', 'attachment'. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "page",
+            "blogpost",
+            "comment",
+            "attachment"
+          ],
+          "minLength": 1
+        },
+        "start": {
+          "description": "The starting index for pagination. Must be non-negative. Defaults to 0.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0,
+          "minimum": 0
+        },
+        "limit": {
+          "description": "The maximum number of child content items to return (1-1000). Must be between 1 and 1000. Defaults to 25.",
+          "type": "integer",
+          "nullable": true,
+          "default": 25,
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "id",
+        "child_type"
+      ]
+    }
+  },
+  {
+    "name": "get_content_comments",
+    "description": "Returns the comments associated with a specific content item.\n\nThis function retrieves all comments that have the specified content as their immediate parent\n(ancestor). Comments are stored as separate content items with an 'ancestors' field pointing to\ntheir parent content. The function supports pagination and optional field expansion.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the parent content. Must be a non-empty string. Whitespace is automatically trimmed.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "expand": {
+          "description": "A comma-separated list of additional fields to include in the\nreturned comment objects (must be one of: 'space', 'metadata.labels'). If provided, must not be empty or whitespace-only. Whitespace is automatically trimmed.",
+          "type": "string",
+          "nullable": true
+        },
+        "parentVersion": {
+          "description": "The version of the parent content. Must be non-negative. Defaults to 0. When set to 0, returns all comments. When set to N > 0, returns comments that existed at parent version N.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0,
+          "minimum": 0
+        },
+        "start": {
+          "description": "The starting index for pagination. Must be non-negative. Defaults to 0.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0,
+          "minimum": 0
+        },
+        "limit": {
+          "description": "The maximum number of comment objects to return (1-1000). Must be between 1 and 1000. Defaults to 25.",
+          "type": "integer",
+          "nullable": true,
+          "default": 25,
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_content_descendants",
+    "description": "Returns all descendants of a content item, grouped by type.\n\nThis function retrieves all descendant content items (children, grandchildren, etc.) of a specified\nparent content item. Descendants are collected recursively and grouped by their content type (page,\nblogpost, comment, attachment). The results support pagination applied to each content type list.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier of the parent content. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "start": {
+          "description": "The starting index for pagination. Must be non-negative. Defaults to 0.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0,
+          "minimum": 0
+        },
+        "limit": {
+          "description": "The maximum number of descendant items to return per type. Must be between 1 and 10000 (minimum=1, maximum=10000). Defaults to 25.",
+          "type": "integer",
+          "nullable": true,
+          "default": 25,
+          "minimum": 1,
+          "maximum": 10000
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_content_descendants_by_type",
+    "description": "Returns descendants of a specific type for a content item.\n\nThis function retrieves all descendant content items (children, grandchildren, etc.) of a specified type\nfrom a parent content item. Descendants are collected recursively and filtered by the specified content\ntype. The results support pagination.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier of the parent content. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "type": {
+          "description": "The type of descendant content to retrieve. Must be one of: 'page', 'blogpost', 'comment', 'attachment'.",
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "page",
+            "blogpost",
+            "comment",
+            "attachment"
+          ]
+        },
+        "start": {
+          "description": "The starting index for pagination. Must be non-negative. Defaults to 0.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0,
+          "minimum": 0
+        },
+        "limit": {
+          "description": "The maximum number of descendant items to return. Must be between 1 and 1000 (minimum=1, maximum=1000). Defaults to 25.",
+          "type": "integer",
+          "nullable": true,
+          "default": 25,
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    }
+  },
+  {
+    "name": "get_content_details",
+    "description": "Retrieves content by its unique identifier.\n\nThis function fetches a content item from the database using its ID. It can optionally\nfilter the content by its status to ensure the content matches the expected state.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the content to retrieve. Must be a numeric string representing a valid content ID in the system (e.g., '1', '42', '12345'). Leading/trailing whitespace is trimmed before lookup.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^\\s*\\d+\\s*$"
+        },
+        "status": {
+          "description": "Optional status filter to verify the content matches the expected state. Valid values are 'current' (published content), 'draft' (unpublished work in progress), 'archived' (no longer active but retained), 'trashed' (marked for deletion), or 'any' (bypass status check). Defaults to None if not provided.",
+          "type": "string",
+          "nullable": true,
+          "enum": [
+            "current",
+            "draft",
+            "archived",
+            "trashed",
+            "any"
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_content_history",
+    "description": "Returns the history of a piece of content.\n\nThis method returns the metadata regarding creation and versioning for the content item\nidentified by the given id. It uses a global history store (DB[\"history\"]) that is updated\nwhenever content is created or updated. Each history record includes the version number,\ncreatedBy, createdDate, and lastUpdated timestamp.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier of the content.",
+          "type": "string",
+          "nullable": false
+        },
+        "expand": {
+          "description": "Comma-separated fields to expand. Allowed values (case-insensitive):\npreviousVersion, nextVersion, lastUpdated. Example: \"previousVersion,lastUpdated\".\nEmpty or whitespace-only is treated as no expand. Defaults to None if not provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_content_labels",
+    "description": "Returns a paginated list of content labels. If a prefix is provided,\nit filters labels that start with the given prefix.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The ID of the content to get labels for. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "prefix": {
+          "description": "Optional prefix to filter labels by. If provided, only labels starting with this prefix are returned. Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "start": {
+          "description": "The starting index for pagination. Must be non-negative. Defaults to 0.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0,
+          "minimum": 0
+        },
+        "limit": {
+          "description": "The maximum number of labels to return (1-1000). Must be between 1 and 1000. Defaults to 200.",
+          "type": "integer",
+          "nullable": true,
+          "default": 200,
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_content_list",
+    "description": "Returns a paginated list of content filtered by the specified parameters.\n\nThis function retrieves content from the database and applies filters based on the provided\narguments (type, spaceKey, title, status, postingDay). The results are paginated using start\nand limit parameters. Additional fields can be expanded using the expand parameter.\n\nThe function supports filtering by content type, space location, title, status, and posting\ndate (for blog posts only). Results can be expanded to include space details, version\ninformation, and history metadata.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "The type of content to filter by. Valid values: 'page' (standard wiki page), 'blogpost' (blog entry), 'comment' (user comment), 'attachment' (file attachment). If None, no type filtering is applied and content of all types is returned. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "enum": [
+            "page",
+            "blogpost",
+            "comment",
+            "attachment"
+          ]
+        },
+        "spaceKey": {
+          "description": "The key identifier of the Docfluence space to filter content by. Only content within the specified space will be returned. Must be a non-empty, non-whitespace-only string if provided. If None, no space filtering is applied. Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "title": {
+          "description": "The optional exact title of the content to filter by. If None or empty, no title filtering is applied. Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "status": {
+          "description": "The status of content to filter by. Valid values: 'current' (published/active content), 'trashed' (deleted but not permanently removed), 'any' (all statuses, no filtering). If None, behaves the same as 'current'. Defaults to 'current'.",
+          "type": "string",
+          "nullable": true,
+          "default": "current",
+          "enum": [
+            "current",
+            "trashed",
+            "any"
+          ]
+        },
+        "postingDay": {
+          "description": "The posting date for blog posts in YYYY-MM-DD format (e.g., '2024-01-15'). This filter is only applied when type='blogpost' and is ignored for other content types. Must match the exact posting date of blog posts. If None, no posting date filtering is applied. Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "expand": {
+          "description": "A comma-separated list of additional fields to include in the response for each content item. Valid fields: 'space', 'version', 'history', and 'body.storage'. Multiple fields can be requested (e.g., 'space,version'). If None or empty, no expansion is performed. Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "start": {
+          "description": "The zero-based starting index for pagination. Determines which content item to start returning from the filtered result set. Must be non-negative. For example, start=0 returns from the first item, start=10 skips the first 10 items. Defaults to 0.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0,
+          "minimum": 0
+        },
+        "limit": {
+          "description": "The maximum number of content items to return per page. Must be between 1 and 1000 (minimum=1, maximum=1000). Defaults to 25.",
+          "type": "integer",
+          "nullable": true,
+          "default": 25,
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_content_properties",
+    "description": "Returns a paginated list of content properties for the specified content.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the content",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "start": {
+          "description": "The starting index for pagination. Defaults to 0. Must be non-negative",
+          "type": "integer",
+          "nullable": true,
+          "default": 0,
+          "minimum": 0
+        },
+        "limit": {
+          "description": "The maximum number of properties to return (1-1000). Defaults to 10. Must be between 1 and 1000.",
+          "type": "integer",
+          "nullable": true,
+          "default": 10,
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_content_property_details",
+    "description": "Retrieves a specific property of a content item by its key.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the content item. Must be a non-empty numeric string (e.g., '1', '42') matching an existing content ID in the database.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^\\d+$"
+        },
+        "key": {
+          "description": "The key of the property to retrieve. Non-empty string; must not contain ':' (reserved for composite storage keys).",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^[^:]+$"
+        }
+      },
+      "required": [
+        "id",
+        "key"
+      ]
+    }
+  },
+  {
+    "name": "get_content_restrictions_by_operation",
+    "description": "Retrieves all restrictions for a content item, grouped by operation type.\n\nThis function returns restriction information for read and update operations on the specified\ncontent. Each operation includes user and group restrictions.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the content. Must be a non-empty string. Whitespace is automatically trimmed.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_content_restrictions_for_operation",
+    "description": "Retrieves restrictions for a specific operation on a content item.\n\nThis function returns restriction information for a single operation type (read or update)\non the specified content. The operation includes user and group restrictions with pagination\nsupport.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the content. Must be a non-empty string. Whitespace is automatically trimmed.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "operationKey": {
+          "description": "The operation type. Must be either \"read\" or \"update\". Whitespace is automatically trimmed.",
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "read",
+            "update"
+          ]
+        },
+        "start": {
+          "description": "The starting index for pagination of restriction results. Must be non-negative. Defaults to 0.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0,
+          "minimum": 0
+        },
+        "limit": {
+          "description": "The maximum number of restriction results to return per collection (users and groups) (1-1000). Must be between 1 and 1000. Defaults to 100.",
+          "type": "integer",
+          "nullable": true,
+          "default": 100,
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "id",
+        "operationKey"
+      ]
+    }
+  },
+  {
+    "name": "get_long_task_details",
+    "description": "Returns a specific long-running task by its ID.\n\nRetrieves the long-running task dictionary that matches the provided task ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the task. Must be a non-empty numeric string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^\\d+$"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_long_tasks",
+    "description": "Returns a paginated list of all long-running tasks. Retrieves a list of task dictionaries for all long-running tasks.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "description": "The starting index for pagination. Must be >= 0.\nDefaults to 0.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0,
+          "minimum": 0
+        },
+        "limit": {
+          "description": "The maximum number of tasks to return (1-1000). Must be between 1 and 1000.\nDefaults to 100.",
+          "type": "integer",
+          "nullable": true,
+          "default": 100,
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_space_content",
+    "description": "Retrieves the content within a specific space (current or draft).\n\nReturns a list of content item dictionaries for the space identified by spaceKey.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spaceKey": {
+          "description": "The unique identifier of the space. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "start": {
+          "description": "The starting index for pagination.\nDefaults to 0. Must be a non-negative integer.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0,
+          "minimum": 0
+        },
+        "limit": {
+          "description": "The maximum number of content items to return (1-1000).\nDefaults to 25. Must be between 1 and 1000.",
+          "type": "integer",
+          "nullable": true,
+          "default": 25,
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "spaceKey"
+      ]
+    }
+  },
+  {
+    "name": "get_space_content_by_type",
+    "description": "Retrieves content of a specific type within a space (current or draft).\n\nReturns a list of content item dictionaries matching the specified type for the given spaceKey.\nNote: The function first retrieves all content for the space and then filters by type.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spaceKey": {
+          "description": "The unique identifier of the space. Must be non-empty.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "type": {
+          "description": "The type of content to filter. Valid values: page, blogpost, comment, attachment. Must be non-empty.",
+          "type": "string",
+          "enum": [
+            "page",
+            "blogpost",
+            "comment",
+            "attachment"
+          ],
+          "nullable": false
+        },
+        "start": {
+          "description": "The starting index for pagination after filtering.\nDefaults to 0. Must be non-negative.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0,
+          "minimum": 0
+        },
+        "limit": {
+          "description": "The maximum number of content items to return after filtering (1-1000).\nDefaults to 25. Must be between 1 and 1000.",
+          "type": "integer",
+          "nullable": true,
+          "default": 25,
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "spaceKey",
+        "type"
+      ]
+    }
+  },
+  {
+    "name": "get_space_details",
+    "description": "Retrieves details about a specific space.\n\nReturns the space dictionary for the provided spaceKey.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spaceKey": {
+          "description": "The unique identifier of the space. Must be a non-empty alphanumeric string (A-Z, 0-9), max 50 characters. Leading/trailing whitespace is trimmed.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "maxLength": 50,
+          "pattern": "^\\s*[A-Za-z0-9]+\\s*$"
+        }
+      },
+      "required": [
+        "spaceKey"
+      ]
+    }
+  },
+  {
+    "name": "get_spaces",
+    "description": "Returns a paginated list of spaces. If spaceKey is provided (single key or comma-separated keys), returns only the specified space(s); otherwise returns all spaces.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spaceKey": {
+          "description": "A unique identifier or comma-separated identifiers to filter spaces by.\nEach key must be a non-empty alphanumeric string (A-Z, 0-9), max 50 characters. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9]+(,[A-Za-z0-9]+)*$"
+        },
+        "start": {
+          "description": "The starting index for pagination.\nDefaults to 0. Must be non-negative.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0,
+          "minimum": 0
+        },
+        "limit": {
+          "description": "The maximum number of spaces to return (1-1000).\nDefaults to 25. Must be between 1 and 1000.",
+          "type": "integer",
+          "nullable": true,
+          "default": 25,
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_user",
+    "description": "Get a registered Docfluence user by username.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "description": "Username of the user to retrieve.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "maxLength": 100
+        }
+      },
+      "required": [
+        "username"
+      ]
+    }
+  },
+  {
+    "name": "remove_content_restriction",
+    "description": "Remove a user or group restriction from content for a specific operation.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the content item. Must be a non-empty string (min_length=1). Whitespace is automatically trimmed.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^[0-9]+$"
+        },
+        "operationKey": {
+          "description": "The operation type. Must be either \"read\" or \"update\". Whitespace is automatically trimmed.",
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "read",
+            "update"
+          ]
+        },
+        "subjectType": {
+          "description": "The subject type. Must be either \"user\" or \"group\". Whitespace is automatically trimmed.",
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "user",
+            "group"
+          ]
+        },
+        "subjectKey": {
+          "description": "The username or group name to restrict. Must be a non-empty string (min_length=1). Whitespace is automatically trimmed.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "operationKey",
+        "subjectType",
+        "subjectKey"
+      ]
+    }
+  },
+  {
+    "name": "search_content",
+    "description": "Search for content based on a CQL (Docfluence Query Language) query.\n\nThis function performs a comprehensive search across all content items using the provided CQL query.\nIt supports complex queries with logical operators, field comparisons, and returns paginated results\nwith optional field expansion.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "The CQL query string. Supported syntax:\n- Field operators: = (equals), != (not equals), ~ (contains), !~ (does not contain),\n  >, <, >=, <= (numeric/date comparison)\n- Logical operators: AND, OR, NOT (case-insensitive)\n- Grouping: Use parentheses () for complex expressions\n- Value types: Strings ('value' or \"value\"), Numbers (123 or 45.67), Keywords (null, true, false), Functions (now())\n- Supported fields: type, space, spaceKey, title, status, id, text, created, postingDay, label, ancestor, parent, creator, contributor, watcher, favourite, favorite, lastmodified, macro, fileExtension\n- Field mappings:\n    * type: Content type ('page', 'blogpost', 'comment', 'attachment')\n    * space/spaceKey: The key of the space containing this content\n    * title: The title/name of the content item\n    * status: Content status\n    * id: Unique identifier for the content item\n    * text: Master field that searches across title, content body, and labels (supports ~ and !~ operators)\n    * created: Maps to history.createdDate (supports date comparison operators)\n    * postingDay: Direct field on blogpost content (YYYY-MM-DD format, supports date comparison)\n    * label: Searches content labels directly (supports =, !=, ~, !~ operators)\n    * ancestor: Searches by ancestor content ID (supports =, !=, ~, !~ operators on list of ancestor IDs)\n    * parent: Searches by direct parent content ID (the immediate ancestor)\n    * creator: Searches by content creator username from history.createdBy\n    * contributor: Searches by content contributor username\n    * watcher: Searches by content watcher username\n    * favourite/favorite: Searches content marked as favourite by current user\n    * lastmodified: Searches by last modification date\n    * macro: Searches for content containing specific macros\n    * fileExtension: Searches attachments by file extension (e.g., 'pdf', 'docx')\n    - Examples:\n      * \"type='page' AND spaceKey='DOC'\"\n      * \"type='page' AND space='DOC'\"\n      * \"title~'meeting' OR title~'notes'\"\n      * \"status='current' AND NOT type='comment'\"\n      * \"text~'marketing' AND type='page'\"\n      * \"created>='2024-01-01T00:00:00.000Z'\"\n      * \"type='blogpost' AND postingDay>='2024-01-01'\"\n      * \"label='finished' AND type='page'\"\n      * \"label!='draft' OR type='blogpost'\"\n      * \"id = 1\" (unquoted number)\n      * \"postingDay = null\" (null keyword for fields without values)\n      * \"postingDay != null\" (fields that have values)\n      * \"ancestor='12345'\" (content with specific ancestor)\n      * \"parent='67890'\" (content with specific direct parent)\n      * \"creator='johndoe'\" (content created by specific user)\n      * \"type='attachment' AND fileExtension='pdf'\" (PDF attachments)\n- CQL Functions:\n  * now(): Current timestamp\n  * now(\"-4w\"): 4 weeks ago\n  * now(\"+1d\"): 1 day from now\n  * Supported units: d/day, w/week, M/month, y/year, h/hour, m/min/minute\n- Function Examples:\n  * \"created > now('-4w')\" - Content created in last 4 weeks\n  * \"title~'project launch' and created > now('-4w')\" - Project launch content from last 4 weeks\n- Note: space field is used for CQL queries, expand='space' returns structured objects",
+          "type": "string",
+          "minLength": 1
+        },
+        "expand": {
+          "description": "Comma-separated list of properties to expand in results.\nSupported values:\n- space: Add detailed space information object with 'spaceKey', 'name', 'description' fields\n- version: Enhance existing version object by adding 'when' (timestamp) and 'by' (user object) fields\n- body: Ensure content body has proper storage structure (may affect pagination limits)\n- body.storage: Ensure storage representation has proper structure with 'value' and 'representation' fields\n- body.view: Add view representation of body (converted from storage) with 'value' and 'representation' fields\n- metadata: Add metadata object with 'labels' and 'properties' sub-objects\n- metadata.labels: Add metadata object with only 'labels' sub-object\n- history: No effect (history is already included in base response)\n- ancestors: Enhance existing ancestors array by adding full details (type, title, status, space, links) to each ancestor\n- container: Add container object (same structure as space field)",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "start": {
+          "description": "Starting index for pagination (default: 0, must be non-negative)",
+          "type": "integer",
+          "nullable": true,
+          "default": 0,
+          "minimum": 0
+        },
+        "limit": {
+          "description": "Maximum number of results to return (default: 25, range: 1-1000)",
+          "type": "integer",
+          "nullable": true,
+          "default": 25,
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  {
+    "name": "search_content_cql",
+    "description": "Search for content based on a CQL (Docfluence Query Language) query.\n\nThis function performs a comprehensive search across all content items using the provided CQL query.\nIt supports complex queries with logical operators, field comparisons, and returns paginated results\nwith optional field expansion.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "cql": {
+          "description": "The CQL query string. Supported syntax:\n- Field operators: = (equals), != (not equals), ~ (contains), !~ (does not contain),\n  >, <, >=, <= (numeric/date comparison)\n- Logical operators: AND, OR, NOT (case-insensitive)\n- Grouping: Use parentheses () for complex expressions\n- Value types: Strings ('value' or \"value\"), Numbers (123 or 45.67), Keywords (null, true, false), Functions (now())\n- Supported fields: type, space, spaceKey, title, status, id, text, created, postingDay, label\n- Field mappings:\n    * type: Content type ('page', 'blogpost', 'comment', 'attachment')\n    * space/spaceKey: The key of the space containing this content\n    * title: The title/name of the content item\n    * status: Content status\n    * id: Unique identifier for the content item\n    * text: Master field that searches across title, content body, and labels (supports ~ and !~ operators)\n    * created: Maps to history.createdDate (supports date comparison operators)\n    * postingDay: Direct field on blogpost content (YYYY-MM-DD format, supports date comparison)\n    * label: Searches content labels directly (supports =, !=, ~, !~ operators)\n    - Examples:\n      * \"type='page' AND spaceKey='DOC'\"\n      * \"type='page' AND space='DOC'\"\n      * \"title~'meeting' OR title~'notes'\"\n      * \"status='current' AND NOT type='comment'\"\n      * \"text~'marketing' AND type='page'\"\n      * \"created>='2024-01-01T00:00:00.000Z'\"\n      * \"type='blogpost' AND postingDay>='2024-01-01'\"\n      * \"label='finished' AND type='page'\"\n      * \"label!='draft' OR type='blogpost'\"\n      * \"id = 1\" (unquoted number)\n      * \"postingDay = null\" (null keyword for fields without values)\n      * \"postingDay != null\" (fields that have values)\n- CQL Functions:\n  * now(): Current timestamp\n  * now(\"-4w\"): 4 weeks ago\n  * now(\"+1d\"): 1 day from now\n  * Supported units: d/day, w/week, M/month, y/year, h/hour, m/min/minute\n- Function Examples:\n  * \"created > now('-4w')\" - Content created in last 4 weeks\n  * \"title~'project launch' and created > now('-4w')\" - Project launch content from last 4 weeks\n- Note: space field is used for CQL queries, expand='space' returns structured objects",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        },
+        "expand": {
+          "description": "Comma-separated list of properties to expand in results.\nSupported values:\n- space: Add detailed space information object with 'spaceKey', 'name', 'description' fields\n- version: Enhance existing version object by adding 'when' (timestamp) and 'by' (user object) fields\n- body: Ensure content body has proper storage structure (may affect pagination limits)\n- body.storage: Ensure storage representation has proper structure with 'value' and 'representation' fields\n- body.view: Add view representation of body (converted from storage) with 'value' and 'representation' fields\n- metadata: Add metadata object with 'labels' and 'properties' sub-objects\n- metadata.labels: Add metadata object with only 'labels' sub-object\n- history: No effect (history is already included in base response)\n- ancestors: Enhance existing ancestors array by adding full details (type, title, status, space, links) to each ancestor\n- container: Add container object (same structure as space field)",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "start": {
+          "description": "Starting index for pagination (default: 0, must be non-negative)",
+          "type": "integer",
+          "nullable": true,
+          "default": 0,
+          "minimum": 0
+        },
+        "limit": {
+          "description": "Maximum number of results to return (default: 25, range: 1-1000)",
+          "type": "integer",
+          "nullable": true,
+          "default": 25,
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "cql"
+      ]
+    }
+  },
+  {
+    "name": "update_attachment_data",
+    "description": "Updates the file content of an existing attachment.\n\nThis function replaces the file data of an existing attachment with new file data. The attachment\nmust exist and be associated with the specified parent content. The version number is incremented\nand metadata is updated. Input validation is performed using Pydantic models.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the parent content containing the attachment. Must be a non-empty numeric string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^\\d+$"
+        },
+        "attachmentId": {
+          "description": "The unique identifier of the attachment to update. Must be a non-empty numeric string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^\\d+$"
+        },
+        "file": {
+          "description": "The file path of the new file to replace the existing attachment data. Must be a non-empty string and the file must exist. Maximum file size is 50 MB.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "comment": {
+          "description": "An optional comment describing the update. If empty string is provided, the existing comment will be removed. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "minorEdit": {
+          "description": "If set to true, no notification email or activity stream will be generated for this update. Defaults to false.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        }
+      },
+      "required": [
+        "id",
+        "attachmentId",
+        "file"
+      ]
+    }
+  },
+  {
+    "name": "update_attachment_metadata",
+    "description": "Updates the metadata of an existing attachment.\n\nThis function allows updating various metadata fields of an attachment such as comment, mediaType,\ntitle. The attachment must exist and be associated with the\nspecified parent content. Input validation is performed using Pydantic models.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the parent content that contains the attachment. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "attachmentId": {
+          "description": "The unique identifier of the attachment to update. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "body": {
+          "description": "A dictionary containing the metadata fields to update. Common fields include: comment (str): Attachment comment/description, mediaType (str): MIME type (e.g., \"text/plain\", \"application/pdf\"), title (str): New display name for the attachment",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "comment": {
+              "description": "Attachment comment or description. Defaults to None. The existing comment is removed if empty string is passed.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "mediaType": {
+              "description": "MIME type of the attachment (e.g., \"text/plain\", \"application/pdf\", \"image/png\"). Defaults to None.",
+              "type": "string",
+              "nullable": true,
+              "default": null,
+              "minLength": 1,
+              "pattern": "^[\\w.+-]+/[\\w.+-]+$"
+            },
+            "title": {
+              "description": "New display name/title for the attachment. Defaults to None. Must be a non-empty string between 1 and 500 characters when provided.",
+              "type": "string",
+              "nullable": true,
+              "default": null,
+              "minLength": 1,
+              "maxLength": 500
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "id",
+        "attachmentId",
+        "body"
+      ]
+    }
+  },
+  {
+    "name": "update_content",
+    "description": "Updates existing content.\n\nThis function updates an existing content item with new values. Versioning is managed\nautomatically: the version is incremented by one. The update payload should not include\na version object (any provided version data is ignored).\n\nSpecial behavior:\n  - **Restoring a trashed page:** To restore content that is \"trashed\", the update request\n    must set its status to \"current\". In that case, only the version is incremented and\n    the status updated to \"current\". No other fields are modified.\n  - **Publishing a draft:** If the content is a draft, it can only be updated by setting\n    status to \"current\" (publishing it). Updating a draft while keeping it as draft is\n    not supported.\n  - **Partial body updates:** When updating the body, if only 'value' is provided in\n    body.storage, the existing 'representation' is preserved. Both fields can be updated\n    by providing both in the request.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "ID of the content to update. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "body": {
+          "description": "A payload with the fields to be updated for the content item. All fields are optional - provide only the fields you need to update. At least one field must be provided. Fields that can be updated: title (str, optional): New content title. Must be a non-empty string if provided. status (str, optional): New content status. Must be one of: current, archived, draft, trashed if provided. body (Dict, optional): New content body object with storage representation containing value (str, required) and representation (str, optional). spaceKey (str, optional): New space key. Must be a non-empty string and must exist in the database if provided. ancestors (List[str], optional): List of ancestor IDs for comments. Each ID must be a non-empty string and must exist.",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "title": {
+              "description": "New content title. If provided, must be a non-empty string after trimming (whitespace-only is rejected at validation). Maximum length 500.",
+              "type": "string",
+              "nullable": true,
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "status": {
+              "description": "New content status. Must be one of: 'current', 'archived', 'draft', 'trashed' if provided.",
+              "type": "string",
+              "nullable": true,
+              "enum": [
+                "current",
+                "archived",
+                "draft",
+                "trashed"
+              ]
+            },
+            "body": {
+              "description": "New content body object with storage representation. Contains storage object (required if body is provided) with value property (str, required): Markup content, required if storage is provided, and representation property (str, optional): Markup type (e.g., storage), if not provided the existing representation value is preserved.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "storage": {
+                  "description": "Storage representation with value (str, required): Markup content, required if storage is provided, and representation (str, optional): Markup type (e.g., storage), if not provided the existing representation value is preserved.",
+                  "type": "object",
+                  "nullable": false,
+                  "properties": {
+                    "value": {
+                      "description": "Markup content. Required if storage is provided.",
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "representation": {
+                      "description": "Markup type (e.g., \"storage\"). If not provided, existing representation is preserved.",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null,
+                      "enum": [
+                        "storage",
+                        "view",
+                        "editor",
+                        "export_view",
+                        "styled_view"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "value"
+                  ]
+                }
+              },
+              "required": [
+                "storage"
+              ]
+            },
+            "spaceKey": {
+              "description": "New space key. Alphanumeric (A–Z, a–z, 0–9) only, 1–50 characters; must exist in the database if provided.",
+              "type": "string",
+              "nullable": true,
+              "minLength": 1,
+              "maxLength": 50,
+              "pattern": "^[A-Za-z0-9]+$"
+            },
+            "ancestors": {
+              "description": "List of ancestor IDs (for comments). Each id must be a numeric string (digits only) and must exist.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "description": "Numeric Docfluence content id (digits only).",
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[0-9]+$"
+              }
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "id",
+        "body"
+      ]
+    }
+  },
+  {
+    "name": "update_content_property",
+    "description": "Updates an existing content property with a new value and version.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the content. Must be a non-empty numeric string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^\\d+$"
+        },
+        "key": {
+          "description": "The key of the property to update. Non-empty string; must not contain ':' (reserved for composite storage keys).",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^[^:]+$"
+        },
+        "body": {
+          "description": "Property update payload with new property value and version",
+          "type": "object",
+          "properties": {
+            "value": {
+              "nullable": true,
+              "default": null,
+              "description": "The property value. Can be any JSON type.",
+              "anyOf": [
+                {
+                  "description": "Text value.",
+                  "type": "string"
+                },
+                {
+                  "description": "Numeric value.",
+                  "type": "number"
+                },
+                {
+                  "description": "Integer value.",
+                  "type": "integer"
+                },
+                {
+                  "description": "Boolean value.",
+                  "type": "boolean"
+                },
+                {
+                  "description": "Circular reference",
+                  "type": "object"
+                },
+                {
+                  "description": "Circular reference",
+                  "type": "array",
+                  "items": {}
+                }
+              ]
+            },
+            "version": {
+              "description": "Version object with new version number to apply.",
+              "type": "object",
+              "properties": {
+                "number": {
+                  "description": "New version number to apply (typically current+1)",
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": [
+                "number"
+              ]
+            }
+          },
+          "required": [
+            "version"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "key",
+        "body"
+      ]
+    }
+  },
+  {
+    "name": "update_space",
+    "description": "Updates an existing space.\n\nUpdates and returns a space dictionary for the space specified by spaceKey.\nAt least one field (name or description) must be provided in body. \nSpaces can only be updated by space creator or admins",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spaceKey": {
+          "description": "The unique identifier of the space to update. Must be a non-empty alphanumeric string (A-Z, 0-9), max 50 characters. Leading/trailing whitespace is trimmed.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "maxLength": 50,
+          "pattern": "^\\s*[A-Za-z0-9]+\\s*$"
+        },
+        "body": {
+          "description": "A data payload with the new values for the space's attributes. Must contain at least one of: name or description. Fields: name (Optional[str]) - The new display name of the space, must be non-empty string if provided, defaults to None; description (Optional[str]) - The new description of the space, defaults to None.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "The new display name of the space. Must be non-empty string if provided. Defaults to None.",
+              "type": "string",
+              "nullable": true,
+              "default": null,
+              "minLength": 1
+            },
+            "description": {
+              "description": "The new description of the space. Defaults to None.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "spaceKey",
+        "body"
+      ]
+    }
+  },
+  {
+    "name": "update_user",
+    "description": "Update an existing Docfluence user.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "description": "Username of the user to update.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "displayName": {
+          "description": "New display name for the user.",
+          "type": "string",
+          "nullable": true,
+          "maxLength": 200
+        },
+        "active": {
+          "description": "Whether the user account is active.",
+          "type": "boolean",
+          "nullable": true
+        },
+        "groups": {
+          "description": "Replacement group memberships. Each group name must exist in the database.",
+          "type": "array",
+          "nullable": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "username"
+      ]
+    }
+  }
+]

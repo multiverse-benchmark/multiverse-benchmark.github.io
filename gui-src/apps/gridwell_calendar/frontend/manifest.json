@@ -1,0 +1,12 @@
+{
+  "id": "gridwell_calendar",
+  "name": "Calendar",
+  "icon": "./icons/gridwell_calendar.svg",
+  "iconBackground": "linear-gradient(135deg, #06B6D4 0%, #0D9488 100%)",
+  "description": "GridwellCalendar",
+  "backendService": "gridwell_calendar",
+  "defaultWindow": {
+    "width": 1100,
+    "height": 700
+  }
+}

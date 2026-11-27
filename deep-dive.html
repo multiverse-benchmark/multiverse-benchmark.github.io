@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ffffff" />
+    <script>
+      // Apply the colour theme before styles render: light, unless the visitor chose dark with the
+      // switch in the header (remembered in this browser). Same script in index.html,
+      // deep-dive.html, and coming-soon.html; src/lib/colorTheme.ts holds the same names and values.
+      (() => {
+        let saved;
+        try { saved = localStorage.getItem('multiverse-color-theme'); } catch {}
+        const dark = saved === 'dark';
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        if (dark) document.querySelector('meta[name="theme-color"]').content = '#101216';
+      })();
+    </script>
+    <meta name="description" content="Explore MultiVerse's validation tasks, each model's results on them, design dimensions, benchmark comparisons, dataset statistics, tool API source code, and release changes." />
+    <meta property="og:title" content="MultiVerse · Dataset, tool APIs, and benchmark design" />
+    <meta property="og:description" content="The task explorer, the result explorer, design dimensions and benchmark comparison, dataset statistics, and the tool explorer of the MultiVerse benchmark." />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/x-icon" href="./favicon.ico?v=purple-parallel" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/svg+xml" href="/src/assets/multiverse-service-orbit-icon.svg" sizes="any" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=purple-parallel" sizes="180x180" />
+    <title>MultiVerse · Dataset, tool APIs, and benchmark design</title>
+  </head>
+  <body>
+    <div id="root">
+      <main>
+        <h1>MultiVerse: dataset, tool APIs, and benchmark design</h1>
+        <p>Browse the validation tasks with their gold trajectories and evaluation criteria, and each model's result and trajectory on every task.</p>
+        <p>Explore eleven design dimensions for realistic tool-use tasks and trustworthy evaluation, and compare MultiVerse with other agent benchmarks.</p>
+        <p>Inspect validation dataset statistics, reference-solution lengths, instruction rubrics, the source code for simulated services, and changes between benchmark releases.</p>
+        <nav aria-label="Explore MultiVerse"><a href="./">MultiVerse project page and leaderboard</a></nav>
+        <noscript><p>Enable JavaScript to explore the tasks, the results, the charts, and the tool source code.</p></noscript>
+      </main>
+    </div>
+    <script type="module" src="/src/deep-dive.tsx"></script>
+    <script type="module" src="/src/lib/analytics.ts"></script>
+  </body>
+</html>

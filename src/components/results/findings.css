@@ -1,0 +1,779 @@
+/*
+ * Main findings: six cards under the leaderboard and the bar chart.
+ * Class prefix: fnd-. Tokens and primitives: ../paper/paper.css.
+ *
+ * The layout follows the block's own width (container queries on .fnd):
+ *   under 680px       one column, each card stacked
+ *   680px to 1149px   one column, each card in two parts side by side
+ *   1150px and wider  the lead card, then two cards, then three cards
+ * (1150px is where three cards to a row first give body lines of about 45 characters.)
+ */
+
+.fnd {
+  container: fnd / inline-size;
+  /* Space kept free beside every plot for the value printed at a bar's end. */
+  --fnd-gutter: 52px;
+  --fnd-bar: 10px;
+  /* A size container has no width of its own, so it takes its parent's. */
+  width: 100%;
+  min-width: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-body);
+}
+
+.fnd-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fnd-cell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+}
+
+/* ---- card ------------------------------------------------------------- */
+
+.fnd-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  min-width: 0;
+  padding: 26px 20px 24px;
+}
+
+/* The card's number sits in the top padding, clear of the content in every layout. */
+.fnd-index {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  color: var(--mv-ink-3);
+  font-family: var(--mv-display);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.fnd-stat {
+  margin: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 40px;
+  font-weight: 600;
+  font-variant-numeric: proportional-nums lining-nums;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.fnd-stat-unit {
+  font-size: 0.5em;
+  letter-spacing: -0.01em;
+}
+
+.fnd-stat-label {
+  margin: 6px 0 0;
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  line-height: 1.5;
+  text-wrap: balance;
+}
+
+/* Hyphenated terms ("closed-source", "model-harness") stay on one line. */
+.fnd-nowrap {
+  white-space: nowrap;
+}
+
+.fnd-title {
+  margin: 18px 0 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+.fnd-body {
+  max-width: 34em;
+  margin: 8px 0 0;
+  color: var(--mv-ink-2);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+/* ---- figures: shared parts -------------------------------------------- */
+
+.fnd-figure {
+  min-width: 0;
+  margin: 18px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--mv-line);
+}
+
+.fnd-figure-caption {
+  margin: 0 0 12px;
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  line-height: 1.5;
+  text-wrap: balance;
+}
+
+/*
+ * The plotted range (0 to max) spans this box; the gutter beside it holds end
+ * labels. The cap keeps a chart small where a stacked card is wide.
+ */
+.fnd-plot {
+  max-width: 420px;
+  margin-right: var(--fnd-gutter);
+}
+
+.fnd-bar {
+  display: block;
+  flex: none;
+  height: var(--fnd-bar);
+  border-radius: 0 4px 4px 0;
+  background: var(--mv-green);
+}
+
+.fnd-bar--neg {
+  border-radius: 4px 0 0 4px;
+  background: var(--mv-fail);
+}
+
+.fnd-bar--closed {
+  background: var(--mv-closed);
+}
+
+.fnd-bar--open {
+  background: var(--mv-open);
+}
+
+.fnd-bar-value {
+  flex: none;
+  color: var(--mv-ink);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* A bar followed by its printed value. The value may run into the gutter. */
+.fnd-track {
+  display: flex;
+  align-items: center;
+  height: 16px;
+}
+
+.fnd-track .fnd-bar {
+  width: calc(100% * var(--fnd-frac));
+}
+
+.fnd-track .fnd-bar-value {
+  padding-left: 7px;
+}
+
+/* Hairline scale. Ticks are placed along the plotted range. */
+.fnd-axis {
+  position: relative;
+  height: 21px;
+  margin-top: 9px;
+  border-top: 1px solid var(--mv-line-strong);
+}
+
+.fnd-tick {
+  position: absolute;
+  top: 0;
+  left: calc(100% * var(--fnd-at));
+  width: 0;
+  height: 4px;
+  border-left: 1px solid var(--mv-line-strong);
+}
+
+.fnd-tick:last-child {
+  margin-left: -1px;
+}
+
+.fnd-tick-label {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  transform: translateX(-50%);
+  color: var(--mv-ink-3);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* ---- bars: one row per item, label above its bar ------------------------ */
+
+.fnd-row + .fnd-row {
+  margin-top: 10px;
+}
+
+.fnd-row-label {
+  display: block;
+  margin: 0 calc(-1 * var(--fnd-gutter)) 3px 0;
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  line-height: 1.4;
+  text-wrap: balance;
+}
+
+/* ---- diverging bars around a zero line --------------------------------- */
+
+.fnd-div {
+  --fnd-gutter: 46px;
+  max-width: 480px;
+}
+
+.fnd-div-rows {
+  position: relative;
+  display: grid;
+  row-gap: 8px;
+}
+
+/* Zero line: a solid hairline through the rows, down to the scale. */
+.fnd-div-rows::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  bottom: -9px;
+  left: 50%;
+  border-left: 1px solid var(--mv-ink-3);
+  transform: translateX(-50%);
+}
+
+.fnd-div-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  min-height: 18px;
+}
+
+.fnd-div-half {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.fnd-div-half--left {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+/* Each half holds one side of the scale plus the gutter for the printed value. */
+.fnd-div-half .fnd-bar {
+  width: calc((100% - var(--fnd-gutter)) * var(--fnd-frac));
+}
+
+.fnd-div-half .fnd-bar-value {
+  padding: 0 6px;
+}
+
+.fnd-div-name {
+  padding: 0 8px;
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.fnd-div .fnd-axis {
+  margin-right: var(--fnd-gutter);
+  margin-left: var(--fnd-gutter);
+}
+
+/* ---- lead card: closed-source vs open-source --------------------------- */
+
+.fnd-lead-text {
+  min-width: 0;
+}
+
+.fnd-card--lead .fnd-stat {
+  font-size: 46px;
+  letter-spacing: -0.04em;
+}
+
+.fnd-card--lead .fnd-stat-unit {
+  font-size: 0.42em;
+  letter-spacing: -0.015em;
+}
+
+.fnd-card--lead .fnd-stat-label {
+  font-size: 13px;
+}
+
+.fnd-card--lead .fnd-title {
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.fnd-card--lead .fnd-body {
+  margin-top: 10px;
+}
+
+.fnd-gap {
+  --fnd-bar: 14px;
+  /* Clear space between a bar and the connector that starts at its end. */
+  --fnd-gap-clear: 3px;
+}
+
+.fnd-gap .fnd-plot {
+  max-width: 480px;
+}
+
+.fnd-gap-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin-right: calc(-1 * var(--fnd-gutter));
+}
+
+.fnd-gap-model {
+  color: var(--mv-ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.fnd-gap .fnd-track {
+  height: var(--fnd-bar);
+  margin: 8px 0;
+}
+
+.fnd-gap .fnd-bar-value {
+  padding-left: 8px;
+  font-size: 13px;
+}
+
+/* The band between the two bars holds the connector and the gap. */
+.fnd-gap-band {
+  position: relative;
+  height: 22px;
+}
+
+/* A stepped hairline from the end of the upper bar to the end of the lower bar. */
+.fnd-gap-link {
+  position: absolute;
+  top: calc(var(--fnd-gap-clear) - 8px);
+  bottom: calc(var(--fnd-gap-clear) - 8px);
+  left: calc(100% * min(var(--fnd-top), var(--fnd-bottom)));
+  width: calc(100% * (max(var(--fnd-top), var(--fnd-bottom)) - min(var(--fnd-top), var(--fnd-bottom))));
+}
+
+.fnd-gap-link::before,
+.fnd-gap-link::after {
+  content: '';
+  position: absolute;
+  border: 0 solid var(--mv-ink-2);
+}
+
+.fnd-gap-link::before {
+  top: 0;
+  width: calc(50% + 1px);
+  height: 50%;
+}
+
+.fnd-gap-link::after {
+  bottom: 0;
+  width: 50%;
+  height: calc(50% + 1px);
+}
+
+/* Upper bar is the longer one: down from its end, left, then down to the lower bar's end. */
+.fnd-gap-link--fall::before {
+  right: 0;
+  border-width: 0 1px 1px 0;
+  border-bottom-right-radius: 6px;
+}
+
+.fnd-gap-link--fall::after {
+  left: 0;
+  border-width: 1px 0 0 1px;
+  border-top-left-radius: 6px;
+}
+
+/* Upper bar is the shorter one: the mirror image. */
+.fnd-gap-link--rise::before {
+  left: 0;
+  border-width: 0 0 1px 1px;
+  border-bottom-left-radius: 6px;
+}
+
+.fnd-gap-link--rise::after {
+  right: 0;
+  border-width: 1px 1px 0 0;
+  border-top-right-radius: 6px;
+}
+
+.fnd-gap-delta {
+  position: absolute;
+  top: 50%;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--mv-tint);
+  transform: translateY(-50%);
+  color: var(--mv-ink);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.fnd-gap-delta--after {
+  left: calc(100% * max(var(--fnd-top), var(--fnd-bottom)) + 7px);
+}
+
+.fnd-gap-delta--before {
+  right: calc(100% * (1 - min(var(--fnd-top), var(--fnd-bottom))) + 7px);
+}
+
+.fnd-gap .fnd-axis {
+  margin-top: 14px;
+}
+
+/* ---- 680px and wider: a card's two parts sit side by side --------------- */
+
+@container fnd (min-width: 680px) {
+  .fnd-grid {
+    row-gap: 16px;
+  }
+
+  .fnd-card {
+    padding: 28px;
+  }
+
+  .fnd-index {
+    top: 13px;
+    right: 16px;
+  }
+
+  /* Same split as the cards below, so the dividers line up down the column. */
+  .fnd-card--lead {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  }
+
+  .fnd-card--lead .fnd-lead-text {
+    align-self: center;
+    padding-right: 36px;
+  }
+
+  .fnd-card--lead .fnd-stat {
+    font-size: 50px;
+  }
+
+  .fnd-card--lead .fnd-figure {
+    align-content: center;
+    margin: 0;
+    padding: 4px 0 4px 36px;
+    border-top: 0;
+    border-left: 1px solid var(--mv-line);
+  }
+}
+
+@container fnd (min-width: 680px) and (max-width: 1149.98px) {
+  /* Text on the left, chart on the right. The last row takes up any height the chart adds. */
+  .fnd-card--chart {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    grid-template-rows: repeat(4, auto) minmax(0, 1fr);
+  }
+
+  .fnd-card--chart > .fnd-stat,
+  .fnd-card--chart > .fnd-stat-label,
+  .fnd-card--chart > .fnd-title,
+  .fnd-card--chart > .fnd-body {
+    grid-column: 1;
+    margin-right: 36px;
+  }
+
+  .fnd-card--chart > .fnd-figure {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-content: center;
+    margin: 0;
+    padding: 4px 0 4px 36px;
+    border-top: 0;
+    border-left: 1px solid var(--mv-line);
+  }
+
+  /* No chart: number and title on the left, body on the right. */
+  .fnd-card--text {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+    grid-template-rows: repeat(3, auto) minmax(0, 1fr);
+  }
+
+  .fnd-card--text > .fnd-stat,
+  .fnd-card--text > .fnd-stat-label,
+  .fnd-card--text > .fnd-title {
+    grid-column: 1;
+    margin-right: 36px;
+  }
+
+  .fnd-card--text > .fnd-body {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-content: center;
+    max-width: calc(34em + 36px);
+    margin: 0;
+    padding: 4px 0 4px 36px;
+    border-left: 1px solid var(--mv-line);
+  }
+}
+
+/* With room to spare, the card without a chart takes the same split as the others. */
+@container fnd (min-width: 880px) and (max-width: 1149.98px) {
+  .fnd-card--text {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  }
+}
+
+/* ---- 880px and wider: the lead card at its full size ---------------------- */
+
+@container fnd (min-width: 880px) {
+  .fnd-card--lead .fnd-stat {
+    font-size: 56px;
+  }
+
+  .fnd-card--lead .fnd-title {
+    font-size: 22px;
+  }
+
+  .fnd-card--lead .fnd-body {
+    font-size: 15px;
+  }
+
+  .fnd-gap {
+    --fnd-bar: 16px;
+  }
+
+  .fnd-gap .fnd-track {
+    margin: 9px 0;
+  }
+
+  .fnd-gap-band {
+    height: 26px;
+  }
+
+  .fnd-gap-link {
+    top: calc(var(--fnd-gap-clear) - 9px);
+    bottom: calc(var(--fnd-gap-clear) - 9px);
+  }
+
+  .fnd-gap-delta {
+    font-size: 13px;
+  }
+
+  .fnd-gap .fnd-figure-caption {
+    margin-bottom: 16px;
+  }
+
+  .fnd-gap .fnd-axis {
+    margin-top: 18px;
+  }
+}
+
+/* ---- 1150px and wider: one, two, then three cards to a row -------------- */
+
+@container fnd (min-width: 1150px) {
+  /*
+   * Twelve columns. Rows: the lead card; five rows shared by the pair (stat,
+   * label, title, body, and a flexible row that takes up any height a chart
+   * beside the text adds); five rows shared by the cards below (stat, label,
+   * title, body, chart). Cards in a row share these tracks through subgrid,
+   * so their stats, titles, bodies, and charts line up.
+   */
+  .fnd-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: auto repeat(4, auto) minmax(0, 1fr) repeat(5, auto);
+    column-gap: 18px;
+    row-gap: 0;
+  }
+
+  .fnd-cell {
+    margin-top: 18px;
+  }
+
+  .fnd-cell--lead {
+    grid-column: 1 / -1;
+    margin-top: 0;
+  }
+
+  .fnd-cell--pair,
+  .fnd-cell--third {
+    grid-row: span 5;
+    grid-template-rows: subgrid;
+  }
+
+  .fnd-cell--span5 {
+    grid-column: span 5;
+  }
+
+  .fnd-cell--span6 {
+    grid-column: span 6;
+  }
+
+  .fnd-cell--span7 {
+    grid-column: span 7;
+  }
+
+  .fnd-cell--third {
+    grid-column: span 4;
+  }
+
+  /* The first row template is what a browser without subgrid uses. */
+  .fnd-cell--pair > .fnd-card,
+  .fnd-cell--third > .fnd-card {
+    grid-row: 1 / -1;
+    grid-template-rows: repeat(4, auto) minmax(0, 1fr);
+    grid-template-rows: subgrid;
+  }
+
+  /* A shorter title sits on the row's last line, next to its body. */
+  .fnd-cell--pair > .fnd-card > .fnd-title,
+  .fnd-cell--third > .fnd-card > .fnd-title {
+    align-self: end;
+  }
+
+  .fnd-cell--third > .fnd-card {
+    padding: 26px 22px;
+  }
+
+  .fnd-cell--third .fnd-title {
+    font-size: 16px;
+  }
+
+  /*
+   * A card without a chart leaves the last shared row empty. Its body takes
+   * that row as well, so the card's bottom padding is still measured.
+   */
+  .fnd-cell--pair > .fnd-card--text > .fnd-body,
+  .fnd-cell--third > .fnd-card--text > .fnd-body {
+    grid-row: span 2;
+  }
+
+  /* The wider card of the pair: text on the left, chart on the right. */
+  .fnd-cell--span7 > .fnd-card--chart {
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  }
+
+  .fnd-cell--span7 > .fnd-card--chart > .fnd-stat,
+  .fnd-cell--span7 > .fnd-card--chart > .fnd-stat-label,
+  .fnd-cell--span7 > .fnd-card--chart > .fnd-title,
+  .fnd-cell--span7 > .fnd-card--chart > .fnd-body {
+    grid-column: 1;
+    margin-right: 28px;
+  }
+
+  .fnd-cell--span7 > .fnd-card--chart > .fnd-figure {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-content: center;
+    margin: 0;
+    padding: 4px 0 4px 28px;
+    border-top: 0;
+    border-left: 1px solid var(--mv-line);
+  }
+
+  .fnd-card--lead {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr);
+    padding: 36px 40px;
+  }
+
+  .fnd-card--lead .fnd-lead-text {
+    padding-right: 52px;
+  }
+
+  .fnd-card--lead .fnd-figure {
+    padding-left: 52px;
+  }
+
+  /* Cards that share a row enter one after another. */
+  .fnd-cell--pair + .fnd-cell--pair > .fnd-card,
+  .fnd-cell--third + .fnd-cell--third > .fnd-card {
+    --fnd-delay: 70ms;
+  }
+
+  .fnd-cell--third + .fnd-cell--third + .fnd-cell--third > .fnd-card {
+    --fnd-delay: 140ms;
+  }
+}
+
+/* ---- forced colors: bars keep a fill that contrasts with the user's canvas -- */
+
+@media (forced-colors: active) {
+  .fnd-bar {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  .fnd-bar--open,
+  .fnd-bar--neg {
+    background: Highlight;
+  }
+}
+
+/* ---- motion: once, when a card or a figure first scrolls into view ------ */
+
+@media (prefers-reduced-motion: no-preference) {
+  .fnd-card[data-fnd-motion='play'] {
+    animation: fnd-rise 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) var(--fnd-delay, 0ms) backwards;
+  }
+
+  .fnd-figure[data-fnd-motion='play'] .fnd-bar {
+    animation: fnd-grow 0.8s cubic-bezier(0.22, 0.61, 0.36, 1) 0.1s backwards;
+  }
+
+  .fnd-figure[data-fnd-motion='play'] .fnd-bar--neg {
+    animation-name: fnd-grow-left;
+  }
+
+  .fnd-figure[data-fnd-motion='play'] .fnd-gap-link,
+  .fnd-figure[data-fnd-motion='play'] .fnd-gap-delta {
+    animation: fnd-fade 0.4s ease-out 0.75s backwards;
+  }
+}
+
+@keyframes fnd-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes fnd-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The bar keeps its full box while a clip uncovers it, so its measured width never changes. */
+@keyframes fnd-grow {
+  from {
+    clip-path: inset(0 100% 0 0 round 0 4px 4px 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0 round 0 4px 4px 0);
+  }
+}
+
+@keyframes fnd-grow-left {
+  from {
+    clip-path: inset(0 0 0 100% round 4px 0 0 4px);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0 round 4px 0 0 4px);
+  }
+}

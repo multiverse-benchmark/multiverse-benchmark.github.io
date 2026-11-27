@@ -1,0 +1,31 @@
+{
+  "generatedBy": "scripts/export_paper.py",
+  "paper": {
+    "sha256": "ee32bb45072ebbdd648f5c98eb0f57b510782d3236347017cd7bc88c402222e8"
+  },
+  "results": {
+    "table": {
+      "file": "main_results.tsv",
+      "sha256": "b3da25ad2dae21580849a1741735c0345dcb04f7d119cea84de8a72cf05a0a57"
+    },
+    "figure": {
+      "label": "fig:main-results-full",
+      "file": "main_results.pdf",
+      "sha256": "c7b11f3906246d978d4f58e2a6b84b54edb5f52dd51cb3fdc94f30ca707c058a",
+      "cellsCheckedAgainstTable": 300
+    },
+    "paper": {
+      "sha256": "ebb76d699cd740b38b2d912f4b626ba5c9570fe166ed96042ee3d62b7bf57987"
+    }
+  },
+  "comparison": {
+    "compactTable": "tab:comparison-compact",
+    "fullTable": "tab:comparison"
+  },
+  "checklist": {
+    "table": "tab:abc-full",
+    "paper": {
+      "sha256": "d7fa7a1aac855a009e8bf9573cf28ee0f5eba7b8e9c812e5960aa5caf035332c"
+    }
+  }
+}

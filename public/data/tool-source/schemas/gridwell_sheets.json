@@ -1,0 +1,2148 @@
+[
+  {
+    "name": "append_spreadsheet_values",
+    "description": "Appends values to a range in a spreadsheet.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spreadsheet_id": {
+          "description": "The ID of the spreadsheet to append values to.",
+          "type": "string",
+          "nullable": false
+        },
+        "range": {
+          "description": "The A1 notation of the range to append values to. Supports various formats:\n\nBasic ranges (without sheet name - uses first sheet):\n- Single cell: \"A1\"\n- Cell range: \"A1:B2\"\n- Full column: \"A:B\"\n- Full row: \"1:2\"\n- Mixed range: \"A2:Z\" (from cell A2 to end of column Z)\n\nWith sheet names (recommended for multi-sheet spreadsheets):\n- Simple sheet: \"Sheet1!A1:B2\"\n- Default sheets: \"Sheet2!A:A\", \"sheet1!1:10\"\n- Sheet with spaces: \"'My Sheet'!A1:B2\" (use single quotes)\n- Sheet with apostrophes: \"'John''s Sheet'!A1\" (escape apostrophes with double apostrophes)\n- Sheet with special characters: \"'Data-Sheet (2024)'!A1:D10\"\n\nNote: If no sheet name specified, first sheet is automatically used.\nValues are appended after the last row of data in the specified range.",
+          "type": "string",
+          "nullable": false
+        },
+        "valueInputOption": {
+          "description": "How the input data should be interpreted. Allowed: 'RAW', 'USER_ENTERED'.",
+          "type": "string",
+          "enum": [
+            "RAW",
+            "USER_ENTERED"
+          ],
+          "nullable": false
+        },
+        "values": {
+          "description": "The values to append to the range (list of rows). Each inner list represents a row.\nEach cell value can be:\n- str: Text value for the cell\n- int: Integer numeric value for the cell\n- float: Decimal numeric value for the cell\n- bool: Boolean value for the cell (True/False)\n- None: Empty cell value",
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "description": "A row of cell values. Each cell can contain a string, number, boolean, or null value.",
+            "type": "array",
+            "nullable": false,
+            "items": {
+              "anyOf": [
+                {
+                  "description": "Text value",
+                  "type": "string",
+                  "nullable": true
+                },
+                {
+                  "description": "Numeric value",
+                  "type": "number",
+                  "nullable": false
+                },
+                {
+                  "description": "Boolean value",
+                  "type": "boolean",
+                  "nullable": false
+                }
+              ],
+              "description": "Cell value. Can be a string (text), number, boolean, or null (empty cell)."
+            }
+          }
+        },
+        "insertDataOption": {
+          "description": "How the input data should be inserted. Allowed: 'OVERWRITE', 'INSERT_ROWS'. Defaults to None (behaves like 'INSERT_ROWS' for appending).",
+          "type": "string",
+          "enum": [
+            "INSERT_ROWS",
+            "OVERWRITE"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "includeValuesInResponse": {
+          "description": "Whether to include the appended values in the response. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "responseValueRenderOption": {
+          "description": "How values should be rendered in the response. Allowed: 'FORMATTED_VALUE', 'UNFORMATTED_VALUE', 'FORMULA'. Defaults to 'FORMATTED_VALUE'.",
+          "type": "string",
+          "enum": [
+            "FORMATTED_VALUE",
+            "FORMULA",
+            "UNFORMATTED_VALUE"
+          ],
+          "default": "FORMATTED_VALUE"
+        },
+        "responseDateTimeRenderOption": {
+          "description": "How dates, times, and durations should be rendered in the response. Allowed: 'SERIAL_NUMBER', 'FORMATTED_STRING'. Defaults to 'SERIAL_NUMBER'.",
+          "type": "string",
+          "enum": [
+            "FORMATTED_STRING",
+            "SERIAL_NUMBER"
+          ],
+          "default": "SERIAL_NUMBER"
+        },
+        "majorDimension": {
+          "description": "The major dimension of the values. Allowed: 'ROWS' (default), 'COLUMNS'. Defaults to \"ROWS\".",
+          "type": "string",
+          "enum": [
+            "COLUMNS",
+            "ROWS"
+          ],
+          "default": "ROWS"
+        }
+      },
+      "required": [
+        "spreadsheet_id",
+        "range",
+        "valueInputOption",
+        "values"
+      ]
+    }
+  },
+  {
+    "name": "batch_clear_spreadsheet_values",
+    "description": "Clears values from multiple ranges in a spreadsheet.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spreadsheet_id": {
+          "description": "The ID of the spreadsheet to clear values from. If you do not have a spreadsheet ID, use create_spreadsheet to create a new spreadsheet first.",
+          "type": "string"
+        },
+        "ranges": {
+          "description": "List of A1 notations of ranges to clear. Each range supports various formats:\n\nBasic ranges (without sheet name - uses first sheet):\n- Single cell: \"A1\"\n- Cell range: \"A1:B2\"\n- Full column: \"A:B\"\n- Full row: \"1:2\"\n- Mixed range: \"A2:Z\" (from cell A2 to end of column Z)\n\nWith sheet names (recommended for multi-sheet spreadsheets):\n- Simple sheet: \"Sheet1!A1:B2\"\n- Default sheets: \"Sheet2!A:A\", \"sheet1!1:10\"\n- Sheet with spaces: \"'My Sheet'!A1:B2\" (use single quotes)\n- Sheet with apostrophes: \"'John''s Sheet'!A1\" (escape apostrophes with double apostrophes)\n- Sheet with special characters: \"'Data-Sheet (2024)'!A1:D10\"\n- Sheet-only: \"Sheet1\" (entire sheet)\n\nNote: If no sheet name specified, first sheet is automatically used.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "spreadsheet_id",
+        "ranges"
+      ]
+    }
+  },
+  {
+    "name": "batch_clear_spreadsheet_values_by_data_filter",
+    "description": "Clears values from a spreadsheet using data filters.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spreadsheet_id": {
+          "description": "The ID of the spreadsheet to clear values from.",
+          "type": "string"
+        },
+        "dataFilters": {
+          "description": "List of data filters. Each dictionary must contain: - a1Range (str): The A1 notation of the range to clear (non-empty string in A1 format). The A1 notation is a syntax used to define a cell or range of cells with a string that contains the sheet name plus the starting and ending cell coordinates using column letters and row numbers like: \"Sheet1!A1:D3\" or \"A1:D3\"",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "a1Range": {
+                "description": "The A1 notation of the range to clear (non-empty string in A1 format). The A1 notation is a syntax used to define a cell or range of cells with a string that contains the sheet name plus the starting and ending cell coordinates using column letters and row numbers like: \"Sheet1!A1:D3\" or \"A1:D3\"",
+                "type": "string"
+              }
+            },
+            "required": [
+              "a1Range"
+            ]
+          }
+        },
+        "userId": {
+          "description": "Optional user ID to use when accessing the spreadsheet. Defaults to \"me\" if not provided.",
+          "type": "string",
+          "nullable": true,
+          "default": "me"
+        }
+      },
+      "required": [
+        "spreadsheet_id",
+        "dataFilters"
+      ]
+    }
+  },
+  {
+    "name": "batch_get_spreadsheet_values",
+    "description": "Gets values from multiple ranges in a spreadsheet.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spreadsheet_id": {
+          "description": "The ID of the spreadsheet to retrieve values from.",
+          "type": "string"
+        },
+        "ranges": {
+          "description": "List of A1 notations of ranges to retrieve values from. Each range supports various formats:\n\nBasic ranges (without sheet name - uses first sheet):\n- Single cell: \"A1\"\n- Cell range: \"A1:B2\"\n- Full column: \"A:B\"\n- Full row: \"1:2\"\n- Mixed range: \"A2:Z\" (from cell A2 to end of column Z)\n\nWith sheet names (recommended for multi-sheet spreadsheets):\n- Simple sheet: \"Sheet1!A1:B2\"\n- Default sheets: \"Sheet2!A:A\", \"sheet1!1:10\"\n- Sheet with spaces: \"'My Sheet'!A1:B2\" (use single quotes)\n- Sheet with apostrophes: \"'John''s Sheet'!A1\" (escape apostrophes with double apostrophes)\n- Sheet with special characters: \"'Data-Sheet (2024)'!A1:D10\"\n- Sheet-only: \"Sheet1\" (entire sheet)\n\nNote: If no sheet name specified, first sheet is automatically used.",
+          "type": "array",
+          "items": {
+            "description": "A range in A1 notation. The A1 notation is a syntax used to define a cell or range of cells with a string that contains the sheet name plus the starting and ending cell coordinates using column letters and row numbers like: \"Sheet1!A1:D3\" or \"A1:D3\"",
+            "type": "string"
+          }
+        },
+        "majorDimension": {
+          "description": "The major dimension that results should use. Valid values: \"ROWS\", \"COLUMNS\". Defaults to \"ROWS\".",
+          "type": "string",
+          "default": "ROWS",
+          "enum": [
+            "ROWS",
+            "COLUMNS"
+          ]
+        },
+        "valueRenderOption": {
+          "description": "How values should be rendered in the output. Valid values: \"FORMATTED_VALUE\", \"UNFORMATTED_VALUE\", \"FORMULA\". Defaults to \"FORMATTED_VALUE\".",
+          "type": "string",
+          "default": "FORMATTED_VALUE",
+          "enum": [
+            "FORMATTED_VALUE",
+            "UNFORMATTED_VALUE",
+            "FORMULA"
+          ]
+        },
+        "dateTimeRenderOption": {
+          "description": "How dates, times, and durations should be rendered. Valid values: \"SERIAL_NUMBER\", \"FORMATTED_STRING\". Defaults to \"SERIAL_NUMBER\".",
+          "type": "string",
+          "default": "SERIAL_NUMBER",
+          "enum": [
+            "SERIAL_NUMBER",
+            "FORMATTED_STRING"
+          ]
+        }
+      },
+      "required": [
+        "spreadsheet_id",
+        "ranges"
+      ]
+    }
+  },
+  {
+    "name": "batch_get_spreadsheet_values_by_data_filter",
+    "description": "Retrieves values from a spreadsheet using data filters. Uses an API-aligned return structure.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spreadsheet_id": {
+          "description": "The ID of the spreadsheet to retrieve values from.",
+          "type": "string"
+        },
+        "dataFilters": {
+          "description": "List of data filter objects. Each filter can specify one of: a1Range, gridRange, or developerMetadataLookup. If None or empty, an empty \"valueRanges\" list is returned. Filters that do not match stored data are silently omitted from the response.",
+          "type": "array",
+          "nullable": true,
+          "items": {
+            "description": "Data filter object that can specify one of: a1Range, gridRange, or developerMetadataLookup.",
+            "type": "object",
+            "properties": {
+              "a1Range": {
+                "description": "A1 notation range (e.g., \"Sheet1!A1:B2\").",
+                "type": "string",
+                "nullable": true
+              },
+              "gridRange": {
+                "description": "Grid range object with sheetId and optional row/column indices.",
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "sheetId": {
+                    "description": "The sheet ID this range is on.",
+                    "type": "integer"
+                  },
+                  "startRowIndex": {
+                    "description": "The start row index (inclusive).",
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "endRowIndex": {
+                    "description": "The end row index (exclusive).",
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "startColumnIndex": {
+                    "description": "The start column index (inclusive).",
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "endColumnIndex": {
+                    "description": "The end column index (exclusive).",
+                    "type": "integer",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "sheetId"
+                ]
+              },
+              "developerMetadataLookup": {
+                "description": "Developer metadata lookup object. Must contain at least one of: metadataKey, metadataValue, or metadataId.",
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "metadataKey": {
+                    "description": "The metadata key to look up.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "metadataValue": {
+                    "description": "The metadata value to look up.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "metadataId": {
+                    "description": "The metadata ID to look up.",
+                    "type": "integer",
+                    "nullable": true
+                  }
+                },
+                "required": []
+              }
+            },
+            "required": []
+          }
+        },
+        "majorDimension": {
+          "description": "Major dimension for results (\"ROWS\" or \"COLUMNS\"). Defaults to \"ROWS\".",
+          "type": "string",
+          "enum": [
+            "ROWS",
+            "COLUMNS"
+          ],
+          "nullable": false,
+          "default": "ROWS"
+        },
+        "valueRenderOption": {
+          "description": "How values should be represented in the output. Valid values: \"FORMATTED_VALUE\", \"UNFORMATTED_VALUE\", \"FORMULA\". If not provided or None is passed, \"FORMATTED_VALUE\" is used.",
+          "type": "string",
+          "enum": [
+            "FORMATTED_VALUE",
+            "UNFORMATTED_VALUE",
+            "FORMULA"
+          ],
+          "nullable": true,
+          "default": "FORMATTED_VALUE"
+        },
+        "dateTimeRenderOption": {
+          "description": "How dates, times, and durations should be represented in the output. This is ignored if valueRenderOption is \"FORMATTED_VALUE\". Valid values: \"SERIAL_NUMBER\", \"FORMATTED_STRING\". If not provided or None is passed, \"SERIAL_NUMBER\" is used.",
+          "type": "string",
+          "enum": [
+            "SERIAL_NUMBER",
+            "FORMATTED_STRING"
+          ],
+          "nullable": true,
+          "default": "SERIAL_NUMBER"
+        },
+        "userId": {
+          "description": "The user ID to use for accessing the spreadsheet. If not provided or None is passed, \"me\" is used.",
+          "type": "string",
+          "nullable": true,
+          "default": "me"
+        }
+      },
+      "required": [
+        "spreadsheet_id"
+      ]
+    }
+  },
+  {
+    "name": "batch_update_spreadsheet",
+    "description": "Applies one or more updates to the spreadsheet.\n\nDescription: This function applies one or more updates to the spreadsheet.\nIt supports the following request types:\n- addSheetRequest - Adds a new sheet to the spreadsheet.\n- deleteSheetRequest - Deletes an existing sheet from the spreadsheet.\n- updateSheetPropertiesRequest - Updates the properties of an existing sheet.\n- updateCells - Updates the cells in a specified range of the spreadsheet.\n- updateSheetProperties - Updates the properties of an existing sheet.\nThe function validates the requests and updates the spreadsheet accordingly.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spreadsheet_id": {
+          "description": "The ID of the spreadsheet to update. If you do not have a spreadsheet ID, use create_spreadsheet to create a new spreadsheet first.",
+          "type": "string"
+        },
+        "requests": {
+          "description": "List of update requests. Defaults to None.\nEach dictionary in the list must contain exactly one key, which specifies the type of\nrequest. The value for that key is a dictionary payload for the request.\nSupported request keys and their payload structures:\n- 'addSheetRequest': Payload must conform to AddSheetRequestPayload.\n     Requires 'properties'. sheetId is optional and auto-generated if omitted.\n- 'deleteSheetRequest': Payload must conform to DeleteSheetRequestPayload.\n    Requires 'sheetId'.\n- 'updateSheetPropertiesRequest': Payload must conform to UpdateSheetPropertiesRequestPayload.\n    Requires 'properties' (with 'sheetId') and 'fields'.\n- 'updateCells': Payload must conform to UpdateCellsPayload.\n    Requires 'range' and 'rows'.\n- 'updateSheetProperties': Payload must conform to UpdateSheetPropertiesSimplePayload.\n    Requires 'properties' (with 'sheetId'); 'fields' is optional.\n\n.. hlist::\n   :columns: 1\n\n   * **addSheetRequest** (`Dict`) - Adds a new sheet.\n   * **deleteSheetRequest** (`Dict`) - Deletes a sheet.\n   * **updateSheetPropertiesRequest** (`Dict`) - Updates a sheet's properties.\n   * **updateCells** (`Dict`) - Updates cells in a sheet.\n   * **updateSheetProperties** (`Dict`) - Updates a sheet's properties (simplified).\n\n.. rubric:: Requests\n\n.. code-block:: json\n\n   [\n       {\n           \"addSheetRequest\": {\n               \"properties\": {\n                   \"sheetId\": 1,\n                   \"title\": \"New Sheet\"\n               }\n           }\n       },\n       {\n           \"deleteSheetRequest\": {\n               \"sheetId\": 0\n           }\n       }\n   ]\n\n.. container:: oneof\n\n   .. container:: addSheetRequest\n\n      Adds a new sheet.\n\n      .. show_properties::\n         :properties: properties\n\n      .. rubric:: Properties\n\n      .. code-block:: json\n\n         {\n             \"sheetId\": 12345,\n             \"title\": \"New Sheet\"\n         }\n\n   .. container:: deleteSheetRequest\n\n      Deletes a sheet.\n\n      .. show_properties::\n         :properties: sheetId\n\n      .. rubric:: sheetId\n\n      .. code-block:: json\n\n         {\n             \"sheetId\": 12345\n         }\n\n   .. container:: updateSheetPropertiesRequest\n\n      Updates a sheet's properties.\n\n      .. show_properties::\n         :properties: properties, fields\n\n      .. rubric:: Properties and Fields\n\n      .. code-block:: json\n\n         {\n             \"properties\": {\n                 \"sheetId\": 12345,\n                 \"title\": \"Updated Sheet\"\n             },\n             \"fields\": \"title\"\n         }\n\n   .. container:: updateCells\n\n      Updates cells in a sheet.\n\n      .. show_properties::\n         :properties: rows, range\n\n      .. rubric:: Rows and Range\n\n      .. code-block:: json\n\n         {\n             \"rows\": [\n                 [\"A1\", \"B1\"],\n                 [\"A2\", \"B2\"]\n             ],\n             \"range\": {\n                 \"sheetId\": 0,\n                 \"startRowIndex\": 0,\n                 \"endRowIndex\": 2,\n                 \"startColumnIndex\": 0,\n                 \"endColumnIndex\": 2\n             }\n         }",
+          "type": "array",
+          "nullable": true,
+          "items": {
+            "description": "A request object containing exactly one of the supported request types",
+            "type": "object",
+            "properties": {
+              "addSheetRequest": {
+                "description": "Adds a new sheet to the spreadsheet",
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "properties": {
+                    "description": "Properties of the new sheet. sheetId is optional and will be auto-generated if not provided. All other fields are optional.",
+                    "type": "object",
+                    "properties": {
+                      "sheetId": {
+                        "description": "The ID of the sheet. Must be non-negative. Auto-generated if not provided or None.",
+                        "type": "integer",
+                        "default": null,
+                        "minimum": 0,
+                        "nullable": true
+                      },
+                      "title": {
+                        "description": "The name of the sheet.",
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "index": {
+                        "description": "The index of the sheet within the spreadsheet. Auto-generated if not provided or None.",
+                        "type": "integer",
+                        "default": null,
+                        "minimum": 0,
+                        "nullable": true
+                      },
+                      "sheetType": {
+                        "description": "The type of sheet. Defaults to GRID if not provided.",
+                        "type": "string",
+                        "enum": [
+                          "SHEET_TYPE_UNSPECIFIED",
+                          "GRID",
+                          "OBJECT",
+                          "DATA_SOURCE"
+                        ],
+                        "default": "GRID"
+                      },
+                      "gridProperties": {
+                        "description": "Additional properties of the sheet if this sheet is a grid. (If the sheet is an object sheet, containing a chart or image, then this field will be absent.) When writing it is an error to set any grid properties on non-grid sheets.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "rowCount": {
+                            "description": "Number of rows in the sheet. Must be at least 1.",
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "columnCount": {
+                            "description": "Number of columns in the sheet. Must be at least 1.",
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "frozenRowCount": {
+                            "description": "Number of frozen rows. Must be non-negative.",
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "frozenColumnCount": {
+                            "description": "Number of frozen columns. Must be non-negative.",
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "hideGridlines": {
+                            "description": "Whether to hide gridlines in the sheet.",
+                            "type": "boolean",
+                            "nullable": true
+                          },
+                          "rowGroupControlAfter": {
+                            "description": "Whether row group controls are shown after the group.",
+                            "type": "boolean",
+                            "nullable": true
+                          },
+                          "columnGroupControlAfter": {
+                            "description": "Whether column group controls are shown after the group.",
+                            "type": "boolean",
+                            "nullable": true
+                          }
+                        },
+                        "required": []
+                      },
+                      "hidden": {
+                        "description": "True if the sheet is hidden in the UI, false if it's visible.",
+                        "type": "boolean",
+                        "nullable": true
+                      },
+                      "tabColor": {
+                        "description": "(Deprecated) The color of the tab in the UI. Deprecated: Use tabColorStyle.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "rgbColor": {
+                            "description": "RGB color value. Document styles can only have RGB colors.",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "red": {
+                                "description": "Red component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              },
+                              "green": {
+                                "description": "Green component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              },
+                              "blue": {
+                                "description": "Blue component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              }
+                            },
+                            "required": []
+                          }
+                        },
+                        "required": []
+                      },
+                      "tabColorStyle": {
+                        "description": "The color of the tab in the UI. If tabColor is also set, this field takes precedence.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "rgbColor": {
+                            "description": "RGB color value.",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "red": {
+                                "description": "Red component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              },
+                              "green": {
+                                "description": "Green component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              },
+                              "blue": {
+                                "description": "Blue component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              }
+                            },
+                            "required": []
+                          },
+                          "themeColor": {
+                            "description": "Theme color reference.",
+                            "type": "string",
+                            "nullable": true
+                          }
+                        },
+                        "required": []
+                      },
+                      "rightToLeft": {
+                        "description": "True if the sheet is an RTL sheet instead of an LTR sheet.",
+                        "type": "boolean",
+                        "nullable": true
+                      }
+                    },
+                    "required": []
+                  }
+                },
+                "required": [
+                  "properties"
+                ]
+              },
+              "deleteSheetRequest": {
+                "description": "Deletes a sheet from the spreadsheet",
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "sheetId": {
+                    "description": "The ID of the sheet to delete",
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "sheetId"
+                ]
+              },
+              "updateSheetPropertiesRequest": {
+                "description": "Updates properties of an existing sheet",
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "properties": {
+                    "description": "The properties to update. Must include sheetId. All other fields are optional.",
+                    "type": "object",
+                    "properties": {
+                      "sheetId": {
+                        "description": "The ID of the sheet. Must be non-negative.",
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "title": {
+                        "description": "The name of the sheet.",
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "index": {
+                        "description": "The index of the sheet within the spreadsheet.",
+                        "type": "integer",
+                        "minimum": 0,
+                        "nullable": true
+                      },
+                      "sheetType": {
+                        "description": "The type of sheet. Defaults to GRID if not provided.",
+                        "type": "string",
+                        "enum": [
+                          "SHEET_TYPE_UNSPECIFIED",
+                          "GRID",
+                          "OBJECT",
+                          "DATA_SOURCE"
+                        ],
+                        "default": "GRID"
+                      },
+                      "gridProperties": {
+                        "description": "Additional properties of the sheet if this sheet is a grid. (If the sheet is an object sheet, containing a chart or image, then this field will be absent.) When writing it is an error to set any grid properties on non-grid sheets.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "rowCount": {
+                            "description": "Number of rows in the sheet. Must be at least 1.",
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "columnCount": {
+                            "description": "Number of columns in the sheet. Must be at least 1.",
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "frozenRowCount": {
+                            "description": "Number of frozen rows. Must be non-negative.",
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "frozenColumnCount": {
+                            "description": "Number of frozen columns. Must be non-negative.",
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "hideGridlines": {
+                            "description": "Whether to hide gridlines in the sheet.",
+                            "type": "boolean",
+                            "nullable": true
+                          },
+                          "rowGroupControlAfter": {
+                            "description": "Whether row group controls are shown after the group.",
+                            "type": "boolean",
+                            "nullable": true
+                          },
+                          "columnGroupControlAfter": {
+                            "description": "Whether column group controls are shown after the group.",
+                            "type": "boolean",
+                            "nullable": true
+                          }
+                        },
+                        "required": []
+                      },
+                      "hidden": {
+                        "description": "True if the sheet is hidden in the UI, false if it's visible.",
+                        "type": "boolean",
+                        "nullable": true
+                      },
+                      "tabColor": {
+                        "description": "(Deprecated) The color of the tab in the UI. Deprecated: Use tabColorStyle.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "rgbColor": {
+                            "description": "RGB color value. Document styles can only have RGB colors.",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "red": {
+                                "description": "Red component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              },
+                              "green": {
+                                "description": "Green component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              },
+                              "blue": {
+                                "description": "Blue component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              }
+                            },
+                            "required": []
+                          }
+                        },
+                        "required": []
+                      },
+                      "tabColorStyle": {
+                        "description": "The color of the tab in the UI. If tabColor is also set, this field takes precedence.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "rgbColor": {
+                            "description": "RGB color value.",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "red": {
+                                "description": "Red component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              },
+                              "green": {
+                                "description": "Green component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              },
+                              "blue": {
+                                "description": "Blue component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              }
+                            },
+                            "required": []
+                          },
+                          "themeColor": {
+                            "description": "Theme color reference.",
+                            "type": "string",
+                            "nullable": true
+                          }
+                        },
+                        "required": []
+                      },
+                      "rightToLeft": {
+                        "description": "True if the sheet is an RTL sheet instead of an LTR sheet.",
+                        "type": "boolean",
+                        "nullable": true
+                      }
+                    },
+                    "required": [
+                      "sheetId"
+                    ]
+                  },
+                  "fields": {
+                    "description": "Comma-separated list of fields to update (e.g., \"title\")",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "properties",
+                  "fields"
+                ]
+              },
+              "updateCells": {
+                "description": "Updates cell values in a specified range",
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "range": {
+                    "description": "The grid range to update",
+                    "type": "object",
+                    "properties": {
+                      "sheetId": {
+                        "description": "The ID of the sheet",
+                        "type": "integer"
+                      },
+                      "startRowIndex": {
+                        "description": "The start row (inclusive, 0-based)",
+                        "type": "integer"
+                      },
+                      "endRowIndex": {
+                        "description": "The end row (exclusive, 0-based)",
+                        "type": "integer"
+                      },
+                      "startColumnIndex": {
+                        "description": "The start column (inclusive, 0-based)",
+                        "type": "integer"
+                      },
+                      "endColumnIndex": {
+                        "description": "The end column (exclusive, 0-based)",
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "sheetId",
+                      "startRowIndex",
+                      "endRowIndex",
+                      "startColumnIndex",
+                      "endColumnIndex"
+                    ]
+                  },
+                  "rows": {
+                    "description": "The cell values to write, as a list of rows",
+                    "type": "array",
+                    "items": {
+                      "description": "A row of cell values",
+                      "type": "array",
+                      "items": {
+                        "description": "A cell value (string, number, boolean, or empty for null)",
+                        "nullable": true,
+                        "anyOf": [
+                          {
+                            "description": "Text value",
+                            "type": "string",
+                            "nullable": true
+                          },
+                          {
+                            "description": "Integer numeric value",
+                            "type": "integer"
+                          },
+                          {
+                            "description": "Decimal numeric value",
+                            "type": "number"
+                          },
+                          {
+                            "description": "Boolean value (true/false)",
+                            "type": "boolean"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "range",
+                  "rows"
+                ]
+              },
+              "updateSheetProperties": {
+                "description": "Updates properties of an existing sheet (simplified version)",
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "properties": {
+                    "description": "The properties to update. Must include sheetId. All other fields are optional.",
+                    "type": "object",
+                    "properties": {
+                      "sheetId": {
+                        "description": "The ID of the sheet. Must be non-negative.",
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "title": {
+                        "description": "The name of the sheet.",
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "index": {
+                        "description": "The index of the sheet within the spreadsheet.",
+                        "type": "integer",
+                        "minimum": 0,
+                        "nullable": true
+                      },
+                      "sheetType": {
+                        "description": "The type of sheet. Defaults to GRID if not provided.",
+                        "type": "string",
+                        "enum": [
+                          "SHEET_TYPE_UNSPECIFIED",
+                          "GRID",
+                          "OBJECT",
+                          "DATA_SOURCE"
+                        ],
+                        "default": "GRID"
+                      },
+                      "gridProperties": {
+                        "description": "Additional properties of the sheet if this sheet is a grid. (If the sheet is an object sheet, containing a chart or image, then this field will be absent.) When writing it is an error to set any grid properties on non-grid sheets.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "rowCount": {
+                            "description": "Number of rows in the sheet. Must be at least 1.",
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "columnCount": {
+                            "description": "Number of columns in the sheet. Must be at least 1.",
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "frozenRowCount": {
+                            "description": "Number of frozen rows. Must be non-negative.",
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "frozenColumnCount": {
+                            "description": "Number of frozen columns. Must be non-negative.",
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "hideGridlines": {
+                            "description": "Whether to hide gridlines in the sheet.",
+                            "type": "boolean",
+                            "nullable": true
+                          },
+                          "rowGroupControlAfter": {
+                            "description": "Whether row group controls are shown after the group.",
+                            "type": "boolean",
+                            "nullable": true
+                          },
+                          "columnGroupControlAfter": {
+                            "description": "Whether column group controls are shown after the group.",
+                            "type": "boolean",
+                            "nullable": true
+                          }
+                        },
+                        "required": []
+                      },
+                      "hidden": {
+                        "description": "True if the sheet is hidden in the UI, false if it's visible.",
+                        "type": "boolean",
+                        "nullable": true
+                      },
+                      "tabColor": {
+                        "description": "(Deprecated) The color of the tab in the UI. Deprecated: Use tabColorStyle.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "rgbColor": {
+                            "description": "RGB color value. Document styles can only have RGB colors.",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "red": {
+                                "description": "Red component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              },
+                              "green": {
+                                "description": "Green component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              },
+                              "blue": {
+                                "description": "Blue component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              }
+                            },
+                            "required": []
+                          }
+                        },
+                        "required": []
+                      },
+                      "tabColorStyle": {
+                        "description": "The color of the tab in the UI. If tabColor is also set, this field takes precedence.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "rgbColor": {
+                            "description": "RGB color value.",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "red": {
+                                "description": "Red component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              },
+                              "green": {
+                                "description": "Green component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              },
+                              "blue": {
+                                "description": "Blue component of the color (0.0-1.0).",
+                                "type": "number",
+                                "nullable": false,
+                                "default": 0.0
+                              }
+                            },
+                            "required": []
+                          },
+                          "themeColor": {
+                            "description": "Theme color reference.",
+                            "type": "string",
+                            "nullable": true
+                          }
+                        },
+                        "required": []
+                      },
+                      "rightToLeft": {
+                        "description": "True if the sheet is an RTL sheet instead of an LTR sheet.",
+                        "type": "boolean",
+                        "nullable": true
+                      }
+                    },
+                    "required": [
+                      "sheetId"
+                    ]
+                  },
+                  "fields": {
+                    "description": "Comma-separated list of fields to update (optional). Defaults to None if not provided.",
+                    "type": "string",
+                    "nullable": true,
+                    "default": null
+                  }
+                },
+                "required": [
+                  "properties"
+                ]
+              }
+            },
+            "required": []
+          }
+        },
+        "include_spreadsheet_in_response": {
+          "description": "Whether to include the\nupdated spreadsheet in the response. Defaults to False.",
+          "type": "boolean",
+          "default": false
+        },
+        "response_ranges": {
+          "description": "The ranges to include in the\nresponse if include_spreadsheet_in_response is True. Defaults to None.",
+          "type": "array",
+          "nullable": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "response_include_grid_data": {
+          "description": "Whether to include grid data\nin the response if include_spreadsheet_in_response is True. Defaults to False.",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "spreadsheet_id"
+      ]
+    }
+  },
+  {
+    "name": "batch_update_spreadsheet_values",
+    "description": "Updates values in multiple ranges of a spreadsheet.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spreadsheet_id": {
+          "description": "The ID of the spreadsheet to update. Must be a non-empty string.",
+          "type": "string",
+          "minLength": 1
+        },
+        "valueInputOption": {
+          "description": "How the input data should be interpreted.\n                  Valid values:\n                  - \"RAW\": Values are inserted as-is, without any parsing.\n                  - \"USER_ENTERED\": Values are parsed as if entered into Sheets by a user.\n                    Formulas are stored as formulas, strings that look like dates or times\nmay be converted to date/time values, plain numbers are converted to numbers.",
+          "type": "string",
+          "enum": [
+            "RAW",
+            "USER_ENTERED"
+          ]
+        },
+        "data": {
+          "description": "List of update requests, each containing a range and values to update.",
+          "type": "array",
+          "items": {
+            "description": "An update request containing a range and values.",
+            "type": "object",
+            "properties": {
+              "range": {
+                "description": "The A1 notation of the range to update.\n                                Supports various formats:\n                                - Single cell: \"A1\"\n                                - Cell range: \"A1:B2\"\n                                - Full column: \"A:B\"\n                                - Full row: \"1:2\"\n                                - Mixed range: \"A2:Z\" (from cell A2 to end of column Z)\n                                With sheet names:\n                                - Simple sheet: \"Sheet1!A1:B2\"\n                                - Default sheets: \"Sheet2!A:A\", \"sheet1!1:10\"\n                                - Sheet with spaces: \"'My Sheet'!A1:B2\" (use single quotes)\n                                - Sheet with apostrophes: \"'John''s Sheet'!A1\" (escape apostrophes with double apostrophes)\n                                - Sheet with special characters: \"'Data-Sheet (2024)'!A1:D10\"\nNote: If no sheet name is specified, uses first sheet in spreadsheet data.",
+                "type": "string",
+                "minLength": 1
+              },
+              "values": {
+                "description": "The values to update in the range (list of rows). Each inner list represents a row. Cell values can be string, number, boolean, or null (empty cell).",
+                "type": "array",
+                "items": {
+                  "description": "A row of cell values. Each cell can contain a string (text), number, boolean, or null value.",
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "description": "Text value",
+                        "type": "string",
+                        "nullable": true
+                      },
+                      {
+                        "description": "Numeric value",
+                        "type": "number",
+                        "nullable": false
+                      },
+                      {
+                        "description": "Boolean value",
+                        "type": "boolean",
+                        "nullable": false
+                      }
+                    ],
+                    "description": "Cell value. Can be a string (text), number, boolean, or null (empty cell).",
+                    "nullable": true
+                  }
+                }
+              }
+            },
+            "required": [
+              "range",
+              "values"
+            ]
+          }
+        },
+        "includeValuesInResponse": {
+          "description": "Optional. Whether to include the updated values in the response. Defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "responseValueRenderOption": {
+          "description": "Optional. How values should be rendered in the response. Defaults to \"FORMATTED_VALUE\".\nValid values:\n- \"FORMATTED_VALUE\": Values are calculated and formatted as they appear in the UI.\n- \"UNFORMATTED_VALUE\": Values are calculated but not formatted in the reply.\n- \"FORMULA\": Values are not calculated. The reply includes formulas.",
+          "type": "string",
+          "enum": [
+            "FORMATTED_VALUE",
+            "UNFORMATTED_VALUE",
+            "FORMULA"
+          ],
+          "default": "FORMATTED_VALUE",
+          "nullable": false
+        },
+        "responseDateTimeRenderOption": {
+          "description": "Optional. How dates, times, and durations should be rendered in the response. Defaults to \"SERIAL_NUMBER\".\nValid values:\n- \"SERIAL_NUMBER\": Date/time values are returned as Excel serial numbers.\n- \"FORMATTED_STRING\": Date/time values are returned as formatted strings.",
+          "type": "string",
+          "enum": [
+            "SERIAL_NUMBER",
+            "FORMATTED_STRING"
+          ],
+          "default": "SERIAL_NUMBER",
+          "nullable": false
+        }
+      },
+      "required": [
+        "spreadsheet_id",
+        "valueInputOption",
+        "data"
+      ]
+    }
+  },
+  {
+    "name": "batch_update_spreadsheet_values_by_data_filter",
+    "description": "Updates values in a spreadsheet using data filters.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spreadsheet_id": {
+          "description": "The ID of the spreadsheet to update.",
+          "type": "string"
+        },
+        "valueInputOption": {
+          "description": "Determines how input data should be interpreted. Valid values: \"RAW\" (values are stored as-is), \"USER_ENTERED\" (values are parsed as if entered by a user). \"INPUT_VALUE_OPTION_UNSPECIFIED\" is not allowed and must not be used.",
+          "type": "string"
+        },
+        "data": {
+          "description": "List of update requests. Each request is a dictionary that must contain:\n- values (required): A 2D array where each inner array represents a row of cell values. Each cell value can be a string (text), number, boolean, or null (empty cell).\n- Either dataFilter OR range (but not both) to specify the target range:\n    * dataFilter: An object containing 'a1Range' (string) - The A1 notation of the range (e.g., \"Sheet1!A1:D3\" or \"A1:D3\")\n    * range: A string with the A1 notation of the range. Supports various formats:\n      Basic ranges (uses default sheet): \"A1\", \"A1:B2\", \"A:B\", \"A2:Z\"\n      With sheet names: \"Sheet1!A1:B2\", \"'My Sheet'!A1:B2\" (use single quotes for spaces), \"'John''s Sheet'!A1\" (escape apostrophes), \"'Data-Sheet (2024)'!A1:D10\"",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "values": {
+                "description": "Required. The values to update in the range. A 2D array where each inner array represents a row of cell values.",
+                "type": "array",
+                "items": {
+                  "description": "A row of cell values. Each cell can contain a string, number, boolean, or null value.",
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "description": "Text value",
+                        "type": "string"
+                      },
+                      {
+                        "description": "Numeric value",
+                        "type": "number"
+                      },
+                      {
+                        "description": "Boolean value",
+                        "type": "boolean"
+                      }
+                    ],
+                    "nullable": true,
+                    "description": "Cell value. Can be a string (text), number, boolean, or null (empty cell)."
+                  }
+                }
+              },
+              "dataFilter": {
+                "description": "Optional (use either this or \"range\", not both). A data filter object specifying the target range using structured criteria. Defaults to None.",
+                "type": "object",
+                "nullable": true,
+                "default": null,
+                "properties": {
+                  "a1Range": {
+                    "description": "The A1 notation of the range. The A1 notation is a syntax used to define a cell or range of cells with a string that contains the sheet name plus the starting and ending cell coordinates using column letters and row numbers like: \"Sheet1!A1:D3\" or \"A1:D3\"",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "a1Range"
+                ]
+              },
+              "range": {
+                "description": "Optional (use either this or \"dataFilter\", not both). The A1 notation of the range. Defaults to None. Supports various formats:\nBasic ranges (uses default sheet):\n- Single cell: \"A1\"\n- Cell range: \"A1:B2\"\n- Full column: \"A:B\"\n- Mixed range: \"A2:Z\" (from cell A2 to end of column Z)\n\nWith sheet names:\n- Simple sheet: \"Sheet1!A1:B2\"\n- Sheet with spaces: \"'My Sheet'!A1:B2\" (use single quotes)\n- Sheet with apostrophes: \"'John''s Sheet'!A1\" (escape apostrophes with double apostrophes)\n- Sheet with special characters: \"'Data-Sheet (2024)'!A1:D10\"",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              }
+            },
+            "required": [
+              "values"
+            ]
+          }
+        },
+        "includeValuesInResponse": {
+          "description": "Whether to include the updated values in the response. Defaults to False.",
+          "type": "boolean",
+          "default": false
+        },
+        "responseValueRenderOption": {
+          "description": "Determines how values in the response should be rendered. Valid values: \"FORMATTED_VALUE\", \"UNFORMATTED_VALUE\", \"FORMULA\". Defaults to \"FORMATTED_VALUE\".",
+          "type": "string",
+          "default": "FORMATTED_VALUE"
+        },
+        "responseDateTimeRenderOption": {
+          "description": "Determines how dates, times, and durations in the response should be rendered. This is ignored if responseValueRenderOption is \"FORMATTED_VALUE\". Valid values: \"SERIAL_NUMBER\", \"FORMATTED_STRING\". Defaults to \"SERIAL_NUMBER\".",
+          "type": "string",
+          "default": "SERIAL_NUMBER"
+        }
+      },
+      "required": [
+        "spreadsheet_id",
+        "valueInputOption",
+        "data"
+      ]
+    }
+  },
+  {
+    "name": "clear_spreadsheet_values",
+    "description": "Clears values from a specific range in a spreadsheet.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spreadsheet_id": {
+          "description": "The ID of the spreadsheet to clear values from.",
+          "type": "string"
+        },
+        "range": {
+          "description": "The A1 notation of the range to clear values from. Supports various formats:\n\nBasic ranges (without sheet name - uses first sheet):\n- Single cell: \"A1\"\n- Cell range: \"A1:B2\"\n- Full column: \"A:B\"\n- Full row: \"1:2\"\n- Mixed range: \"A2:Z\" (from cell A2 to end of column Z)\n\nWith sheet names (recommended for multi-sheet spreadsheets):\n- Simple sheet: \"Sheet1!A1:B2\"\n- Default sheets: \"Sheet2!A:A\", \"sheet1!1:10\"\n- Sheet with spaces: \"'My Sheet'!A1:B2\" (use single quotes)\n- Sheet with apostrophes: \"'John''s Sheet'!A1\" (escape apostrophes with double apostrophes)\n- Sheet with special characters: \"'Data-Sheet (2024)'!A1:D10\"\n- Sheet-only: \"Sheet1\" (entire sheet)\n\nNote: If no sheet name is specified (e.g., \"A1:B2\"), the system automatically\nuses the first sheet in the spreadsheet data.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "spreadsheet_id",
+        "range"
+      ]
+    }
+  },
+  {
+    "name": "copy_sheet_to_spreadsheet",
+    "description": "Copies a sheet to another spreadsheet.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spreadsheet_id": {
+          "description": "The ID of the spreadsheet to copy the sheet from.",
+          "type": "string"
+        },
+        "sheet_id": {
+          "description": "The ID of the sheet to copy.",
+          "type": "integer"
+        },
+        "destination_spreadsheet_id": {
+          "description": "The ID of the spreadsheet to copy the sheet to.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "spreadsheet_id",
+        "sheet_id",
+        "destination_spreadsheet_id"
+      ]
+    }
+  },
+  {
+    "name": "create_spreadsheet",
+    "description": "Create a new spreadsheet with optional sheets, properties, and initial data.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spreadsheet": {
+          "description": "A complete spreadsheet.",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "Spreadsheet ID. Generated on creation.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "properties": {
+              "description": "Spreadsheet-level properties.",
+              "type": "object",
+              "properties": {
+                "title": {
+                  "description": "Spreadsheet title.",
+                  "type": "string",
+                  "default": "Untitled Spreadsheet",
+                  "nullable": false
+                },
+                "locale": {
+                  "description": "Locale (ISO 639-1/2, e.g. 'en_US').",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "autoRecalc": {
+                  "description": "Recalculation interval for volatile functions.",
+                  "type": "string",
+                  "enum": [
+                    "RECALCULATION_INTERVAL_UNSPECIFIED",
+                    "ON_CHANGE",
+                    "MINUTE",
+                    "HOUR"
+                  ],
+                  "nullable": true,
+                  "default": null
+                },
+                "timeZone": {
+                  "description": "Time zone in CLDR format (e.g. 'America/New_York').",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "iterativeCalculationSettings": {
+                  "description": "Settings to control how circular dependencies are resolved.",
+                  "type": "object",
+                  "properties": {
+                    "maxIterations": {
+                      "description": "Maximum number of calculation rounds for iterative calculation.",
+                      "type": "integer",
+                      "minimum": 1,
+                      "nullable": true,
+                      "default": null
+                    },
+                    "convergenceThreshold": {
+                      "description": "Stop iterating when successive results differ by less than this value.",
+                      "type": "number",
+                      "minimum": 0.0,
+                      "nullable": true,
+                      "default": null
+                    }
+                  },
+                  "required": [],
+                  "nullable": true,
+                  "default": null
+                },
+                "spreadsheetTheme": {
+                  "description": "Spreadsheet theme with font family and color pairs.",
+                  "type": "object",
+                  "properties": {
+                    "primaryFontFamily": {
+                      "description": "Primary font family name.",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    },
+                    "themeColors": {
+                      "description": "Theme color pairs. Provide all pairs when updating.",
+                      "type": "array",
+                      "items": {
+                        "description": "Maps a theme color type to its concrete color.",
+                        "type": "object",
+                        "properties": {
+                          "colorType": {
+                            "description": "Theme color type: TEXT, BACKGROUND, ACCENT1-ACCENT6, LINK.",
+                            "type": "string",
+                            "nullable": true,
+                            "default": null
+                          },
+                          "color": {
+                            "description": "Color style with RGB or theme color reference.",
+                            "type": "object",
+                            "properties": {
+                              "rgbColor": {
+                                "description": "RGB color representation. Components default to 0.0 if omitted.",
+                                "type": "object",
+                                "properties": {
+                                  "red": {
+                                    "description": "Red component (0-1).",
+                                    "type": "number",
+                                    "default": 0.0,
+                                    "minimum": 0.0,
+                                    "maximum": 1.0,
+                                    "nullable": false
+                                  },
+                                  "green": {
+                                    "description": "Green component (0-1).",
+                                    "type": "number",
+                                    "default": 0.0,
+                                    "minimum": 0.0,
+                                    "maximum": 1.0,
+                                    "nullable": false
+                                  },
+                                  "blue": {
+                                    "description": "Blue component (0-1).",
+                                    "type": "number",
+                                    "default": 0.0,
+                                    "minimum": 0.0,
+                                    "maximum": 1.0,
+                                    "nullable": false
+                                  }
+                                },
+                                "required": [],
+                                "nullable": true,
+                                "default": null
+                              },
+                              "themeColor": {
+                                "description": "Theme color: TEXT, BACKGROUND, ACCENT1-ACCENT6, LINK.",
+                                "type": "string",
+                                "nullable": true,
+                                "default": null
+                              }
+                            },
+                            "required": [],
+                            "nullable": true,
+                            "default": null
+                          }
+                        },
+                        "required": [],
+                        "nullable": false
+                      },
+                      "nullable": true,
+                      "default": null
+                    }
+                  },
+                  "required": [],
+                  "nullable": true,
+                  "default": null
+                },
+                "importFunctionsExternalUrlAccessAllowed": {
+                  "description": "Whether external URL access is allowed for import functions.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": null
+                }
+              },
+              "required": [],
+              "nullable": true,
+              "default": null
+            },
+            "sheets": {
+              "description": "List of sheets with properties and optional data.",
+              "type": "array",
+              "items": {
+                "description": "A sheet within a spreadsheet.",
+                "type": "object",
+                "properties": {
+                  "properties": {
+                    "description": "Properties for a single sheet within a spreadsheet.",
+                    "type": "object",
+                    "properties": {
+                      "sheetId": {
+                        "description": "Sheet ID. Auto-generated if omitted.",
+                        "type": "integer",
+                        "minimum": 0,
+                        "nullable": true,
+                        "default": null
+                      },
+                      "title": {
+                        "description": "Sheet name.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": "Untitled Sheet"
+                      },
+                      "index": {
+                        "description": "Position within the spreadsheet.",
+                        "type": "integer",
+                        "minimum": 0,
+                        "nullable": true,
+                        "default": null
+                      },
+                      "sheetType": {
+                        "description": "Sheet type.",
+                        "type": "string",
+                        "enum": [
+                          "SHEET_TYPE_UNSPECIFIED",
+                          "GRID",
+                          "OBJECT",
+                          "DATA_SOURCE"
+                        ],
+                        "nullable": false,
+                        "default": "GRID"
+                      },
+                      "gridProperties": {
+                        "description": "Grid properties for a sheet.",
+                        "type": "object",
+                        "properties": {
+                          "rowCount": {
+                            "description": "Number of rows.",
+                            "type": "integer",
+                            "minimum": 1,
+                            "nullable": true,
+                            "default": null
+                          },
+                          "columnCount": {
+                            "description": "Number of columns.",
+                            "type": "integer",
+                            "minimum": 1,
+                            "nullable": true,
+                            "default": null
+                          },
+                          "frozenRowCount": {
+                            "description": "Number of frozen rows.",
+                            "type": "integer",
+                            "minimum": 0,
+                            "nullable": true,
+                            "default": null
+                          },
+                          "frozenColumnCount": {
+                            "description": "Number of frozen columns.",
+                            "type": "integer",
+                            "minimum": 0,
+                            "nullable": true,
+                            "default": null
+                          },
+                          "hideGridlines": {
+                            "description": "Whether to hide gridlines.",
+                            "type": "boolean",
+                            "nullable": true,
+                            "default": null
+                          },
+                          "rowGroupControlAfter": {
+                            "description": "Whether row group controls appear after the group.",
+                            "type": "boolean",
+                            "nullable": true,
+                            "default": null
+                          },
+                          "columnGroupControlAfter": {
+                            "description": "Whether column group controls appear after the group.",
+                            "type": "boolean",
+                            "nullable": true,
+                            "default": null
+                          }
+                        },
+                        "required": [],
+                        "nullable": true,
+                        "default": null
+                      },
+                      "hidden": {
+                        "description": "Whether the sheet is hidden in the UI.",
+                        "type": "boolean",
+                        "nullable": true,
+                        "default": null
+                      },
+                      "tabColor": {
+                        "description": "Deprecated, use ColorStyle instead.",
+                        "type": "object",
+                        "properties": {
+                          "rgbColor": {
+                            "description": "RGB color representation. Components default to 0.0 if omitted.",
+                            "type": "object",
+                            "properties": {
+                              "red": {
+                                "description": "Red component (0-1).",
+                                "type": "number",
+                                "default": 0.0,
+                                "minimum": 0.0,
+                                "maximum": 1.0,
+                                "nullable": false
+                              },
+                              "green": {
+                                "description": "Green component (0-1).",
+                                "type": "number",
+                                "default": 0.0,
+                                "minimum": 0.0,
+                                "maximum": 1.0,
+                                "nullable": false
+                              },
+                              "blue": {
+                                "description": "Blue component (0-1).",
+                                "type": "number",
+                                "default": 0.0,
+                                "minimum": 0.0,
+                                "maximum": 1.0,
+                                "nullable": false
+                              }
+                            },
+                            "required": [],
+                            "nullable": true,
+                            "default": null
+                          }
+                        },
+                        "required": [],
+                        "nullable": true,
+                        "default": null
+                      },
+                      "tabColorStyle": {
+                        "description": "Color style with RGB or theme color reference.",
+                        "type": "object",
+                        "properties": {
+                          "rgbColor": {
+                            "description": "RGB color representation. Components default to 0.0 if omitted.",
+                            "type": "object",
+                            "properties": {
+                              "red": {
+                                "description": "Red component (0-1).",
+                                "type": "number",
+                                "default": 0.0,
+                                "minimum": 0.0,
+                                "maximum": 1.0,
+                                "nullable": false
+                              },
+                              "green": {
+                                "description": "Green component (0-1).",
+                                "type": "number",
+                                "default": 0.0,
+                                "minimum": 0.0,
+                                "maximum": 1.0,
+                                "nullable": false
+                              },
+                              "blue": {
+                                "description": "Blue component (0-1).",
+                                "type": "number",
+                                "default": 0.0,
+                                "minimum": 0.0,
+                                "maximum": 1.0,
+                                "nullable": false
+                              }
+                            },
+                            "required": [],
+                            "nullable": true,
+                            "default": null
+                          },
+                          "themeColor": {
+                            "description": "Theme color: TEXT, BACKGROUND, ACCENT1-ACCENT6, LINK.",
+                            "type": "string",
+                            "nullable": true,
+                            "default": null
+                          }
+                        },
+                        "required": [],
+                        "nullable": true,
+                        "default": null
+                      },
+                      "rightToLeft": {
+                        "description": "RTL layout.",
+                        "type": "boolean",
+                        "nullable": true,
+                        "default": null
+                      }
+                    },
+                    "required": [],
+                    "nullable": true,
+                    "default": null
+                  },
+                  "merges": {
+                    "description": "Merged cell ranges.",
+                    "type": "array",
+                    "items": {
+                      "description": "Grid range specification within a sheet.",
+                      "type": "object",
+                      "properties": {
+                        "sheetId": {
+                          "description": "Sheet ID containing the range.",
+                          "type": "integer",
+                          "minimum": 0,
+                          "nullable": false
+                        },
+                        "startRowIndex": {
+                          "description": "Start row (inclusive, zero-based).",
+                          "type": "integer",
+                          "minimum": 0,
+                          "nullable": true,
+                          "default": null
+                        },
+                        "endRowIndex": {
+                          "description": "End row (exclusive, zero-based).",
+                          "type": "integer",
+                          "minimum": 0,
+                          "nullable": true,
+                          "default": null
+                        },
+                        "startColumnIndex": {
+                          "description": "Start column (inclusive, zero-based).",
+                          "type": "integer",
+                          "minimum": 0,
+                          "nullable": true,
+                          "default": null
+                        },
+                        "endColumnIndex": {
+                          "description": "End column (exclusive, zero-based).",
+                          "type": "integer",
+                          "minimum": 0,
+                          "nullable": true,
+                          "default": null
+                        }
+                      },
+                      "required": [
+                        "sheetId"
+                      ],
+                      "nullable": false
+                    },
+                    "nullable": true,
+                    "default": null
+                  },
+                  "bandedRanges": {
+                    "description": "Alternating-color banded ranges.",
+                    "type": "array",
+                    "items": {
+                      "description": "Alternating-color banded range.",
+                      "type": "object",
+                      "properties": {
+                        "bandedRangeId": {
+                          "description": "Banded range ID.",
+                          "type": "integer",
+                          "nullable": true,
+                          "default": null
+                        },
+                        "range": {
+                          "description": "Grid range specification within a sheet.",
+                          "type": "object",
+                          "properties": {
+                            "sheetId": {
+                              "description": "Sheet ID containing the range.",
+                              "type": "integer",
+                              "minimum": 0,
+                              "nullable": false
+                            },
+                            "startRowIndex": {
+                              "description": "Start row (inclusive, zero-based).",
+                              "type": "integer",
+                              "minimum": 0,
+                              "nullable": true,
+                              "default": null
+                            },
+                            "endRowIndex": {
+                              "description": "End row (exclusive, zero-based).",
+                              "type": "integer",
+                              "minimum": 0,
+                              "nullable": true,
+                              "default": null
+                            },
+                            "startColumnIndex": {
+                              "description": "Start column (inclusive, zero-based).",
+                              "type": "integer",
+                              "minimum": 0,
+                              "nullable": true,
+                              "default": null
+                            },
+                            "endColumnIndex": {
+                              "description": "End column (exclusive, zero-based).",
+                              "type": "integer",
+                              "minimum": 0,
+                              "nullable": true,
+                              "default": null
+                            }
+                          },
+                          "required": [
+                            "sheetId"
+                          ],
+                          "nullable": true,
+                          "default": null
+                        }
+                      },
+                      "required": [],
+                      "nullable": false
+                    },
+                    "nullable": true,
+                    "default": null
+                  },
+                  "developerMetadata": {
+                    "description": "Developer metadata entries attached to this sheet.",
+                    "type": "array",
+                    "items": {
+                      "description": "Arbitrary developer metadata attached to a spreadsheet location.",
+                      "type": "object",
+                      "properties": {
+                        "metadataId": {
+                          "description": "Unique metadata ID.",
+                          "type": "integer",
+                          "minimum": 0,
+                          "nullable": true,
+                          "default": null
+                        },
+                        "metadataKey": {
+                          "description": "Metadata key.",
+                          "type": "string",
+                          "nullable": true,
+                          "default": null
+                        },
+                        "metadataValue": {
+                          "description": "Metadata value.",
+                          "type": "string",
+                          "nullable": true,
+                          "default": null
+                        },
+                        "location": {
+                          "description": "Location where developer metadata may be associated.",
+                          "type": "object",
+                          "properties": {
+                            "dimensionRange": {
+                              "description": "Row or column range for developer metadata location.",
+                              "type": "object",
+                              "properties": {
+                                "sheetId": {
+                                  "description": "Sheet ID.",
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "nullable": true,
+                                  "default": null
+                                },
+                                "dimension": {
+                                  "description": "ROWS or COLUMNS.",
+                                  "type": "string",
+                                  "nullable": false
+                                },
+                                "startIndex": {
+                                  "description": "Start index (inclusive).",
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "nullable": false
+                                },
+                                "endIndex": {
+                                  "description": "End index (exclusive).",
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "nullable": false
+                                }
+                              },
+                              "required": [
+                                "dimension",
+                                "startIndex",
+                                "endIndex"
+                              ],
+                              "nullable": true,
+                              "default": null
+                            }
+                          },
+                          "required": [],
+                          "nullable": true,
+                          "default": null
+                        }
+                      },
+                      "required": [],
+                      "nullable": false
+                    },
+                    "nullable": true,
+                    "default": null
+                  }
+                },
+                "required": [],
+                "nullable": false
+              },
+              "nullable": true,
+              "default": null
+            },
+            "data": {
+              "description": "Dynamic A1-range keys mapping to 2D cell arrays.\n\nKeys are A1 range strings like 'Sheet1!A1:B2'. Values are row-major\n2D arrays of cell values.",
+              "type": "object",
+              "properties": {},
+              "required": [],
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "description": "Text value.",
+                        "type": "string"
+                      },
+                      {
+                        "description": "Integer value.",
+                        "type": "integer"
+                      },
+                      {
+                        "description": "Numeric value.",
+                        "type": "number"
+                      },
+                      {
+                        "description": "Boolean value.",
+                        "type": "boolean"
+                      }
+                    ],
+                    "nullable": true
+                  },
+                  "nullable": false
+                },
+                "nullable": false
+              },
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": false
+        }
+      },
+      "required": [
+        "spreadsheet"
+      ]
+    }
+  },
+  {
+    "name": "get_spreadsheet",
+    "description": "Gets the latest version of a specified spreadsheet.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spreadsheet_id": {
+          "description": "The ID of the spreadsheet to retrieve.",
+          "type": "string",
+          "nullable": false
+        },
+        "ranges": {
+          "description": "The ranges to retrieve, in A1 notation. The A1 notation is a syntax used to define a cell or range of cells with a string that contains the sheet name plus the starting and ending cell coordinates using column letters and row numbers like: \"Sheet1!A1:D3\" or \"A1:D3\". Defaults to None.",
+          "type": "array",
+          "nullable": true,
+          "default": null,
+          "items": {
+            "description": "A1 notation range string (e.g., \"Sheet1!A1:D3\" or \"A1:D3\").",
+            "type": "string"
+          }
+        },
+        "includeGridData": {
+          "description": "Whether to include grid data. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        }
+      },
+      "required": [
+        "spreadsheet_id"
+      ]
+    }
+  },
+  {
+    "name": "get_spreadsheet_by_data_filter",
+    "description": "Gets spreadsheet data filtered by specified criteria.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spreadsheet_id": {
+          "description": "The ID of the spreadsheet to retrieve.",
+          "type": "string",
+          "minLength": 1
+        },
+        "includeGridData": {
+          "description": "Whether to include grid data. If not provided or None is passed, False is used.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "dataFilters": {
+          "description": "List of data filters. If not provided or None is passed, an empty list is used. Each filter must specify exactly ONE of: a1Range, gridRange, or developerMetadataLookup (mutually exclusive).",
+          "type": "array",
+          "nullable": true,
+          "items": {
+            "description": "A data filter object. Must contain exactly one of: a1Range, gridRange, or developerMetadataLookup.",
+            "type": "object",
+            "properties": {
+              "a1Range": {
+                "description": "The range in A1 notation (e.g., \"Sheet1!A1:B2\").",
+                "type": "string",
+                "nullable": true
+              },
+              "gridRange": {
+                "description": "A range on a sheet. All indexes are zero-based and half open ([startIndex, endIndex)). Missing indexes mean the range is unbounded.",
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "sheetId": {
+                    "description": "The sheet this range is on.",
+                    "type": "integer"
+                  },
+                  "startRowIndex": {
+                    "description": "The start row (inclusive). Unbounded if not set.",
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "endRowIndex": {
+                    "description": "The end row (exclusive). Unbounded if not set.",
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "startColumnIndex": {
+                    "description": "The start column (inclusive). Unbounded if not set.",
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "endColumnIndex": {
+                    "description": "The end column (exclusive). Unbounded if not set.",
+                    "type": "integer",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "sheetId"
+                ]
+              },
+              "developerMetadataLookup": {
+                "description": "Developer metadata lookup criteria.",
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "metadataKey": {
+                    "description": "Key of the metadata to look up.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "metadataValue": {
+                    "description": "Value of the metadata.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "metadataId": {
+                    "description": "ID of the metadata to look up.",
+                    "type": "integer",
+                    "nullable": true
+                  }
+                },
+                "required": []
+              }
+            },
+            "required": []
+          }
+        }
+      },
+      "required": [
+        "spreadsheet_id"
+      ]
+    }
+  },
+  {
+    "name": "get_spreadsheet_values",
+    "description": "Gets values from a specific range in a spreadsheet.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spreadsheet_id": {
+          "description": "The ID of the spreadsheet to retrieve values from.",
+          "type": "string"
+        },
+        "range": {
+          "description": "The A1 notation of the range to retrieve values from.\nSupports various formats:\n    Basic ranges (without sheet name - uses first sheet):\n    - Single cell: \"A1\"\n    - Cell range: \"A1:B2\"\n    - Full column: \"A:B\"\n    - Full row: \"1:2\"\n    - Mixed range: \"A2:Z\" (from cell A2 to end of column Z)\n\n    With sheet names (recommended for multi-sheet spreadsheets):\n    - Simple sheet: \"Sheet1!A1:B2\"\n    - Default sheets: \"Sheet2!A:A\", \"sheet1!1:10\"\n    - Sheet with spaces: \"'My Sheet'!A1:B2\" (use single quotes)\n    - Sheet with apostrophes: \"'John''s Sheet'!A1\" (escape apostrophes with double apostrophes)\n    - Sheet with special characters: \"'Data-Sheet (2024)'!A1:D10\"\n    - Sheet-only: \"Sheet1\" (entire sheet)\n\n    Note: If no sheet name specified, first sheet is automatically used.",
+          "type": "string"
+        },
+        "majorDimension": {
+          "description": "The major dimension that results should use. If not specified, defaults to \"ROWS\". Valid values: \"ROWS\", \"COLUMNS\".",
+          "type": "string",
+          "default": "ROWS",
+          "enum": [
+            "ROWS",
+            "COLUMNS"
+          ]
+        },
+        "valueRenderOption": {
+          "description": "How values should be rendered in the output. If not specified, defaults to \"FORMATTED_VALUE\". Valid values: \"FORMATTED_VALUE\", \"UNFORMATTED_VALUE\", \"FORMULA\".",
+          "type": "string",
+          "default": "FORMATTED_VALUE",
+          "enum": [
+            "FORMATTED_VALUE",
+            "UNFORMATTED_VALUE",
+            "FORMULA"
+          ]
+        },
+        "dateTimeRenderOption": {
+          "description": "How dates, times, and durations should be rendered. If not specified, defaults to \"FORMATTED_STRING\". Valid values: \"SERIAL_NUMBER\", \"FORMATTED_STRING\".",
+          "type": "string",
+          "default": "FORMATTED_STRING",
+          "enum": [
+            "SERIAL_NUMBER",
+            "FORMATTED_STRING"
+          ]
+        }
+      },
+      "required": [
+        "spreadsheet_id",
+        "range"
+      ]
+    }
+  },
+  {
+    "name": "update_spreadsheet_values",
+    "description": "Updates values in a specific range of a spreadsheet.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "spreadsheet_id": {
+          "description": "The ID of the spreadsheet to update.",
+          "type": "string",
+          "nullable": false
+        },
+        "range": {
+          "description": "The A1 notation of the range to update. Supports various formats:\n\nBasic ranges (without sheet name - uses first sheet):\n- Single cell: \"A1\"\n- Cell range: \"A1:B2\"\n- Full column: \"A:B\"\n- Full row: \"1:2\"\n- Mixed range: \"A2:Z\" (from cell A2 to end of column Z)\n\nWith sheet names (recommended for multi-sheet spreadsheets):\n- Simple sheet: \"Sheet1!A1:B2\"\n- Default sheets: \"Sheet2!A:A\", \"sheet1!1:10\"\n- Sheet with spaces: \"'My Sheet'!A1:B2\" (use single quotes)\n- Sheet with apostrophes: \"'John''s Sheet'!A1\" (escape apostrophes with double apostrophes)\n- Sheet with special characters: \"'Data-Sheet (2024)'!A1:D10\"\n\nNote: If no sheet name specified, first sheet is automatically used.",
+          "type": "string",
+          "nullable": false
+        },
+        "valueInputOption": {
+          "description": "How the input data should be interpreted.\nValid values: \"RAW\" (values inserted as-is) or\n\"USER_ENTERED\" (values parsed as if entered by user).\nIn USER_ENTERED mode, date-like strings are interpreted\naccording to the spreadsheet's locale (for example, \"en_US\"\nuses MM/DD/YYYY, while \"en_GB\"/\"en_AU\" use DD/MM/YYYY) and may\nbe converted to underlying date serial numbers.",
+          "type": "string",
+          "enum": [
+            "RAW",
+            "USER_ENTERED"
+          ],
+          "nullable": false
+        },
+        "values": {
+          "description": "The values to update in the range (list of rows). Each inner list represents a row, and each cell can contain a string, number, boolean, or null (empty cell) value.",
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "description": "A row of cell values. Each cell can contain a string, number, boolean, or null value.",
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "description": "Text value",
+                  "type": "string"
+                },
+                {
+                  "description": "Numeric value",
+                  "type": "number"
+                },
+                {
+                  "description": "Boolean value",
+                  "type": "boolean"
+                }
+              ],
+              "nullable": true,
+              "description": "Cell value. Can be a string (text), number, boolean, or null (empty cell)."
+            }
+          }
+        },
+        "includeValuesInResponse": {
+          "description": "Whether to include the updated values in the response.",
+          "type": "boolean",
+          "default": false,
+          "nullable": true
+        },
+        "responseValueRenderOption": {
+          "description": "How values should be rendered in the response.\n\nValid values:\n- \"FORMATTED_VALUE\": Returns formatted values. In this mode\n  responseDateTimeRenderOption is ignored and date values are returned as\n  formatted strings.\n- \"UNFORMATTED_VALUE\": Returns the underlying stored values; when combined\n  with responseDateTimeRenderOption=\"SERIAL_NUMBER\", date values are\n  returned as locale-aware serial numbers.\n- \"FORMULA\": Preserves formulas in the response; non-formula cells are\n  rendered according to responseDateTimeRenderOption.",
+          "type": "string",
+          "enum": [
+            "FORMATTED_VALUE",
+            "UNFORMATTED_VALUE",
+            "FORMULA"
+          ],
+          "default": "FORMATTED_VALUE",
+          "nullable": true
+        },
+        "responseDateTimeRenderOption": {
+          "description": "How dates, times, and durations should be rendered in the response. Defaults to \"SERIAL_NUMBER\".\n\nValid values:\n- \"SERIAL_NUMBER\": Converts recognized date values to Excel-style serial numbers,\n  using the spreadsheet's locale (for example, \"en_US\" as MM/DD/YYYY and\n  \"en_GB\"/\"en_AU\" as DD/MM/YYYY). Date parsing for serial numbers respects the\n  spreadsheet's locale in the same way as USER_ENTERED date input.\n- \"FORMATTED_STRING\": Returns date values as plain strings with any internal\n  DATE: markers stripped.\n\nThis option is applied only when responseValueRenderOption is \"UNFORMATTED_VALUE\"\nor \"FORMULA\"; it is ignored when responseValueRenderOption is \"FORMATTED_VALUE\".",
+          "type": "string",
+          "enum": [
+            "SERIAL_NUMBER",
+            "FORMATTED_STRING"
+          ],
+          "default": "SERIAL_NUMBER",
+          "nullable": false
+        }
+      },
+      "required": [
+        "spreadsheet_id",
+        "range",
+        "valueInputOption",
+        "values"
+      ]
+    }
+  }
+]

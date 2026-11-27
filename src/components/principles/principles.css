@@ -1,0 +1,1427 @@
+/*
+ * Design principles (the paper's Figure 2) and benchmark comparison (Table 1).
+ * Prefixes: prn- for the principles, cmp- for the comparison table.
+ * Colours and type come from the tokens in ../paper/paper.css.
+ */
+
+/* ======================================================================
+   Section layout
+   ====================================================================== */
+.prn-section {
+  font-family: var(--mv-body);
+  color: var(--mv-ink);
+}
+
+.prn-section-comparison {
+  margin-top: 84px;
+  scroll-margin-top: 20px;
+}
+
+.prn-section button {
+  cursor: pointer;
+}
+
+/* ======================================================================
+   Design principles
+   ====================================================================== */
+.prn-root {
+  container: prn / inline-size;
+}
+
+/* ---- intro sentence and the expand-all control ------------------------ */
+.prn-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px 40px;
+  margin-bottom: 28px;
+}
+
+.prn-intro {
+  flex: 1 1 420px;
+  max-width: 740px;
+  margin: 0;
+  color: var(--mv-ink-2);
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* The two phrases of the sentence that the two panels answer. */
+.prn-hinge {
+  margin: 0 -1px;
+  padding: 2px 4px 3px;
+  border-radius: 4px;
+  color: var(--mv-ink);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.prn-hinge--realism {
+  background: var(--mv-realism-tint);
+  box-shadow: inset 0 -2px 0 var(--mv-realism);
+}
+
+.prn-hinge--trustworthy {
+  background: var(--mv-trust-tint);
+  box-shadow: inset 0 -2px 0 var(--mv-trust);
+}
+
+.prn-expand-all {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 196px;
+  min-height: 36px;
+  padding: 8px 14px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: var(--mv-radius-sm);
+  background: var(--mv-card);
+  color: var(--mv-ink-2);
+  font-family: var(--mv-body);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+
+.prn-expand-all:hover {
+  border-color: var(--mv-sage);
+  background: var(--mv-tint);
+  color: var(--mv-ink);
+}
+
+.prn-expand-all:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+/* ---- the two panels ---------------------------------------------------- */
+.prn-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: auto 1fr;
+  align-items: stretch;
+  gap: 0 22px;
+}
+
+.prn-group {
+  --prn-color: var(--mv-realism);
+  --prn-tint: var(--mv-realism-tint);
+  --prn-line: var(--mv-realism-line);
+  display: flex;
+  flex-direction: column;
+  grid-row: span 2;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--prn-line);
+  border-radius: var(--mv-radius);
+  background: var(--mv-card);
+  box-shadow: var(--mv-shadow-sm);
+}
+
+.prn-group--trustworthy {
+  --prn-color: var(--mv-trust);
+  --prn-tint: var(--mv-trust-tint);
+  --prn-line: var(--mv-trust-line);
+}
+
+/* The two header bands share one row, so they are always the same height. */
+@supports (grid-template-rows: subgrid) {
+  .prn-group {
+    display: grid;
+    grid-template-rows: subgrid;
+  }
+}
+
+/* Header band: group title on the left, its tagline on the right, as in the paper. */
+.prn-group-head {
+  padding: 15px 22px 16px;
+  background: var(--prn-color);
+  color: var(--mv-card);
+}
+
+.prn-group-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 20px;
+}
+
+.prn-group-range {
+  margin: 0 0 4px;
+  color: color-mix(in srgb, var(--mv-card) 84%, var(--prn-color));
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 1.5px;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.prn-group-title {
+  margin: 0;
+  font-family: var(--mv-display);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+  line-height: 1.25;
+}
+
+.prn-group-tagline {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 20px;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+  line-height: 1.25;
+}
+
+/* ---- one principle ----------------------------------------------------- */
+.prn-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* --prn-balance is set from DesignPrinciples.tsx: extra room between the rows of the shorter panel. */
+.prn-item {
+  position: relative;
+  padding-block: calc(var(--prn-balance, 0px) / 2);
+  transition: background-color 0.18s ease;
+}
+
+.prn-item:first-child {
+  padding-top: 0;
+}
+
+.prn-item:last-child {
+  padding-bottom: 0;
+}
+
+.prn-item + .prn-item::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 22px;
+  left: 22px;
+  height: 1px;
+  background: var(--mv-line);
+}
+
+.prn-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: var(--prn-color);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.prn-item[data-active] {
+  background: color-mix(in srgb, var(--prn-tint) 58%, var(--mv-card));
+}
+
+.prn-item[data-active]::before {
+  opacity: 1;
+}
+
+.prn-main {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  column-gap: 14px;
+  padding: 20px 22px 20px 20px;
+}
+
+.prn-badge {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-top: -2px;
+  border: 1.5px solid var(--prn-color);
+  border-radius: 50%;
+  background: var(--mv-card);
+  color: var(--prn-color);
+  font-family: var(--mv-display);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.prn-item:hover .prn-badge,
+.prn-item:focus-within .prn-badge,
+.prn-item[data-active] .prn-badge {
+  background: var(--prn-color);
+  color: var(--mv-card);
+}
+
+.prn-headline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.prn-title {
+  margin: 0;
+  padding-top: 2px;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.25px;
+  line-height: 1.4;
+}
+
+.prn-toggle {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  margin: -4px -8px -6px 0;
+  padding: 4px 8px 4px 10px;
+  border: 0;
+  border-radius: var(--mv-radius-sm);
+  background: none;
+  color: var(--mv-ink-3);
+  font-family: var(--mv-body);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  transition: background-color 0.16s ease, color 0.16s ease;
+}
+
+.prn-toggle:hover,
+.prn-toggle[aria-expanded='true'] {
+  color: var(--mv-ink);
+}
+
+.prn-toggle:hover {
+  background: var(--prn-tint);
+}
+
+.prn-item[data-active] .prn-toggle:hover {
+  background: var(--mv-card);
+}
+
+.prn-toggle:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+.prn-toggle-icon {
+  transition: transform 0.22s ease;
+}
+
+.prn-toggle[aria-expanded='true'] .prn-toggle-icon {
+  transform: rotate(180deg);
+}
+
+.prn-short {
+  margin: 3px 0 0;
+  color: var(--mv-ink-2);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* How MultiVerse meets the principle: always visible. */
+.prn-mv {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  column-gap: 10px;
+  margin: 12px 0 0;
+  padding: 10px 14px 11px 11px;
+  border-radius: var(--mv-radius-sm);
+  background: var(--prn-tint);
+  color: var(--mv-ink);
+  font-size: 13px;
+  line-height: 1.6;
+  transition: background-color 0.18s ease;
+}
+
+.prn-item[data-active] .prn-mv {
+  background: var(--mv-card);
+}
+
+.prn-mv-icon {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  border-radius: 50%;
+  background: var(--prn-color);
+  color: var(--mv-card);
+}
+
+.prn-mv-label {
+  margin-right: 8px;
+  color: var(--mv-ink-3);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ---- the full definition ----------------------------------------------- */
+.prn-more {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition: grid-template-rows 0.24s ease, visibility 0s linear 0.24s;
+}
+
+.prn-more[data-open] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition: grid-template-rows 0.24s ease, visibility 0s linear 0s;
+}
+
+.prn-more-clip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.prn-more-body {
+  margin: -4px 22px 20px 64px;
+  padding-left: 14px;
+  border-left: 2px solid var(--prn-line);
+}
+
+.prn-definition {
+  margin: 0;
+  color: var(--mv-ink-2);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+/* The table columns that mark this principle. */
+.prn-cols {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0 0;
+}
+
+.prn-cols-label {
+  margin-right: 4px;
+  color: var(--mv-ink-3);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.prn-show {
+  min-height: 32px;
+  margin-top: 4px;
+  border-radius: 4px;
+}
+
+/* ---- motion ------------------------------------------------------------ */
+@keyframes prn-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .prn-root[data-reveal='pending'] .prn-item {
+    opacity: 0;
+  }
+
+  /* backwards: hidden during the stagger delay, and nothing left applied once the rise has finished. */
+  .prn-root[data-reveal='done'] .prn-item {
+    animation: prn-rise 0.6s cubic-bezier(0.22, 0.8, 0.26, 1) backwards;
+    animation-delay: calc(80ms + var(--prn-i, 0) * 70ms);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prn-item,
+  .prn-item::before,
+  .prn-badge,
+  .prn-toggle,
+  .prn-toggle-icon,
+  .prn-mv,
+  .prn-more,
+  .prn-more[data-open],
+  .prn-expand-all {
+    animation: none;
+    transition: none;
+  }
+}
+
+@media print {
+  .prn-root[data-reveal='pending'] .prn-item {
+    opacity: 1;
+  }
+}
+
+/* ---- narrower containers ----------------------------------------------- */
+
+/* Two narrow panels: the tagline moves under the group title in both bands, so the bands match. */
+@container prn (min-width: 761px) and (max-width: 960px) {
+  .prn-group-line {
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .prn-main {
+    padding-right: 18px;
+    padding-left: 16px;
+  }
+
+  .prn-item + .prn-item::after {
+    right: 18px;
+    left: 18px;
+  }
+
+  .prn-group-head {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .prn-more-body {
+    margin-right: 18px;
+    margin-left: 60px;
+  }
+}
+
+@container prn (max-width: 760px) {
+  .prn-columns {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+  }
+
+  .prn-group + .prn-group {
+    margin-top: 18px;
+  }
+}
+
+@container prn (max-width: 520px) {
+  .prn-top {
+    margin-bottom: 22px;
+  }
+
+  .prn-group-line {
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .prn-expand-all {
+    width: 100%;
+  }
+
+  .prn-group-head {
+    padding: 13px 16px 15px;
+  }
+
+  .prn-group-title,
+  .prn-group-tagline {
+    font-size: 18px;
+  }
+
+  .prn-main {
+    grid-template-columns: 28px minmax(0, 1fr);
+    column-gap: 11px;
+    padding: 18px 16px 18px 14px;
+  }
+
+  .prn-badge {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .prn-item + .prn-item::after {
+    right: 16px;
+    left: 16px;
+  }
+
+  /* On a phone the MultiVerse line and the definition use the full row width, under the number. */
+  .prn-mv {
+    margin-left: -39px;
+  }
+
+  .prn-more-body {
+    margin: -4px 16px 18px 14px;
+    padding-left: 12px;
+  }
+
+  /* The word "Definition" stays in the accessible name; the chevron carries it visually. */
+  .prn-toggle-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .prn-toggle {
+    justify-content: center;
+    min-width: 32px;
+    margin: -4px -6px -6px 0;
+    padding: 4px;
+    border: 1px solid var(--mv-line);
+  }
+}
+
+/* ======================================================================
+   Benchmark comparison
+   ====================================================================== */
+.cmp-root {
+  container: cmp / inline-size;
+}
+
+.cmp-title {
+  margin: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.9px;
+  line-height: 1.25;
+}
+
+.cmp-figure {
+  --cmp-name-w: 176px;
+  --cmp-col-min: 48px;
+  position: relative;
+  margin: 8px 0 0;
+  scroll-margin-top: 20px;
+}
+
+.cmp-caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 24px;
+  margin: 0 0 16px;
+  color: var(--mv-ink-3);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Shown only while the table is wider than its region. */
+.cmp-hint {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cmp-root[data-overflow] .cmp-hint {
+  display: inline-flex;
+}
+
+.cmp-frame {
+  position: relative;
+}
+
+/*
+ * position: relative keeps the cells' visually hidden text inside the region, so it cannot widen the page.
+ * scroll-padding keeps a focused column header clear of the sticky name column.
+ */
+.cmp-scroll {
+  position: relative;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-padding-left: calc(var(--cmp-name-w) + 8px);
+  scroll-padding-right: 8px;
+  border: 1px solid var(--mv-line);
+  border-radius: var(--mv-radius);
+  background: var(--mv-card);
+  box-shadow: var(--mv-shadow-sm);
+}
+
+.cmp-scroll:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+/* A soft edge on the right while more columns wait off screen. */
+.cmp-fade {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  bottom: 1px;
+  width: 26px;
+  border-radius: 0 calc(var(--mv-radius) - 1px) calc(var(--mv-radius) - 1px) 0;
+  background: linear-gradient(to right, transparent, color-mix(in srgb, var(--mv-ink) 11%, transparent));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.cmp-root[data-overflow]:not([data-at-end]) .cmp-fade {
+  opacity: 1;
+}
+
+/* ---- table ------------------------------------------------------------- */
+.cmp-table {
+  width: 100%;
+  min-width: calc(var(--cmp-name-w) + var(--cmp-cols, 15) * var(--cmp-col-min));
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-body);
+  font-size: 13px;
+}
+
+.cmp-colw-name {
+  width: var(--cmp-name-w);
+}
+
+.cmp-corner {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  padding: 0 12px 13px 18px;
+  border-right: 1px solid var(--mv-line);
+  border-bottom: 1px solid var(--mv-line-strong);
+  background: var(--mv-card);
+  color: var(--mv-ink-3);
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: 1.3px;
+  text-align: left;
+  text-transform: uppercase;
+  vertical-align: bottom;
+}
+
+/* Group bands: the same colours as the two panels above. */
+.cmp-band {
+  --cmp-color: var(--mv-realism);
+  padding: 0;
+  background: var(--cmp-color);
+  color: var(--mv-card);
+  text-align: left;
+}
+
+.cmp-band--trustworthy {
+  --cmp-color: var(--mv-trust);
+}
+
+.cmp-band + .cmp-band {
+  border-left: 2px solid var(--mv-card);
+}
+
+/* overflow: clip (not hidden) so a long title can never widen the region, and the title can still stick. */
+.cmp-band-inner {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  overflow: clip;
+  padding: 9px 14px 10px;
+}
+
+/*
+ * The title stays in view while the table scrolls sideways. Its own band-coloured
+ * background lets it slide over the range label at the end of the band instead
+ * of printing on top of it.
+ */
+.cmp-band-title {
+  position: sticky;
+  left: calc(var(--cmp-name-w) + 14px);
+  z-index: 1;
+  padding-right: 12px;
+  background: var(--cmp-color);
+  font-family: var(--mv-display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.cmp-band-range {
+  color: color-mix(in srgb, var(--mv-card) 86%, var(--cmp-color));
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+/* Column headers: a vertical label that explains itself, and the principle it marks. */
+.cmp-col,
+.cmp-cell {
+  --cmp-color: var(--mv-realism);
+  --cmp-tint: var(--mv-realism-tint);
+  --cmp-edge: var(--mv-realism-line);
+}
+
+.cmp-col--trustworthy,
+.cmp-cell--trustworthy {
+  --cmp-color: var(--mv-trust);
+  --cmp-tint: var(--mv-trust-tint);
+  --cmp-edge: var(--mv-trust-line);
+}
+
+.cmp-col {
+  padding: 0;
+  border-bottom: 1px solid var(--mv-line-strong);
+  background: var(--cmp-tint);
+  font-weight: inherit;
+  vertical-align: bottom;
+  transition: background-color 0.15s ease;
+}
+
+.cmp-col[data-active] {
+  background: color-mix(in srgb, var(--cmp-color) 17%, var(--mv-card));
+}
+
+.cmp-group-start {
+  border-left: 1px solid var(--mv-line-strong);
+}
+
+.cmp-col-button {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 120px;
+  padding: 10px 0 3px;
+  border: 0;
+  background: none;
+  color: var(--mv-ink-2);
+  font-family: var(--mv-body);
+  transition: color 0.15s ease;
+}
+
+.cmp-col-button:hover,
+.cmp-col[data-active] .cmp-col-button {
+  color: var(--mv-ink);
+}
+
+/* Inside the scrolling region an outer ring would be clipped, so the ring sits inside the cell. */
+.cmp-col-button:focus-visible,
+.cmp-p:focus-visible {
+  border-radius: var(--mv-radius-sm);
+  outline: 3px solid var(--mv-focus);
+  outline-offset: -3px;
+}
+
+/* Reads bottom to top; longer labels wrap onto a second or third line. */
+.cmp-col-label {
+  max-height: 104px;
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.2;
+  text-align: start;
+  transform: rotate(180deg);
+  writing-mode: vertical-rl;
+}
+
+.cmp-word {
+  white-space: nowrap;
+}
+
+.cmp-p {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.cmp-p-pill {
+  min-width: 28px;
+  padding: 2px 6px;
+  border: 1px solid var(--cmp-edge);
+  border-radius: 999px;
+  background: var(--mv-card);
+  color: var(--cmp-color);
+  font-family: var(--mv-display);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+  text-align: center;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.cmp-p:hover .cmp-p-pill,
+.cmp-col[data-active] .cmp-p-pill {
+  border-color: var(--cmp-color);
+  background: var(--cmp-color);
+  color: var(--mv-card);
+}
+
+/* ---- body -------------------------------------------------------------- */
+.cmp-group-title {
+  padding: 0;
+  border-bottom: 1px solid var(--mv-line);
+  background: var(--mv-card);
+  text-align: left;
+}
+
+.cmp-group-title > span {
+  position: sticky;
+  left: 18px;
+  display: inline-block;
+  padding: 15px 0 7px;
+  color: var(--mv-ink-3);
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: 1.3px;
+  line-height: 1.4;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.cmp-name,
+.cmp-cell {
+  border-bottom: 1px solid var(--mv-line);
+  background-color: var(--mv-card);
+  vertical-align: top;
+  transition: background-color 0.12s ease;
+}
+
+.cmp-name {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  padding: 8px 12px 7px 18px;
+  border-right: 1px solid var(--mv-line);
+  color: var(--mv-ink);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  overflow-wrap: break-word;
+  text-align: left;
+}
+
+.cmp-cell {
+  padding: 9px 0 6px;
+  text-align: center;
+}
+
+.cmp-row:hover > .cmp-name,
+.cmp-row:hover > .cmp-cell {
+  background-color: var(--mv-sunken);
+}
+
+/* The columns of the active principle, tinted through every row over whatever the row carries. */
+.cmp-cell[data-col-active] {
+  box-shadow: inset 0 0 0 100px color-mix(in srgb, var(--cmp-color) 10%, transparent);
+}
+
+.cmp-glyph {
+  position: relative;
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  vertical-align: top;
+}
+
+.cmp-count {
+  display: block;
+  margin-top: 2px;
+  color: var(--mv-ink-3);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  line-height: 13px;
+}
+
+/* MultiVerse: last row, stronger text, a tinted band, and a rule above it. */
+.cmp-row--ours > .cmp-name,
+.cmp-row--ours > .cmp-cell {
+  border-top: 2px solid var(--mv-green);
+  border-bottom: 0;
+  background-color: var(--mv-green-tint);
+}
+
+.cmp-row--ours:hover > .cmp-name,
+.cmp-row--ours:hover > .cmp-cell {
+  background-color: color-mix(in srgb, var(--mv-green-tint) 90%, var(--mv-green));
+}
+
+.cmp-row--ours > .cmp-name {
+  padding-top: 9px;
+  padding-bottom: 10px;
+}
+
+.cmp-row--ours > .cmp-cell {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.cmp-row--ours .cmp-name-text {
+  font-family: var(--mv-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.cmp-ours-tag {
+  display: block;
+  color: var(--mv-ink-3);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+}
+
+.cmp-row--ours .cmp-count {
+  color: var(--mv-ink-2);
+  font-weight: 600;
+}
+
+/* ---- glyphs ------------------------------------------------------------ */
+.cmp-icon {
+  display: inline-block;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.cmp-icon--yes {
+  color: var(--mv-pass);
+  stroke-width: 2.2;
+}
+
+.cmp-icon--partial {
+  color: var(--mv-partial);
+  stroke-width: 1.8;
+}
+
+.cmp-icon--no {
+  color: var(--mv-fail);
+}
+
+.cmp-icon--na {
+  color: var(--mv-ink-3);
+  stroke-width: 1.8;
+}
+
+/* Buckets are sizes, not grades: neutral ink, never the outcome colours. */
+.cmp-icon--bucket {
+  color: var(--mv-ink-2);
+  stroke-width: 1.5;
+}
+
+.cmp-icon-fill {
+  fill: currentColor;
+}
+
+.cmp-icon-half {
+  fill: currentColor;
+  stroke: none;
+}
+
+.cmp-only {
+  position: absolute;
+  top: -5px;
+  right: -9px;
+  color: var(--mv-green);
+}
+
+.cmp-only-star {
+  display: block;
+  width: 10px;
+  height: 10px;
+  fill: currentColor;
+}
+
+/* ---- column explanation ------------------------------------------------ */
+.cmp-pop {
+  --cmp-color: var(--mv-realism);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  width: min(348px, 100%);
+  padding: 13px 15px 14px;
+  border: 1px solid var(--mv-line-strong);
+  border-top: 3px solid var(--cmp-color);
+  border-radius: var(--mv-radius);
+  background: var(--mv-card);
+  box-shadow: var(--mv-shadow), var(--mv-shadow-sm), var(--mv-shadow-sm);
+  color: var(--mv-ink-2);
+  font-family: var(--mv-body);
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: left;
+  visibility: hidden;
+}
+
+.cmp-pop--trustworthy {
+  --cmp-color: var(--mv-trust);
+}
+
+.cmp-pop[data-placed] {
+  visibility: visible;
+}
+
+/* A small pointer towards the column, when the explanation sits right above or below it. */
+.cmp-pop[data-placement='above']::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: calc(var(--cmp-arrow, 50%) - 6px);
+  width: 11px;
+  height: 11px;
+  border: 1px solid var(--mv-line-strong);
+  border-top-color: transparent;
+  border-left-color: transparent;
+  background: var(--mv-card);
+  transform: rotate(45deg);
+}
+
+.cmp-pop[data-placement='below']::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: calc(var(--cmp-arrow, 50%) - 7px);
+  width: 14px;
+  height: 7px;
+  background: var(--cmp-color);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.cmp-pop-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+}
+
+/* Which design principle the column marks, in words. */
+.cmp-pop-principle {
+  margin: 1px 0 0;
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.cmp-pop-body {
+  margin-top: 8px;
+}
+
+.cmp-pop-title {
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  line-height: 1.3;
+}
+
+.cmp-pop-p {
+  flex: none;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--cmp-color);
+  color: var(--mv-card);
+  font-family: var(--mv-display);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.cmp-pop-text,
+.cmp-pop-level,
+.cmp-pop-buckets {
+  margin: 0;
+}
+
+.cmp-pop-text + .cmp-pop-text,
+.cmp-pop-text + .cmp-pop-level,
+.cmp-pop-level + .cmp-pop-level,
+.cmp-pop-buckets + .cmp-pop-text {
+  margin-top: 6px;
+}
+
+.cmp-pop-level {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  column-gap: 8px;
+}
+
+.cmp-pop-level .cmp-icon {
+  margin-top: 2px;
+}
+
+.cmp-pop strong {
+  color: var(--mv-ink);
+  font-weight: 600;
+}
+
+.cmp-pop-buckets {
+  display: grid;
+  gap: 3px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--mv-line);
+}
+
+.cmp-pop-bucket {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---- legend, bucket rules, closing paragraph --------------------------- */
+.cmp-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 34px;
+  margin-top: 16px;
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.cmp-legend-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The four marks take the first line; the buckets and the "only" marker share the second. */
+.cmp-legend-group:first-child {
+  flex-basis: 100%;
+}
+
+.cmp-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.cmp-legend-item .cmp-glyph {
+  margin-right: 8px;
+}
+
+.cmp-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 22px;
+  margin-top: 12px;
+}
+
+.cmp-rules-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 32px;
+  margin-left: -7px;
+  padding: 4px 11px 4px 7px;
+  border: 0;
+  border-radius: var(--mv-radius-sm);
+  background: none;
+  color: var(--mv-green);
+  font-family: var(--mv-body);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  transition: background-color 0.16s ease, color 0.16s ease;
+}
+
+.cmp-rules-toggle:hover {
+  background: var(--mv-tint);
+  color: var(--mv-green-dark);
+}
+
+.cmp-rules-toggle:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+.cmp-rules-icon {
+  transform: rotate(-90deg);
+  transition: transform 0.2s ease;
+}
+
+.cmp-rules-toggle[aria-expanded='true'] .cmp-rules-icon {
+  transform: none;
+}
+
+.cmp-note {
+  flex: 1 1 300px;
+}
+
+.cmp-rules {
+  display: grid;
+  gap: 7px;
+  max-width: 780px;
+  margin: 8px 0 0;
+  padding: 14px 18px;
+  border: 1px solid var(--mv-line);
+  border-radius: var(--mv-radius);
+  background: var(--mv-sunken);
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  line-height: 1.5;
+  list-style: none;
+}
+
+.cmp-rules[hidden] {
+  display: none;
+}
+
+.cmp-rule {
+  display: grid;
+  grid-template-columns: 118px repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: 4px 16px;
+}
+
+.cmp-rule-name {
+  color: var(--mv-ink);
+  font-weight: 600;
+}
+
+.cmp-rule-level {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.cmp-takeaway {
+  max-width: 800px;
+  margin: 28px 0 0;
+  padding-left: 18px;
+  border-left: 3px solid var(--mv-green);
+  color: var(--mv-ink);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cmp-col,
+  .cmp-col-button,
+  .cmp-p-pill,
+  .cmp-name,
+  .cmp-cell,
+  .cmp-fade,
+  .cmp-rules-toggle,
+  .cmp-rules-icon {
+    transition: none;
+  }
+}
+
+/* ---- narrower containers ----------------------------------------------- */
+
+/*
+ * Tablet widths: narrower columns so the whole table still fits without
+ * scrolling. Labels get more height and wrap onto two lines at most.
+ */
+@container cmp (min-width: 720px) and (max-width: 895px) {
+  .cmp-figure {
+    --cmp-name-w: 150px;
+    --cmp-col-min: 37px;
+  }
+
+  .cmp-corner,
+  .cmp-name {
+    padding-left: 14px;
+    padding-right: 8px;
+  }
+
+  .cmp-group-title > span {
+    left: 14px;
+  }
+
+  .cmp-col-button {
+    height: 166px;
+  }
+
+  .cmp-col-label {
+    max-height: 150px;
+  }
+
+  .cmp-band-inner {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+}
+
+/* Where the table scrolls sideways, the bands carry only their titles, which stay in view. */
+@container cmp (max-width: 719px) {
+  .cmp-band-range {
+    display: none;
+  }
+}
+
+@container cmp (max-width: 640px) {
+  .cmp-title {
+    font-size: 22px;
+  }
+
+  .cmp-figure {
+    --cmp-name-w: 132px;
+  }
+
+  .cmp-corner,
+  .cmp-name {
+    padding-left: 12px;
+    padding-right: 8px;
+  }
+
+  .cmp-name {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .cmp-group-title > span {
+    left: 12px;
+  }
+
+  .cmp-rule {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .cmp-rule-name {
+    grid-column: 1 / -1;
+  }
+}
+
+@container cmp (max-width: 400px) {
+  .cmp-figure {
+    --cmp-name-w: 124px;
+  }
+
+  .cmp-rule {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

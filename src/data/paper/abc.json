@@ -1,0 +1,666 @@
+{
+  "schemaVersion": 1,
+  "checklist": {
+    "name": "Agentic Benchmark Checklist",
+    "abbr": "ABC",
+    "version": "v5",
+    "itemCount": 43
+  },
+  "benchmarks": [
+    {
+      "id": "MV",
+      "name": "MultiVerse",
+      "ours": true
+    },
+    {
+      "id": "AW",
+      "name": "AppWorld",
+      "ours": false
+    },
+    {
+      "id": "G2",
+      "name": "GAIA2",
+      "ours": false
+    },
+    {
+      "id": "TA",
+      "name": "Toolathlon",
+      "ours": false
+    },
+    {
+      "id": "AB",
+      "name": "AutomationBench",
+      "ours": false
+    },
+    {
+      "id": "HB",
+      "name": "HANDBOOK.md",
+      "ours": false
+    }
+  ],
+  "categories": [
+    {
+      "id": "outcome",
+      "title": "Outcome validity",
+      "items": [
+        {
+          "id": "O.a.1",
+          "requirement": "String match: semantic equivalents",
+          "marks": {
+            "MV": "no",
+            "AW": "no",
+            "G2": "no",
+            "TA": "no",
+            "AB": "no",
+            "HB": "no"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.a.2",
+          "requirement": "String match: redundant words",
+          "marks": {
+            "MV": "no",
+            "AW": "no",
+            "G2": "no",
+            "TA": "no",
+            "AB": "no",
+            "HB": "no"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.b.1",
+          "requirement": "Substring: negation modifiers",
+          "marks": {
+            "MV": "no",
+            "AW": "no",
+            "G2": "yes",
+            "TA": "no",
+            "AB": "no",
+            "HB": "no"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.b.2",
+          "requirement": "Substring: robust to answer-listing",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "no",
+            "AB": "no",
+            "HB": "no"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.b.3",
+          "requirement": "Substring: complex enough vs guessing",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "yes",
+            "AB": "yes",
+            "HB": "yes"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.c.1",
+          "requirement": "Judge accuracy / self-consistency / human agreement",
+          "marks": {
+            "MV": "yes",
+            "AW": "na",
+            "G2": "no",
+            "TA": "na",
+            "AB": "na",
+            "HB": "na"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.c.2",
+          "requirement": "LLM judge designed to resist adversarial input / reward hacking",
+          "marks": {
+            "MV": "yes",
+            "AW": "na",
+            "G2": "yes",
+            "TA": "na",
+            "AB": "na",
+            "HB": "na"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.d.1",
+          "requirement": "Unit tests verified for correctness",
+          "marks": {
+            "MV": "na",
+            "AW": "na",
+            "G2": "na",
+            "TA": "na",
+            "AB": "na",
+            "HB": "na"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.d.2",
+          "requirement": "Unit-test quality metrics (coverage, etc.)",
+          "marks": {
+            "MV": "na",
+            "AW": "na",
+            "G2": "na",
+            "TA": "na",
+            "AB": "na",
+            "HB": "na"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.e.1",
+          "requirement": "Fuzz: edge cases",
+          "marks": {
+            "MV": "na",
+            "AW": "na",
+            "G2": "na",
+            "TA": "na",
+            "AB": "na",
+            "HB": "na"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.e.2",
+          "requirement": "Fuzz: input-variation coverage",
+          "marks": {
+            "MV": "na",
+            "AW": "na",
+            "G2": "na",
+            "TA": "na",
+            "AB": "na",
+            "HB": "na"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.e.3",
+          "requirement": "Fuzz: output-sensitive inputs",
+          "marks": {
+            "MV": "na",
+            "AW": "na",
+            "G2": "na",
+            "TA": "na",
+            "AB": "na",
+            "HB": "na"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.f.1",
+          "requirement": "End-to-end: exercises all relevant code",
+          "marks": {
+            "MV": "na",
+            "AW": "na",
+            "G2": "na",
+            "TA": "na",
+            "AB": "na",
+            "HB": "na"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.f.2",
+          "requirement": "End-to-end: no flaky results",
+          "marks": {
+            "MV": "na",
+            "AW": "na",
+            "G2": "na",
+            "TA": "na",
+            "AB": "na",
+            "HB": "na"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.g.1",
+          "requirement": "State GT covers all successful end states",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "no",
+            "TA": "no",
+            "AB": "yes",
+            "HB": "yes"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.g.2",
+          "requirement": "State: relevant and irrelevant states checked",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "no",
+            "AB": "no",
+            "HB": "no"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.g.3",
+          "requirement": "State complexity prevents trivial success",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "yes",
+            "AB": "yes",
+            "HB": "yes"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.h.1",
+          "requirement": "Answer formats specified",
+          "marks": {
+            "MV": "na",
+            "AW": "no",
+            "G2": "na",
+            "TA": "na",
+            "AB": "na",
+            "HB": "na"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.h.2",
+          "requirement": "Answer: guessing minimized",
+          "marks": {
+            "MV": "na",
+            "AW": "yes",
+            "G2": "na",
+            "TA": "na",
+            "AB": "na",
+            "HB": "na"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "O.i.1",
+          "requirement": "Quality metric resists exploitation",
+          "marks": {
+            "MV": "na",
+            "AW": "na",
+            "G2": "na",
+            "TA": "na",
+            "AB": "na",
+            "HB": "na"
+          },
+          "noteMarks": {}
+        }
+      ]
+    },
+    {
+      "id": "task",
+      "title": "Challenge (task) validity",
+      "items": [
+        {
+          "id": "T.1",
+          "requirement": "Tool versions specified",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "no",
+            "TA": "no",
+            "AB": "yes",
+            "HB": "no"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "T.2",
+          "requirement": "API tools consistently accessible",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "no",
+            "AB": "yes",
+            "HB": "yes"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "T.3",
+          "requirement": "Handle / terminate on API inaccessibility",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "no",
+            "AB": "yes",
+            "HB": "yes"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "T.4",
+          "requirement": "Residual state cleared between runs",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "yes",
+            "AB": "yes",
+            "HB": "yes"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "T.5",
+          "requirement": "Agent isolated from ground truth",
+          "marks": {
+            "MV": "yes",
+            "AW": "no",
+            "G2": "yes",
+            "TA": "yes",
+            "AB": "yes",
+            "HB": "yes"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "T.6",
+          "requirement": "Task environment fixed across evaluations",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "no",
+            "AB": "yes",
+            "HB": "yes"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "T.7",
+          "requirement": "Ground truth verified for correctness",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "yes",
+            "AB": "yes",
+            "HB": "yes"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "T.8",
+          "requirement": "Each task verified solvable",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "yes",
+            "AB": "no",
+            "HB": "yes"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "T.9",
+          "requirement": "Automatic oracle solver",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "no",
+            "AB": "no",
+            "HB": "no"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "T.10",
+          "requirement": "No exploitable vulnerabilities",
+          "marks": {
+            "MV": "yes",
+            "AW": "no",
+            "G2": "yes",
+            "TA": "yes",
+            "AB": "yes",
+            "HB": "yes"
+          },
+          "noteMarks": {}
+        }
+      ]
+    },
+    {
+      "id": "reporting",
+      "title": "Benchmark reporting",
+      "items": [
+        {
+          "id": "R.1",
+          "requirement": "Open-sourced (at least partially)",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "yes",
+            "AB": "yes",
+            "HB": "yes"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "R.2",
+          "requirement": "Open-source evaluation harness",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "yes",
+            "AB": "yes",
+            "HB": "yes"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "R.3",
+          "requirement": "Contamination control (held-out set)",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "no",
+            "AB": "yes",
+            "HB": "no"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "R.4",
+          "requirement": "Plan to update over time",
+          "marks": {
+            "MV": "no",
+            "AW": "no",
+            "G2": "no",
+            "TA": "no",
+            "AB": "yes",
+            "HB": "no"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "R.5",
+          "requirement": "Capability–construct relationship stated",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "yes",
+            "AB": "yes",
+            "HB": "yes"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "R.6",
+          "requirement": "Evaluation subject stated (model vs. harness)",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "yes",
+            "AB": "yes",
+            "HB": "yes"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "R.7",
+          "requirement": "Flaw prevention / identification / correction",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "yes",
+            "AB": "yes",
+            "HB": "yes"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "R.8",
+          "requirement": "Qualitative discussion of flaw impact",
+          "marks": {
+            "MV": "yes",
+            "AW": "yes",
+            "G2": "yes",
+            "TA": "no",
+            "AB": "yes",
+            "HB": "no"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "R.9",
+          "requirement": "Quantitative analysis of evaluator noise",
+          "marks": {
+            "MV": "yes",
+            "AW": "no",
+            "G2": "yes",
+            "TA": "no",
+            "AB": "no",
+            "HB": "no"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "R.10",
+          "requirement": "Uncertainty statistics (CI, SE, or SD)",
+          "marks": {
+            "MV": "yes",
+            "AW": "no",
+            "G2": "yes",
+            "TA": "yes",
+            "AB": "no",
+            "HB": "no"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "R.11",
+          "requirement": "Interpretation guidance given eval flaws",
+          "marks": {
+            "MV": "yes",
+            "AW": "no",
+            "G2": "yes",
+            "TA": "yes",
+            "AB": "no",
+            "HB": "no"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "R.12",
+          "requirement": "Non-AI (human) baseline reported",
+          "marks": {
+            "MV": "no",
+            "AW": "no",
+            "G2": "yes",
+            "TA": "no",
+            "AB": "no",
+            "HB": "no"
+          },
+          "noteMarks": {}
+        },
+        {
+          "id": "R.13",
+          "requirement": "Trivial-agent baseline reported",
+          "marks": {
+            "MV": "yes",
+            "AW": "no",
+            "G2": "no",
+            "TA": "no",
+            "AB": "no",
+            "HB": "no"
+          },
+          "noteMarks": {}
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "MV": {
+      "satisfied": 28,
+      "committed": 0,
+      "notSatisfied": 5,
+      "notApplicable": 10,
+      "applicable": 33
+    },
+    "AW": {
+      "satisfied": 21,
+      "committed": 0,
+      "notSatisfied": 12,
+      "notApplicable": 10,
+      "applicable": 33
+    },
+    "G2": {
+      "satisfied": 26,
+      "committed": 0,
+      "notSatisfied": 7,
+      "notApplicable": 10,
+      "applicable": 33
+    },
+    "TA": {
+      "satisfied": 14,
+      "committed": 0,
+      "notSatisfied": 17,
+      "notApplicable": 12,
+      "applicable": 31
+    },
+    "AB": {
+      "satisfied": 19,
+      "committed": 0,
+      "notSatisfied": 12,
+      "notApplicable": 12,
+      "applicable": 31
+    },
+    "HB": {
+      "satisfied": 16,
+      "committed": 0,
+      "notSatisfied": 15,
+      "notApplicable": 12,
+      "applicable": 31
+    }
+  },
+  "notes": [],
+  "warnings": []
+}

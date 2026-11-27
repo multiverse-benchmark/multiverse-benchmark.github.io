@@ -1,0 +1,378 @@
+[
+  {
+    "name": "make_call",
+    "description": "Make a call to a single recipient with exactly one phone number endpoint.\n\nTo resolve the phone number endpoint, you may have to call one or more tools\nprior to calling this operation. Before calling this operation, always check\nif the Geofencing Policy applies. If there is a recipient with more than one\nphone number endpoints, ask the user for the intended endpoint by invoking\nshow_call_recipient_choices. Do not call this operation until the user has\nchosen a single recipient with exactly one phone number endpoint.\n\nWhen recipient is provided, the function validates that contact_name and\ncontact_endpoints belong to the same contact in the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "recipient": {
+          "description": "The recipient of the phone call. Defaults to None. Contains: contact_id, contact_name, contact_endpoints, contact_photo_url, recipient_type, address, distance, confidence_level.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "contact_id": {
+              "description": "Unique identifier for the contact.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "contact_name": {
+              "description": "Name of the contact.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "contact_endpoints": {
+              "description": "List of endpoints for the contact. Each endpoint represents a different phone number (e.g., mobile, work, home). Each endpoint dict contains:",
+              "type": "array",
+              "nullable": true,
+              "default": null,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "endpoint_value": {
+                    "description": "The phone number endpoint value in E.164 format.",
+                    "type": "string",
+                    "nullable": false
+                  },
+                  "endpoint_type": {
+                    "description": "Type of endpoint. Only \"PHONE_NUMBER\" is supported.",
+                    "type": "string",
+                    "nullable": false,
+                    "default": "PHONE_NUMBER"
+                  },
+                  "endpoint_label": {
+                    "description": "Optional label for endpoint.",
+                    "type": "string",
+                    "nullable": true,
+                    "default": null
+                  },
+                  "is_primary": {
+                    "description": "Whether this is the primary endpoint.",
+                    "type": "boolean",
+                    "nullable": true,
+                    "default": null
+                  }
+                },
+                "required": [
+                  "endpoint_value"
+                ]
+              }
+            },
+            "contact_photo_url": {
+              "description": "URL to the contact's profile photo.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "recipient_type": {
+              "description": "Type of recipient (\"CONTACT\", \"BUSINESS\", \"DIRECT\", \"VOICEMAIL\").",
+              "type": "string",
+              "nullable": true,
+              "default": null,
+              "enum": [
+                "CONTACT",
+                "BUSINESS",
+                "DIRECT",
+                "VOICEMAIL"
+              ]
+            },
+            "address": {
+              "description": "Address of the recipient.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "distance": {
+              "description": "Distance to the recipient.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "confidence_level": {
+              "description": "Confidence level of the recipient match.",
+              "type": "string",
+              "nullable": true,
+              "default": null,
+              "enum": [
+                "LOW",
+                "MEDIUM",
+                "HIGH"
+              ]
+            }
+          },
+          "required": []
+        },
+        "on_speakerphone": {
+          "description": "If True, the phone call will be placed on the speakerphone. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "recipient_name": {
+          "description": "The recipient's name. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "recipient_phone_number": {
+          "description": "The phone number of the recipient to make the call to, e.g. \"+11234567890\". This value is validated for proper format. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "recipient_photo_url": {
+          "description": "The url to the profile photo of the recipient. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "prepare_call",
+    "description": "Prepare a call to one or more recipients, given provided recipient information.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "recipients": {
+          "description": "A list of recipient objects to prepare call cards for. Defaults to None.",
+          "type": "array",
+          "nullable": true,
+          "default": null,
+          "items": {
+            "type": "object",
+            "properties": {
+              "contact_id": {
+                "description": "Unique identifier for the contact.",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              },
+              "contact_name": {
+                "description": "Name of the contact.",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              },
+              "contact_endpoints": {
+                "description": "List of endpoints for the contact. Each endpoint represents a different phone number.",
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "endpoint_value": {
+                      "description": "The phone number endpoint value in E.164 format.",
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "endpoint_type": {
+                      "description": "Type of endpoint. Only \"PHONE_NUMBER\" is supported.",
+                      "type": "string",
+                      "nullable": false,
+                      "default": "PHONE_NUMBER"
+                    },
+                    "endpoint_label": {
+                      "description": "Optional label for endpoint.",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    },
+                    "is_primary": {
+                      "description": "Whether this is the primary endpoint.",
+                      "type": "boolean",
+                      "nullable": true,
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "endpoint_value"
+                  ]
+                }
+              },
+              "contact_photo_url": {
+                "description": "URL to the contact's profile photo.",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              },
+              "recipient_type": {
+                "description": "Type of recipient.",
+                "type": "string",
+                "nullable": true,
+                "default": null,
+                "enum": [
+                  "CONTACT",
+                  "BUSINESS",
+                  "DIRECT",
+                  "VOICEMAIL"
+                ]
+              },
+              "address": {
+                "description": "Address of the recipient.",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              },
+              "distance": {
+                "description": "Distance to the recipient.",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              },
+              "confidence_level": {
+                "description": "Confidence level of the recipient match.",
+                "type": "string",
+                "nullable": true,
+                "default": null,
+                "enum": [
+                  "LOW",
+                  "MEDIUM",
+                  "HIGH"
+                ]
+              }
+            },
+            "required": [
+              "contact_endpoints"
+            ]
+          }
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "show_call_recipient_choices",
+    "description": "Show a list of one or more recipients to the user to choose from.\n\nThis operation uses a UI component to show the list of choices. You do not\nneed to enumerate the list of choices in your final response. If you call\nthis operation, you may not call other operations from this tool before\ndrafting the final response.\n\nThe function validates that contact_name and contact_endpoints belong to the same contact\nin the database to prevent mismatched data.\n\nInvoke this operation in the following scenarios:\n    * There are multiple recipients (contacts or businesses) to choose from.\n    * There are multiple phone number endpoints for a business to choose from.\n    * There are multiple phone number endpoints for a single contact to choose from.\n    * There is a single contact recipient with `confidence_level` LOW.\n    * The Geofencing Policy applies.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "recipients": {
+          "description": "A list of recipient objects to display as choices.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "contact_id": {
+                "description": "Unique identifier for the contact",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              },
+              "contact_name": {
+                "description": "Name of the contact",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              },
+              "contact_endpoints": {
+                "description": "List of phone number endpoints for the contact (required - needed to show choices). Each endpoint represents a different phone number (e.g., mobile, work, home).",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "endpoint_type": {
+                      "description": "Type of endpoint. Only 'PHONE_NUMBER' is supported.",
+                      "type": "string",
+                      "nullable": false,
+                      "default": "PHONE_NUMBER"
+                    },
+                    "endpoint_value": {
+                      "description": "Phone number in E.164 format (e.g., '+11234567890'). If the recipient type is VOICEMAIL, always set this field to '*86'. May include common separators like dashes, spaces, dots, or parentheses.",
+                      "type": "string",
+                      "nullable": false,
+                      "pattern": "^\\+?[1-9][\\d\\s\\-\\.\\(\\)]{1,20}$|^\\*86$"
+                    },
+                    "endpoint_label": {
+                      "description": "Human-readable label for the endpoint (e.g., \"Mobile\", \"Work\", \"Home\").",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    },
+                    "is_primary": {
+                      "description": "Whether this is the primary endpoint.",
+                      "type": "boolean",
+                      "nullable": true,
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "endpoint_value"
+                  ]
+                }
+              },
+              "contact_photo_url": {
+                "description": "URL to the contact's profile photo",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              },
+              "recipient_type": {
+                "description": "Type of recipient",
+                "type": "string",
+                "enum": [
+                  "CONTACT",
+                  "BUSINESS",
+                  "DIRECT",
+                  "VOICEMAIL"
+                ],
+                "nullable": true,
+                "default": null
+              },
+              "address": {
+                "description": "Address of the recipient",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              },
+              "distance": {
+                "description": "Distance to the recipient",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              },
+              "confidence_level": {
+                "description": "Confidence level of the recipient match",
+                "type": "string",
+                "nullable": true,
+                "default": null,
+                "enum": [
+                  "LOW",
+                  "MEDIUM",
+                  "HIGH"
+                ]
+              }
+            },
+            "required": [
+              "contact_endpoints"
+            ]
+          }
+        }
+      },
+      "required": [
+        "recipients"
+      ]
+    }
+  },
+  {
+    "name": "show_call_recipient_not_found_or_specified",
+    "description": "Show a message to the user when the call recipient is not found or not specified.\n\nYou must attempt to search for a recipient before calling this operation.\nCall this operation when no match is found for a recipient, or when the user\nexpresses an intent to call without specifying a recipient.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "contact_name": {
+          "description": "The recipient name that was searched for. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "id": "salespower",
+  "name": "Salespower",
+  "icon": "./icons/salespower.svg",
+  "iconBackground": "linear-gradient(135deg, #0F766E 0%, #FFFBEB 50%, #F59E0B 100%)",
+  "description": "CRM with tasks, events, and SOQL queries",
+  "backendService": "salespower",
+  "defaultWindow": {
+    "width": 1200,
+    "height": 800
+  }
+}

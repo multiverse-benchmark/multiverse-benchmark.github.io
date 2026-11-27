@@ -1,0 +1,373 @@
+/*
+ * Shared tokens and primitives for the whole site. Every colour a component
+ * uses comes from a token here, so the light and the dark theme differ only
+ * in the token values: the light values are in :root, the dark ones in
+ * :root[data-theme='dark'] below them. The ink colours clear 4.5:1 on the
+ * page, band, and card surfaces of their theme. Paper roles, outcomes, and
+ * model-access colours keep their distinct semantic palettes in both themes.
+ */
+:root {
+  color-scheme: light;
+
+  /* surfaces */
+  --mv-page: #ffffff;
+  --mv-band: #f8f9fc;
+  --mv-card: #ffffff;
+  --mv-sunken: #f8f9fc;
+  --mv-tint: #eff2f7;
+
+  /* ink: primary, secondary, muted (all >= 4.5:1 on the surfaces above) */
+  --mv-ink: #121317;
+  --mv-ink-2: #45474d;
+  --mv-ink-3: #5b5f67;
+
+  /* lines */
+  --mv-line: #e3e5ea;
+  --mv-line-strong: #b8c4db;
+
+  /*
+   * The accent (a blue). In the token names, "purple" is the accent,
+   * "purple-dark" its stronger step for text, and "green" and "sage" are
+   * aliases of the same accent.
+   */
+  --mv-purple: #2b4fda;
+  --mv-purple-dark: #2342b8;
+  --mv-purple-tint: #eef2ff;
+  --mv-lavender: #6379b2;
+  --mv-accent-light: #dce6ff;
+  --mv-green: var(--mv-purple);
+  --mv-green-dark: var(--mv-purple-dark);
+  --mv-green-tint: var(--mv-purple-tint);
+  --mv-sage: var(--mv-lavender);
+  /* Focus ring: at least 3:1 against every surface above. */
+  --mv-focus: var(--mv-purple);
+
+  /* Site chrome: the translucent header, the footer, and the solid buttons. */
+  --mv-header: #ffffffed;
+  --mv-header-line: #eceef2;
+  --mv-footer: #17191f;
+  --mv-footer-ink: #e4e8f2;
+  --mv-footer-ink-2: #b8bfcd;
+  --mv-footer-line: #ffffff26;
+  --mv-button: #202124;
+  --mv-button-hover: #34363b;
+  --mv-button-ink: #ffffff;
+  /* Text and glyphs on a solid fill of the accent, an ink, or an outcome colour. */
+  --mv-on-fill: #ffffff;
+
+  /* Tool browser chrome; syntax colors remain independent. */
+  --mv-code-bg: #171a24;
+  --mv-code-panel: #202532;
+  --mv-code-border: #3d465b;
+  --mv-code-ink: #e4e8f2;
+  --mv-code-muted: #aeb9ce;
+
+  /* design-principle groups (paper Figure 2) */
+  --mv-realism: #3d5a99;
+  --mv-realism-tint: #eef2fa;
+  --mv-realism-line: #cdd8ee;
+  --mv-trust: #1f6f52;
+  --mv-trust-tint: #eaf4ee;
+  --mv-trust-line: #c6dfd1;
+
+  /* overview-figure roles (paper Figure 1) */
+  --mv-task: #5b4b8a;
+  --mv-task-tint: #f2eff9;
+  --mv-task-line: #cfc6e6;
+  --mv-user: #8a620c;
+  --mv-user-tint: #fcf4dc;
+  --mv-user-line: #e6c56a;
+  --mv-agent: #1f2a24;
+  --mv-verify: #2a7a4b;
+  --mv-verify-tint: #eaf4e6;
+  --mv-verify-line: #b9d8bf;
+  --mv-service: #55615b;
+  --mv-service-tint: #f0f2ee;
+  --mv-service-line: #c9d0c8;
+
+  /* outcomes: always paired with an icon or a word, never colour alone */
+  --mv-pass: #2a7a4b;
+  --mv-pass-tint: #e6f3e6;
+  --mv-fail: #b3392f;
+  --mv-fail-tint: #fbe9e6;
+  --mv-partial: #9a6a12;
+  --mv-partial-tint: #fbf1d8;
+
+  /* model groups: proprietary (closed) vs open-weight (open) */
+  --mv-closed: #0b7350;
+  --mv-closed-tint: #e2f1ea;
+  --mv-open: #e2702a;
+  --mv-open-tint: #fdecdd;
+  --mv-open-ink: #9a4a12;
+
+  /* type: one family for headings, text, and columns of numbers (loaded in index.css) */
+  --mv-display: 'Google Sans Flex', Arial, Helvetica, sans-serif;
+  --mv-body: 'Google Sans Flex', Arial, Helvetica, sans-serif;
+  --mv-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --mv-numeric: var(--mv-display);
+
+  /* shape */
+  --mv-radius: 12px;
+  --mv-radius-sm: 8px;
+  --mv-shadow: 0 8px 28px -18px #20212426;
+  --mv-shadow-sm: none;
+}
+
+/*
+ * The dark theme (src/lib/colorTheme.ts sets data-theme on <html>). The same
+ * roles on dark surfaces: cards sit one step above the page, sunken and tint
+ * fills one and two steps above a card, and every colour used for text is a
+ * lighter step of its light-theme hue, so that it keeps at least 4.5:1.
+ */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --mv-page: #101216;
+  --mv-band: #14161b;
+  --mv-card: #16191f;
+  --mv-sunken: #1b1e25;
+  --mv-tint: #232730;
+
+  --mv-ink: #eceef3;
+  --mv-ink-2: #c2c7d1;
+  --mv-ink-3: #9da4b1;
+
+  --mv-line: #2a2e37;
+  --mv-line-strong: #485062;
+
+  --mv-purple: #8ea8ff;
+  --mv-purple-dark: #b3c4ff;
+  --mv-purple-tint: #1b2440;
+  --mv-lavender: #8c9dce;
+  --mv-accent-light: #2b3c75;
+
+  --mv-header: #101216ed;
+  --mv-header-line: #22252d;
+  --mv-footer: #0b0c0f;
+  --mv-footer-ink: #e4e8f2;
+  --mv-footer-ink-2: #a9b0be;
+  --mv-footer-line: #ffffff1f;
+  --mv-button: #eceef3;
+  --mv-button-hover: #ffffff;
+  --mv-button-ink: #121317;
+  --mv-on-fill: #101216;
+
+  --mv-code-bg: #0c0e13;
+  --mv-code-panel: #14171e;
+  --mv-code-border: #2c3240;
+  --mv-code-ink: #e4e8f2;
+  --mv-code-muted: #a3adc2;
+
+  --mv-realism: #9db7f0;
+  --mv-realism-tint: #182036;
+  --mv-realism-line: #33456e;
+  --mv-trust: #6fcfa6;
+  --mv-trust-tint: #12251e;
+  --mv-trust-line: #2a5743;
+
+  --mv-task: #b9abea;
+  --mv-task-tint: #1f1b30;
+  --mv-task-line: #473c6e;
+  --mv-user: #e2b95a;
+  --mv-user-tint: #2a2210;
+  --mv-user-line: #6b5318;
+  --mv-agent: #dfe6e2;
+  --mv-verify: #72cf95;
+  --mv-verify-tint: #13251a;
+  --mv-verify-line: #2c5a3c;
+  --mv-service: #a9b4ae;
+  --mv-service-tint: #1b1f1d;
+  --mv-service-line: #3b443f;
+
+  --mv-pass: #6fcf93;
+  --mv-pass-tint: #12271a;
+  --mv-fail: #f08a80;
+  --mv-fail-tint: #321816;
+  --mv-partial: #e0b356;
+  --mv-partial-tint: #2b230f;
+
+  --mv-closed: #4fc79d;
+  --mv-closed-tint: #10261e;
+  --mv-open: #f0935a;
+  --mv-open-tint: #33200f;
+  --mv-open-ink: #f3ad7f;
+
+  --mv-shadow: 0 10px 30px -16px #000000cc;
+}
+
+/* ---- primitives ------------------------------------------------------- */
+.mv-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  color: var(--mv-ink-3);
+  font-size: 10px;
+  font-weight: 550;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+.mv-card {
+  background: var(--mv-card);
+  border: 1px solid var(--mv-line);
+  border-radius: var(--mv-radius);
+  box-shadow: var(--mv-shadow-sm);
+}
+
+.mv-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: 999px;
+  background: var(--mv-card);
+  color: var(--mv-ink-2);
+  font-size: 11px;
+  font-weight: 550;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.mv-note {
+  margin: 0;
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.mv-note strong { color: var(--mv-ink-2); font-weight: 600; }
+.mv-note a { color: var(--mv-green); text-decoration: underline; text-underline-offset: 2px; }
+
+.mv-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mv-green);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.mv-link:hover { color: var(--mv-green-dark); text-decoration: underline; text-underline-offset: 3px; }
+
+/* A link inside a sentence: the size of the sentence, underlined, with a small arrow when it opens another page. */
+.mv-text-link {
+  border-radius: 3px;
+  color: var(--mv-green-dark);
+  font-weight: 650;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.mv-text-link:hover { color: var(--mv-ink); text-decoration-thickness: 2px; }
+.mv-text-link:focus-visible { outline: 3px solid var(--mv-focus); outline-offset: 2px; }
+.mv-text-link svg { display: inline; margin-left: 3px; vertical-align: -1px; }
+
+/* Segmented control: one option active at a time (see Segmented in shared.tsx). */
+.mv-seg {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--mv-line);
+  border-radius: 8px;
+  background: var(--mv-tint);
+}
+.mv-seg-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--mv-ink-2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 550;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.mv-seg-option:hover { background: var(--mv-sunken); }
+.mv-seg-option[aria-checked='true'] {
+  background: var(--mv-card);
+  color: var(--mv-purple-dark);
+  font-weight: 650;
+  box-shadow: 0 1px 4px #35204f2b;
+}
+/* An option that cannot be selected yet: its name stays readable, inside a dashed outline. */
+.mv-seg-option[aria-disabled='true'] {
+  color: var(--mv-ink-3);
+  outline: 1px dashed var(--mv-line-strong);
+  outline-offset: -4px;
+  cursor: not-allowed;
+}
+.mv-seg-option[aria-disabled='true']:hover { background: transparent; }
+.mv-seg-label {
+  color: var(--mv-ink-3);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+}
+
+/* Model group badge (proprietary / open-weight): a coloured mark carries the series colour, the word stays in ink. */
+.mv-access {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px 2px 7px;
+  border-radius: 999px;
+  color: var(--mv-ink-2);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.mv-access::before {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  /* Keep the group mark when the system overrides colours. */
+  forced-color-adjust: none;
+}
+.mv-access--closed { background: var(--mv-closed-tint); }
+.mv-access--closed::before { background: var(--mv-closed); }
+.mv-access--open { background: var(--mv-open-tint); }
+/* The open-weight mark is a diamond so the two groups differ in shape as well as colour. */
+.mv-access--open::before { background: var(--mv-open); border-radius: 1px; transform: rotate(45deg) scale(0.86); }
+
+.mv-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.mv-focusable:focus-visible,
+.mv-seg-option:focus-visible,
+.mv-link:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mv-motion,
+  .mv-motion * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "githut",
+  "name": "Githut",
+  "icon": "./icons/githut.svg",
+  "iconBackground": "linear-gradient(135deg, #0F766E 0%, #14B8A6 100%)",
+  "description": "Githut-like repositories, issues, and pull requests",
+  "backendService": "githut",
+  "defaultWindow": {
+    "width": 900,
+    "height": 650
+  }
+}

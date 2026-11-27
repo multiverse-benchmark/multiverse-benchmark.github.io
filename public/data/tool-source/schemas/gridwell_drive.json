@@ -1,0 +1,2934 @@
+[
+  {
+    "name": "copy_file",
+    "description": "Creates a copy of a file in GridwellDrive if quota allows.\n\nThis function creates an exact copy of the specified file with a new file ID.\nThe copied file can optionally be placed in different parent folder(s) and given\na new name. Metadata and content are copied to the new file.\nPermissions are not copied — the user performing the copy becomes the sole owner.\nThe function validates all input parameters, checks quota availability, and\nensures proper permissions before performing the copy operation.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file to copy. Must be a non-empty string that does not consist only of whitespace. This is a mandatory parameter.",
+          "type": "string",
+          "nullable": false
+        },
+        "body": {
+          "description": "An optional dictionary of file properties to apply to the copied file. If not provided or None, the copy will inherit properties from the original file.",
+          "type": "object",
+          "nullable": true,
+          "properties": {
+            "name": {
+              "description": "The name for the copied file. Must be a non-empty string between 1 and 255 characters. Colons are allowed because this is Drive metadata, not a local filesystem path. Cannot contain path traversal patterns, control characters, the retained reserved characters (<>\"|?*), or reserved names. If not provided, defaults to \"Copy of {original_file_name}\".",
+              "type": "string",
+              "nullable": true
+            },
+            "parents": {
+              "description": "A list of parent folder IDs where the copied file should be placed. Each parent folder ID must be a valid folder ID with a maximum length of 100 characters. If not provided, the copied file will inherit the parent folders from the original file.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": []
+        },
+        "ignoreDefaultVisibility": {
+          "description": "Whether to ignore default visibility settings set by domain administrators. Defaults to False if not provided.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "keepRevisionForever": {
+          "description": "Whether to keep revision history forever for the copied file. Defaults to False if not provided.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "ocrLanguage": {
+          "description": "The language code to use for OCR (Optical Character Recognition) processing. Must be a valid language code string. Defaults to an empty string if not provided.",
+          "type": "string",
+          "nullable": false,
+          "default": ""
+        },
+        "supportsAllDrives": {
+          "description": "Whether to support operations on files in shared drives. Must be set to True when copying files from or to shared drives. Defaults to False if not provided.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "supportsTeamDrives": {
+          "description": "Whether to support operations on files in team drives (legacy shared drives). Must be set to True when copying files from or to team drives. Defaults to False if not provided.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "includePermissionsForView": {
+          "description": "Specifies which additional view's permissions to include in the response. Only 'published' is supported. Defaults to an empty string if not provided.",
+          "type": "string",
+          "nullable": false,
+          "default": ""
+        },
+        "includeLabels": {
+          "description": "A comma-separated list of label IDs to include in the response. Defaults to an empty string if not provided.",
+          "type": "string",
+          "nullable": false,
+          "default": ""
+        }
+      },
+      "required": [
+        "fileId"
+      ]
+    }
+  },
+  {
+    "name": "create_comment_reply",
+    "description": "Creates a reply to a comment.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file.",
+          "type": "string",
+          "nullable": false
+        },
+        "commentId": {
+          "description": "The ID of the comment.",
+          "type": "string",
+          "nullable": false
+        },
+        "body": {
+          "description": "The resource body for the reply to be created. At least one of 'content' or 'action' must be provided. If no action is specified, content is required.",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "content": {
+              "description": "The plain text content of the reply. This field is used for setting the content, while htmlContent should be displayed. This is required on creates if no action is specified.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "action": {
+              "description": "The action the reply performed to the parent comment. Valid values are: 'resolve' and 'reopen'.",
+              "type": "string",
+              "enum": [
+                "reopen",
+                "resolve"
+              ],
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "fileId",
+        "commentId",
+        "body"
+      ]
+    }
+  },
+  {
+    "name": "create_file_comment",
+    "description": "Creates a comment on a file.\n\nThis function creates a new comment on the specified GridwellDrive file with\ninput validation and error handling. If author is not provided, it defaults to the authenticated user.\nNew comments are always created as unresolved (resolved=False).\n\nThe function validates all input parameters using Pydantic models, checks file existence and permissions,\nand returns a validated comment object conforming to the response schema.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file to comment on. Must be a non-empty string matching GridwellDrive file ID format (alphanumeric with underscores and hyphens only).",
+          "type": "string",
+          "nullable": false
+        },
+        "content": {
+          "description": "The plain text content of the comment. This is a required field representing the main text of the comment that will be displayed to users.",
+          "type": "string",
+          "nullable": false
+        },
+        "author": {
+          "description": "Optional author information. If not provided, automatically set to the authenticated user who creates the comment. If provided, displayName and emailAddress are required.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "displayName": {
+              "description": "The display name of the comment author.",
+              "type": "string",
+              "nullable": false
+            },
+            "emailAddress": {
+              "description": "The email address of the comment author.",
+              "type": "string",
+              "nullable": false
+            },
+            "photoLink": {
+              "description": "Optional link to the author's profile photo.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [
+            "displayName",
+            "emailAddress"
+          ]
+        },
+        "quotedFileContent": {
+          "description": "Optional quoted file content. If provided, must include both 'value' (the quoted text) and 'mimeType' (the MIME type of the quoted content). This allows comments to reference specific portions of a file.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "value": {
+              "description": "The quoted content text. This is required if quotedFileContent is provided.",
+              "type": "string",
+              "nullable": false
+            },
+            "mimeType": {
+              "description": "MIME type of the quoted content. This is required if quotedFileContent is provided. Must be a valid MIME type format (type/subtype).",
+              "type": "string",
+              "nullable": false
+            }
+          },
+          "required": [
+            "value",
+            "mimeType"
+          ]
+        },
+        "anchor": {
+          "description": "Optional anchor point for the comment. Must be a valid JSON string if provided. The anchor is used to position the comment at a specific location within the file.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "fileId",
+        "content"
+      ]
+    }
+  },
+  {
+    "name": "create_file_or_folder",
+    "description": "Creates a new file or folder with permissions if quota allows.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "description": "Dictionary of file properties. Defaults to None. Keys:",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "name": {
+              "description": "Name of the file. Optional. If omitted, defaults to 'Untitled'. If provided, must be a string (cannot be None). Validated to reject path traversal sequences ('../' or '..\\\\') and must not exceed 255 characters. Defaults to 'Untitled'.",
+              "type": "string",
+              "nullable": false,
+              "default": "Untitled"
+            },
+            "description": {
+              "description": "Description of the file. Optional. If omitted, defaults to empty string (\"\"). If provided, must be a string (cannot be None). Must not exceed 65535 characters. Defaults to \"\" (empty string).",
+              "type": "string",
+              "nullable": false,
+              "default": ""
+            },
+            "mimeType": {
+              "description": "MIME type of the file. Some common mime types include: 'application/vnd.gridwell-apps.document', 'application/vnd.gridwell-apps.spreadsheet', 'application/vnd.gridwell-apps.presentation', 'application/vnd.gridwell-apps.drawing', 'application/vnd.gridwell-apps.folder', 'application/vnd.gridwell-apps.script'. Defaults to 'application/octet-stream'.",
+              "type": "string",
+              "nullable": false,
+              "default": "application/octet-stream"
+            },
+            "parents": {
+              "description": "List of parent folder IDs. Must not exceed 10 items. Defaults to [] (empty list).",
+              "type": "array",
+              "nullable": true,
+              "default": [],
+              "items": {
+                "type": "string"
+              }
+            },
+            "size": {
+              "description": "File size in bytes (string that must be convertible to non-negative integer). Must not exceed maximum 64-bit integer value (2^63 - 1). Defaults to \"0\".",
+              "type": "string",
+              "nullable": false,
+              "default": "0"
+            },
+            "modifiedTime": {
+              "description": "Last modification timestamp in RFC3339 format (e.g., '2024-05-01T00:00:00Z'). Defaults to current timestamp.",
+              "type": "string",
+              "nullable": false,
+              "default": ""
+            }
+          },
+          "required": []
+        },
+        "media_body": {
+          "description": "Dictionary containing media content properties. Defaults to None. All fields in media_body are ignored when creating folders (mimeType='application/vnd.gridwell-apps.folder') or Gridwell Workspace documents (GridwellDocs, Sheets, Slides, etc.), as these are metadata-only objects. Keys:",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "size": {
+              "description": "File size in bytes (max 10GB). Defaults to None.",
+              "type": "integer",
+              "nullable": true,
+              "default": null
+            },
+            "md5Checksum": {
+              "description": "MD5 checksum of the file content (max 32 characters). Defaults to None.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "sha1Checksum": {
+              "description": "SHA1 checksum of the file content (max 40 characters). Defaults to None.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "sha256Checksum": {
+              "description": "SHA256 checksum of the file content (max 64 characters). Defaults to None.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "mimeType": {
+              "description": "MIME type of the file content (max 100 characters). Defaults to None.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "imageMediaMetadata": {
+              "description": "Additional metadata about image files. Only applied when the file's effective mimeType starts with 'image/' (e.g., image/jpeg, image/png). For other mimeTypes, this value is ignored.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "width": {
+                  "description": "Width in pixels.",
+                  "type": "integer",
+                  "nullable": true
+                },
+                "height": {
+                  "description": "Height in pixels.",
+                  "type": "integer",
+                  "nullable": true
+                },
+                "rotation": {
+                  "description": "Rotation in degrees.",
+                  "type": "integer",
+                  "nullable": true
+                },
+                "location": {
+                  "description": "Geographic location where the image was taken.",
+                  "type": "object",
+                  "properties": {
+                    "latitude": {
+                      "description": "Latitude coordinate.",
+                      "type": "number",
+                      "nullable": true
+                    },
+                    "longitude": {
+                      "description": "Longitude coordinate.",
+                      "type": "number",
+                      "nullable": true
+                    },
+                    "altitude": {
+                      "description": "Altitude in meters.",
+                      "type": "number",
+                      "nullable": true
+                    }
+                  },
+                  "required": [],
+                  "nullable": true
+                },
+                "time": {
+                  "description": "Time the image was taken.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "cameraMake": {
+                  "description": "Camera manufacturer.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "cameraModel": {
+                  "description": "Camera model.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "exposureTime": {
+                  "description": "Exposure time in seconds.",
+                  "type": "number",
+                  "nullable": true
+                },
+                "aperture": {
+                  "description": "Aperture f-number.",
+                  "type": "number",
+                  "nullable": true
+                },
+                "flashUsed": {
+                  "description": "Whether flash was used.",
+                  "type": "boolean",
+                  "nullable": true
+                },
+                "focalLength": {
+                  "description": "Focal length in millimeters.",
+                  "type": "number",
+                  "nullable": true
+                },
+                "isoSpeed": {
+                  "description": "ISO speed.",
+                  "type": "integer",
+                  "nullable": true
+                },
+                "meteringMode": {
+                  "description": "Metering mode.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "sensor": {
+                  "description": "Sensor type.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "exposureMode": {
+                  "description": "Exposure mode.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "colorSpace": {
+                  "description": "Color space.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "whiteBalance": {
+                  "description": "White balance mode.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "exposureBias": {
+                  "description": "Exposure bias.",
+                  "type": "number",
+                  "nullable": true
+                },
+                "maxApertureValue": {
+                  "description": "Maximum aperture value.",
+                  "type": "number",
+                  "nullable": true
+                },
+                "subjectDistance": {
+                  "description": "Subject distance.",
+                  "type": "integer",
+                  "nullable": true
+                },
+                "lens": {
+                  "description": "Lens information.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": [],
+              "default": null
+            },
+            "videoMediaMetadata": {
+              "description": "Additional metadata about video files. Only applied when the file's effective mimeType starts with 'video/' (e.g., video/mp4). For other mimeTypes, this value is ignored.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "width": {
+                  "description": "Width in pixels.",
+                  "type": "integer",
+                  "nullable": true
+                },
+                "height": {
+                  "description": "Height in pixels.",
+                  "type": "integer",
+                  "nullable": true
+                },
+                "durationMillis": {
+                  "description": "Duration in milliseconds.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": [],
+              "default": null
+            },
+            "filePath": {
+              "description": "Path to file for content upload. Defaults to None. Validated to reject path traversal patterns (Unix/Windows formats, URL encoded variants) and control characters for security.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": []
+        },
+        "enforceSingleParent": {
+          "description": "Whether to enforce single parent. If True and multiple parents are provided in body['parents'], only the last parent in the list is kept. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "ignoreDefaultVisibility": {
+          "description": "Whether to ignore default visibility. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "keepRevisionForever": {
+          "description": "Whether to keep revision forever. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "ocrLanguage": {
+          "description": "The language to use for OCR. Cannot be None (must be a string or omitted to use default ''). Must be a valid ISO 639-1 language code (e.g., 'en', 'es', 'fr', 'de', 'zh', 'ja'). Defaults to empty string.",
+          "type": "string",
+          "nullable": false,
+          "default": ""
+        },
+        "supportsAllDrives": {
+          "description": "Whether to support all drives. Defaults to False. If True, allows creation in shared drives. If either supportsAllDrives or supportsTeamDrives is True, creation in shared drives is allowed.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "supportsTeamDrives": {
+          "description": "Whether to support team drives. Defaults to False. If True, allows creation in shared drives. If either supportsAllDrives or supportsTeamDrives is True, creation in shared drives is allowed.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "useContentAsIndexableText": {
+          "description": "Whether to use content as indexable text. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "includePermissionsForView": {
+          "description": "Specifies which additional view's permissions to include. Must be either an empty string or 'published'. Defaults to empty string.",
+          "type": "string",
+          "nullable": false,
+          "default": ""
+        },
+        "includeLabels": {
+          "description": "Comma-separated list of label IDs to include in the response. Only labels matching the specified IDs and applied to this file will be returned. Defaults to empty string.",
+          "type": "string",
+          "nullable": false,
+          "default": ""
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "create_file_revision",
+    "description": "Create a new revision for a file.\n\nThis function creates a new revision for a file with the given content. It\ngenerates a unique revision ID based on the existing revisions in the file's\ndata structure, creates a revision content structure matching the expected\nJSON format, and validates the revision using the Revision. The function\nthen adds the revision to the file's revisions list.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "file_id": {
+          "description": "The unique identifier of the file to which the revision is being added. This is a required string that identifies the specific file in GridwellDrive. The file_id must be a valid GridwellDrive file ID format. If the file does not exist for the specified user, a ValueError will be raised during business logic execution. The file_id cannot be empty or consist only of whitespace.",
+          "type": "string",
+          "nullable": false
+        },
+        "content": {
+          "description": "The content to be added to the revision. This is a required string containing the actual file content. The content will be base64-encoded before storage in the revision, regardless of the file's original encoding type, to ensure data integrity and match the RevisionContent.data field description. The content cannot be empty or consist only of whitespace. The size of the content in bytes will be calculated and stored in the revision metadata.",
+          "type": "string",
+          "nullable": false
+        },
+        "user_id": {
+          "description": "The ID of the user creating the revision. This is an optional string that defaults to 'me' if not provided or None. The value 'me' is a special identifier that refers to the currently authenticated user. If a specific user_id is provided, it must be a non-empty string. If the user_id does not exist in the system, a ValueError will be raised during business logic execution.",
+          "type": "string",
+          "nullable": true,
+          "default": "me"
+        }
+      },
+      "required": [
+        "file_id",
+        "content"
+      ]
+    }
+  },
+  {
+    "name": "create_permission",
+    "description": "Creates a permission for a file or shared drive.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file or shared drive.",
+          "type": "string"
+        },
+        "body": {
+          "description": "A permission resource to be created, specifying the grantee and their level of access.",
+          "type": "object",
+          "properties": {
+            "role": {
+              "description": "The role granted by this permission.:\n- 'reader': Can view the file\n- 'writer': Can view, comment, and edit the file\n- 'commenter': Can view and comment on the file\n- 'owner': Has full control over the file\n- 'organizer': Can manage content and users in shared drives\n- 'fileOrganizer': Can manage content in shared drives",
+              "type": "string",
+              "enum": [
+                "reader",
+                "writer",
+                "commenter",
+                "owner",
+                "organizer",
+                "fileOrganizer"
+              ]
+            },
+            "type": {
+              "description": "The type of the grantee. Possible values:\n- 'user': Permission granted to a specific user\n- 'group': Permission granted to a group\n- 'domain': Permission granted to a domain\n- 'anyone': Permission granted to anyone with the link",
+              "type": "string",
+              "enum": [
+                "user",
+                "group",
+                "domain",
+                "anyone"
+              ]
+            },
+            "emailAddress": {
+              "description": "The email address of the user or group to grant the permission to. This will be normalized to lowercase.",
+              "type": "string",
+              "nullable": true
+            },
+            "domain": {
+              "description": "The domain name (e.g. 'example.com') of the entity this permission refers to. Required when type='domain'.",
+              "type": "string",
+              "nullable": true
+            },
+            "allowFileDiscovery": {
+              "description": "Whether the permission allows the file to be discovered through search, defaults to False.",
+              "type": "boolean",
+              "nullable": true,
+              "default": false
+            },
+            "expirationTime": {
+              "description": "The time at which this permission will expire, in RFC 3339 format. Example: `'2025-06-30T12:00:00Z'` (UTC) or `'2025-06-30T08:00:00-04:00'`.",
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "required": [
+            "role",
+            "type"
+          ]
+        }
+      },
+      "required": [
+        "fileId",
+        "body"
+      ]
+    }
+  },
+  {
+    "name": "create_shared_drive",
+    "description": "Creates a new shared drive in GridwellDrive.\n\nThis function creates a shared drive with customizable properties including name,\nrestrictions, visibility, and theme. If a requestId is provided, it serves as the\ndrive's ID and enables idempotent creation (if a drive with that ID already exists,\nit will be returned instead of creating a duplicate). Otherwise, an internal ID is\nautomatically generated for the new drive.\n\nThe function automatically assigns the creating user as the owner with full permissions.\nAll optional properties have sensible defaults applied if not specified.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "requestId": {
+          "description": "An optional identifier for the shared drive, such as a random UUID.\nIf provided, this ID is used as the drive's unique identifier and enables idempotent\ncreation: if a drive with this ID already exists, it will be returned without creating\na duplicate. If not provided (None or empty string), an internal ID is automatically\ngenerated for the new drive. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "body": {
+          "description": "Dictionary of drive properties to configure the shared drive.\nAll fields are optional with sensible defaults applied when not specified.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "name": {
+              "description": "The name of the shared drive. If not provided, defaults to\n'Drive_{drive_id}' where drive_id is the drive's unique identifier.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "restrictions": {
+              "description": "Dictionary of access and capability restrictions for the shared drive.\nAll restriction fields are optional and default to false (unrestricted) when not provided.",
+              "type": "object",
+              "nullable": true,
+              "default": null,
+              "properties": {
+                "adminManagedRestrictions": {
+                  "description": "Whether administrative privileges on this shared drive are required\nto modify restrictions. When true, only users with administrative privileges can change\ndrive-level restrictions. Defaults to None.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": null
+                },
+                "copyRequiresWriterPermission": {
+                  "description": "Whether the options to copy, print, or download files inside this\nshared drive should be disabled for readers and commenters. When true, only users with\nwriter or owner permissions can copy, print, or download files. Defaults to None.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": null
+                },
+                "downloadRestriction": {
+                  "description": "Download restriction settings for the shared drive. Allows fine-grained\ncontrol over download permissions for different user roles.",
+                  "type": "object",
+                  "nullable": true,
+                  "default": null,
+                  "properties": {
+                    "restrictedForReaders": {
+                      "description": "Whether download is restricted for readers. When true, users\nwith reader permission cannot download files. Defaults to None.",
+                      "type": "boolean",
+                      "nullable": true,
+                      "default": null
+                    },
+                    "restrictedForWriters": {
+                      "description": "Whether download is restricted for writers. When true, users\nwith writer permission cannot download files. Defaults to None.",
+                      "type": "boolean",
+                      "nullable": true,
+                      "default": null
+                    }
+                  },
+                  "required": []
+                },
+                "domainUsersOnly": {
+                  "description": "Whether access to this shared drive and items inside it is restricted\nto users of the domain to which this shared drive belongs. When true, only domain members\ncan access the drive. Defaults to None.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": null
+                },
+                "driveMembersOnly": {
+                  "description": "Whether access to items inside this shared drive is restricted to its\nmembers. When true, only users explicitly granted access to the drive can view or modify\nitems within it. Defaults to None.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": null
+                },
+                "sharingFoldersRequiresOrganizerPermission": {
+                  "description": "Whether sharing folders requires organizer permission. When true, only\nusers with organizer or owner permissions can share folders within this shared drive.\nDefaults to None.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": null
+                }
+              },
+              "required": []
+            },
+            "hidden": {
+              "description": "Whether the shared drive is hidden from the default view in the GridwellDrive UI.\nHidden drives can still be accessed directly by users who have permission. Defaults to None.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "themeId": {
+              "description": "The ID of the theme to apply to this shared drive for visual customization.\nTheme IDs correspond to predefined GridwellDrive themes. If not provided, no theme is applied\n(remains null).",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": []
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "delete_comment_reply",
+    "description": "Deletes a reply.\n\nThis function soft deletes a reply by marking it as deleted. The reply is\nidentified by its replyId, commentId, and fileId. If the reply does not exist\nor the provided IDs are incorrect, an error will be raised.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file.",
+          "type": "string",
+          "nullable": false
+        },
+        "commentId": {
+          "description": "The ID of the comment.",
+          "type": "string",
+          "nullable": false
+        },
+        "replyId": {
+          "description": "The ID of the reply to delete.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "fileId",
+        "commentId",
+        "replyId"
+      ]
+    }
+  },
+  {
+    "name": "delete_file_comment",
+    "description": "Deletes a comment from a file in GridwellDrive.\n\nThis function soft deletes a comment by marking it as deleted. The comment is\nidentified by its `commentId` and the `fileId` of the file it is associated\nwith. If the comment does not exist or the provided IDs are incorrect, an error will be raised.\nIt also soft deletes all associated replies to maintain referential integrity.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file the comment belongs to.",
+          "type": "string",
+          "nullable": false
+        },
+        "commentId": {
+          "description": "The ID of the comment to delete.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "fileId",
+        "commentId"
+      ]
+    }
+  },
+  {
+    "name": "delete_file_permanently",
+    "description": "Permanently deletes a file owned by the user without moving it to trash. When deleting a folder, ALL nested files and folders are deleted regardless of ownership.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file to delete. Must be non-empty (min_length=1).",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        },
+        "enforceSingleParent": {
+          "description": "Whether to enforce single parent. Defaults to False. If True, deletion fails when file has multiple parents. Deprecated parameter.",
+          "type": "boolean",
+          "default": false,
+          "nullable": true
+        },
+        "supportsAllDrives": {
+          "description": "Whether to support all drives. Defaults to False. Required for deleting files in shared drives.",
+          "type": "boolean",
+          "default": false,
+          "nullable": true
+        },
+        "supportsTeamDrives": {
+          "description": "Whether to support team drives. Defaults to False. Deprecated parameter, use supportsAllDrives instead.",
+          "type": "boolean",
+          "default": false,
+          "nullable": true
+        }
+      },
+      "required": [
+        "fileId"
+      ]
+    }
+  },
+  {
+    "name": "delete_permission",
+    "description": "Deletes a permission.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file or shared drive.",
+          "type": "string"
+        },
+        "permissionId": {
+          "description": "The ID of the permission to delete.",
+          "type": "string"
+        },
+        "supportsAllDrives": {
+          "description": "Whether to support all drives. Defaults to False.",
+          "type": "boolean",
+          "default": false
+        },
+        "supportsTeamDrives": {
+          "description": "Whether to support team drives. Defaults to False.",
+          "type": "boolean",
+          "default": false
+        },
+        "useDomainAdminAccess": {
+          "description": "Whether to use domain admin access. Defaults to False.",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "fileId",
+        "permissionId"
+      ]
+    }
+  },
+  {
+    "name": "delete_shared_drive",
+    "description": "Permanently deletes a shared drive for which the user is an organizer.\n\nThis function permanently removes a shared drive from the user's account. The drive\nmust be identified by its unique `driveId`. For the operation to succeed, the user\nmust have the appropriate permissions (e.g., be an organizer) for the specified drive.\nOnce deleted, the drive and all of its contents are irretrievably lost.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "driveId": {
+          "description": "The unique identifier of the shared drive to be deleted.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "driveId"
+      ]
+    }
+  },
+  {
+    "name": "empty_files_from_trash",
+    "description": "Permanently deletes all of the trashed files owned by the user.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "driveId": {
+          "description": "If set, empties the trash of the provided shared drive. Defaults to an empty string, which corresponds to the user's My Drive.",
+          "type": "string",
+          "nullable": true,
+          "default": ""
+        },
+        "enforceSingleParent": {
+          "description": "Deprecated: If an item isn't in a shared drive and its last parent is deleted but the item itself isn't, the item will be placed under its owner's root. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "export_file_content",
+    "description": "Export file content to a different format.\n\nThis function exports the content of a file to a different format. It checks\nif the export is cached and returns the cached content (decoded/deserialized to match uncached return type) if available. If not,\nvalidates the export format, and exports the content to the target MIME type.\nFinally, it caches the exported content and returns the exported content.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "The ID of the user exporting the file content. Defaults to 'me'.",
+          "type": "string",
+          "nullable": true,
+          "default": "me"
+        },
+        "file_id": {
+          "description": "The ID of the file to export content from.",
+          "type": "string",
+          "nullable": false
+        },
+        "target_mime": {
+          "description": "The target MIME type for export.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "file_id",
+        "target_mime"
+      ]
+    }
+  },
+  {
+    "name": "export_gridwell_doc",
+    "description": "Exports a GridwellDocs to the requested MIME type and returns the content.\n\nThis function exports a GridwellDocs file to a different format specified by the MIME type. The function validates all input parameters,\nperforms the export operation, and returns the exported content along with metadata about the export.\nThe exported content can be in various formats such as application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf, text/plain, or text/html,\ndepending on the requested MIME type.\n        \nThis is a read-only operation that does not modify the database state. Exported content is not cached.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fileId": {
+          "description": "The unique identifier of the GridwellDocs file to export. This must be a non-empty string matching GridwellDrive file ID format (typically alphanumeric with underscores and hyphens). The file must exist in the user's Drive and must be a GridwellDocs file (application/vnd.gridwell-apps.document) that supports export operations. GridwellDrive file IDs are unique identifiers assigned to each file when it is created and remain constant throughout the file's lifetime, even if the file is renamed or moved. The file ID is used by GridwellDrive API to locate and access the specific GridwellDocs file for export operations.",
+          "type": "string"
+        },
+        "mimeType": {
+          "description": "The target MIME type to export the GridwellDocs file to. This must be a non-empty string representing a valid MIME type format. The MIME type must be one of the supported export formats for GridwellDocs files. The supported export MIME types for GridwellDocs are: application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf, text/plain, and text/html. The MIME type determines the format and encoding of the exported content that will be returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fileId",
+        "mimeType"
+      ]
+    }
+  },
+  {
+    "name": "export_gridwell_docs",
+    "description": "Exports a GridwellDocs to the requested MIME type and returns the content.\n\nThis function exports a GridwellDocs file to a different format specified by the MIME type. The function validates all input parameters,\nperforms the export operation, and returns the exported content along with metadata about the export.\nThe exported content can be in various formats such as application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf, text/plain, or text/html,\ndepending on the requested MIME type.\n        \nThis is a read-only operation that does not modify the database state. Exported content is not cached.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fileId": {
+          "description": "The unique identifier of the GridwellDocs file to export. This must be a non-empty string matching GridwellDrive file ID format (typically alphanumeric with underscores and hyphens). The file must exist in the user's Drive and must be a GridwellDocs file (application/vnd.gridwell-apps.document) that supports export operations. GridwellDrive file IDs are unique identifiers assigned to each file when it is created and remain constant throughout the file's lifetime, even if the file is renamed or moved. The file ID is used by GridwellDrive API to locate and access the specific GridwellDocs file for export operations.",
+          "type": "string"
+        },
+        "mimeType": {
+          "description": "The target MIME type to export the GridwellDocs file to. This must be a non-empty string representing a valid MIME type format. The MIME type must be one of the supported export formats for GridwellDocs files. The supported export MIME types for GridwellDocs are: application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf, text/plain, and text/html. The MIME type determines the format and encoding of the exported content that will be returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fileId",
+        "mimeType"
+      ]
+    }
+  },
+  {
+    "name": "generate_file_ids",
+    "description": "Generates a set of file IDs which can be provided in create or copy requests.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "description": "The number of IDs to return. Must be a positive integer (at least 1). If not provided or null is passed, 10 is used.",
+          "type": "integer",
+          "minimum": 1,
+          "default": 10,
+          "nullable": true
+        },
+        "space": {
+          "description": "The space in which the IDs can be used to create files. Supported values are drive and appDataFolder. (Default: drive.)",
+          "type": "string",
+          "enum": [
+            "drive",
+            "appDataFolder"
+          ],
+          "default": "drive",
+          "nullable": false
+        },
+        "type": {
+          "description": "The type of items which the IDs can be used for. Supported values are files and shortcuts. Note that shortcuts are only supported in the drive space. (Default: files.)",
+          "type": "string",
+          "enum": [
+            "files",
+            "shortcuts"
+          ],
+          "default": "files",
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_app_details",
+    "description": "Gets a specific app.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "appId": {
+          "description": "The ID of the app to retrieve. Cannot be empty or whitespace.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "appId"
+      ]
+    }
+  },
+  {
+    "name": "get_changes_start_page_token",
+    "description": "Gets the starting pageToken for listing future changes.\n\nThis method retrieves a starting page token that can be used to list changes\nto files in a user's Drive or a shared drive. The page token is a base64-encoded\nJSON string containing the offset (1-based position in the changes list) and\ndefault query state parameters. The query state includes driveId and supportsAllDrives\nfrom the request, plus default values for filtering parameters like includeRemoved.\nThe token doesn't expire and should be stored for subsequent change tracking operations.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "driveId": {
+          "description": "The ID of the shared drive for which the starting\npageToken for listing future changes will be returned. Must be a valid\nshared drive ID if provided. Optional, nullable. Defaults to empty string (user's My Drive).",
+          "type": "string",
+          "nullable": true,
+          "default": ""
+        },
+        "supportsAllDrives": {
+          "description": "Whether the requesting application\nsupports both My Drives and shared drives. When True, enables access\nto shared drive content. Optional, nullable. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "supportsTeamDrives": {
+          "description": "**DEPRECATED** - Use supportsAllDrives\ninstead. This parameter will be removed in a future version. Optional, nullable. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "teamDriveId": {
+          "description": "**DEPRECATED** - Use driveId instead.\nThis parameter will be removed in a future version. Optional, nullable. Defaults to empty string.",
+          "type": "string",
+          "nullable": true,
+          "default": ""
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_comment_reply",
+    "description": "Gets a reply by ID from a comment on a file.\n\nThis function retrieves a specific reply to a comment on a GridwellDrive file.\nDeleted replies are excluded by default unless explicitly requested.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file.",
+          "type": "string",
+          "nullable": false
+        },
+        "commentId": {
+          "description": "The ID of the comment.",
+          "type": "string",
+          "nullable": false
+        },
+        "replyId": {
+          "description": "The ID of the reply to retrieve.",
+          "type": "string",
+          "nullable": false
+        },
+        "includeDeleted": {
+          "description": "Whether to include deleted replies in the response.\nDefaults to False. When False, deleted replies are filtered out from the list.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "fields": {
+          "description": "Selector specifying which fields to include in the response. Supports nested syntax (e.g., \"author(displayName,emailAddress)\") and wildcards (e.g., \"*\" for all fields, \"author(*)\" for all author fields). Defaults to empty string (returns all fields).",
+          "type": "string",
+          "default": "",
+          "nullable": false
+        }
+      },
+      "required": [
+        "fileId",
+        "commentId",
+        "replyId"
+      ]
+    }
+  },
+  {
+    "name": "get_drive_account_info",
+    "description": "Gets information about the user's Drive account.\n\nThis function retrieves account information for the authenticated user\nfrom the GridwellDrive API. The response can be filtered to include\nonly specific fields using the fields parameter.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "description": "Selector specifying which fields to include in the response.\nUse '*' to include all fields (default).\nSupports nested field syntax (e.g., 'user(displayName,emailAddress)') and wildcards\n(e.g., 'user(*)' for all user fields, '*' for all fields).\nExamples: 'user,storageQuota', 'user(displayName,emailAddress)', 'user(*)', '*'\nField names are case-sensitive and whitespace around commas is ignored.\nCannot be empty, only whitespace, or contain null bytes.",
+          "type": "string",
+          "default": "*"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_file_comment",
+    "description": "Retrieves a specific comment from a GridwellDrive file by its ID.\n\nThis function fetches detailed information about a comment associated with a file.\nThe comment must belong to the specified file. You can optionally retrieve deleted\ncomments by setting the includeDeleted parameter to true. This is useful for\nreviewing comment history or auditing purposes.\n\nReturns a complete comment dictionary with all details including any replies.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file the comment belongs to. Must be a valid\nGridwellDrive file ID (alphanumeric with underscores and hyphens). Cannot be\nempty or whitespace-only. The file must exist in the user's Drive.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9_-]+$"
+        },
+        "commentId": {
+          "description": "The unique ID of the comment to retrieve. Must be a valid\ncomment ID (alphanumeric with underscores and hyphens). Cannot be empty\nor whitespace-only. Must belong to the specified file.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9_-]+$"
+        },
+        "includeDeleted": {
+          "description": "Whether to return the comment if it has been deleted.\nIf false (default), deleted comments will not be returned and will raise\na NotFoundError. If true, deleted comments will be returned with their\ndeleted flag set to true.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        }
+      },
+      "required": [
+        "fileId",
+        "commentId"
+      ]
+    }
+  },
+  {
+    "name": "get_file_content",
+    "description": "Get file content, optionally for a specific revision.\n\nThis function retrieves the content of a file, optionally for a specific revision.\nIf a revision ID is provided, it searches the file's revisions list for the matching\nrevision and returns its content along with revision metadata. If no revision ID is\nprovided, it returns the current content of the file.\n\nNote: Files without downloadable binary content (folders, Gridwell Workspace files\naccessed without export, or files with no stored content) raise a ValueError.\nWhen retrieving a specific revision, a ValueError is raised if the revision\nhas no content stored.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "file_id": {
+          "description": "The ID of the file to retrieve content from. This must be a non-empty string that does not consist only of whitespace.",
+          "type": "string",
+          "nullable": false
+        },
+        "user_id": {
+          "description": "The ID of the user retrieving the file content. Defaults to 'me' if not provided or None. This must be a non-empty string that does not consist only of whitespace if explicitly provided.",
+          "type": "string",
+          "nullable": true,
+          "default": "me"
+        },
+        "revision_id": {
+          "description": "Optional revision ID to get specific revision. Default to None if not provided. If explicitly provided, must be a non-empty string that does not consist only of whitespace.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "file_id"
+      ]
+    }
+  },
+  {
+    "name": "get_file_metadata_or_content",
+    "description": "Gets a file's metadata.\n\nThis function retrieves a file's complete metadata from the database, including all properties\nthat are stored for the file. The function returns a copy of the file object from the database\nwith a 'kind' key added (set to 'drive#file') to identify the resource type. The returned object\nmay contain various fields depending on the file type and whether content has been uploaded.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file to retrieve. Must be a non-empty string that does not consist only of whitespace.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fileId"
+      ]
+    }
+  },
+  {
+    "name": "get_permission",
+    "description": "Gets a permission by ID.\n\nRetrieves a specific permission by its ID for the specified file. The function\nsupports various access patterns including shared drives and domain admin access.\n\nThis function searches for permissions across different scopes based on the provided\nparameters. It first checks the current user's files, then optionally searches shared\ndrives (if supportsAllDrives or supportsTeamDrives is True), and finally searches\nacross other users' files and drives (if useDomainAdminAccess is True).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file or shared drive for which to retrieve the permission.\nMust be a non-empty string containing only alphanumeric characters, hyphens, underscores,\nand dots. This can refer to a regular file, folder, or shared drive ID.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[a-zA-Z0-9_\\-\\.]+$"
+        },
+        "permissionId": {
+          "description": "The ID of the permission to retrieve. Must be a non-empty string\ncontaining only alphanumeric characters, hyphens, underscores, and dots.\nPermission IDs are unique identifiers assigned to each permission object when it is created.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[a-zA-Z0-9_\\-\\.]+$"
+        },
+        "supportsAllDrives": {
+          "description": "Whether the requesting application supports both My Drives\nand shared drives. When set to True, the function will search for permissions\nacross shared drives in addition to regular files. Optional, defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "supportsTeamDrives": {
+          "description": "Deprecated. Whether to support team drives. Use\nsupportsAllDrives instead. This parameter is maintained for backward compatibility.\nWhen set to True, behaves the same as supportsAllDrives. Optional, defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "useDomainAdminAccess": {
+          "description": "Issue the request as a domain administrator. If set to\ntrue, grants access to files and shared drives if the requester is an administrator\nof the domain to which the shared drive belongs. This allows domain administrators\nto retrieve permissions for files owned by other users in their domain.\nRequires supportsAllDrives or supportsTeamDrives to be True. Optional, defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        }
+      },
+      "required": [
+        "fileId",
+        "permissionId"
+      ]
+    }
+  },
+  {
+    "name": "get_shared_drive_metadata",
+    "description": "Gets a shared drive's metadata by ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "driveId": {
+          "description": "The ID of the shared drive. Must be a non-empty string.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "driveId"
+      ]
+    }
+  },
+  {
+    "name": "hide_shared_drive",
+    "description": "Hides a shared drive from the default view. Sets the hidden flag to True for the specified drive.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "driveId": {
+          "description": "The ID of the shared drive to hide. Must be a non-empty string.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "driveId"
+      ]
+    }
+  },
+  {
+    "name": "list_changes",
+    "description": "Lists the changes for a user or shared drive.\n\nThis method retrieves a list of changes that have occurred since the specified\npage token. Changes include file additions, modifications, deletions, and\npermission changes. Each change's file field contains metadata only (no content,\nsheets, revisions, or exportFormats); use files.get for full file content.\nThe pageToken must be a base64-encoded JSON string containing the offset\n(1-based position in the changes list) and query state (filtering parameters).\nIf the query parameters in this request don't match the query state encoded in\nthe token, an InvalidRequestError will be raised. If pageToken is not provided\nor empty, the method starts from the beginning of the changes list.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "pageToken": {
+          "description": "The token for continuing a previous list request on the next page.\nThis token is a base64-encoded JSON string containing the offset (1-based position\nin the changes list) and query state (filtering parameters). The token is obtained\nfrom a previous changes.list request (nextPageToken or newStartPageToken) or from\nchanges.getStartPageToken(). The query parameters in this request must match the\nquery state encoded in the token, otherwise an InvalidRequestError will be raised.\nIf not provided or empty, starts from the beginning of the changes list (index 0).\nDefaults to empty string.",
+          "type": "string",
+          "default": "",
+          "nullable": false
+        },
+        "driveId": {
+          "description": "The ID of the shared drive for which changes are returned.\nOnly changes to files within this shared drive will be returned. Defaults to empty string (user's My Drive).",
+          "type": "string",
+          "default": "",
+          "nullable": false
+        },
+        "includeCorpusRemovals": {
+          "description": "Whether changes should include the file resource\n(metadata-only) if the file is still accessible by the user at the\ntime of the request. Defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "includeItemsFromAllDrives": {
+          "description": "Whether both My Drive and shared drive items\nshould be included in results. Defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "includeRemoved": {
+          "description": "Whether to include changes indicating that items have\nbeen removed from the list of changes. Defaults to True.",
+          "type": "boolean",
+          "default": true,
+          "nullable": false
+        },
+        "includeTeamDriveItems": {
+          "description": "**DEPRECATED** - Use includeItemsFromAllDrives\ninstead. Whether to include changes for team drive items. Defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "pageSize": {
+          "description": "Maximum number of changes to return per page. Must be between\n1 and 1000 inclusive. Defaults to 100.",
+          "type": "integer",
+          "default": 100,
+          "nullable": false
+        },
+        "restrictToMyDrive": {
+          "description": "Whether to restrict the results to changes inside\nthe My Drive hierarchy. This cannot be used together with teamDriveId or driveId. Defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "spaces": {
+          "description": "A comma-separated list of spaces to query within the user corpus.\nSupported values are 'drive', 'appDataFolder', and 'photos'. Defaults to 'drive'.",
+          "type": "string",
+          "default": "drive",
+          "nullable": false
+        },
+        "supportsAllDrives": {
+          "description": "Whether the requesting application supports both\nMy Drives and shared drives. Defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "supportsTeamDrives": {
+          "description": "**DEPRECATED** - Use supportsAllDrives instead.\nWhether the requesting application supports Team Drives. Defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "teamDriveId": {
+          "description": "**DEPRECATED** - Use driveId instead. The ID of the Team Drive\nfor which changes will be returned. Defaults to empty string.",
+          "type": "string",
+          "default": "",
+          "nullable": false
+        },
+        "includePermissionsForView": {
+          "description": "Specifies which additional view's permissions\nto include in the response. Only 'published' is supported. Defaults to empty string.",
+          "type": "string",
+          "default": "",
+          "nullable": false
+        },
+        "includeLabels": {
+          "description": "A comma-separated list of IDs of labels to include in\nthe labelInfo part of the response. Defaults to empty string.",
+          "type": "string",
+          "default": "",
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_comment_replies",
+    "description": "Lists a comment's replies.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file. Must not be empty.",
+          "type": "string",
+          "nullable": false
+        },
+        "commentId": {
+          "description": "The ID of the comment. Must not be empty.",
+          "type": "string",
+          "nullable": false
+        },
+        "includeDeleted": {
+          "description": "Whether to include deleted replies. Defaults to False. When False, deleted replies are filtered out from the list.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "pageSize": {
+          "description": "Maximum number of replies to return per page. Must be between 1 and 100. Defaults to 20.",
+          "type": "integer",
+          "default": 20,
+          "nullable": false
+        },
+        "pageToken": {
+          "description": "Token for the next page of results. Defaults to None.",
+          "type": "string",
+          "default": null,
+          "nullable": true
+        },
+        "fields": {
+          "description": "Selector specifying which fields to include in the response (e.g., \"replies(id,content),nextPageToken\" or \"replies(author(displayName,emailAddress))\"). Supports nested field syntax and wildcards (e.g., \"*\", \"replies(*)\", \"replies(author(*))\"). Defaults to '' (empty string, returns all fields).",
+          "type": "string",
+          "default": "",
+          "nullable": false
+        }
+      },
+      "required": [
+        "fileId",
+        "commentId"
+      ]
+    }
+  },
+  {
+    "name": "list_comments",
+    "description": "Lists comments for a file.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file to list comments for. Cannot be empty.",
+          "type": "string",
+          "nullable": false
+        },
+        "includeDeleted": {
+          "description": "Whether to include deleted comments.\nIf False, deleted comments are excluded from the response. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "pageSize": {
+          "description": "Maximum number of comments to return per page.\nMust be between 1 and 100, inclusive. Defaults to 20.",
+          "type": "integer",
+          "nullable": false,
+          "default": 20
+        },
+        "pageToken": {
+          "description": "Page token for continuing a previous list request.\nProvides the starting point for pagination. Expected to be an integer string if provided.\nDefaults to an empty string.",
+          "type": "string",
+          "nullable": false,
+          "default": ""
+        },
+        "startModifiedTime": {
+          "description": "The start time to filter comments by.\nOnly comments modified on or after this timestamp are returned.\nFormat: RFC 3339 timestamp (e.g., '2023-01-01T00:00:00Z').\nDefaults to an empty string (no time filter).",
+          "type": "string",
+          "nullable": false,
+          "default": ""
+        }
+      },
+      "required": [
+        "fileId"
+      ]
+    }
+  },
+  {
+    "name": "list_file_labels",
+    "description": "Lists all labels applied to a file.\n\nThis method retrieves all labels currently applied to the specified file.\nLabels are returned as a list of DriveLabel objects with id, kind, revisionId, and fields.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file to list labels for.",
+          "type": "string",
+          "nullable": false
+        },
+        "maxResults": {
+          "description": "Maximum number of labels to return per page (1-100). Defaults to 100.",
+          "type": "integer",
+          "nullable": true,
+          "default": 100
+        },
+        "pageToken": {
+          "description": "Page token for pagination.",
+          "type": "string",
+          "nullable": true,
+          "default": ""
+        }
+      },
+      "required": [
+        "fileId"
+      ]
+    }
+  },
+  {
+    "name": "list_file_revisions",
+    "description": "List all revisions for a file.\n\nThis function retrieves all revisions for a file. It returns the file's revisions\nlist, which is a list of dictionaries containing the revision information.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "The ID of the user retrieving the revisions. Defaults to 'me' if not provided.",
+          "type": "string",
+          "default": "me"
+        },
+        "file_id": {
+          "description": "The ID of the file to retrieve revisions from. Required, not nullable.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "file_id"
+      ]
+    }
+  },
+  {
+    "name": "list_installed_apps",
+    "description": "Lists a user's installed apps.\n\nThis function retrieves all installed apps for the current user and applies\noptional filtering based on file extensions and MIME types. The languageCode\nparameter is accepted for API compatibility but does not affect the current\nimplementation.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "appFilterExtensions": {
+          "description": "A comma-separated list of file extensions\nto filter by (e.g., \"pdf,txt,docx\"). Only apps that support these extensions\nwill be returned. Defaults to '' (no filtering).",
+          "type": "string",
+          "nullable": false,
+          "default": ""
+        },
+        "appFilterMimeTypes": {
+          "description": "A comma-separated list of MIME types to\nfilter by (e.g., \"text/plain,application/pdf\"). Only apps that support\nthese MIME types will be returned. Defaults to '' (no filtering).",
+          "type": "string",
+          "nullable": false,
+          "default": ""
+        },
+        "languageCode": {
+          "description": "The language code to use for localized strings.\nCurrently unused but accepted for API compatibility. Defaults to ''.",
+          "type": "string",
+          "nullable": false,
+          "default": ""
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_permissions",
+    "description": "Lists a file's or shared drive's permissions.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file or shared drive.",
+          "type": "string"
+        },
+        "supportsAllDrives": {
+          "description": "Whether to support all drives. If True, includes permissions from all drives. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "supportsTeamDrives": {
+          "description": "Whether to support team drives. If True, includes team drive specific permissions. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "useDomainAdminAccess": {
+          "description": "Whether to use domain admin access. If True, allows domain administrators to access permissions for files in shared drives they manage. This affects authorization but does not add extra permissions to the response. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        }
+      },
+      "required": [
+        "fileId"
+      ]
+    }
+  },
+  {
+    "name": "list_user_files",
+    "description": "Lists the user's files with support for Shared Drives, ordering, and pagination.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "corpora": {
+          "description": "Specifies which corpus of files to search. Must be a single value (not comma-separated).\nValid values are: 'user', 'drive', 'domain', or 'allDrives'.\n- 'user': Only files owned by or shared with the user will be returned. This is the default value.\n- 'drive': Files in the specified shared drive. Requires driveId to be specified.\n- 'domain': Only files shared within the user's domain.\n- 'allDrives': Files from all drives accessible to the user.\nDefaults to 'user'.",
+          "type": "string",
+          "nullable": true,
+          "default": "user"
+        },
+        "driveId": {
+          "description": "ID of the shared drive to search. Must be specified if and only if corpora is set to 'drive'.\nDefaults to empty string.",
+          "type": "string",
+          "nullable": true,
+          "default": ""
+        },
+        "includeItemsFromAllDrives": {
+          "description": "Whether to include items from all shared drives in addition to the user's files.\nWhen True with corpora='user', files from shared drives where the user has access are also included.\nDefaults to False, meaning only items from the user's My Drive and directly shared files are included.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "orderBy": {
+          "description": "Sort order for the results. A comma-separated list of field names and sort directions.\nDefaults to 'folder,modifiedTime desc,name', which means:\n- Folders are listed first (using 'folder' or 'folder asc' puts folders first; 'folder desc' puts files first)\n- Then files are sorted by modified time in descending order (newest first)\n- Items with the same modified time are sorted by name (alphabetically)\nValid field names for sorting include: 'folder', 'modifiedTime', 'modifiedByMeTime', 'name', 'name_natural', 'quotaBytesUsed', 'recency', 'sharedWithMeTime', 'starred', 'viewedByMeTime', 'createdTime'.\nSort directions: 'asc' (ascending) or 'desc' (descending). If not specified, defaults to 'asc'.\nExamples: 'name', 'modifiedTime desc', 'folder,name', 'modifiedTime desc,name asc'.\nDefaults to 'folder,modifiedTime desc,name'.",
+          "type": "string",
+          "nullable": true,
+          "default": "folder,modifiedTime desc,name"
+        },
+        "pageSize": {
+          "description": "Maximum number of files to return. Must be a positive integer between 1 and 1000.\nDefaults to 10, meaning at most 10 files will be returned per page.",
+          "type": "integer",
+          "nullable": true,
+          "default": 10
+        },
+        "pageToken": {
+          "description": "Token for the next page of results. Defaults to empty string,\nmeaning the first page of results will be returned.",
+          "type": "string",
+          "nullable": true,
+          "default": ""
+        },
+        "q": {
+          "description": "Query string for filtering files. Defaults to empty string,\nmeaning no filtering is applied. The query string should follow the format: `field operator value`.\nLogical Operators:\nMultiple conditions can be combined using `and`, `or`, and `not` logical operators.\nFor example, `name = 'file.txt' and trashed = False or mimeType = 'image/jpeg'`\nis processed as `(name = 'file.txt' and trashed = False) or (mimeType = 'image/jpeg')`.\n`not` operator is always used in the first position of the term, for instance,\n`not 'Hello' in parents` is valid, but `'Hello' not in parents` is not valid.\nParentheses are supported for explicitly grouping conditions (e.g., `name = 'report' and (mimeType = 'application/pdf' or mimeType = 'text/plain')`,\n`(name = 'report' and mimeType = 'application/pdf') or (name = 'report' and mimeType = 'text/plain')`).\nSupported Operators:\n   - `=`: Equals. For exact matches.\n   - `!=`: Not equals.\n   - `contains`: Checks if the field's string representation contains the given value.\n   (e.g., `name contains 'report'`).\n   - `<`: Less than. Used for numeric or date/time fields.\n   - `<=`: Less than or equal to. Used for numeric or date/time fields.\n   - `>`: Greater than. Used for numeric or date/time fields.\n   - `>=`: Greater than or equal to. Used for numeric or date/time fields.\n   - `in`: Checks if a specific string value is present within a list-like field (e.g., `parents`).\n   The syntax is `'stringValue' in fieldName`.\n   For example, `'folderId123' in parents` checks if `'folderId123'`\n   is one of the IDs in the `parents` list of a file.\nValue Types:\n   - Strings: Must be enclosed in single (`'`) or double (`\"`) quotes\n   (e.g., `name = 'My Document.pdf'` or `description = \"Final Report\"`).\n   - Booleans: Use `True` or `False` (case-insensitive)\n   (e.g., `trashed = False` or `starred = True`).\n   - Date/Timestamps: For fields like `modifiedTime` or `createdTime`.\n   Values should be in a standard date/time format that can be parsed\n   (e.g., ISO 8601 format like `'2023-10-26T10:00:00Z'`).\nFilterable Fields:\n   - `name` (str): The name of the file. Operators: contains, =, !=\n   - `fullText` (str): Searches name, description, and file content. Operators: contains\n   - `mimeType` (str): The MIME type of the file. Operators: contains, =, !=\n   - `modifiedTime` (str): The last modification time (RFC 3339). Operators: <=, <, =, !=, >, >=\n   - `trashed` (bool): Whether the file is in the trash. Operators: =, !=\n   - `starred` (bool): Whether the file is starred. Operators: =, !=\n   - `parents` (List[str]): Parent folder IDs. Operators: in\n   - `owners` (List[str]): Users who own the file. Operators: in\n   - `createdTime` (str): The creation time (RFC 3339). Operators: <=, <, =, !=, >, >=\nExamples of `q` strings:\n   - `name = 'MyContract.pdf' and trashed = false`\n   - `mimeType = 'application/vnd.gridwell-apps.folder' or starred = true`\n   - `modifiedTime > '2024-01-01T00:00:00Z'`\n   - `'specific_folder_id' in parents and name contains 'confidential'`\n   - `(fullText contains 'secret' and mimeType = 'application/pdf') or (fullText contains 'secret' and mimeType = 'text/csv')`\nNote:\n   - The contains operator performs substring matching for a name term. For example, if you have a name of HelloWorld, a query of name contains 'Hello' returns a result, and a query of name contains 'World' also returns a result because 'World' appears within 'HelloWorld'. Similarly, name contains 'loWo' would match since it's a substring of 'HelloWorld'.\n   - The contains operator only performs matching on entire string tokens for the fullText term. For example, if the full text of a document contains the string \"HelloWorld\", only the query fullText contains 'HelloWorld' returns a result.\n   - The contains operator matches on an exact alphanumeric phrase if the right operand is surrounded by double quotes. For example, if the fullText of a document contains the string \"Hello there world\", then the query fullText contains \"Hello there\" returns a result, but the query fullText contains \"Hello world\" doesn't. Furthermore, since the search is alphanumeric, if the full text of a document contains the string \"Hello_world\", then the query fullText contains \"Hello world\" returns a result.",
+          "type": "string",
+          "nullable": true,
+          "default": ""
+        },
+        "spaces": {
+          "description": "Comma-separated list of spaces to search. Defaults to 'drive',\nwhich means only files in the user's Drive will be returned. Valid values are 'drive' and 'appDataFolder'.",
+          "type": "string",
+          "nullable": true,
+          "default": "drive"
+        },
+        "supportsAllDrives": {
+          "description": "Whether to support all drives. Defaults to False,\nmeaning shared drive operations are not supported.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "supportsTeamDrives": {
+          "description": "[DEPRECATED] Whether to support team drives. Defaults to False.\nThis parameter is deprecated. Use 'supportsAllDrives' instead.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "teamDriveId": {
+          "description": "[DEPRECATED] ID of the team drive to search. Defaults to empty string.\nThis parameter is deprecated. Use 'driveId' instead.",
+          "type": "string",
+          "nullable": true,
+          "default": ""
+        },
+        "includeTeamDriveItems": {
+          "description": "[DEPRECATED] Whether to include team drive items. Defaults to False.\nThis parameter is deprecated. Use 'includeItemsFromAllDrives' instead.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "includePermissionsForView": {
+          "description": "Specifies which additional view's permissions to include in the response.\nOnly 'published' is supported. When set to 'published', permissions for the published view\nare included in each file's 'permissions' field. This allows you to see who has access to\nthe published version of a file (e.g., a published GridwellDocs).\nThe permissions returned include the same structure as regular permissions:\n- 'id' (str): Permission ID\n- 'type' (str): Permission type ('user', 'group', 'domain', or 'anyone')\n- 'role' (str): Permission role ('reader', 'writer', 'commenter', or 'owner')\n- 'emailAddress' (str): Email address of the user/group (if applicable)\nDefaults to empty string, meaning no additional permissions are included.",
+          "type": "string",
+          "nullable": true,
+          "default": ""
+        },
+        "includeLabels": {
+          "description": "Comma-separated list of label IDs to include in the response's labelInfo field.\nThis parameter only affects which label information is returned in the response and does not\nfilter which files are returned. When specified, each file object in the response will include\na 'labelInfo' field containing label information for labels that match the provided IDs.\nEach labelInfo object contains:\n- 'id' (str): The label ID\n- 'name' (str): The label name\nIf no labels match the requested label IDs, the 'labelInfo' field will be an empty list [].\nDefaults to empty string, meaning no label information is included.",
+          "type": "string",
+          "nullable": true,
+          "default": ""
+        },
+        "fields": {
+          "description": "Selector specifying which fields to include in the response.\nWhen empty or not provided, minimal file fields are returned (kind, id, name, mimeType). If includeLabels is specified, labelInfo is automatically added.\nFormat: 'files(field1,field2)', 'files(*)', '*', or 'files(field1),nextPageToken'.\nSupports nested syntax and wildcards: 'files(id,permissions(role,emailAddress))', 'files(permissions(*))', '*'.\nExamples: 'files(id,name,mimeType)', 'files(id,name,permissions(*))', 'files(*),nextPageToken', or '*'.\nValid field names are: kind, id, name, mimeType, createdTime, modifiedTime, trashed, starred, parents, owners, size, permissions, description, labelInfo, driveId.\nNote: When requesting 'nextPageToken' in fields, it will only be included if there are more pages available. If there are no more pages, the field is omitted from the response (not set to null).\nDefaults to empty string.",
+          "type": "string",
+          "nullable": true,
+          "default": ""
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_user_shared_drives",
+    "description": "Lists the user's shared drives.\n\nThis function returns a list of shared drives that the user is a member of.\nIt supports filtering by drive properties through the `q` parameter\nand allows for pagination using `pageSize` and `pageToken`.\n\nWhen `useDomainAdminAccess` is set to true, domain administrators can list\nall shared drives in the entire domain, not just the ones they are a member of.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "pageSize": {
+          "description": "Maximum number of shared drives to return per page.\nMust be an integer between 1 and 100. Defaults to 10.",
+          "type": "integer",
+          "default": 10,
+          "nullable": true
+        },
+        "q": {
+          "description": "Query string for searching shared drives. Defaults to empty string.\nThe query supports any field present in the drive resource object, like:\n   - 'id' (str): The ID of the shared drive. Supports operators: contains, =, !=, in\n   - 'name' (str): The name of the shared drive. Supports operators: contains, =, !=, in\n   - 'themeId' (str): The theme ID of the shared drive. Supports operators: contains, =, !=, in\n   - 'createdTime' (str): The time at which the shared drive was created (e.g., `'2024-01-01T00:00:00Z'`). Supports operators: <=, <, =, !=, >, >=\n   - 'hidden' (bool): Whether the shared drive is hidden from default view.\nOperators: =, !=, <, <=, >, >=, contains, in\nYou can combine conditions with 'and', 'or', and 'not'.\n`not` operator is always used in the first position of the term, for instance,\n`not name = 'My Drive'` is valid, but `name not = 'My Drive' is not valid.\nParentheses are supported for explicitly grouping conditions (e.g., `(name = 'My Drive' or name = 'Our Drive') and hidden =  false`,\n`(name = 'My Drive' and hidden = false) or (name = 'Our Drive' and hidden = false)`).\nString values must be quoted. Example queries:\n    - \"name = 'My Drive'\"\n    - \"name contains 'Project' and hidden = false\"\n    - \"createdTime >= '2023-01-01T00:00:00Z'\"\n    - \"name = 'Team Drive' or hidden = false\"\nNote:\n      - The contains operator only performs prefix matching for a name term. For example, suppose you have a name of HelloWorld. A query of name contains 'Hello' returns a result, but a query of name contains 'World' doesn't.\n      - The contains operator only performs matching on entire string tokens for the fullText term. For example, if the full text of a document contains the string \"HelloWorld\", only the query fullText contains 'HelloWorld' returns a result.\n      - The contains operator matches on an exact alphanumeric phrase if the right operand is surrounded by double quotes. For example, if the fullText of a document contains the string \"Hello there world\", then the query fullText contains \"Hello there\" returns a result, but the query fullText contains \"Hello world\" doesn't. Furthermore, since the search is alphanumeric, if the full text of a document contains the string \"Hello_world\", then the query fullText contains \"Hello world\" returns a result.",
+          "type": "string",
+          "default": "",
+          "nullable": true
+        },
+        "pageToken": {
+          "description": "A base64-encoded token for pagination. Defaults to empty string. The token encodes a JSON object with:\n- 'last_row_time' (str): The unix timestamp (as a string) when the last page was generated.\n- 'offset' (int): The offset (index) to start the next page from.",
+          "type": "string",
+          "default": "",
+          "nullable": true
+        },
+        "useDomainAdminAccess": {
+          "description": "Issue the request as a domain administrator;\nif set to true, then all shared drives of the domain in which the\nrequester is an administrator are returned. Defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": true
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "modify_file_labels",
+    "description": "Modifies the set of labels applied to a file.\n\nThis method allows adding, updating, or removing labels and their fields on a file.\nAll modifications are atomic - they all succeed or all fail together.\nLabels are stored directly on the file object in the 'labels' array.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file to modify labels on.",
+          "type": "string",
+          "nullable": false
+        },
+        "labelModifications": {
+          "description": "List of label modifications to apply.",
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "description": "Modification to a single label on a file.",
+            "type": "object",
+            "properties": {
+              "labelId": {
+                "description": "The ID of the label to modify.",
+                "type": "string",
+                "nullable": false
+              },
+              "kind": {
+                "description": "Resource type identifier (always 'drive#labelModification').",
+                "type": "string",
+                "nullable": false,
+                "default": "drive#labelModification"
+              },
+              "fieldModifications": {
+                "description": "List of field modifications to apply to this label.",
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "description": "Modification to a single field within a label.",
+                  "type": "object",
+                  "properties": {
+                    "fieldId": {
+                      "description": "The ID of the field to modify.",
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "kind": {
+                      "description": "Resource type identifier (always 'drive#labelFieldModification').",
+                      "type": "string",
+                      "nullable": false,
+                      "default": "drive#labelFieldModification"
+                    },
+                    "setDateValues": {
+                      "description": "RFC 3339 formatted dates to set for a dateString field.",
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "setIntegerValues": {
+                      "description": "Integer values as strings to set for an integer field.",
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "setSelectionValues": {
+                      "description": "Selection choice IDs to set for a selection field.",
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "setTextValues": {
+                      "description": "Text values to set for a text field.",
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "setUserValues": {
+                      "description": "User email addresses to set for a user field.",
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "unsetValues": {
+                      "description": "If True, removes all values from this field.",
+                      "type": "boolean",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "fieldId"
+                  ]
+                }
+              },
+              "removeLabel": {
+                "description": "If True, removes this label entirely from the file.",
+                "type": "boolean",
+                "nullable": true
+              }
+            },
+            "required": [
+              "labelId"
+            ]
+          }
+        }
+      },
+      "required": [
+        "fileId",
+        "labelModifications"
+      ]
+    }
+  },
+  {
+    "name": "stop_channel_watch",
+    "description": "Stops watching resources through this channel.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "description": "Dictionary of channel properties. Both id and resourceId are required fields.",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "id": {
+              "description": "Channel ID. Must be a non-empty string that uniquely identifies the notification channel.",
+              "type": "string",
+              "nullable": false
+            },
+            "resourceId": {
+              "description": "Server-assigned resource ID. An opaque ID that identifies the resource being watched on this channel.",
+              "type": "string",
+              "nullable": false
+            }
+          },
+          "required": [
+            "id",
+            "resourceId"
+          ]
+        }
+      },
+      "required": [
+        "resource"
+      ]
+    }
+  },
+  {
+    "name": "subscribe_to_file_changes",
+    "description": "Subscribes to changes to a file.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file to watch. Required, not nullable.",
+          "type": "string",
+          "nullable": false
+        },
+        "body": {
+          "description": "The configuration for the notification channel that will receive change updates. Required, not nullable. Must be a dictionary containing the following fields: 'id' (str, required, non-empty string), 'type' (str, required, must be \"web_hook\" or \"webhook\"), 'address' (str, required, non-empty string), 'token' (optional str for authentication), 'expiration' (optional str in RFC 3339 format).",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "id": {
+              "description": "Channel ID. Required, not nullable. Must be a non-empty string.",
+              "type": "string",
+              "nullable": false
+            },
+            "type": {
+              "description": "The type of delivery mechanism used for this channel. Required, not nullable. Valid values are \"web_hook\" or \"webhook\".",
+              "type": "string",
+              "nullable": false,
+              "enum": [
+                "web_hook",
+                "webhook"
+              ]
+            },
+            "address": {
+              "description": "The address where notifications are delivered for this channel. Required, not nullable. Must be a non-empty string.",
+              "type": "string",
+              "nullable": false
+            },
+            "token": {
+              "description": "Channel token for authentication. Optional, nullable. Defaults to None if not provided.",
+              "type": "string",
+              "nullable": true
+            },
+            "expiration": {
+              "description": "Date and time of notification channel expiration (Unix timestamp in milliseconds). Optional, nullable. Defaults to None if not provided.",
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "address"
+          ]
+        },
+        "acknowledgeAbuse": {
+          "description": "Whether to acknowledge abuse. Optional, not nullable. Defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "ignoreDefaultVisibility": {
+          "description": "Whether to ignore default visibility. Optional, not nullable. Defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "supportsAllDrives": {
+          "description": "Whether to support all drives. Optional, not nullable. Defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "supportsTeamDrives": {
+          "description": "Whether to support team drives (deprecated). Optional, not nullable. Defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "includePermissionsForView": {
+          "description": "Specifies which additional view's permissions to include. Optional, not nullable. Defaults to empty string.",
+          "type": "string",
+          "default": "",
+          "nullable": false
+        },
+        "includeLabels": {
+          "description": "Comma-separated list of label IDs to include. Optional, not nullable. Defaults to empty string.",
+          "type": "string",
+          "default": "",
+          "nullable": false
+        }
+      },
+      "required": [
+        "fileId",
+        "body"
+      ]
+    }
+  },
+  {
+    "name": "unhide_shared_drive",
+    "description": "Restores a shared drive to the default view.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "driveId": {
+          "description": "The ID of the shared drive. Required, not nullable. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "driveId"
+      ]
+    }
+  },
+  {
+    "name": "update_comment_reply",
+    "description": "Updates a reply with patch semantics. Only writable fields (content) can be updated.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file. Must be non-empty (min_length=1).",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        },
+        "commentId": {
+          "description": "The ID of the comment. Must be non-empty (min_length=1).",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        },
+        "replyId": {
+          "description": "The ID of the reply to update. Must be non-empty (min_length=1).",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        },
+        "body": {
+          "description": "The reply fields to update. Only \"content\" is writable. Required parameter. Dictionary with fields:\n- content (str): The plain text content of the reply. Must be non-empty. Only writable field. Note: Read-only fields (author, id, createdTime, etc.) are silently ignored if sent.",
+          "type": "object",
+          "properties": {
+            "content": {
+              "description": "The plain text content of the reply. Must be non-empty.",
+              "type": "string",
+              "nullable": false
+            }
+          },
+          "required": [
+            "content"
+          ],
+          "nullable": false
+        },
+        "fields": {
+          "description": "Selector specifying which fields to include in response (e.g., \"content\", \"id,author(displayName)\"). Supports nested field syntax and wildcards (e.g., \"*\", \"author(*)\"). Defaults to None (all fields returned).",
+          "type": "string",
+          "default": null,
+          "nullable": true
+        }
+      },
+      "required": [
+        "fileId",
+        "commentId",
+        "replyId",
+        "body"
+      ]
+    }
+  },
+  {
+    "name": "update_file_comment",
+    "description": "Updates a comment with patch semantics.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file the comment belongs to. Required, not nullable. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "commentId": {
+          "description": "The ID of the comment to update. Required, not nullable. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "body": {
+          "description": "The set of comment fields to be updated. Any fields provided in this dictionary will overwrite the existing values on the comment (author field is not updatable). Optional, nullable. Defaults to None if not provided.",
+          "type": "object",
+          "nullable": true,
+          "properties": {
+            "content": {
+              "description": "The content of the comment. Optional, nullable. Can be None.",
+              "type": "string",
+              "nullable": true
+            },
+            "quotedFileContent": {
+              "description": "The quoted file content. Optional, nullable. Can be None. If provided, value and mimeType are required.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "value": {
+                  "description": "The quoted content. Required, not nullable.",
+                  "type": "string",
+                  "nullable": false
+                },
+                "mimeType": {
+                  "description": "The MIME type of the quoted content. Required, not nullable.",
+                  "type": "string",
+                  "nullable": false
+                }
+              },
+              "required": [
+                "value",
+                "mimeType"
+              ]
+            },
+            "anchor": {
+              "description": "The anchor point of the comment. Optional, nullable. Can be None.",
+              "type": "string",
+              "nullable": true
+            },
+            "resolved": {
+              "description": "Whether the comment has been resolved. Optional, nullable. Can be None.",
+              "type": "boolean",
+              "nullable": true
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "fileId",
+        "commentId"
+      ]
+    }
+  },
+  {
+    "name": "update_file_content",
+    "description": "Update file content with new string data. This function replaces the content of a file with new string data. It calculates a new checksum for the new content, encodes it based on the file's encoding type (base64 for binary files, text for text files), and creates a new content structure matching the expected JSON format. The function then validates the new content using the FileContent model and creates a new revision before updating the file's content and size. Finally, it clears the export cache since the content has changed.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "The ID of the user updating the file content. Must be 1-255 characters. Cannot contain path traversal characters (.., /, \\). Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "nullable": true
+        },
+        "file_id": {
+          "description": "The ID of the file whose content is being replaced. Must be 1-255 characters. Cannot contain path traversal characters (.., /, \\).",
+          "type": "string",
+          "nullable": false
+        },
+        "new_content": {
+          "description": "The new content that will replace the existing file content.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "file_id",
+        "new_content"
+      ]
+    }
+  },
+  {
+    "name": "update_file_metadata_or_content",
+    "description": "Updates a file's metadata or content with patch semantics.\n\nThis means only the fields explicitly provided in the `body` dictionary\nwill be updated. All other file properties will remain unchanged.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file to update. Must be 1-100 characters. Cannot contain control characters or reserved characters (<>:\"|?*).",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^[^<>:\"|?*\\x00-\\x1f\\x7f-\\x9f]+$"
+        },
+        "body": {
+          "description": "Dictionary of file properties to update with keys. Defaults to None.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "name": {
+              "description": "New name of the file. Must be 1-255 characters. Colons are allowed because this is Drive metadata, not a local filesystem path. Cannot contain path traversal patterns (../, ..\\), control characters, or the retained reserved characters (<>\"|?*). Cannot use Windows reserved names (CON, PRN, AUX, NUL, COM1-9, LPT1-9).",
+              "type": "string",
+              "nullable": true,
+              "minLength": 1,
+              "maxLength": 255,
+              "pattern": "^[^<>\"|?*\\x00-\\x1f\\x7f-\\x9f]+$"
+            },
+            "description": {
+              "description": "Description of the file. Optional. If provided, must be a string (cannot be None). Must not exceed 65535 characters.",
+              "type": "string",
+              "nullable": true
+            },
+            "mimeType": {
+              "description": "New MIME type of the file. Must follow standard MIME type format (e.g., \"text/plain\", \"application/json\"). Note: If media_body.filePath is provided, mimeType from media_body takes precedence over this value, as it describes the new content being uploaded.",
+              "type": "string",
+              "nullable": true,
+              "maxLength": 100,
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9!#$&\\-\\^_.]*/[a-zA-Z0-9][a-zA-Z0-9!#$&\\-\\^_.]*$"
+            },
+            "parents": {
+              "description": "New list of parent folder IDs. Each parent ID must be 1-100 characters and non-empty.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              }
+            },
+            "trashed": {
+              "description": "Whether the file should be in trash. Set to True to move file to trash, False to restore from trash. When moving to/from trash, quota is automatically updated to transfer usage between usageInDrive and usageInDriveTrash.",
+              "type": "boolean",
+              "nullable": true
+            },
+            "permissions": {
+              "description": "New list of permission objects with keys:",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "description": "Permission ID (optional for Docs interoperability)",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "kind": {
+                    "description": "Resource kind identifier. Defaults to 'drive#permission'.",
+                    "type": "string",
+                    "nullable": true,
+                    "default": "drive#permission"
+                  },
+                  "role": {
+                    "description": "Permission role (e.g., 'owner', 'reader', 'writer')",
+                    "type": "string",
+                    "nullable": false,
+                    "enum": [
+                      "commenter",
+                      "content manager",
+                      "contributor",
+                      "editor",
+                      "fileOrganizer",
+                      "manager",
+                      "organizer",
+                      "owner",
+                      "reader",
+                      "viewer",
+                      "writer"
+                    ]
+                  },
+                  "type": {
+                    "description": "Permission type (e.g., 'user', 'group', 'domain', 'anyone')",
+                    "type": "string",
+                    "nullable": false,
+                    "enum": [
+                      "anyone",
+                      "domain",
+                      "group",
+                      "user"
+                    ]
+                  },
+                  "emailAddress": {
+                    "description": "Email address for user/group permissions",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "domain": {
+                    "description": "The domain name of the entity this permission refers to. Required when type='domain'.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "allowFileDiscovery": {
+                    "description": "Whether the permission allows the file to be discovered through search.",
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "expirationTime": {
+                    "description": "The time at which this permission will expire. This must be an RFC 3339 date-time string, must be in the future, and cannot be more than one year in the future.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "deleted": {
+                    "description": "Whether the permission has been deleted. Output-only field.",
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "displayName": {
+                    "description": "Display name of the user or group. Present for user and group types. Output-only field.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "inheritedPermissionsDisabled": {
+                    "description": "When true, only organizers, owners, and users with permissions added directly on the item can access it. Output-only field.",
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "pendingOwner": {
+                    "description": "Whether the account associated with this permission is a pending owner. Only populated for permissions of type user for files that are not in a shared drive. Output-only field.",
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "permissionDetails": {
+                    "description": "Details of whether the permissions on this item are inherited or are directly on this item. Output-only field.",
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "permissionType": {
+                          "description": "The permission type for this user. Supported values: file, member. Output-only field.",
+                          "type": "string",
+                          "nullable": true,
+                          "enum": [
+                            "file",
+                            "member"
+                          ]
+                        },
+                        "inheritedFrom": {
+                          "description": "The ID of the item from which this permission is inherited. Only populated for items in shared drives. Output-only field.",
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "role": {
+                          "description": "The primary role for this user. Supported values: owner, organizer, fileOrganizer, writer, commenter, reader. Output-only field.",
+                          "type": "string",
+                          "nullable": true,
+                          "enum": [
+                            "commenter",
+                            "content manager",
+                            "contributor",
+                            "editor",
+                            "fileOrganizer",
+                            "manager",
+                            "organizer",
+                            "owner",
+                            "reader",
+                            "viewer",
+                            "writer"
+                          ]
+                        },
+                        "inherited": {
+                          "description": "Whether this permission is inherited. This field is always populated. Output-only field.",
+                          "type": "boolean",
+                          "nullable": true,
+                          "default": false
+                        }
+                      },
+                      "required": []
+                    }
+                  },
+                  "photoLink": {
+                    "description": "Link to user's profile photo. Present for user types when available. Output-only field.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "teamDrivePermissionDetails": {
+                    "description": "Deprecated: Use permissionDetails instead. Output-only field.",
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "teamDrivePermissionType": {
+                          "description": "Deprecated: Use permissionDetails/permissionType instead. Output-only field.",
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "inheritedFrom": {
+                          "description": "Deprecated: Use permissionDetails/inheritedFrom instead. Output-only field.",
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "role": {
+                          "description": "Deprecated: Use permissionDetails/role instead. Output-only field.",
+                          "type": "string",
+                          "nullable": true,
+                          "enum": [
+                            "commenter",
+                            "content manager",
+                            "contributor",
+                            "editor",
+                            "fileOrganizer",
+                            "manager",
+                            "organizer",
+                            "owner",
+                            "reader",
+                            "viewer",
+                            "writer"
+                          ]
+                        },
+                        "inherited": {
+                          "description": "Deprecated: Use permissionDetails/inherited instead. Output-only field.",
+                          "type": "boolean",
+                          "nullable": true,
+                          "default": false
+                        }
+                      },
+                      "required": []
+                    }
+                  },
+                  "view": {
+                    "description": "Indicates the view for this permission. Only populated for permissions that belong to a view. Supported values: published, metadata. Output-only field.",
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "role",
+                  "type"
+                ]
+              }
+            }
+          },
+          "required": []
+        },
+        "media_body": {
+          "description": "Dictionary containing media content properties to update with keys. Defaults to None. Note: Gridwell Workspace files (Docs, Sheets, Slides, Drawings, Forms) cannot be updated via media_body.filePath as they use structured content and cannot be overwritten with raw bytes.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "size": {
+              "description": "File size in bytes. Must be a non-negative integer (not a string or float), maximum 10GB (10737418240 bytes). Note: This integer value is converted to a string in the response to match the GridwellDrive API behavior, which uses strings for size fields to handle large numbers that exceed JavaScript safe integer range. This field is only used when filePath is provided to upload new content. If provided without filePath, it will be ignored as the file size is automatically calculated from the actual content.",
+              "type": "integer",
+              "nullable": true,
+              "minimum": 0,
+              "maximum": 10737418240
+            },
+            "md5Checksum": {
+              "description": "MD5 checksum of the file content. Must be a 32-character hexadecimal string (e.g., \"d41d8cd98f00b204e9800998ecf8427e\"). Note: When filePath is provided, checksums are automatically calculated from the actual file content bytes to ensure data integrity. User-provided checksum values in this field are ignored - checksums are always calculated from file content, not accepted from user input. If provided without filePath, this field will be ignored to maintain data integrity.",
+              "type": "string",
+              "nullable": true,
+              "minLength": 32,
+              "maxLength": 32,
+              "pattern": "^[a-fA-F0-9]{32}$"
+            },
+            "sha1Checksum": {
+              "description": "SHA1 checksum of the file content. Must be a 40-character hexadecimal string (e.g., \"da39a3ee5e6b4b0d3255bfef95601890afd80709\"). Note: When filePath is provided, checksums are automatically calculated from the actual file content bytes to ensure data integrity. User-provided checksum values in this field are ignored - checksums are always calculated from file content, not accepted from user input. If provided without filePath, this field will be ignored to maintain data integrity.",
+              "type": "string",
+              "nullable": true,
+              "minLength": 40,
+              "maxLength": 40,
+              "pattern": "^[a-fA-F0-9]{40}$"
+            },
+            "sha256Checksum": {
+              "description": "SHA256 checksum of the file content. Must be a 64-character hexadecimal string (e.g., \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"). Note: When filePath is provided, checksums are automatically calculated from the actual file content bytes to ensure data integrity. User-provided checksum values in this field are ignored - checksums are always calculated from file content, not accepted from user input. If provided without filePath, this field will be ignored to maintain data integrity.",
+              "type": "string",
+              "nullable": true,
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[a-fA-F0-9]{64}$"
+            },
+            "mimeType": {
+              "description": "MIME type of the file content. Must follow standard MIME type format (e.g., \"text/plain\", \"application/json\"). Maximum 100 characters. Note: When filePath is provided, this mimeType takes precedence over any mimeType specified in the body parameter, as it describes the new content being uploaded.",
+              "type": "string",
+              "nullable": true,
+              "maxLength": 100,
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9!#$&\\-\\^_.]*/[a-zA-Z0-9][a-zA-Z0-9!#$&\\-\\^_.]*$"
+            },
+            "imageMediaMetadata": {
+              "description": "Metadata about image media.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "width": {
+                  "description": "Width in pixels.",
+                  "type": "integer",
+                  "nullable": true
+                },
+                "height": {
+                  "description": "Height in pixels.",
+                  "type": "integer",
+                  "nullable": true
+                },
+                "rotation": {
+                  "description": "Rotation in degrees.",
+                  "type": "integer",
+                  "nullable": true
+                },
+                "location": {
+                  "description": "Geographic location where the image was taken.",
+                  "type": "object",
+                  "properties": {
+                    "latitude": {
+                      "description": "Latitude coordinate.",
+                      "type": "number",
+                      "nullable": true
+                    },
+                    "longitude": {
+                      "description": "Longitude coordinate.",
+                      "type": "number",
+                      "nullable": true
+                    },
+                    "altitude": {
+                      "description": "Altitude in meters.",
+                      "type": "number",
+                      "nullable": true
+                    }
+                  },
+                  "required": [],
+                  "nullable": true
+                },
+                "time": {
+                  "description": "Time the image was taken.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "cameraMake": {
+                  "description": "Camera manufacturer.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "cameraModel": {
+                  "description": "Camera model.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "exposureTime": {
+                  "description": "Exposure time in seconds.",
+                  "type": "number",
+                  "nullable": true
+                },
+                "aperture": {
+                  "description": "Aperture f-number.",
+                  "type": "number",
+                  "nullable": true
+                },
+                "flashUsed": {
+                  "description": "Whether flash was used.",
+                  "type": "boolean",
+                  "nullable": true
+                },
+                "focalLength": {
+                  "description": "Focal length in millimeters.",
+                  "type": "number",
+                  "nullable": true
+                },
+                "isoSpeed": {
+                  "description": "ISO speed.",
+                  "type": "integer",
+                  "nullable": true
+                },
+                "meteringMode": {
+                  "description": "Metering mode.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "sensor": {
+                  "description": "Sensor type.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "exposureMode": {
+                  "description": "Exposure mode.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "colorSpace": {
+                  "description": "Color space.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "whiteBalance": {
+                  "description": "White balance mode.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "exposureBias": {
+                  "description": "Exposure bias.",
+                  "type": "number",
+                  "nullable": true
+                },
+                "maxApertureValue": {
+                  "description": "Maximum aperture value.",
+                  "type": "number",
+                  "nullable": true
+                },
+                "subjectDistance": {
+                  "description": "Subject distance.",
+                  "type": "integer",
+                  "nullable": true
+                },
+                "lens": {
+                  "description": "Lens information.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            },
+            "videoMediaMetadata": {
+              "description": "Metadata about video media.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "width": {
+                  "description": "Width in pixels.",
+                  "type": "integer",
+                  "nullable": true
+                },
+                "height": {
+                  "description": "Height in pixels.",
+                  "type": "integer",
+                  "nullable": true
+                },
+                "durationMillis": {
+                  "description": "Duration in milliseconds.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            },
+            "filePath": {
+              "description": "Path to file for content upload (creates new revision). Cannot contain path traversal patterns (../, ..\\, URL-encoded variants) or control characters. Cannot be used to update Gridwell Workspace files (Docs, Sheets, Slides, Drawings, Forms) as they use structured content.",
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "required": []
+        },
+        "addParents": {
+          "description": "Comma-separated list of parent IDs to add. Each parent ID must be 1-100 characters and cannot contain control characters or reserved characters (<>:\"|?*). Defaults to ''.",
+          "type": "string",
+          "nullable": true,
+          "default": ""
+        },
+        "enforceSingleParent": {
+          "description": "Whether to enforce single parent, defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "removeParents": {
+          "description": "Comma-separated list of parent IDs to remove. Each parent ID must be 1-100 characters and cannot contain control characters or reserved characters (<>:\"|?*). Defaults to ''.",
+          "type": "string",
+          "nullable": true,
+          "default": ""
+        },
+        "includeLabels": {
+          "description": "Comma-separated list of label IDs to include in the output response. Maximum 1000 characters. This parameter only filters which labels are returned in the response and does not modify the file's labels in the database. If a requested label ID is not applied to the file, a ValueError will be raised. Defaults to ''.",
+          "type": "string",
+          "nullable": true,
+          "default": "",
+          "maxLength": 1000
+        }
+      },
+      "required": [
+        "fileId"
+      ]
+    }
+  },
+  {
+    "name": "update_permission",
+    "description": "Updates a permission with patch semantics.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "description": "The ID of the file or shared drive.",
+          "type": "string",
+          "nullable": false
+        },
+        "permissionId": {
+          "description": "The ID of the permission to update.",
+          "type": "string",
+          "nullable": false
+        },
+        "body": {
+          "description": "A permission resource body containing the fields to update.",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "role": {
+              "description": "The role granted by this permission. Supports both API and UI role names (case-insensitive):\n - 'reader'/'Viewer': Can view the file\n- 'writer'/'editor': Can view, comment, and edit the file\n- 'commenter'/'commenter': Can view and comment on the file\n- 'owner'/'owner': Has full control over the file\n- 'organizer'/'manager': Can manage content and users in shared drives\n- 'fileOrganizer'/'content manager': Can manage content in shared drives\n- 'writer'/'contributor': Can view, comment, and edit files in shared drives\n\nNote: Required when transferOwnership=False. Optional (and ignored) when transferOwnership=True, as the role is automatically set to 'owner'.",
+              "type": "string",
+              "nullable": true,
+              "enum": [
+                "commenter",
+                "content manager",
+                "contributor",
+                "editor",
+                "fileOrganizer",
+                "manager",
+                "organizer",
+                "owner",
+                "reader",
+                "viewer",
+                "writer"
+              ]
+            },
+            "type": {
+              "description": "The type of the grantee. Possible values:\n- 'user': Permission granted to a specific user\n- 'group': Permission granted to a group\n- 'domain': Permission granted to a domain\n- 'anyone': Permission granted to anyone with the link",
+              "type": "string",
+              "nullable": true,
+              "enum": [
+                "anyone",
+                "domain",
+                "group",
+                "user"
+              ]
+            },
+            "emailAddress": {
+              "description": "The email address of the user or group.",
+              "type": "string",
+              "nullable": true
+            },
+            "domain": {
+              "description": "The domain name of the entity this permission refers to.",
+              "type": "string",
+              "nullable": true
+            },
+            "allowFileDiscovery": {
+              "description": "Whether the permission allows the file to be discovered through search.",
+              "type": "boolean",
+              "nullable": true
+            },
+            "expirationTime": {
+              "description": "The time at which this permission will expire.",
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "required": []
+        },
+        "transferOwnership": {
+          "description": "Whether to transfer ownership to the specified user and downgrade the current owner to a writer. Defaults to False.",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "fileId",
+        "permissionId",
+        "body"
+      ]
+    }
+  },
+  {
+    "name": "update_shared_drive_metadata",
+    "description": "Updates the metadata for a shared drive.\n\nThis function modifies an existing shared drive's metadata based on the\nprovided `body`. The drive is identified by its `driveId`.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "driveId": {
+          "description": "The ID of the shared drive.",
+          "type": "string"
+        },
+        "body": {
+          "description": "A dictionary representing the metadata fields to be updated on the shared drive.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "name": {
+              "description": "The name of the shared drive.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "restrictions": {
+              "description": "Dictionary of restrictions with keys:",
+              "type": "object",
+              "nullable": true,
+              "default": null,
+              "properties": {
+                "adminManagedRestrictions": {
+                  "description": "Whether administrative privileges on this shared drive are required to modify restrictions.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": null
+                },
+                "copyRequiresWriterPermission": {
+                  "description": "Whether the options to copy, print, or download files inside this shared drive, should be disabled for readers and commenters.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": null
+                },
+                "downloadRestriction": {
+                  "description": "Download restriction settings with keys:",
+                  "type": "object",
+                  "nullable": true,
+                  "default": null,
+                  "properties": {
+                    "restrictedForReaders": {
+                      "description": "Whether download is restricted for readers.",
+                      "type": "boolean",
+                      "nullable": true,
+                      "default": null
+                    },
+                    "restrictedForWriters": {
+                      "description": "Whether download is restricted for writers.",
+                      "type": "boolean",
+                      "nullable": true,
+                      "default": null
+                    }
+                  },
+                  "required": []
+                },
+                "domainUsersOnly": {
+                  "description": "Whether access to this shared drive and items inside this shared drive is restricted to users of the domain to which this shared drive belongs.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": null
+                },
+                "driveMembersOnly": {
+                  "description": "Whether access to items inside this shared drive is restricted to its members.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": null
+                },
+                "sharingFoldersRequiresOrganizerPermission": {
+                  "description": "Whether sharing folders requires organizer permission.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": null
+                }
+              },
+              "required": []
+            },
+            "hidden": {
+              "description": "Whether the shared drive is hidden from default view.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "themeId": {
+              "description": "The ID of the theme to apply to this shared drive.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "driveId"
+      ]
+    }
+  },
+  {
+    "name": "watch_changes",
+    "description": "Creates a notification channel for watching changes in GridwellDrive.\n\nThis function sets up a watch channel for changes to files in\na user's Drive or shared drive. It stores the channel\nconfiguration and validates the watch parameters, but does not establish\nactual real-time notifications.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "pageToken": {
+          "description": "The token for the initial page of changes to watch from. This token is obtained from changes.getStartPageToken() or a previous changes.list request. The pageToken is an opaque string and may not be numeric. If not provided or empty, will call getStartPageToken() to get the starting token. Defaults to empty string.",
+          "type": "string",
+          "nullable": false,
+          "default": ""
+        },
+        "resource": {
+          "description": "Dictionary of notification channel properties. This object defines the channel configuration including the channel ID, type, delivery address, and optional settings like expiration and authentication token. The resource object must contain the required fields: id, type, and address.",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "id": {
+              "description": "Unique identifier for the channel. Must be a non-empty string that uniquely identifies the notification channel. The channel ID is used to manage and stop the watch channel later.",
+              "type": "string",
+              "nullable": false
+            },
+            "type": {
+              "description": "The type of the notification channel. Must be 'web_hook' or 'webhook'. This determines how notifications are delivered to the specified address.",
+              "type": "string",
+              "nullable": false,
+              "enum": [
+                "web_hook",
+                "webhook"
+              ]
+            },
+            "address": {
+              "description": "The URL where notifications are delivered. Must be a valid HTTP or HTTPS URL (e.g., https://example.com/webhook). The GridwellDrive API will send POST requests to this URL when changes occur.",
+              "type": "string",
+              "nullable": false
+            },
+            "resourceId": {
+              "description": "**IGNORED** - Server-assigned. ID of the resource being watched. This is automatically generated by the server and returned in the response. Client-provided values are ignored.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "resourceUri": {
+              "description": "URI of the resource being watched. This is an optional identifier that can be used to track which specific resource the channel is monitoring. If not provided, defaults to an empty string.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "token": {
+              "description": "Token for authenticating the channel. This is an optional authentication token that can be included in notification requests to verify the authenticity of the notification. If not provided, defaults to an empty string.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "expiration": {
+              "description": "Expiration time in RFC 3339 format (e.g., 2024-12-31T23:59:59.999Z). The channel will automatically stop sending notifications after this time. Must be in the future and cannot exceed 7 days from now. If not provided, defaults to 24 hours from the current time.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "payload": {
+              "description": "Whether to include payload in notifications. When True, the notification POST request will include the full change details. When False, only a minimal notification is sent. Defaults to True.",
+              "type": "boolean",
+              "nullable": false,
+              "default": true
+            },
+            "params": {
+              "description": "Additional channel parameters. These are custom key-value pairs that can be used to pass additional context or configuration to the notification endpoint. Each parameter is declared by name as a key-value pair. Example: {\"a_key\": \"A String\"} declares a new parameter by name. Defaults to {}.",
+              "type": "object",
+              "nullable": false,
+              "default": {},
+              "properties": {},
+              "additionalProperties": {
+                "description": "Additional channel parameters in key-value pair format.",
+                "type": "string"
+              },
+              "required": []
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "address"
+          ]
+        },
+        "driveId": {
+          "description": "The ID of the shared drive for which changes are watched.\nOnly changes to files within this shared drive will trigger notifications.\nWhen provided, supportsAllDrives must be set to True. Defaults to empty string (user's My Drive).",
+          "type": "string",
+          "nullable": false,
+          "default": ""
+        },
+        "includeCorpusRemovals": {
+          "description": "Whether the watch should include notifications for files that are removed from the corpus but still accessible. When True, notifications will be sent even for files that have been removed from the main corpus but are still accessible to the user. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "includeItemsFromAllDrives": {
+          "description": "Whether to watch changes in both My Drive and shared drives. When True, the watch channel will monitor changes across all drives the user has access to, not just their My Drive. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "includeRemoved": {
+          "description": "Whether to include notifications for removed items. When True, the watch channel will send notifications when files are deleted or moved to trash. Defaults to True.",
+          "type": "boolean",
+          "nullable": false,
+          "default": true
+        },
+        "includeTeamDriveItems": {
+          "description": "**DEPRECATED** - Use includeItemsFromAllDrives instead. Whether to include changes for team drive items. This parameter is deprecated and will be removed in a future version. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "restrictToMyDrive": {
+          "description": "Whether to restrict notifications to changes inside the My Drive hierarchy only. When True, only changes to files in the user's My Drive will trigger notifications. Cannot be used together with driveId or teamDriveId. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "spaces": {
+          "description": "A comma-separated list of spaces to watch for changes. Supported values are 'drive', 'appDataFolder', and 'photos'. The 'drive' space includes files in My Drive and shared drives. The 'appDataFolder' space includes application-specific data. The 'photos' space includes Gridwell Photos. Defaults to 'drive'.",
+          "type": "string",
+          "nullable": false,
+          "default": "drive"
+        },
+        "supportsAllDrives": {
+          "description": "Whether the requesting application supports both My Drives and shared drives. When True, enables access to shared drive content. This parameter must be set to True when driveId is specified. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "supportsTeamDrives": {
+          "description": "**DEPRECATED** - Use supportsAllDrives instead. Whether the application supports Team Drives. This parameter is deprecated and will be removed in a future version. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "teamDriveId": {
+          "description": "**DEPRECATED** - Use driveId instead. The ID of the Team Drive to watch for changes. This parameter is deprecated and will be removed in a future version. Defaults to empty string.",
+          "type": "string",
+          "nullable": false,
+          "default": ""
+        }
+      },
+      "required": [
+        "resource"
+      ]
+    }
+  }
+]

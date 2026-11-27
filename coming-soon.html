@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#ffffff" />
+    <script>
+      // Apply the colour theme before styles render: light, unless the visitor chose dark with the
+      // switch in the header (remembered in this browser). Same script in index.html,
+      // deep-dive.html, and coming-soon.html; src/lib/colorTheme.ts holds the same names and values.
+      (() => {
+        let saved;
+        try { saved = localStorage.getItem('multiverse-color-theme'); } catch {}
+        const dark = saved === 'dark';
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        if (dark) document.querySelector('meta[name="theme-color"]').content = '#101216';
+      })();
+    </script>
+    <link rel="icon" type="image/x-icon" href="./favicon.ico?v=purple-parallel" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/svg+xml" href="/src/assets/multiverse-service-orbit-icon.svg" sizes="any" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=purple-parallel" sizes="180x180" />
+    <title>MultiVerse · Coming soon</title>
+  </head>
+  <body><div id="root"></div><script type="module" src="/src/coming-soon.tsx"></script></body>
+</html>

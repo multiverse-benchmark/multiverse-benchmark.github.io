@@ -1,0 +1,905 @@
+/*
+ * Agentic Benchmark Checklist assessment: summary bars, the takeaway, and
+ * the full table. Tokens and the mark glyphs come
+ * from paper.css and principles.css (the benchmark comparison above it).
+ */
+.abc-root {
+  /* Height of the site's sticky header: the table header parks under it. */
+  --abc-sticky-top: 88px;
+  /* Bar fills. Satisfied and committed share the outcome green; "not satisfied" is the unfilled part of the track. */
+  --abc-fill: var(--mv-pass);
+  --abc-track: color-mix(in srgb, var(--mv-ink-3) 50%, var(--mv-card));
+  container: abc / inline-size;
+  margin-top: 84px;
+  scroll-margin-top: 20px;
+  font-family: var(--mv-body);
+  color: var(--mv-ink);
+}
+
+/* As the body of its own page section, under that section's heading. */
+.abc-root--section {
+  margin-top: 0;
+}
+
+.abc-root--section .abc-summary {
+  margin-top: 0;
+}
+
+.abc-lead {
+  max-width: 800px;
+  margin: 12px 0 0;
+  color: var(--mv-ink-2);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.abc-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--mv-green);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+
+.abc-source:hover {
+  color: var(--mv-green-dark);
+  text-decoration-thickness: 2px;
+}
+
+.abc-source:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/*
+ * ---- summary: one figure across the full width ---------------------------
+ * The text is on the left (the takeaway on top; under it, what the bars show
+ * and their key) and the bars are on the right, so that the bars get most of
+ * the width and no part of the row stays empty.
+ */
+.abc-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 0.74fr) minmax(0, 1.26fr);
+  gap: 22px 40px;
+  margin: 26px 0 0;
+  padding: 24px 28px;
+  border: 1px solid var(--mv-line);
+  border-radius: var(--mv-radius);
+  background: var(--mv-card);
+  box-shadow: var(--mv-shadow-sm);
+}
+
+.abc-summary-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 22px;
+  padding-right: 40px;
+  border-right: 1px solid var(--mv-line);
+}
+
+.abc-takeaway {
+  margin: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.abc-chart-title {
+  margin: 0;
+  color: var(--mv-ink-2);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.abc-bars {
+  display: grid;
+  align-content: center;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.abc-bar-row {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr) 74px;
+  align-items: center;
+  gap: 14px;
+  min-height: 30px;
+}
+
+.abc-bar-name {
+  color: var(--mv-ink);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.abc-bar-row[data-ours] .abc-bar-name {
+  font-family: var(--mv-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.abc-ours-tag {
+  display: block;
+  color: var(--mv-ink-3);
+  font-family: var(--mv-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+/* A thin segmented bar: widths are item counts out of all checklist items, with a surface gap between segments. */
+.abc-bar {
+  display: flex;
+  gap: 2px;
+  height: 8px;
+}
+
+.abc-seg {
+  flex: 0 1 0;
+  min-width: 2px;
+  height: 100%;
+}
+
+.abc-seg:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.abc-seg:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+.abc-seg:only-child {
+  border-radius: 4px;
+}
+
+.abc-seg--yes {
+  background: var(--abc-fill);
+}
+
+/* Committed: the same green, hatched, so it differs from "satisfied" by texture and not by hue. */
+.abc-seg--committed {
+  background: repeating-linear-gradient(135deg, var(--abc-fill) 0 2px, var(--mv-pass-tint) 2px 4px);
+  box-shadow: inset 0 0 0 1px var(--abc-fill);
+}
+
+.abc-seg--no {
+  background: var(--abc-track);
+}
+
+.abc-seg--na {
+  box-shadow: inset 0 0 0 1px var(--mv-line-strong);
+}
+
+.abc-seg,
+.abc-swatch {
+  /* Keep the fills when the system overrides colours. */
+  forced-color-adjust: none;
+}
+
+.abc-bar-score {
+  color: var(--mv-ink);
+  font-family: var(--mv-numeric);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.abc-bar-score strong {
+  font-weight: 700;
+}
+
+.abc-bar-of {
+  color: var(--mv-ink-3);
+  font-weight: 500;
+}
+
+.abc-bar-sub {
+  display: block;
+  margin-top: 2px;
+  color: var(--mv-ink-3);
+  font-family: var(--mv-body);
+  font-size: 10.5px;
+  font-weight: 500;
+}
+
+.abc-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 9px 0 0;
+  padding: 0;
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  line-height: 1.5;
+  list-style: none;
+}
+
+.abc-chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.abc-swatch {
+  flex: none;
+  width: 16px;
+  height: 8px;
+  border-radius: 4px;
+}
+
+/* Checklist item ids ("O.a.1"): set apart from the prose around them. */
+.abc-id {
+  flex: none;
+  padding: 1px 6px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: 4px;
+  background: var(--mv-sunken);
+  color: var(--mv-ink-2);
+  font-family: var(--mv-mono);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+/* ---- the "committed" glyph ---------------------------------------------- */
+.abc-icon-committed {
+  color: var(--mv-pass);
+  stroke-width: 1.7;
+}
+
+.abc-icon-ring {
+  stroke-dasharray: 2.1 1.9;
+  stroke-width: 1.2;
+}
+
+/* ---- full table ---------------------------------------------------------- */
+/* The column width is set here, not on .abc-root: a container query cannot restyle its own container. */
+.abc-figure {
+  --abc-mark-w: 118px;
+  margin: 44px 0 0;
+}
+
+.abc-caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 24px;
+  margin: 0 0 14px;
+  color: var(--mv-ink-3);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.abc-caption > span {
+  flex: 1 1 320px;
+}
+
+.abc-expand-all {
+  flex: none;
+  cursor: pointer;
+}
+
+/* overflow: clip rounds the corners without making the frame a scroll container, so the header can stick to the viewport. */
+.abc-frame {
+  overflow: clip;
+  border: 1px solid var(--mv-line);
+  border-radius: var(--mv-radius);
+  background: var(--mv-card);
+  box-shadow: var(--mv-shadow-sm);
+}
+
+.abc-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-body);
+  font-size: 13px;
+}
+
+.abc-colw-mark {
+  width: var(--abc-mark-w);
+}
+
+.abc-th {
+  position: sticky;
+  top: var(--abc-sticky-top);
+  z-index: 2;
+  padding: 13px 6px 12px;
+  border-bottom: 1px solid var(--mv-line-strong);
+  background: var(--mv-card);
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.3;
+  text-align: center;
+  vertical-align: bottom;
+}
+
+.abc-th--item {
+  padding-left: 18px;
+  color: var(--mv-ink-3);
+  font-size: 10.5px;
+  letter-spacing: 1.3px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.abc-th--mark[data-ours] {
+  border-top: 2px solid var(--mv-green);
+  background: var(--mv-green-tint);
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+/* Full names while the columns are wide; the paper's abbreviations otherwise. */
+.abc-bm-abbr {
+  display: none;
+}
+
+/* ---- one row per checklist category; it unfolds into its items ---------- */
+.abc-cat-row {
+  cursor: pointer;
+}
+
+.abc-cat-head,
+.abc-cat-cell {
+  border-bottom: 1px solid var(--mv-line);
+  background-color: var(--mv-card);
+  transition: background-color 0.12s ease;
+}
+
+.abc-cat-head {
+  padding: 0;
+  text-align: left;
+}
+
+.abc-cat-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px 10px;
+  width: 100%;
+  min-height: 60px;
+  padding: 12px 12px 12px 14px;
+  border: 0;
+  background: none;
+  color: var(--mv-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.abc-cat-toggle:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: -3px;
+  border-radius: var(--mv-radius-sm);
+}
+
+.abc-cat-icon {
+  flex: none;
+  color: var(--mv-ink-3);
+  transform: rotate(-90deg);
+  transition: transform 0.2s ease;
+}
+
+.abc-cat-row[data-open] .abc-cat-icon {
+  transform: none;
+}
+
+.abc-cat-title {
+  font-family: var(--mv-display);
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  line-height: 1.3;
+}
+
+.abc-cat-count {
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.abc-cat-cell {
+  padding: 10px 8px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.abc-cat-cell[data-ours] {
+  background-color: var(--mv-green-tint);
+}
+
+.abc-cat-row:hover > .abc-cat-head,
+.abc-cat-row:hover > .abc-cat-cell {
+  background-color: var(--mv-sunken);
+}
+
+.abc-cat-row:hover > .abc-cat-cell[data-ours] {
+  background-color: color-mix(in srgb, var(--mv-green-tint) 90%, var(--mv-green));
+}
+
+/* The count of satisfied items over the applicable ones, with a small meter of the same share under it. */
+.abc-frac {
+  display: block;
+  color: var(--mv-ink);
+  font-family: var(--mv-numeric);
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.abc-frac-of {
+  color: var(--mv-ink-3);
+  font-weight: 500;
+}
+
+.abc-meter {
+  display: block;
+  width: min(72px, 100%);
+  height: 4px;
+  margin: 6px auto 0;
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--mv-ink-3) 24%, var(--mv-card));
+  forced-color-adjust: none;
+}
+
+.abc-meter-fill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--abc-fill);
+}
+
+/* ---- the items of an open category --------------------------------------- */
+.abc-items[hidden] {
+  display: none;
+}
+
+.abc-item,
+.abc-cell {
+  border-bottom: 1px solid var(--mv-line);
+  background-color: var(--mv-card);
+  transition: background-color 0.12s ease;
+}
+
+/* The last item closes its category with a stronger rule. */
+.abc-items > .abc-row:last-child > * {
+  border-bottom-color: var(--mv-line-strong);
+}
+
+.abc-item {
+  padding: 8px 12px 8px 40px;
+  font-weight: 400;
+  text-align: left;
+  vertical-align: top;
+}
+
+.abc-item-inner {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.abc-definition-trigger {
+  border-radius: 4px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.abc-definition-trigger .abc-req {
+  text-decoration: underline dotted var(--mv-line-strong);
+  text-underline-offset: 3px;
+}
+
+.abc-definition-trigger:hover .abc-req {
+  text-decoration-color: currentColor;
+}
+
+.abc-definition-trigger:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 3px;
+}
+
+.abc-item .abc-id {
+  min-width: 46px;
+  text-align: center;
+}
+
+.abc-req {
+  min-width: 0;
+  color: var(--mv-ink);
+  font-size: 13px;
+  line-height: 18px;
+  overflow-wrap: break-word;
+}
+
+.abc-cell {
+  padding: 9px 0 6px;
+  text-align: center;
+  vertical-align: top;
+}
+
+.abc-cell[data-ours] {
+  background-color: var(--mv-green-tint);
+}
+
+.abc-row:hover > .abc-item,
+.abc-row:hover > .abc-cell {
+  background-color: var(--mv-sunken);
+}
+
+.abc-row:hover > .abc-cell[data-ours] {
+  background-color: color-mix(in srgb, var(--mv-green-tint) 90%, var(--mv-green));
+}
+
+/* Items that apply to none of the six benchmarks recede. */
+.abc-row[data-inapplicable] .abc-req {
+  color: var(--mv-ink-3);
+}
+
+.abc-cell-note {
+  position: absolute;
+  top: -5px;
+  right: -8px;
+  color: var(--mv-ink-2);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* Each cross opens a short assessment note. Portalling keeps it clear of the table's clipped frame. */
+.abc-explain-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  min-height: 30px;
+  margin: -6px 0 -5px;
+  padding: 6px;
+  border: 1px dotted var(--mv-line-strong);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--mv-ink);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.abc-explain-trigger:hover,
+.abc-explain-trigger[data-state='delayed-open'],
+.abc-explain-trigger[data-state='instant-open'] {
+  border-color: var(--mv-ink-3);
+  background: var(--mv-sunken);
+}
+
+.abc-explain-trigger:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+.abc-explanation {
+  z-index: 100;
+  width: min(340px, calc(100vw - 24px));
+  padding: 14px 16px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: var(--mv-radius);
+  background: var(--mv-card);
+  box-shadow: var(--mv-shadow-sm);
+  color: var(--mv-ink);
+  font-family: var(--mv-body);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+}
+
+.abc-explanation-heading {
+  margin: 0;
+  font-weight: 700;
+}
+
+.abc-explanation-requirement {
+  margin: 2px 0 0;
+  color: var(--mv-ink-3);
+}
+
+.abc-explanation-body {
+  margin: 8px 0 0;
+}
+
+.abc-explanation-arrow {
+  fill: var(--mv-card);
+}
+
+/* Total over all items. */
+.abc-total-label,
+.abc-total {
+  padding: 13px 8px;
+  border-top: 1px solid var(--mv-line-strong);
+  background: var(--mv-sunken);
+  vertical-align: middle;
+}
+
+/* The category rows above already end in a rule. */
+.abc-table tbody:last-of-type > tr:last-child > * {
+  border-bottom: 0;
+}
+
+.abc-total-label {
+  padding-left: 40px;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  text-align: left;
+}
+
+.abc-total {
+  text-align: center;
+}
+
+.abc-total .abc-frac {
+  font-size: 14.5px;
+}
+
+.abc-total:not([data-best]) .abc-frac {
+  font-weight: 600;
+}
+
+.abc-total[data-ours] {
+  background: color-mix(in srgb, var(--mv-green-tint) 80%, var(--mv-sunken));
+}
+
+/* ---- legend, notes, method ---------------------------------------------- */
+.abc-legend {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.abc-legend-marks,
+.abc-legend-names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The key to the abbreviations appears with them. */
+.abc-legend-names {
+  display: none;
+  color: var(--mv-ink-3);
+}
+
+.abc-legend-names strong {
+  color: var(--mv-ink-2);
+  font-weight: 650;
+}
+
+.abc-notes {
+  display: grid;
+  gap: 5px;
+  max-width: 860px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.abc-note-marker {
+  color: var(--mv-ink-2);
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .abc-item,
+  .abc-cell,
+  .abc-cat-head,
+  .abc-cat-cell,
+  .abc-cat-icon {
+    transition: none;
+  }
+}
+
+/* The site header is shorter on small screens. */
+@media (max-width: 800px) {
+  .abc-root {
+    --abc-sticky-top: 75px;
+  }
+}
+
+@media (max-width: 600px) {
+  .abc-root {
+    --abc-sticky-top: 69px;
+  }
+}
+
+/* ---- narrower containers ------------------------------------------------- */
+/* Abbreviated column heads, with their key under the table: the longest names need about 118px each. */
+@container abc (max-width: 1040px) {
+  .abc-figure {
+    --abc-mark-w: 68px;
+  }
+
+  .abc-bm-full {
+    display: none;
+  }
+
+  .abc-bm-abbr {
+    display: inline;
+  }
+
+  .abc-legend-names {
+    display: flex;
+  }
+}
+
+/* One column: the text first, then the bars. The divider moves from the side of the text to under it. */
+@container abc (max-width: 900px) {
+  .abc-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .abc-summary-text {
+    padding: 0 0 20px;
+    border-right: 0;
+    border-bottom: 1px solid var(--mv-line);
+  }
+
+  .abc-figure {
+    --abc-mark-w: 56px;
+  }
+}
+
+@container abc (max-width: 620px) {
+  .abc-figure {
+    --abc-mark-w: 38px;
+  }
+
+  .abc-lead {
+    font-size: 14px;
+  }
+
+  .abc-summary {
+    padding: 18px 16px 16px;
+  }
+
+  .abc-takeaway {
+    font-size: 17px;
+  }
+
+  /* The name and the total share a line; the bar takes the full width under them. */
+  .abc-bar-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px 12px;
+  }
+
+  .abc-bar {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+
+  .abc-ours-tag {
+    display: inline;
+    margin-left: 8px;
+  }
+
+  .abc-bar-sub {
+    display: inline;
+    margin: 0 0 0 8px;
+  }
+
+  .abc-th {
+    padding: 10px 2px 9px;
+  }
+
+  .abc-th--item,
+  .abc-item,
+  .abc-total-label {
+    padding-left: 12px;
+  }
+
+  .abc-item {
+    padding-right: 8px;
+  }
+
+  /* The chevron stays on the first line; the title and the item count stack beside it. */
+  .abc-cat-toggle {
+    display: grid;
+    grid-template-columns: 16px minmax(0, 1fr);
+    align-items: start;
+    gap: 2px 6px;
+    padding: 11px 6px 11px 10px;
+  }
+
+  .abc-cat-icon {
+    margin-top: 1px;
+  }
+
+  .abc-cat-title {
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
+
+  .abc-cat-count {
+    grid-column: 2;
+    font-size: 11px;
+  }
+
+  .abc-cat-cell,
+  .abc-total {
+    padding-right: 2px;
+    padding-left: 2px;
+  }
+
+  .abc-frac,
+  .abc-total .abc-frac {
+    font-size: 12px;
+  }
+
+  .abc-meter {
+    width: calc(100% - 8px);
+  }
+
+  /* The id sits above the requirement. */
+  .abc-item-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .abc-item .abc-id {
+    min-width: 0;
+  }
+
+  .abc-req {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .abc-total-label {
+    font-size: 13px;
+  }
+
+  /* "28/33" does not fit a narrow column on one line: the denominator goes under the count. */
+  .abc-frac-of {
+    display: block;
+  }
+}
+
+@container abc (max-width: 400px) {
+  .abc-figure {
+    --abc-mark-w: 33px;
+  }
+}

@@ -1,0 +1,8 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Message bubble -->
+  <path d="M64 16C35.28 16 12 36.86 12 62.67c0 14.12 7.04 26.76 18.13 35.36L24 116l21.67-8.13c5.76 1.76 11.84 2.8 18.33 2.8 28.72 0 52-20.86 52-46.67S92.72 16 64 16z" fill="white" stroke="white" stroke-width="2"/>
+  <!-- Three dots inside bubble -->
+  <circle cx="48" cy="62" r="6" fill="#34C759"/>
+  <circle cx="64" cy="62" r="6" fill="#34C759"/>
+  <circle cx="80" cy="62" r="6" fill="#34C759"/>
+</svg>

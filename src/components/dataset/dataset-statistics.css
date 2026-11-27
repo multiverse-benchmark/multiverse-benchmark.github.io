@@ -1,0 +1,1605 @@
+/*
+ * Dataset statistics (dst-). Tokens come from ../paper/paper.css.
+ *
+ * Layout. DatasetStatistics.tsx measures the section's own width and sets
+ * data-dst-layout on the root: "wide" from 980px, "medium" from 600px,
+ * "narrow" below. The rules for narrow are the defaults.
+ *
+ * Marks. One hue (--dst-series) where one series is shown. Columns and bars
+ * are at most 24px thick, rounded at the data end and square at the baseline,
+ * with at least 2px of surface between neighbours. Numbers that must align
+ * are set in Manrope, which has tabular figures; DM Sans, as served, has none.
+ */
+.dst {
+  --dst-series: var(--mv-green);
+  --dst-series-strong: var(--mv-green-dark);
+  --dst-if: var(--mv-realism);
+  --dst-mtif: var(--mv-user);
+  --dst-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  width: 100%;
+  min-width: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-body);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ---- headline numbers --------------------------------------------------- */
+.dst-intro {
+  max-width: 84ch;
+  margin: 0 0 26px;
+  color: var(--mv-ink-2);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.dst-facts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0 0 36px;
+  padding: 0;
+  list-style: none;
+}
+
+/* Narrow: the number beside its label. */
+.dst-fact {
+  display: grid;
+  grid-template-columns: 102px minmax(0, 1fr);
+  column-gap: 14px;
+  align-content: start;
+  padding: 14px 0 15px;
+  border-top: 1px solid var(--mv-line-strong);
+}
+
+.dst-fact-value {
+  grid-row: 1 / span 2;
+  margin: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -1.2px;
+  line-height: 1.15;
+}
+
+.dst-fact-label {
+  margin: 3px 0 0;
+  color: var(--mv-ink);
+  font-size: 14px;
+  font-weight: 550;
+  line-height: 1.4;
+}
+
+.dst-fact-detail {
+  margin: 2px 0 0;
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.dst[data-dst-layout='medium'] .dst-facts,
+.dst[data-dst-layout='wide'] .dst-facts {
+  column-gap: 40px;
+  margin-bottom: 44px;
+}
+
+.dst[data-dst-layout='medium'] .dst-facts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.dst[data-dst-layout='wide'] .dst-facts {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.dst[data-dst-layout='medium'] .dst-fact,
+.dst[data-dst-layout='wide'] .dst-fact {
+  display: block;
+  padding: 18px 0 24px;
+}
+
+.dst[data-dst-layout='medium'] .dst-fact-value,
+.dst[data-dst-layout='wide'] .dst-fact-value {
+  font-size: 44px;
+  letter-spacing: -1.8px;
+  line-height: 1.1;
+}
+
+.dst[data-dst-layout='medium'] .dst-fact-label,
+.dst[data-dst-layout='wide'] .dst-fact-label {
+  margin-top: 9px;
+}
+
+/* ---- cards -------------------------------------------------------------- */
+.dst-card {
+  position: relative;
+  margin: 0 0 24px;
+  padding: 16px 14px 14px;
+}
+
+.dst-card:last-child {
+  margin-bottom: 0;
+}
+
+.dst[data-dst-layout='medium'] .dst-card {
+  padding: 22px 22px 18px;
+}
+
+.dst[data-dst-layout='wide'] .dst-card {
+  padding: 26px 28px 20px;
+}
+
+.dst-card-head {
+  margin-bottom: 20px;
+}
+
+.dst-card-head--split {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px 32px;
+}
+
+/* The text keeps a readable measure: the control or legend moves under it when there is less room. */
+.dst-card-head--split > div:first-child {
+  flex: 1 1 560px;
+  min-width: 0;
+}
+
+.dst-card-title {
+  margin: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+  line-height: 1.3;
+}
+
+.dst-card-lead {
+  max-width: 88ch;
+  margin: 6px 0 0;
+  color: var(--mv-ink-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.dst-card-control {
+  display: flex;
+  max-width: 100%;
+}
+
+/* Narrow: the two options of the control share the full width, one above the other when they do not fit. */
+.dst[data-dst-layout='narrow'] .dst-card-control {
+  width: 100%;
+}
+
+.dst[data-dst-layout='narrow'] .dst-card-control > .mv-seg-field {
+  flex: 1 1 auto;
+}
+
+.dst[data-dst-layout='narrow'] .dst-card-control .mv-seg {
+  display: flex;
+  flex: 1 1 100%;
+}
+
+.dst[data-dst-layout='narrow'] .dst-card-control .mv-seg-option {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+.dst-sub-title {
+  margin: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  line-height: 1.4;
+}
+
+.dst-figure-block {
+  margin: 0;
+}
+
+.dst-caption-text {
+  max-width: 96ch;
+  margin: 16px 0 0;
+  color: var(--mv-ink-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Two labelled lines of text: a definition and the paper's sentence, or a definition and an example. */
+.dst-notes {
+  display: grid;
+  row-gap: 8px;
+  margin: 0;
+}
+
+.dst-notes > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 1px;
+}
+
+.dst-notes dt {
+  color: var(--mv-ink-3);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.9px;
+  line-height: 21px;
+  text-transform: uppercase;
+}
+
+.dst-notes dd {
+  max-width: 96ch;
+  margin: 0;
+  color: var(--mv-ink-2);
+  font-size: 13px;
+  line-height: 21px;
+}
+
+.dst[data-dst-layout='medium'] .dst-notes > div,
+.dst[data-dst-layout='wide'] .dst-notes > div {
+  grid-template-columns: 116px minmax(0, 1fr);
+  column-gap: 14px;
+}
+
+/* ---- card foot: links and the table toggle ------------------------------ */
+.dst-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px 24px;
+  margin-top: 16px;
+  padding-top: 10px;
+  border-top: 1px solid var(--mv-line);
+}
+
+.dst-foot--end {
+  justify-content: flex-end;
+}
+
+/* One link per line, so the row keeps its height whatever the length of the unit. */
+.dst-links {
+  flex: 1 1 280px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dst-link {
+  min-height: 32px;
+  border-radius: 4px;
+  text-align: left;
+}
+
+/* A link to a task may wrap; its arrow stays with the value at its end. */
+.dst-links .dst-link {
+  display: inline-block;
+  padding: 7px 0;
+  line-height: 18px;
+}
+
+.dst-nowrap {
+  white-space: nowrap;
+}
+
+.dst-links .dst-link svg {
+  display: inline;
+  margin-left: 5px;
+  vertical-align: -2px;
+}
+
+.dst-table-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  margin-left: auto;
+  padding: 4px 11px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: var(--mv-radius-sm);
+  background: var(--mv-card);
+  color: var(--mv-ink-2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.dst-table-toggle:hover {
+  border-color: var(--mv-sage);
+  color: var(--mv-ink);
+}
+
+.dst-table-toggle svg {
+  flex: none;
+  color: var(--mv-ink-3);
+}
+
+.dst-table-toggle:focus-visible,
+.dst-table-scroll:focus-visible,
+.dst-select:focus-visible,
+.dst-choice-option:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+/* ---- table views -------------------------------------------------------- */
+.dst-table-box {
+  margin-top: 14px;
+  border: 1px solid var(--mv-line);
+  border-radius: var(--mv-radius-sm);
+}
+
+/* The title does not scroll with a wide table. */
+.dst-table-title {
+  margin: 0;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--mv-line);
+  border-radius: var(--mv-radius-sm) var(--mv-radius-sm) 0 0;
+  background: var(--mv-sunken);
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.dst-table-scroll {
+  overflow-x: auto;
+  border-radius: 0 0 var(--mv-radius-sm) var(--mv-radius-sm);
+}
+
+.dst-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.dst-table th,
+.dst-table td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--mv-line);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.dst-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.dst-table thead th {
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  font-weight: 650;
+  vertical-align: bottom;
+}
+
+.dst-table td {
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The first column stays in view when a wide table scrolls. */
+.dst-table th:first-child {
+  position: sticky;
+  left: 0;
+  background: var(--mv-card);
+  text-align: left;
+}
+
+.dst-table tbody th {
+  color: var(--mv-ink);
+  font-weight: 550;
+}
+
+.dst-table .dst-cell-text {
+  min-width: 230px;
+  color: var(--mv-ink-2);
+  font-family: var(--mv-body);
+  text-align: left;
+  white-space: normal;
+}
+
+.dst-table .dst-cell-id {
+  color: var(--mv-ink-2);
+  font-family: var(--mv-mono);
+  font-size: 12px;
+  text-align: left;
+}
+
+.dst-table--text thead th:nth-child(n + 5) {
+  text-align: left;
+}
+
+.dst-table--text tbody th {
+  min-width: 150px;
+  white-space: normal;
+}
+
+/* ---- single-choice controls --------------------------------------------- */
+.dst-choice--segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  max-width: 100%;
+}
+
+/* An option the selected quantity is not defined for. */
+.dst-choice .mv-seg-option:disabled {
+  color: var(--mv-ink-3);
+  text-decoration: line-through;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dst-choice .mv-seg-option:disabled:hover {
+  background: transparent;
+}
+
+.dst[data-dst-layout='narrow'] .dst-choice .mv-seg-option {
+  padding-right: 10px;
+  padding-left: 10px;
+}
+
+/* The quantities as a vertical list (wide layout). The selected option carries a bar as well as a tint. */
+.dst-choice--list .mv-seg-label {
+  display: block;
+  margin-bottom: 10px;
+  line-height: 20px;
+}
+
+.dst-choice-list {
+  display: grid;
+  row-gap: 2px;
+}
+
+.dst-choice-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 6px 10px 6px 16px;
+  border: 0;
+  border-radius: var(--mv-radius-sm);
+  background: transparent;
+  color: var(--mv-ink-2);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dst-choice-option::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 5px;
+  width: 3px;
+  border-radius: 2px;
+  background: transparent;
+}
+
+.dst-choice-option:hover {
+  background: var(--mv-sunken);
+}
+
+.dst-choice-option[aria-checked='true'] {
+  background: var(--mv-green-tint);
+  color: var(--mv-ink);
+  font-weight: 600;
+}
+
+.dst-choice-option[aria-checked='true']::before {
+  background: var(--mv-green);
+}
+
+/* The quantities as a native select (medium and narrow layouts). */
+.dst-select-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.dst-select-box {
+  position: relative;
+  display: inline-flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.dst-select {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 34px 8px 12px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: 8px;
+  background: var(--mv-card);
+  color: var(--mv-ink);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 550;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* iOS zooms the page when a control with text under 16px takes focus. */
+@supports (-webkit-touch-callout: none) {
+  .dst[data-dst-layout='narrow'] .dst-select {
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+.dst-select:hover {
+  border-color: var(--mv-sage);
+}
+
+.dst-select-box svg {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  margin-top: -7px;
+  color: var(--mv-ink-3);
+  pointer-events: none;
+}
+
+.dst[data-dst-layout='medium'] .dst-select-box {
+  flex: 0 1 auto;
+}
+
+.dst[data-dst-layout='medium'] .dst-select {
+  width: auto;
+  font-size: 13px;
+}
+
+/* ---- distribution card -------------------------------------------------- */
+.dst-dist-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.dst-dist-main {
+  min-width: 0;
+}
+
+.dst-dist-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 28px;
+  margin-bottom: 18px;
+}
+
+.dst-figure {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 18px;
+  margin: 0;
+}
+
+.dst[data-dst-layout='wide'] .dst-dist-grid {
+  grid-template-columns: 268px minmax(0, 1fr);
+  column-gap: 30px;
+}
+
+.dst[data-dst-layout='wide'] .dst-quantity {
+  padding-right: 20px;
+  border-right: 1px solid var(--mv-line);
+}
+
+.dst[data-dst-layout='wide'] .dst-figure {
+  grid-template-columns: minmax(0, 1fr) 208px;
+  column-gap: 34px;
+}
+
+.dst[data-dst-layout='wide'] .dst-caption {
+  grid-column: 1 / -1;
+}
+
+/*
+ * A stack holds the texts of all nine quantities. Narrow: only the selected
+ * one takes space. Medium and wide: they share one grid cell and the others
+ * are invisible, so the stack is as tall as the longest text and the card
+ * keeps its height when the quantity changes.
+ */
+.dst-stack > .dst-notes:not([data-current]) {
+  display: none;
+}
+
+.dst[data-dst-layout='medium'] .dst-stack,
+.dst[data-dst-layout='wide'] .dst-stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.dst[data-dst-layout='medium'] .dst-stack > .dst-notes,
+.dst[data-dst-layout='wide'] .dst-stack > .dst-notes {
+  display: grid;
+  grid-area: 1 / 1;
+  align-content: start;
+}
+
+.dst[data-dst-layout='medium'] .dst-stack > .dst-notes:not([data-current]),
+.dst[data-dst-layout='wide'] .dst-stack > .dst-notes:not([data-current]) {
+  visibility: hidden;
+}
+
+/* Wide: the definition of the selected quantity, under the list of quantities. */
+.dst-quantity-text {
+  margin-top: 18px;
+  padding: 14px 4px 0 16px;
+  border-top: 1px solid var(--mv-line);
+}
+
+.dst[data-dst-layout='wide'] .dst-quantity-text .dst-notes > div {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.dst-quantity-text .dst-notes dd {
+  font-size: 12px;
+  line-height: 19px;
+}
+
+/* ---- histogram ---------------------------------------------------------- */
+.dst-hist {
+  --dst-plot-h: 210px;
+  --dst-yaxis-w: 30px;
+
+  position: relative;
+  min-width: 0;
+}
+
+.dst[data-dst-layout='medium'] .dst-hist,
+.dst[data-dst-layout='wide'] .dst-hist {
+  --dst-plot-h: 260px;
+  --dst-yaxis-w: 34px;
+}
+
+/* Above the plot: the count axis title, and what the two vertical markers are. */
+.dst-hist-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 20px;
+  margin-bottom: 16px;
+}
+
+.dst-axis-title {
+  color: var(--mv-ink-3);
+  font-size: 11px;
+  line-height: 20px;
+}
+
+.dst-key {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  line-height: 20px;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.dst-key li {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dst-key b {
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+
+.dst-glyph {
+  flex: none;
+  overflow: visible;
+}
+
+/* Median: a filled triangle with a ring of the surface colour, so it stays apart from the mean's when the two meet. */
+.dst-glyph--median path {
+  fill: var(--mv-ink);
+  stroke: var(--mv-card);
+  stroke-linejoin: round;
+  stroke-width: 3;
+  paint-order: stroke;
+}
+
+/* Mean: an open triangle. */
+.dst-glyph--mean path {
+  fill: var(--mv-card);
+  stroke: var(--mv-ink-3);
+  stroke-linejoin: round;
+  stroke-width: 1.3;
+}
+
+.dst-hist-body {
+  display: grid;
+  grid-template-columns: var(--dst-yaxis-w) minmax(0, 1fr);
+}
+
+.dst-yaxis {
+  position: relative;
+  height: var(--dst-plot-h);
+}
+
+.dst-ytick {
+  position: absolute;
+  right: 8px;
+  height: 14px;
+  margin-bottom: -7px;
+  color: var(--mv-ink-3);
+  font-family: var(--mv-display);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  line-height: 14px;
+}
+
+.dst-plot {
+  position: relative;
+  height: var(--dst-plot-h);
+}
+
+/* The baseline lies directly under the plot, so column heights are fractions of the plot's own height. */
+.dst-plot::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--mv-line-strong);
+}
+
+.dst-gridline {
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--mv-line);
+  pointer-events: none;
+}
+
+/* The slot of the column under the pointer or with keyboard focus. */
+.dst-band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(100% / var(--dst-n) * var(--dst-i));
+  width: calc(100% / var(--dst-n));
+  background: var(--mv-sunken);
+  pointer-events: none;
+}
+
+.dst-cols {
+  position: absolute;
+  inset: 0;
+}
+
+/*
+ * A column: centred in its slot, 2px narrower than the slot and at most 24px
+ * wide. Its height is its count as a fraction of the top of the count axis.
+ */
+.dst-col {
+  --dst-slot: calc(100% / var(--dst-n));
+  --dst-bar: min(24px, var(--dst-slot) - 2px);
+
+  position: absolute;
+  bottom: 0;
+  left: calc(var(--dst-slot) * var(--dst-i) + (var(--dst-slot) - var(--dst-bar)) / 2);
+  width: var(--dst-bar);
+  border-radius: 4px 4px 0 0;
+  background: var(--dst-series);
+  transition: height 0.3s var(--dst-ease), background-color 0.12s ease;
+  animation: dst-rise 0.3s var(--dst-ease);
+}
+
+@keyframes dst-rise {
+  from {
+    height: 0;
+  }
+}
+
+.dst-col[data-active] {
+  background: var(--dst-series-strong);
+}
+
+.dst-col:focus {
+  outline: none;
+}
+
+.dst-col:focus-visible {
+  z-index: 1;
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+/*
+ * Median and mean: a triangle above the plot and a vertical rule under it.
+ * The rules lie behind the columns, so a rule is seen above the column it
+ * passes through and never draws stripes on it.
+ */
+.dst-marker {
+  position: absolute;
+  top: -11px;
+  bottom: 0;
+  width: 0;
+  pointer-events: none;
+  transition: left 0.3s var(--dst-ease);
+}
+
+.dst-marker::after {
+  content: '';
+  position: absolute;
+  top: 9px;
+  bottom: 0;
+}
+
+.dst-marker--median::after {
+  left: -1px;
+  width: 2px;
+  background: var(--mv-ink);
+}
+
+.dst-marker--mean::after {
+  left: 0;
+  width: 1px;
+  background: var(--mv-ink-3);
+}
+
+.dst-marker .dst-glyph {
+  position: absolute;
+  top: 0;
+  left: -4.5px;
+}
+
+.dst-marker--mean .dst-glyph {
+  left: -4px;
+}
+
+.dst-xaxis {
+  position: relative;
+  height: 24px;
+  margin-left: var(--dst-yaxis-w);
+}
+
+.dst-xtick {
+  position: absolute;
+  top: 8px;
+  color: var(--mv-ink-3);
+  font-family: var(--mv-display);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  line-height: 14px;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+/* Labels at bin edges carry a tick mark. */
+.dst-xaxis--edges .dst-xtick::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  width: 1px;
+  height: 4px;
+  background: var(--mv-line-strong);
+}
+
+.dst-xaxis-title {
+  margin: 3px 0 0 var(--dst-yaxis-w);
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+}
+
+/* ---- summary beside or under the histogram ------------------------------ */
+.dst-side {
+  min-width: 0;
+}
+
+.dst-summary {
+  margin: 0;
+  border-top: 1px solid var(--mv-line);
+}
+
+.dst-summary-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--mv-line);
+}
+
+.dst-summary dt {
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.dst-summary dd {
+  margin: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  line-height: 20px;
+}
+
+.dst-medians {
+  width: 100%;
+  margin-top: 16px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.dst-medians caption {
+  padding-bottom: 6px;
+  color: var(--mv-ink-3);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.9px;
+  line-height: 18px;
+  text-align: left;
+  text-transform: uppercase;
+  caption-side: top;
+}
+
+.dst-medians th,
+.dst-medians td {
+  padding: 4px 6px;
+  text-align: left;
+}
+
+.dst-medians th {
+  border-bottom: 1px solid var(--mv-line);
+  color: var(--mv-ink-2);
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 16px;
+}
+
+.dst-medians td {
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+/* The selected setting's column. */
+.dst-medians [data-current] {
+  background: var(--mv-green-tint);
+}
+
+.dst-medians td[data-current] {
+  font-weight: 750;
+}
+
+/* Medium: the five numbers in a row, the medians by setting beside them, or under them where the row would be cramped. */
+.dst[data-dst-layout='medium'] .dst-side {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 18px 32px;
+}
+
+.dst[data-dst-layout='medium'] .dst-summary {
+  display: grid;
+  flex: 1 1 400px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-top: 0;
+}
+
+.dst[data-dst-layout='medium'] .dst-summary-row {
+  display: block;
+  padding: 0;
+  border-bottom: 0;
+}
+
+.dst[data-dst-layout='medium'] .dst-summary dt {
+  color: var(--mv-ink-3);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.9px;
+  line-height: 18px;
+  text-transform: uppercase;
+}
+
+.dst[data-dst-layout='medium'] .dst-summary dd {
+  margin-top: 4px;
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.dst[data-dst-layout='medium'] .dst-medians {
+  flex: none;
+  width: 236px;
+  margin-top: 0;
+}
+
+/* ---- tooltip ------------------------------------------------------------ */
+.dst-tip {
+  position: absolute;
+  z-index: 6;
+  width: max-content;
+  max-width: min(268px, 100%);
+  padding: 10px 12px 11px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: var(--mv-radius);
+  background: var(--mv-card);
+  box-shadow: var(--mv-shadow), var(--mv-shadow-sm);
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  line-height: 1.5;
+  pointer-events: none;
+}
+
+.dst-tip p {
+  margin: 0;
+}
+
+.dst-tip-title {
+  color: var(--mv-ink-2);
+  font-weight: 550;
+}
+
+.dst-tip-value strong {
+  margin-right: 2px;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 22px;
+  font-weight: 650;
+  letter-spacing: -0.5px;
+  line-height: 1.25;
+}
+
+.dst-tip-line {
+  color: var(--mv-ink-3);
+}
+
+.dst-tip-name {
+  color: var(--mv-ink);
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.dst-tip-id {
+  color: var(--mv-ink-3);
+  font-family: var(--mv-mono);
+  font-size: 11px;
+}
+
+.dst-tip-split,
+.dst-tip-rows,
+.dst-tip .dst-tip-keys {
+  margin: 8px 0 0;
+  padding-top: 7px;
+  border-top: 1px solid var(--mv-line);
+}
+
+.dst-tip-split {
+  display: grid;
+  grid-auto-columns: minmax(34px, 1fr);
+  grid-auto-flow: column;
+  column-gap: 12px;
+}
+
+.dst-tip-split dt {
+  color: var(--mv-ink-3);
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.6px;
+  line-height: 14px;
+}
+
+.dst-tip-split dd,
+.dst-tip-rows dd {
+  margin: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+
+.dst-tip-split dd {
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.dst-tip-rows > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+  line-height: 1.75;
+}
+
+.dst-tip-rows [data-current] dt {
+  color: var(--mv-ink);
+  font-weight: 650;
+}
+
+.dst-tip .dst-tip-keys {
+  color: var(--mv-ink-3);
+  font-size: 11px;
+}
+
+/* ---- services ----------------------------------------------------------- */
+.dst-svc {
+  position: relative;
+}
+
+.dst-svc-columns {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  column-gap: 44px;
+  align-items: start;
+}
+
+.dst-svc-group + .dst-svc-group {
+  margin-top: 20px;
+}
+
+/* Each column of groups is a size container, so a family header can adapt to the column's width. */
+.dst-svc-column {
+  container: dst-svc-column / inline-size;
+  min-width: 0;
+}
+
+/* Family header: its name, and its subtotal at the right. Neither breaks; the subtotal wraps as a whole if it must. */
+.dst-svc-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0 12px;
+  margin: 0 0 4px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--mv-line);
+  color: var(--mv-ink);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.dst-svc-head > span {
+  white-space: nowrap;
+}
+
+.dst-svc-total {
+  color: var(--mv-ink-3);
+  font-weight: 500;
+}
+
+/*
+ * The subtotal of the usage view is long. In a column too narrow for the
+ * longest header (281px, plus a margin), it goes under the name in every
+ * group alike.
+ */
+@container dst-svc-column (max-width: 289px) {
+  .dst-svc[data-metric='goldTasks'] .dst-svc-head {
+    display: block;
+  }
+
+  .dst-svc[data-metric='goldTasks'] .dst-svc-total {
+    display: block;
+  }
+}
+
+.dst-svc-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A row is a hover and focus target, so it is 32px tall although its bar is thin. */
+.dst-svc-row {
+  display: grid;
+  grid-template-columns: 114px minmax(0, 1fr);
+  column-gap: 10px;
+  align-items: center;
+  min-height: 32px;
+  margin: 0 -6px;
+  padding: 0 6px;
+  border-radius: var(--mv-radius-sm);
+  cursor: default;
+}
+
+.dst-svc-row[data-active] {
+  background: var(--mv-sunken);
+}
+
+.dst-svc-row:focus {
+  outline: none;
+}
+
+.dst-svc-row:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+.dst-svc-name {
+  overflow: hidden;
+  min-width: 0;
+  color: var(--mv-ink);
+  font-size: 13px;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dst-svc-track,
+.dst-rub-track,
+.dst-fam-track {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+/* A horizontal bar: 8px thick, rounded at the data end. */
+.dst-bar {
+  flex: none;
+  height: 8px;
+  border-radius: 0 4px 4px 0;
+  background: var(--dst-series);
+}
+
+/* The longest bar leaves room for its value. */
+.dst-svc-track .dst-bar {
+  width: calc((100% - 36px) * var(--dst-v));
+}
+
+.dst-svc-row[data-active] .dst-bar {
+  background: var(--dst-series-strong);
+}
+
+.dst-bar-value {
+  margin-left: 6px;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  line-height: 14px;
+  white-space: nowrap;
+}
+
+/* ---- service families --------------------------------------------------- */
+.dst-fam {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 10px;
+  margin: 26px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--mv-line);
+}
+
+.dst-fam .dst-caption-text {
+  margin-top: 4px;
+}
+
+.dst-fam-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Narrow: the family name on its own line above the bar. */
+.dst-fam-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px 64px;
+  column-gap: 10px;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.dst-fam-name {
+  grid-column: 1 / -1;
+  color: var(--mv-ink);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.dst-fam-track .dst-bar {
+  width: calc(100% * var(--dst-v));
+}
+
+.dst-fam-share,
+.dst-fam-pairs {
+  font-family: var(--mv-display);
+  font-variant-numeric: tabular-nums;
+  line-height: 18px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.dst-fam-share {
+  color: var(--mv-ink);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.dst-fam-pairs {
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.dst[data-dst-layout='medium'] .dst-fam-row,
+.dst[data-dst-layout='wide'] .dst-fam-row {
+  grid-template-columns: 176px minmax(0, 1fr) 48px 74px;
+  column-gap: 12px;
+  min-height: 28px;
+  padding: 0;
+}
+
+.dst[data-dst-layout='medium'] .dst-fam-name,
+.dst[data-dst-layout='wide'] .dst-fam-name {
+  grid-column: auto;
+}
+
+.dst[data-dst-layout='wide'] .dst-fam {
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  column-gap: 52px;
+}
+
+.dst[data-dst-layout='wide'] .dst-fam .dst-sub-title {
+  grid-column: 1 / -1;
+}
+
+.dst[data-dst-layout='wide'] .dst-fam .dst-caption-text {
+  margin-top: 3px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ---- rubric categories -------------------------------------------------- */
+.dst-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin: 3px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dst-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.dst-swatch {
+  flex: none;
+  width: 14px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.dst-swatch--if,
+.dst-bar--if {
+  background: var(--dst-if);
+}
+
+.dst-swatch--mtif,
+.dst-bar--mtif {
+  background: var(--dst-mtif);
+}
+
+.dst-legend-name {
+  color: var(--mv-ink);
+  font-weight: 650;
+}
+
+.dst-legend-note {
+  color: var(--mv-ink-3);
+}
+
+.dst-rub-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 20px;
+  margin-bottom: 6px;
+}
+
+.dst-hint {
+  margin: 0;
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.dst-rub-rows {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--mv-line);
+  list-style: none;
+}
+
+.dst-rub-item {
+  border-bottom: 1px solid var(--mv-line);
+}
+
+/* Narrow: the category above its two bars. The whole row is the toggle's target. */
+.dst-rub-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 6px;
+  margin: 0 -6px;
+  padding: 9px 6px 10px;
+  border-radius: var(--mv-radius-sm);
+}
+
+.dst-rub-row:hover {
+  background: var(--mv-sunken);
+}
+
+.dst-rub-name {
+  min-width: 0;
+  margin: 0;
+}
+
+.dst-rub-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mv-ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 18px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dst-rub-toggle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--mv-radius-sm);
+}
+
+.dst-rub-toggle:focus {
+  outline: none;
+}
+
+.dst-rub-toggle:focus-visible::after {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+.dst-rub-chevron {
+  flex: none;
+  margin-top: 1.5px;
+  color: var(--mv-ink-3);
+  transition: transform 0.15s ease;
+}
+
+.dst-rub-item[data-open] .dst-rub-chevron {
+  transform: rotate(90deg);
+}
+
+.dst-rub-bars {
+  min-width: 0;
+}
+
+/* One line per series: its name, its bar, its value. */
+.dst-rub-line {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  column-gap: 8px;
+  align-items: center;
+  height: 16px;
+}
+
+.dst-rub-series {
+  color: var(--mv-ink-3);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+.dst-rub-track .dst-bar {
+  width: calc((100% - 34px) * var(--dst-v));
+}
+
+.dst-rub-detail {
+  padding: 4px 0 14px 21px;
+}
+
+.dst[data-dst-layout='medium'] .dst-rub-row,
+.dst[data-dst-layout='wide'] .dst-rub-row {
+  grid-template-columns: 232px minmax(0, 1fr);
+  column-gap: 20px;
+  align-items: center;
+  min-height: 50px;
+  padding: 7px 6px;
+}
+
+.dst[data-dst-layout='wide'] .dst-rub-row {
+  grid-template-columns: 330px minmax(0, 1fr);
+}
+
+.dst[data-dst-layout='medium'] .dst-rub-series,
+.dst[data-dst-layout='wide'] .dst-rub-series {
+  text-align: right;
+}
+
+.dst[data-dst-layout='medium'] .dst-rub-line,
+.dst[data-dst-layout='wide'] .dst-rub-line {
+  grid-template-columns: 34px minmax(0, 1fr);
+}
+
+/* ---- motion and forced colours ------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .dst *,
+  .dst *::before,
+  .dst *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Keep the marks when the system replaces page colours, and keep the selected option recognisable without its tint. */
+@media (forced-colors: active) {
+  .dst-col,
+  .dst-bar,
+  .dst-swatch,
+  .dst-gridline,
+  .dst-marker::after,
+  .dst-plot::after,
+  .dst-choice-option::before {
+    forced-color-adjust: none;
+  }
+
+  .dst .mv-seg-option[aria-checked='true'],
+  .dst-choice-option[aria-checked='true'] {
+    outline: 2px solid CanvasText;
+    outline-offset: -2px;
+  }
+}

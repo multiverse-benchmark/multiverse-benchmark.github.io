@@ -1,0 +1,3067 @@
+[
+  {
+    "name": "clear_primary_calendar",
+    "description": "Clears the primary calendar by deleting all events and associated recurring exceptions. Only the primary calendar can be cleared using this operation. Attempting to clear a non-primary calendar will result in an error.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The identifier of the primary calendar. Use the keyword \"primary\" to access the primary calendar of the currently logged-in user, or provide the actual calendar ID of the primary calendar. Only primary calendars can be cleared with this operation.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "calendarId"
+      ]
+    }
+  },
+  {
+    "name": "create_access_control_rule",
+    "description": "Creates a new access control rule for the specified calendar.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The ID of the calendar to create the rule for.",
+          "type": "string"
+        },
+        "sendNotifications": {
+          "description": "Whether to send notifications to the rule's scope. Defaults to True.",
+          "type": "boolean",
+          "default": true,
+          "nullable": true
+        },
+        "resource": {
+          "description": "The rule details.\n- role (str): The role to assign (e.g., 'reader', 'writer').\n- scope (dict): The scope of the rule:\n    - type (str): The type of scope (e.g., 'user', 'group', 'domain', 'default').\n    - value (str): The value of the scope (e.g., email address or domain). Required when type is 'user', 'group', or 'domain'; empty string for type 'default'.\n- ruleId (str, optional): The ID of the rule. If not provided, one will be generated.",
+          "type": "object",
+          "properties": {
+            "role": {
+              "description": "The role to assign (e.g., 'reader', 'writer').",
+              "type": "string",
+              "enum": [
+                "none",
+                "freeBusyReader",
+                "reader",
+                "writer",
+                "owner"
+              ]
+            },
+            "scope": {
+              "description": "The scope of the rule:",
+              "type": "object",
+              "properties": {
+                "type": {
+                  "description": "The type of scope (e.g., 'user', 'group', 'domain', 'default').",
+                  "type": "string",
+                  "enum": [
+                    "user",
+                    "domain",
+                    "group",
+                    "default"
+                  ]
+                },
+                "value": {
+                  "description": "The value of the scope (e.g., email address or domain). Required when type is 'user', 'group', or 'domain'; empty string for type 'default'.",
+                  "type": "string",
+                  "default": ""
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "ruleId": {
+              "description": "The ID of the rule. If not provided, one will be generated.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [
+            "role",
+            "scope"
+          ]
+        }
+      },
+      "required": [
+        "calendarId",
+        "resource"
+      ]
+    }
+  },
+  {
+    "name": "create_calendar_list_entry",
+    "description": "Creates a new calendar list entry in the user's calendar list.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "colorRgbFormat": {
+          "description": "Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.",
+          "type": "boolean",
+          "default": false
+        },
+        "resource": {
+          "description": "The resource to create the calendar list entry with.",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "The ID of the calendar list entry. Cannot be empty and must not exceed 255 characters.",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "summary": {
+              "description": "READ-ONLY: The summary comes from the underlying calendar. This field is ignored if sent.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "description": {
+              "description": "READ-ONLY: The description comes from the underlying calendar. This field is ignored if sent.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "timeZone": {
+              "description": "READ-ONLY: The timeZone comes from the underlying calendar. This field is ignored if sent.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "location": {
+              "description": "READ-ONLY: The location comes from the underlying calendar. This field is ignored if sent.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "primary": {
+              "description": "READ-ONLY: The primary flag comes from the underlying calendar. This field is ignored if sent.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "summaryOverride": {
+              "description": "The summary that the authenticated user has set for this calendar. This overrides the read-only summary field for display purposes.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "selected": {
+              "description": "Whether the calendar content shows up in the calendar UI. Defaults to False.",
+              "type": "boolean",
+              "nullable": false,
+              "default": false
+            },
+            "colorId": {
+              "description": "The color of the calendar. This is an ID referring to an entry in the calendar section of the colors definition (see the colors endpoint). This property is superseded by the backgroundColor and foregroundColor properties and can be ignored when using these properties. Optional.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "backgroundColor": {
+              "description": "The main color of the calendar in the hexadecimal format '#0088aa'. This property supersedes the index-based colorId property. To set or change this property, you need to specify colorRgbFormat=true. Must be provided together with foregroundColor. Optional.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "foregroundColor": {
+              "description": "The foreground color of the calendar in the hexadecimal format '#ffffff'. This property supersedes the index-based colorId property. To set or change this property, you need to specify colorRgbFormat=true. Must be provided together with backgroundColor. Optional.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "hidden": {
+              "description": "Whether the calendar has been hidden from the list. Defaults to False.",
+              "type": "boolean",
+              "nullable": false,
+              "default": false
+            },
+            "notificationSettings": {
+              "description": "The notifications that the authenticated user is receiving for this calendar. Defaults to empty notifications list.",
+              "type": "object",
+              "nullable": false,
+              "default": {
+                "notifications": []
+              },
+              "properties": {
+                "notifications": {
+                  "description": "The list of notifications set for this calendar.",
+                  "type": "array",
+                  "default": [],
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "description": "The type of notification.",
+                        "type": "string",
+                        "enum": [
+                          "eventCreation",
+                          "eventChange",
+                          "eventCancellation",
+                          "eventResponse",
+                          "agenda"
+                        ]
+                      },
+                      "method": {
+                        "description": "The method used to deliver the notification.",
+                        "type": "string",
+                        "enum": [
+                          "email"
+                        ],
+                        "default": "email"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  }
+                }
+              },
+              "required": []
+            },
+            "defaultReminders": {
+              "description": "The default reminders that the authenticated user has for this calendar. Defaults to empty list.",
+              "type": "array",
+              "nullable": false,
+              "default": [],
+              "items": {
+                "type": "object",
+                "properties": {
+                  "method": {
+                    "description": "The method used to deliver the reminder. Required when adding a reminder.",
+                    "type": "string",
+                    "enum": [
+                      "email",
+                      "popup",
+                      "sms"
+                    ]
+                  },
+                  "minutes": {
+                    "description": "Number of minutes before the event when the reminder triggers. Required when adding a reminder.",
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "method",
+                  "minutes"
+                ]
+              }
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      },
+      "required": [
+        "resource"
+      ]
+    }
+  },
+  {
+    "name": "create_event",
+    "description": "Creates a new event in the specified calendar.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The identifier of the calendar. Defaults to the string \"primary\". When \"primary\" is provided, it is automatically mapped to the actual primary calendar ID.",
+          "type": "string",
+          "default": "primary",
+          "nullable": false
+        },
+        "resource": {
+          "description": "The event to create:",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "The identifier of the event. If not provided,\na new UUID will be generated.",
+              "type": "string",
+              "nullable": true
+            },
+            "summary": {
+              "description": "The summary/title of the event.",
+              "type": "string",
+              "default": "",
+              "nullable": false
+            },
+            "description": {
+              "description": "The description of the event.",
+              "type": "string",
+              "default": "",
+              "nullable": false
+            },
+            "start": {
+              "description": "The start time of the event.",
+              "type": "object",
+              "properties": {
+                "date": {
+                  "description": "The date of the start time in format YYYY-MM-DD. Either date or dateTime field must be provided and cannot be provided at the same time. Default to None.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "dateTime": {
+                  "description": "The date and time of the start time in RFC 3339 format YYYY-MM-DDTHH:MM:SSZ, YYYY-MM-DDTHH:MM:SS+/-HH:MM, or YYYY-MM-DDTHH:MM:SS. If the dateTime string does not contain timezone information (YYYY-MM-DDTHH:MM:SS), then timeZone should be provided. If dateTime contains timezone information (YYYY-MM-DDTHH:MM:SSZ or YYYY-MM-DDTHH:MM:SS+/-HH:MM), then timeZone is ignored. The date and dateTime field cannot be provided at the same time. Default to None.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "timeZone": {
+                  "description": "The time zone of the start time in IANA format (e.g., \"America/New_York\"). The timeZone is required if the dateTime string does not contain timezone information (YYYY-MM-DDTHH:MM:SS). Defaults to None.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            },
+            "end": {
+              "description": "The end time of the event.",
+              "type": "object",
+              "properties": {
+                "date": {
+                  "description": "The date of the end time in format YYYY-MM-DD. Either date or dateTime field must be provided and cannot be provided at the same time. Default to None.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "dateTime": {
+                  "description": "The date and time of the end time in RFC 3339 format YYYY-MM-DDTHH:MM:SSZ, YYYY-MM-DDTHH:MM:SS+/-HH:MM, or YYYY-MM-DDTHH:MM:SS. If the dateTime string does not contain timezone information (YYYY-MM-DDTHH:MM:SS), then timeZone should be provided. If dateTime contains timezone information (YYYY-MM-DDTHH:MM:SSZ or YYYY-MM-DDTHH:MM:SS+/-HH:MM), then timeZone is ignored. The date and dateTime field cannot be provided at the same time. Default to None.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "timeZone": {
+                  "description": "The time zone of the end time in IANA format (e.g., \"America/New_York\"). The timeZone is required if the dateTime string does not contain timezone information (YYYY-MM-DDTHH:MM:SS). Defaults to None.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            },
+            "recurrence": {
+              "description": "The recurrence rules of the event in RRULE format and exception dates in EXDATE format.\n Examples:\n- Daily for 5 occurrences: [\"RRULE:FREQ=DAILY;COUNT=5\"]\n- Weekly on Monday and Wednesday: [\"RRULE:FREQ=WEEKLY;BYDAY=MO,WE\"]\n- Monthly on the 15th: [\"RRULE:FREQ=MONTHLY;BYMONTHDAY=15\"]\n- Yearly on January 1st: [\"RRULE:FREQ=YEARLY;BYMONTH=1;BYMONTHDAY=1\"]\n- Every 2 weeks: [\"RRULE:FREQ=WEEKLY;INTERVAL=2\"]\n- Until a specific date: [\"RRULE:FREQ=DAILY;UNTIL=20241231T235959Z\"]\n- With exception dates: [\"RRULE:FREQ=WEEKLY;BYDAY=MO\", \"EXDATE:20241225T120000Z\", \"EXDATE:20250101T120000Z\"]\n- Multiple exception dates: [\"RRULE:FREQ=DAILY;COUNT=10\", \"EXDATE:20241225T120000Z\", \"EXDATE:20241226T120000Z\"]\n- All-day event exceptions: [\"RRULE:FREQ=WEEKLY;BYDAY=MO\", \"EXDATE:20241225\", \"EXDATE:20250101\"]\nSupported RRULE parameters:\n- FREQ: MINUTELY, HOURLY, DAILY, WEEKLY, MONTHLY, YEARLY (required)\n- INTERVAL: Positive integer (default: 1)\n- COUNT: Positive integer (number of occurrences)\n- UNTIL: YYYYMMDDTHHMMSSZ (UTC required; Z suffix required for date-time)\n- BYDAY: SU,MO,TU,WE,TH,FR,SA (with optional ordinal: 1SU, -1MO)\n- BYMONTH: 1-12\n- BYMONTHDAY: 1-31\n- BYYEARDAY: 1-366\n- BYWEEKNO: 1-53\n- BYHOUR: 0-23\n- BYMINUTE: 0-59\n- BYSECOND: 0-59\n- BYSETPOS: 1-366 or -366 to -1\n- WKST: SU,MO,TU,WE,TH,FR,SA (week start)\nSupported EXDATE format:\n- EXDATE:YYYYMMDDTHHMMSSZ (UTC timezone)\n- EXDATE:YYYYMMDDTHHMMSS (floating/local time)\n- EXDATE:YYYYMMDD (date only for all-day events)\n- Multiple dates: Use separate EXDATE entries (not comma-separated)\nNote: TZID parameter not supported in this implementation",
+              "type": "array",
+              "default": [],
+              "nullable": false,
+              "items": {
+                "type": "string"
+              }
+            },
+            "attendees": {
+              "description": "List of event attendees. Each attendee can have:",
+              "type": "array",
+              "default": [],
+              "nullable": false,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "description": "The attendee's email address",
+                    "type": "string",
+                    "format": "email",
+                    "nullable": true
+                  },
+                  "displayName": {
+                    "description": "The attendee's display name",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "organizer": {
+                    "description": "Whether the attendee is the organizer",
+                    "type": "boolean",
+                    "default": false,
+                    "nullable": false
+                  },
+                  "self": {
+                    "description": "Whether the attendee is the user",
+                    "type": "boolean",
+                    "default": false,
+                    "nullable": false
+                  },
+                  "resource": {
+                    "description": "Whether the attendee is a resource",
+                    "type": "boolean",
+                    "default": false,
+                    "nullable": false
+                  },
+                  "optional": {
+                    "description": "Whether the attendee's presence is optional",
+                    "type": "boolean",
+                    "default": false,
+                    "nullable": false
+                  },
+                  "responseStatus": {
+                    "description": "The attendee's response status",
+                    "type": "string",
+                    "enum": [
+                      "accepted",
+                      "declined",
+                      "tentative",
+                      "needsAction",
+                      "organizer"
+                    ],
+                    "default": "needsAction",
+                    "nullable": false
+                  },
+                  "comment": {
+                    "description": "The attendee's comment",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "additionalGuests": {
+                    "description": "Number of additional guests",
+                    "type": "integer",
+                    "default": 0,
+                    "nullable": false
+                  }
+                },
+                "required": []
+              }
+            },
+            "reminders": {
+              "description": "The reminders of the event.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "useDefault": {
+                  "description": "Whether to use the default reminders.",
+                  "type": "boolean",
+                  "default": true,
+                  "nullable": false
+                },
+                "overrides": {
+                  "description": "List of custom reminder overrides for this event. Each override specifies a method (email, popup, sms) and minutes before the event. If useDefault is False, only these overrides are used. If useDefault is True, these overrides are added in addition to the default reminders. Maximum of 5 overrides per event.",
+                  "type": "array",
+                  "nullable": false,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "description": "The method of the reminder (email, popup, sms). Required when adding a reminder.",
+                        "type": "string",
+                        "enum": [
+                          "email",
+                          "popup",
+                          "sms"
+                        ]
+                      },
+                      "minutes": {
+                        "description": "Minutes before the event to trigger the reminder. Required when adding a reminder.",
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "minutes"
+                    ]
+                  }
+                }
+              },
+              "required": []
+            },
+            "location": {
+              "description": "The location of the event.",
+              "type": "string",
+              "default": "",
+              "nullable": false
+            },
+            "attachments": {
+              "description": "The attachments list contains the dicts and each dict has the following keys:",
+              "type": "array",
+              "default": [],
+              "nullable": false,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "fileUrl": {
+                    "description": "The URL of the attachment",
+                    "type": "string"
+                  },
+                  "title": {
+                    "description": "Title of the attachment.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mimeType": {
+                    "description": "Internet media type (MIME type) of the attachment.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "iconLink": {
+                    "description": "URL link to the attachment's icon.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "fileId": {
+                    "description": "ID of the attached file. Read-only.",
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "fileUrl"
+                ]
+              }
+            },
+            "status": {
+              "description": "Status of the event. Valid values: \"confirmed\" (event is confirmed), \"tentative\" (event is tentatively confirmed), \"cancelled\" (event is cancelled). Defaults to \"confirmed\".",
+              "type": "string",
+              "enum": [
+                "confirmed",
+                "tentative",
+                "cancelled"
+              ],
+              "default": "confirmed",
+              "nullable": false
+            },
+            "organizer": {
+              "description": "Organizer of the event. Contains email and optional displayName.",
+              "type": "object",
+              "nullable": false,
+              "properties": {
+                "email": {
+                  "description": "Email address of the person. Used to identify the organizer.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "displayName": {
+                  "description": "Display name of the person. Human-readable name shown in the UI.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "self": {
+                  "description": "Whether this person corresponds to the calendar on which this copy of the event appears.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": false
+                },
+                "id": {
+                  "description": "Profile ID of the person.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            },
+            "creator": {
+              "description": "Creator of the event. Contains email and optional displayName.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "email": {
+                  "description": "Email address of the person. Used to identify the creator.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "displayName": {
+                  "description": "Display name of the person. Human-readable name shown in the UI.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "self": {
+                  "description": "Whether this person corresponds to the calendar on which this copy of the event appears.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": false
+                },
+                "id": {
+                  "description": "Profile ID of the person.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            },
+            "extendedProperties": {
+              "description": "Extended properties of the event. Allows storing custom metadata as key-value pairs. Extended properties can be private (visible only to the organizer) or shared (visible to all attendees).",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "private": {
+                  "description": "Private extended properties, visible only to the event organizer. Dictionary of key-value pairs where both keys and values are strings.",
+                  "type": "object",
+                  "nullable": true,
+                  "additionalProperties": {
+                    "description": "A key-value pair where the key is a string property name and the value is a string property value.",
+                    "type": "string"
+                  }
+                },
+                "shared": {
+                  "description": "Shared extended properties, visible to all event attendees. Dictionary of key-value pairs where both keys and values are strings.",
+                  "type": "object",
+                  "nullable": true,
+                  "additionalProperties": {
+                    "description": "A key-value pair where the key is a string property name and the value is a string property value.",
+                    "type": "string"
+                  }
+                }
+              },
+              "required": []
+            }
+          },
+          "required": [
+            "start",
+            "end"
+          ]
+        },
+        "sendUpdates": {
+          "description": "Whether to send updates about the creation.\nPossible values: \"all\", \"externalOnly\", \"none\". Defaults to \"none\".",
+          "type": "string",
+          "enum": [
+            "all",
+            "externalOnly",
+            "none"
+          ],
+          "default": "none",
+          "nullable": false
+        }
+      },
+      "required": [
+        "resource"
+      ]
+    }
+  },
+  {
+    "name": "create_secondary_calendar",
+    "description": "Creates a secondary calendar.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "description": "The resource to create the calendar with.",
+          "type": "object",
+          "properties": {
+            "summary": {
+              "description": "The title of the calendar.",
+              "type": "string"
+            },
+            "id": {
+              "description": "The identifier of the calendar. If not provided, a UUID will be generated.",
+              "type": "string",
+              "nullable": true
+            },
+            "description": {
+              "description": "The description of the calendar. If explicitly set to null, defaults to an empty string.",
+              "type": "string",
+              "nullable": true,
+              "default": ""
+            },
+            "timeZone": {
+              "description": "The time zone of the calendar (e.g. \"America/New_York\"). Defaults to \"UTC\".",
+              "type": "string",
+              "default": "UTC"
+            },
+            "location": {
+              "description": "Geographic location of the calendar as free-form text. Defaults to an empty string.",
+              "type": "string",
+              "default": ""
+            },
+            "kind": {
+              "description": "Type of the resource. Must be \"calendar#calendar\" if provided. Defaults to \"calendar#calendar\" if not provided.",
+              "type": "string",
+              "enum": [
+                "calendar#calendar"
+              ],
+              "default": "calendar#calendar"
+            },
+            "conferenceProperties": {
+              "description": "Conference-related properties.",
+              "type": "object",
+              "properties": {
+                "allowedConferenceSolutionTypes": {
+                  "description": "List of conference solution types that are supported for this calendar.\n Defaults to an empty list if not provided.\n Each string in the list can be one of:\n- \"eventHangout\"\n- \"eventNamedHangout\"\n- \"hangoutsMeet\"",
+                  "type": "array",
+                  "default": [],
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "eventHangout",
+                      "eventNamedHangout",
+                      "hangoutsMeet"
+                    ]
+                  }
+                }
+              },
+              "required": [],
+              "default": {
+                "allowedConferenceSolutionTypes": []
+              }
+            }
+          },
+          "required": [
+            "summary"
+          ]
+        }
+      },
+      "required": [
+        "resource"
+      ]
+    }
+  },
+  {
+    "name": "delete_access_control_rule",
+    "description": "Deletes an access control rule from the specified calendar.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The ID of the calendar to delete the rule from.",
+          "type": "string"
+        },
+        "ruleId": {
+          "description": "The ID of the rule to delete.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "calendarId",
+        "ruleId"
+      ]
+    }
+  },
+  {
+    "name": "delete_calendar_list_entry",
+    "description": "Removes a calendar from the user's calendar list (unsubscribes). This only removes the calendar from the user's view - the actual calendar, events, ACL rules, and channels are NOT deleted. To delete the actual calendar, use delete_secondary_calendar.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The ID of the calendar list entry to remove from the user's calendar list. The primary calendar cannot be removed.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "calendarId"
+      ]
+    }
+  },
+  {
+    "name": "delete_event",
+    "description": "Deletes an event from the specified calendar. When deleting a parent recurring event,\nalso removes all associated child instance exceptions from recurring_exceptions.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The identifier of the calendar containing the event to delete. If \"primary\" is provided, the primary calendar will be used.",
+          "type": "string"
+        },
+        "eventId": {
+          "description": "The identifier of the event to delete.",
+          "type": "string"
+        },
+        "sendUpdates": {
+          "description": "Whether to send updates about the deletion.\nPossible values: \"all\", \"externalOnly\", \"none\". Defaults to \"none\".",
+          "type": "string",
+          "default": "none",
+          "enum": [
+            "all",
+            "externalOnly",
+            "none"
+          ]
+        }
+      },
+      "required": [
+        "calendarId",
+        "eventId"
+      ]
+    }
+  },
+  {
+    "name": "delete_secondary_calendar",
+    "description": "Deletes a secondary calendar. This operation removes the calendar from the user's calendar list\nand cleans up all associated data including events, ACL rules, notification channels, and recurring_exceptions.\n\nNote: Primary calendars cannot be deleted. Only the owner of the calendar can delete it.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The identifier of the secondary calendar to delete.\nMust not be empty or contain only whitespace.\nTo retrieve calendar IDs, call the `calendarList.list` method.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "calendarId"
+      ]
+    }
+  },
+  {
+    "name": "get_access_control_rule",
+    "description": "Retrieves an access control rule from the specified calendar.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The ID of the calendar to get the rule from.",
+          "type": "string"
+        },
+        "ruleId": {
+          "description": "The ID of the rule to retrieve.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "calendarId",
+        "ruleId"
+      ]
+    }
+  },
+  {
+    "name": "get_calendar_and_event_colors",
+    "description": "Returns the color definitions for calendars and events.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_calendar_list_entry",
+    "description": "Retrieves a calendar list entry from the user's calendar list.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The ID of the calendar list entry to retrieve. If \"primary\" is provided, the primary calendar will be returned.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "calendarId"
+      ]
+    }
+  },
+  {
+    "name": "get_calendar_metadata",
+    "description": "Retrieves metadata for a specified calendar.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The identifier of the calendar. Cannot be empty or contain only whitespace.\n- To retrieve calendar IDs, call the `calendarList.list` method.\n- Use the keyword \"primary\" to access the primary calendar of the currently logged-in user.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "calendarId"
+      ]
+    }
+  },
+  {
+    "name": "get_event",
+    "description": "Retrieves an event from the specified calendar.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "alwaysIncludeEmail": {
+          "description": "Deprecated. This parameter is ignored as email addresses\nare always included in the response. If not provided or None is passed, False is used.",
+          "type": "boolean",
+          "default": false,
+          "nullable": true
+        },
+        "calendarId": {
+          "description": "The identifier of the calendar. Optional.\nTo retrieve calendar IDs call the calendarList.list method.\nIf you want to access the primary calendar of the currently logged in user,\nuse the \"primary\" keyword. If not provided or None is passed, \"primary\" is used. Defaults to \"primary\".",
+          "type": "string",
+          "default": "primary",
+          "nullable": true
+        },
+        "eventId": {
+          "description": "The identifier of the event to retrieve. Required.",
+          "type": "string"
+        },
+        "maxAttendees": {
+          "description": "The maximum number of attendees to return (must be at least 1).\nIf there are more than the specified number of attendees, only the participant (the attendee with self=True) is returned.\nDefaults to None (return all attendees).",
+          "type": "integer",
+          "nullable": true
+        },
+        "timeZone": {
+          "description": "The time zone to use for the response, in the format 'Continent/City' (e.g., \"America/New_York\").\nAn empty string is not allowed. Defaults to None (which uses the calendar's time zone).",
+          "type": "string",
+          "nullable": true
+        }
+      },
+      "required": [
+        "eventId"
+      ]
+    }
+  },
+  {
+    "name": "get_setting",
+    "description": "Returns a single user setting for the authenticated user. Setting ids are\ncase-sensitive: 'timezone' resolves, 'TimeZone' does not.\n\nArgs:\n    setting (str):\n        The id of the user setting to retrieve. Case-sensitive (e.g. 'timezone' is\n        valid, 'TimeZone' is not). Required.\n\nReturns:\n    Dict[str, str]:\n        Response model for ``get_setting`` (a single ``calendar#setting``).\n        Fields:\n        - kind (str): Type of the resource. Always \"calendar#setting\". Optional; allowed\n          values: ['calendar#setting']; default: 'calendar#setting'.\n        - etag (str): ETag of the setting resource. Required.\n        - id (str): The id of the user setting (e.g. 'timezone', 'weekStart'). Required.\n        - value (str): Value of the user setting. The format depends on the setting id\n          and is always a string (e.g. 'true', '60', 'Asia/Kolkata'). Required.\n\nRaises:\n    TypeError:\n        Raised if 'setting' is not a string.\n    ValidationError:\n        Raised if 'setting' is empty/whitespace-only. Raised if the response does not\n        conform to the expected schema.\n    ResourceNotFoundError:\n        Raised if no setting with the given id exists (ids are case-sensitive).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "setting": {
+          "description": "The id of the user setting to retrieve. Case-sensitive (e.g. 'timezone' is valid, 'TimeZone' is not).",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "setting"
+      ]
+    }
+  },
+  {
+    "name": "import_event",
+    "description": "Imports an event or creates a new event in a destination calendar. Supports two modes: (1) If full_id is provided, copies an event from the source calendar (specified in full_id) to the destination calendar (specified in calendarId). (2) If full_id is not provided, creates a new event directly in the destination calendar with the provided event data.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The identifier of the destination calendar where the event will be imported to. Use \"primary\" for the primary calendar.",
+          "type": "string"
+        },
+        "resource": {
+          "description": "The event to import or create. start and end are required. full_id is optional - if provided, the function imports an event from a source calendar; if omitted, the function creates a new event directly. Other fields are optional - if None (when importing), the value from the source event is kept; if provided, it overrides the source event value.",
+          "type": "object",
+          "properties": {
+            "full_id": {
+              "description": "Optional. The full source identifier in the format \"sourceCalendarId:eventId\". This specifies the event to import from. The sourceCalendarId is the calendar containing the event, and eventId is the identifier of the event to import. If not provided, a new event is created with the provided data.",
+              "type": "string",
+              "nullable": true
+            },
+            "id": {
+              "description": "Optional. The identifier of the event. If not provided, a new ID will be generated.",
+              "type": "string",
+              "nullable": true
+            },
+            "summary": {
+              "description": "Optional. The summary/title of the event. If None, keeps the source event summary.",
+              "type": "string",
+              "nullable": true
+            },
+            "description": {
+              "description": "Optional. The description of the event. If None, keeps the source event description.",
+              "type": "string",
+              "nullable": true
+            },
+            "start": {
+              "description": "The start time of the event.",
+              "type": "object",
+              "properties": {
+                "date": {
+                  "description": "The date of the start time in format YYYY-MM-DD. Either date or dateTime field must be provided and cannot be provided at the same time. Default to None.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "dateTime": {
+                  "description": "The date and time of the start time in RFC 3339 format YYYY-MM-DDTHH:MM:SSZ, YYYY-MM-DDTHH:MM:SS+/-HH:MM, or YYYY-MM-DDTHH:MM:SS. If the dateTime string does not contain timezone information (YYYY-MM-DDTHH:MM:SS), then timeZone should be provided. If dateTime contains timezone information (YYYY-MM-DDTHH:MM:SSZ or YYYY-MM-DDTHH:MM:SS+/-HH:MM), then timeZone is ignored. The date and dateTime field cannot be provided at the same time. Default to None.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "timeZone": {
+                  "description": "The time zone of the start time in IANA format (e.g., \"America/New_York\"). The timeZone is required if the dateTime string does not contain timezone information (YYYY-MM-DDTHH:MM:SS). Defaults to None.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            },
+            "end": {
+              "description": "The end time of the event.",
+              "type": "object",
+              "properties": {
+                "date": {
+                  "description": "The date of the end time in format YYYY-MM-DD. Either date or dateTime field must be provided and cannot be provided at the same time. Default to None.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "dateTime": {
+                  "description": "The date and time of the end time in RFC 3339 format YYYY-MM-DDTHH:MM:SSZ, YYYY-MM-DDTHH:MM:SS+/-HH:MM, or YYYY-MM-DDTHH:MM:SS. If the dateTime string does not contain timezone information (YYYY-MM-DDTHH:MM:SS), then timeZone should be provided. If dateTime contains timezone information (YYYY-MM-DDTHH:MM:SSZ or YYYY-MM-DDTHH:MM:SS+/-HH:MM), then timeZone is ignored. The date and dateTime field cannot be provided at the same time. Default to None.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "timeZone": {
+                  "description": "The time zone of the end time in IANA format (e.g., \"America/New_York\"). The timeZone is required if the dateTime string does not contain timezone information (YYYY-MM-DDTHH:MM:SS). Defaults to None.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            },
+            "recurrence": {
+              "description": "Optional. Recurrence rules in RRULE format. If None, keeps the source event recurrence.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string"
+              }
+            },
+            "attendees": {
+              "description": "Optional. List of event attendees. If None, keeps the source event attendees.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "description": "The attendee's email address.",
+                    "type": "string",
+                    "format": "email",
+                    "nullable": true
+                  },
+                  "displayName": {
+                    "description": "The attendee's display name.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "organizer": {
+                    "description": "Whether the attendee is the organizer.",
+                    "type": "boolean",
+                    "nullable": false,
+                    "default": false
+                  },
+                  "self": {
+                    "description": "Whether the attendee is the current user.",
+                    "type": "boolean",
+                    "nullable": false,
+                    "default": false
+                  },
+                  "resource": {
+                    "description": "Whether the attendee is a resource.",
+                    "type": "boolean",
+                    "nullable": false,
+                    "default": false
+                  },
+                  "optional": {
+                    "description": "Whether the attendee's presence is optional.",
+                    "type": "boolean",
+                    "nullable": false,
+                    "default": false
+                  },
+                  "responseStatus": {
+                    "description": "The attendee's response status.",
+                    "type": "string",
+                    "enum": [
+                      "accepted",
+                      "declined",
+                      "tentative",
+                      "needsAction",
+                      "organizer"
+                    ],
+                    "nullable": false,
+                    "default": "needsAction"
+                  },
+                  "comment": {
+                    "description": "The attendee's comment.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "additionalGuests": {
+                    "description": "Number of additional guests.",
+                    "type": "integer",
+                    "nullable": false,
+                    "default": 0
+                  }
+                },
+                "required": []
+              }
+            },
+            "reminders": {
+              "description": "Optional. Reminder configuration. If None, keeps the source event reminders.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "useDefault": {
+                  "description": "Whether to use the default reminders.",
+                  "type": "boolean",
+                  "nullable": true
+                },
+                "overrides": {
+                  "description": "List of reminder overrides.",
+                  "type": "array",
+                  "nullable": true,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "description": "The method of the reminder.",
+                        "type": "string",
+                        "enum": [
+                          "email",
+                          "popup",
+                          "sms"
+                        ]
+                      },
+                      "minutes": {
+                        "description": "Minutes before the event to trigger the reminder.",
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "minutes"
+                    ]
+                  }
+                }
+              },
+              "required": []
+            },
+            "location": {
+              "description": "Optional. Location of the event. If None, keeps the source event location.",
+              "type": "string",
+              "nullable": true
+            },
+            "attachments": {
+              "description": "Optional. List of attachments. If None, keeps the source event attachments.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "fileUrl": {
+                    "description": "URL of the attachment file.",
+                    "type": "string"
+                  },
+                  "title": {
+                    "description": "Title of the attachment.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mimeType": {
+                    "description": "Internet media type (MIME type) of the attachment.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "iconLink": {
+                    "description": "URL link to the attachment's icon.",
+                    "type": "string",
+                    "pattern": "^https?://\\S+$",
+                    "nullable": true
+                  },
+                  "fileId": {
+                    "description": "ID of the attached file. Read-only.",
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "fileUrl"
+                ]
+              }
+            },
+            "status": {
+              "description": "Optional. Status of the event. If None, keeps the source event status.",
+              "type": "string",
+              "enum": [
+                "confirmed",
+                "tentative",
+                "cancelled"
+              ],
+              "nullable": true
+            },
+            "organizer": {
+              "description": "Optional. Organizer of the event. If None, keeps the source event organizer.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "email": {
+                  "description": "Email address of the organizer.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "displayName": {
+                  "description": "Display name of the organizer.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "self": {
+                  "description": "Whether this person corresponds to the calendar on which this copy of the event appears.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": false
+                },
+                "id": {
+                  "description": "Profile ID of the person.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            },
+            "creator": {
+              "description": "Optional. Creator of the event. If None, keeps the source event creator.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "email": {
+                  "description": "Email address of the creator.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "displayName": {
+                  "description": "Display name of the creator.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "self": {
+                  "description": "Whether this person corresponds to the calendar on which this copy of the event appears.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": false
+                },
+                "id": {
+                  "description": "Profile ID of the person.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            },
+            "extendedProperties": {
+              "description": "Extended properties of the event. Allows storing custom metadata as key-value pairs. Extended properties can be private (visible only to the organizer) or shared (visible to all attendees).",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "private": {
+                  "description": "Private extended properties, visible only to the event organizer. Dictionary of key-value pairs where both keys and values are strings.",
+                  "type": "object",
+                  "nullable": true,
+                  "additionalProperties": {
+                    "description": "A key-value pair where the key is a string property name and the value is a string property value.",
+                    "type": "string"
+                  }
+                },
+                "shared": {
+                  "description": "Shared extended properties, visible to all event attendees. Dictionary of key-value pairs where both keys and values are strings.",
+                  "type": "object",
+                  "nullable": true,
+                  "additionalProperties": {
+                    "description": "A key-value pair where the key is a string property name and the value is a string property value.",
+                    "type": "string"
+                  }
+                }
+              },
+              "required": []
+            }
+          },
+          "required": [
+            "start",
+            "end"
+          ]
+        },
+        "supportsAttachments": {
+          "description": "Whether the API client performing the operation supports event attachments. If True, attachments are included in the response. Defaults to False.",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "calendarId",
+        "resource"
+      ]
+    }
+  },
+  {
+    "name": "list_access_control_rules",
+    "description": "Lists all access control rules for the specified calendar.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The ID of the calendar to list rules for. Must not be empty or contain only whitespace.",
+          "type": "string"
+        },
+        "maxResults": {
+          "description": "Maximum number of rules to return. Must be a positive integer. Defaults to 100.",
+          "type": "integer",
+          "minimum": 1,
+          "default": 100
+        },
+        "pageToken": {
+          "description": "Token for pagination. Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "showDeleted": {
+          "description": "Whether to include deleted rules. Defaults to False.",
+          "type": "boolean",
+          "default": false
+        },
+        "syncToken": {
+          "description": "Token for synchronization. Defaults to None.",
+          "type": "string",
+          "nullable": true
+        }
+      },
+      "required": [
+        "calendarId"
+      ]
+    }
+  },
+  {
+    "name": "list_calendar_list_entries",
+    "description": "Lists all calendar list entries in the user's calendar list.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "maxResults": {
+          "description": "Maximum number of calendar list entries to return. Must be a positive integer. Defaults to 100.",
+          "type": "integer",
+          "default": 100
+        },
+        "pageToken": {
+          "description": "Token for fetching the next page of results. Should be a stringified non-negative integer offset. Empty strings or whitespace-only strings are not allowed. Defaults to '0'.",
+          "type": "string",
+          "default": "0"
+        },
+        "showHidden": {
+          "description": "Whether to show hidden entries in the list. When False (default), entries with hidden=True are filtered out. When True, all entries including hidden ones are returned.",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_event_instances",
+    "description": "Returns instances of a specified recurring event.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "description": "The identifier of the recurring event.",
+          "type": "string"
+        },
+        "alwaysIncludeEmail": {
+          "description": "Deprecated. This parameter is ignored as email addresses\nare always included in the response.",
+          "type": "boolean",
+          "default": true
+        },
+        "calendarId": {
+          "description": "The identifier of the calendar. If not provided, defaults to \"primary\".",
+          "type": "string",
+          "default": "primary"
+        },
+        "maxAttendees": {
+          "description": "The maximum number of attendees to include in the response. If there are more than\nthe specified number of attendees, only the participant is returned. Optional. Defaults to None",
+          "type": "integer",
+          "nullable": true
+        },
+        "maxResults": {
+          "description": "Maximum number of events returned on one result page. By default the value is 250 events.\nThe page size can never be larger than 2500 events. Optional. Defaults to 250.",
+          "type": "integer",
+          "default": 250
+        },
+        "originalStart": {
+          "description": "The original start time of the instance in the result. Optional. Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "pageToken": {
+          "description": "Token specifying which result page to return. Optional. Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "showDeleted": {
+          "description": "Whether to include deleted instances.\nDefaults to False.",
+          "type": "boolean",
+          "default": false
+        },
+        "timeMax": {
+          "description": "Upper bound (exclusive) for an event's start time to filter by.\nOptional. The default is not to filter by start time. Must be an RFC3339 timestamp with mandatory time zone offset.  Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "timeMin": {
+          "description": "Lower bound (exclusive) for an event's end time to filter by.\nOptional. The default is not to filter by end time. Must be an RFC3339 timestamp with mandatory time zone offset.  Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "timeZone": {
+          "description": "The time zone to use for the response (e.g. \"America/New_York\").\nMust be in format 'Continent/City'. Defaults to the calendar's time zone.",
+          "type": "string",
+          "nullable": true
+        }
+      },
+      "required": [
+        "eventId"
+      ]
+    }
+  },
+  {
+    "name": "list_events",
+    "description": "Lists events from the specified calendar.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The identifier of the calendar. Defaults to \"primary\".",
+          "type": "string",
+          "default": "primary"
+        },
+        "maxResults": {
+          "description": "The maximum number of events to return.\nMust be a positive integer. Defaults to 250. Maximum allowed value is 2500.",
+          "type": "integer",
+          "default": 250,
+          "minimum": 1,
+          "maximum": 2500
+        },
+        "timeMin": {
+          "description": "Lower bound (exclusive) for event end times. Must be timezone-aware RFC 3339 datetime string\n(e.g., \"2024-04-01T00:00:00Z\"). Events are included only if event_end > timeMin.\nIMPORTANT: If an event ends EXACTLY at timeMin, it is EXCLUDED (exclusive boundary).\nFor recurring events with singleEvents=False: Returns the master event if ANY instance's end time > timeMin.\nFor recurring events with singleEvents=True: Only returns instances whose end time > timeMin.\nDefaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "timeMax": {
+          "description": "Upper bound (exclusive) for event start times. Must be timezone-aware RFC 3339 datetime string\n(e.g., \"2024-04-01T23:59:59Z\"). Events are included only if event_start < timeMax.\nIMPORTANT: For recurring events with singleEvents=True, expansion is capped at ~730 days (~2 years)\nfrom current time regardless of timeMax value.\nFor recurring events with singleEvents=False: Returns the master event if ANY instance starts before timeMax.\nDefaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "q": {
+          "description": "The query string to filter events by. Takes a query term and then matches it with the summary, description, location, or attendees' data such as email and display name of the event. Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "singleEvents": {
+          "description": "Whether to expand recurring events into individual instances.\n\nWhen True: Recurring events are expanded into separate instances within the time range.\nModified instances show their updated values. Cancelled instances are excluded.\n\nIMPORTANT EXPANSION BEHAVIORS:\n- Maximum expansion is ~730 days (~2 years) from current time, regardless of timeMax\n- BYMONTHDAY values that don't exist in a month are SKIPPED (RFC 5545 compliant):\n  Example: BYMONTHDAY=31 skips Feb, Apr, Jun, Sep, Nov (does NOT fall back to last day)\n- EXDATE takes precedence over RDATE: If same date is in both, it is EXCLUDED\n- All-day events preserve date-only format in expanded instances\n\nWhen False: Returns the master recurring event (if any instance falls within the time range),\nplus any modified instances and cancelled instances as separate items.\n- Master event has 'recurrence' field with RRULE, no 'recurringEventId'\n- Modified instances have 'recurringEventId' pointing to master, no 'recurrence'\n- Cancelled instances have status='cancelled' and 'recurringEventId', no 'recurrence'\n\nDefaults to False.",
+          "type": "boolean",
+          "default": false
+        },
+        "orderBy": {
+          "description": "The order of the events.\nMust be one of: \"startTime\", \"updated\". Defaults to None.",
+          "type": "string",
+          "enum": [
+            "startTime",
+            "updated"
+          ],
+          "nullable": true
+        },
+        "timeZone": {
+          "description": "Time zone used in the response. Optional. Defaults to empty string. If empty or not provided, the calendar's time zone is used.",
+          "type": "string",
+          "default": ""
+        },
+        "pageToken": {
+          "description": "Token specifying which result page to return. Optional. Defaults to '0'.",
+          "type": "string",
+          "default": "0"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_settings",
+    "description": "Returns the user settings for the authenticated user. Pagination: a non-final page\ncarries ``nextPageToken`` and no ``nextSyncToken``; the final page carries\n``nextSyncToken`` and no ``nextPageToken`` (the two are mutually exclusive). Re-listing\nwith a current ``syncToken`` returns an empty ``items`` list plus a fresh\n``nextSyncToken``. Known limitation: the ``syncToken`` encodes the catalog size (a\ncount), not its content. Adding/removing a setting changes the count and is therefore\nreflected by a sync delta, but a pure *value* change (e.g. ``timezone`` updated via a\nprimary-calendar patch) leaves the count unchanged, so an incremental re-list with the\nold ``syncToken`` returns an empty delta and misses it. The collection ``etag`` does\nchange on any value change, so clients that compare ``etag`` still detect it.\n\nArgs:\n    maxResults (int):\n        Maximum number of settings to return on one page. Must be a positive integer.\n        Values above the documented maximum (250) are accepted and effectively clamped\n        rather than rejected. Defaults to 250. Optional; default: 250.\n    pageToken (str):\n        Token specifying which result page to return. Empty string (the default)\n        requests the first page. Optional; default: ''.\n    syncToken (str):\n        Token obtained from the nextSyncToken field of a previous list request. When\n        supplied, only entries changed since then are returned. Empty string (the\n        default) requests a full sync. Optional; default: ''.\n\nReturns:\n    Dict[str, Union[str, List[Dict[str, str]], None]]:\n        Response model for ``list_settings`` (``calendar#settings`` collection).\n        Fields:\n        - kind (str): Type of the collection. Always \"calendar#settings\". Optional;\n          allowed values: ['calendar#settings']; default: 'calendar#settings'.\n        - etag (str): ETag of the collection. Required.\n        - items (list[dict]): List of user settings on this page. Required.\n        - items[].kind (str): Type of the resource. Always \"calendar#setting\". Optional;\n          allowed values: ['calendar#setting']; default: 'calendar#setting'.\n        - items[].etag (str): ETag of the setting resource. Required.\n        - items[].id (str): The id of the user setting (e.g. 'timezone', 'weekStart').\n          Required.\n        - items[].value (str): Value of the user setting. The format depends on the\n          setting id and is always a string (e.g. 'true', '60', 'Asia/Kolkata').\n          Required.\n        - nextPageToken (str | None): Token to retrieve the next page of results, or\n          null on the final page. Mutually exclusive with nextSyncToken. Optional;\n          nullable; default: None.\n        - nextSyncToken (str | None): Token used to retrieve only entries that changed\n          since this result. Returned only on the final page (when nextPageToken is\n          null). Optional; nullable; default: None.\n\nRaises:\n    TypeError:\n        Raised if maxResults is not an integer (booleans are not accepted). Raised if\n        pageToken or syncToken is not a string.\n    ValidationError:\n        Raised if maxResults is not a positive integer. Raised if the response does not\n        conform to the expected schema.\n    ValueError:\n        Raised if pageToken is provided but is not a valid page token value.\n    ResourceGoneError:\n        Raised if syncToken is provided but is no longer valid; the caller must drop\n        local state and perform a full sync (without a syncToken).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "maxResults": {
+          "description": "Maximum number of settings to return on one page. Must be a positive integer. Values above the documented maximum (250) are accepted and effectively clamped rather than rejected. Defaults to 250.",
+          "type": "integer",
+          "default": 250,
+          "nullable": false
+        },
+        "pageToken": {
+          "description": "Token specifying which result page to return. Empty string (the default) requests the first page.",
+          "type": "string",
+          "default": "",
+          "nullable": false
+        },
+        "syncToken": {
+          "description": "Token obtained from the nextSyncToken field of a previous list request. When supplied, only entries changed since then are returned. Empty string (the default) requests a full sync.",
+          "type": "string",
+          "default": "",
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "move_event",
+    "description": "Moves an event from one calendar to another.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The identifier of the source calendar. Must not be empty or whitespace.",
+          "type": "string",
+          "nullable": false
+        },
+        "eventId": {
+          "description": "The identifier of the event to move. Must not be empty or whitespace.",
+          "type": "string",
+          "nullable": false
+        },
+        "destination": {
+          "description": "The identifier of the destination calendar. Must not be empty or whitespace.",
+          "type": "string",
+          "nullable": false
+        },
+        "sendUpdates": {
+          "description": "Whether to send updates about the move.\nPossible values: \"all\", \"externalOnly\", \"none\". Defaults to \"none\".",
+          "type": "string",
+          "enum": [
+            "all",
+            "externalOnly",
+            "none"
+          ],
+          "default": "none",
+          "nullable": false
+        }
+      },
+      "required": [
+        "calendarId",
+        "eventId",
+        "destination"
+      ]
+    }
+  },
+  {
+    "name": "patch_access_control_rule",
+    "description": "Updates specific fields of an existing access control rule using PATCH semantics. Omitted fields are preserved unchanged. The scope object is deep-merged with existing values (only provided sub-fields are updated).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The ID of the calendar containing the rule.",
+          "type": "string"
+        },
+        "ruleId": {
+          "description": "The ID of the rule to update.",
+          "type": "string"
+        },
+        "sendNotifications": {
+          "description": "Whether to send notifications about this patch. Defaults to True.",
+          "type": "boolean",
+          "default": true
+        },
+        "resource": {
+          "description": "The resource body for partial update. Only include the fields you want to change. Omitted fields are preserved unchanged. The scope object is deep-merged with existing values.",
+          "type": "object",
+          "properties": {
+            "role": {
+              "description": "New role to assign. Omit to leave unchanged.",
+              "type": "string",
+              "enum": [
+                "none",
+                "freeBusyReader",
+                "reader",
+                "writer",
+                "owner"
+              ],
+              "nullable": true
+            },
+            "scope": {
+              "description": "New scope settings. If provided, individual sub-fields are merged with existing scope values (only provided sub-fields are updated, existing sub-fields are preserved).",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "type": {
+                  "description": "The type of the scope. Possible values are:\n\"default\" - The public scope. This is the default value.\n\"user\" - Limits the scope to a single user.\n\"group\" - Limits the scope to a group.\n\"domain\" - Limits the scope to a domain.",
+                  "type": "string",
+                  "enum": [
+                    "default",
+                    "user",
+                    "group",
+                    "domain"
+                  ],
+                  "nullable": true
+                },
+                "value": {
+                  "description": "The email address of a user or group, or the name of a domain, depending on the scope type. Omitted for type \"default\".",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "calendarId",
+        "ruleId",
+        "resource"
+      ]
+    }
+  },
+  {
+    "name": "patch_calendar_list_entry",
+    "description": "Updates specific fields of an existing calendar list entry.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The ID of the calendar list entry to patch. Cannot be empty and must not exceed 255 characters. If \"primary\" is provided, the primary calendar will be patched.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "colorRgbFormat": {
+          "description": "Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.",
+          "type": "boolean",
+          "default": false
+        },
+        "resource": {
+          "description": "The resource to patch the calendar list entry with. Required. Patch semantic: only non-None explicit values trigger an update; None values and omitted fields preserve the existing value.",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "id": {
+              "description": "READ-ONLY: The id comes from the calendarId parameter. This field is ignored if sent.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "summary": {
+              "description": "READ-ONLY: The summary comes from the underlying calendar. This field is ignored if sent.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "description": {
+              "description": "READ-ONLY: The description comes from the underlying calendar. This field is ignored if sent.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "timeZone": {
+              "description": "READ-ONLY: The timeZone comes from the underlying calendar. This field is ignored if sent.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "location": {
+              "description": "READ-ONLY: The location comes from the underlying calendar. This field is ignored if sent.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "primary": {
+              "description": "READ-ONLY: The primary flag comes from the underlying calendar. This field is ignored if sent.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "summaryOverride": {
+              "description": "The summary that the authenticated user has set for this calendar. Patch semantic: only update if explicitly provided with non-None value. Set to an empty string to clear the override.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "selected": {
+              "description": "Whether the calendar content shows up in the calendar UI. Patch semantic: only update if explicitly provided with non-None value.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "colorId": {
+              "description": "The color of the calendar. This is an ID referring to an entry in the calendar section of the colors definition (see the colors endpoint). This property is superseded by the backgroundColor and foregroundColor properties and can be ignored when using these properties. Patch semantic: only update if explicitly provided with non-None value.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "backgroundColor": {
+              "description": "The main color of the calendar in the hexadecimal format '#0088aa'. This property supersedes the index-based colorId property. To set or change this property, you need to specify colorRgbFormat=true. Must be provided together with foregroundColor. Patch semantic: only update if explicitly provided with non-None value.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "foregroundColor": {
+              "description": "The foreground color of the calendar in the hexadecimal format '#ffffff'. This property supersedes the index-based colorId property. To set or change this property, you need to specify colorRgbFormat=true. Must be provided together with backgroundColor. Patch semantic: only update if explicitly provided with non-None value.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "hidden": {
+              "description": "Whether the calendar has been hidden from the list. Patch semantic: only update if explicitly provided with non-None value.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "notificationSettings": {
+              "description": "The notifications that the authenticated user is receiving for this calendar. Patch semantic: only update if explicitly provided.",
+              "type": "object",
+              "nullable": true,
+              "default": null,
+              "properties": {
+                "notifications": {
+                  "description": "The list of notifications set for this calendar.",
+                  "type": "array",
+                  "default": [],
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "description": "The type of notification.",
+                        "type": "string",
+                        "enum": [
+                          "eventCreation",
+                          "eventChange",
+                          "eventCancellation",
+                          "eventResponse",
+                          "agenda"
+                        ]
+                      },
+                      "method": {
+                        "description": "The method used to deliver the notification.",
+                        "type": "string",
+                        "enum": [
+                          "email"
+                        ],
+                        "default": "email"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  }
+                }
+              },
+              "required": []
+            },
+            "defaultReminders": {
+              "description": "The default reminders for this calendar. Patch semantic: only update if explicitly provided.",
+              "type": "array",
+              "nullable": true,
+              "default": null,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "method": {
+                    "description": "The method used to deliver the reminder. Required when adding a reminder.",
+                    "type": "string",
+                    "enum": [
+                      "email",
+                      "popup",
+                      "sms"
+                    ]
+                  },
+                  "minutes": {
+                    "description": "Number of minutes before the event when the reminder triggers. Required when adding a reminder.",
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "method",
+                  "minutes"
+                ]
+              }
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "calendarId",
+        "resource"
+      ]
+    }
+  },
+  {
+    "name": "patch_calendar_metadata",
+    "description": "Updates specific fields of an existing calendar using PATCH semantics. Omitted fields are preserved unchanged, fields explicitly set to null are cleared/reset to their defaults.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The identifier of the calendar.\n- To retrieve calendar IDs, call the `calendarList.list` method.\n- Use the keyword \"primary\" to access the primary calendar of the currently logged-in user.",
+          "type": "string"
+        },
+        "resource": {
+          "description": "The resource body for partial update. Only include the fields you want to change. Omitted fields are preserved unchanged, fields explicitly set to null are cleared/reset to their defaults. Defaults to None. If None, returns the existing calendar without modifications.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "summary": {
+              "description": "The summary of the calendar. Set to null to clear (resets to empty string).",
+              "type": "string",
+              "nullable": true
+            },
+            "description": {
+              "description": "The description of the calendar. Set to null to clear (resets to empty string).",
+              "type": "string",
+              "nullable": true
+            },
+            "timeZone": {
+              "description": "The time zone of the calendar (e.g. \"America/New_York\"). Must be a valid IANA time zone. Set to null to reset to \"UTC\". Omit the field to leave it unchanged.",
+              "type": "string",
+              "nullable": true
+            },
+            "location": {
+              "description": "Geographic location of the calendar as free-form text. Set to null to clear (resets to empty string). Omit the field to leave it unchanged.",
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "calendarId"
+      ]
+    }
+  },
+  {
+    "name": "patch_event",
+    "description": "Updates specific fields of an existing event using PATCH semantics.\n\nThis function allows partial updates to an event by providing only the fields\nthat need to be changed using PATCH semantics. Omitted fields\nare preserved unchanged, fields explicitly set to null are deleted/cleared to\ntheir defaults, nested objects (start, end, reminders, extendedProperties) are\ndeep-merged with existing values, and arrays (attendees, recurrence, attachments)\nreplace the existing array entirely when provided.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "description": "The identifier of the event to update.",
+          "type": "string"
+        },
+        "calendarId": {
+          "description": "The identifier of the calendar. Defaults to \"primary\".",
+          "type": "string",
+          "default": "primary"
+        },
+        "resource": {
+          "description": "The event resource body for partial update. Only include the fields you want to change. Follows GridwellCalendar PATCH semantics: omitted fields are preserved unchanged, fields set to null are deleted/cleared, nested objects (start, end, reminders, extendedProperties) are merged with existing values, and arrays (attendees, recurrence, attachments) replace the existing array entirely. Defaults to None.",
+          "type": "object",
+          "nullable": true,
+          "properties": {
+            "id": {
+              "description": "The identifier of the event.",
+              "type": "string",
+              "nullable": true
+            },
+            "summary": {
+              "description": "The summary/title of the event. Set to null to clear.",
+              "type": "string",
+              "nullable": true
+            },
+            "description": {
+              "description": "The description of the event. Set to null to clear.",
+              "type": "string",
+              "nullable": true
+            },
+            "start": {
+              "description": "The start time of the event. If provided, merges with the existing start time (only provided sub-fields are updated, existing sub-fields are preserved). Setting to null is ignored as start is a required field.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "date": {
+                  "description": "The date of the start time in format YYYY-MM-DD. An event must have either date or dateTime field and cannot have both at the same time. Default to None.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "dateTime": {
+                  "description": "The date and time of the start time in RFC 3339 format YYYY-MM-DDTHH:MM:SSZ, YYYY-MM-DDTHH:MM:SS+/-HH:MM, or YYYY-MM-DDTHH:MM:SS. If the dateTime string does not contain timezone information (YYYY-MM-DDTHH:MM:SS), then timeZone should be provided. If dateTime contains timezone information (YYYY-MM-DDTHH:MM:SSZ or YYYY-MM-DDTHH:MM:SS+/-HH:MM), then timeZone is ignored. An event must have either date or dateTime field and cannot have both at the same time. Default to None.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "timeZone": {
+                  "description": "The time zone of the start time in IANA format (e.g., \"America/New_York\"). The timeZone is required if the dateTime string does not contain timezone information (YYYY-MM-DDTHH:MM:SS). Defaults to None.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            },
+            "end": {
+              "description": "The end time of the event. If provided, merges with the existing end time (only provided sub-fields are updated, existing sub-fields are preserved). Setting to null is ignored as end is a required field.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "date": {
+                  "description": "The date of the end time in format YYYY-MM-DD. An event must have either date or dateTime field and cannot have both at the same time. Default to None.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "dateTime": {
+                  "description": "The date and time of the end time in RFC 3339 format YYYY-MM-DDTHH:MM:SSZ, YYYY-MM-DDTHH:MM:SS+/-HH:MM, or YYYY-MM-DDTHH:MM:SS. If the dateTime string does not contain timezone information (YYYY-MM-DDTHH:MM:SS), then timeZone should be provided. If dateTime contains timezone information (YYYY-MM-DDTHH:MM:SSZ or YYYY-MM-DDTHH:MM:SS+/-HH:MM), then timeZone is ignored. An event must have either date or dateTime field and cannot have both at the same time. Default to None.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "timeZone": {
+                  "description": "The time zone of the end time in IANA format (e.g., \"America/New_York\"). Defaults to None.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            },
+            "recurrence": {
+              "description": "The recurrence rules of the event in RRULE format and exception dates in EXDATE format. If provided, replaces the existing recurrence rules entirely. Set to null to clear all recurrence rules.\n Examples:\n- Daily for 5 occurrences: [\"RRULE:FREQ=DAILY;COUNT=5\"]\n- Weekly on Monday and Wednesday: [\"RRULE:FREQ=WEEKLY;BYDAY=MO,WE\"]\n- Monthly on the 15th: [\"RRULE:FREQ=MONTHLY;BYMONTHDAY=15\"]\n- Yearly on January 1st: [\"RRULE:FREQ=YEARLY;BYMONTH=1;BYMONTHDAY=1\"]\n- Every 2 weeks: [\"RRULE:FREQ=WEEKLY;INTERVAL=2\"]\n- Until a specific date: [\"RRULE:FREQ=DAILY;UNTIL=20241231T235959Z\"]\n- With exception dates: [\"RRULE:FREQ=WEEKLY;BYDAY=MO\", \"EXDATE:20241225T120000Z\", \"EXDATE:20250101T120000Z\"]\n- Multiple exception dates: [\"RRULE:FREQ=DAILY;COUNT=10\", \"EXDATE:20241225T120000Z\", \"EXDATE:20241226T120000Z\"]\n- All-day event exceptions: [\"RRULE:FREQ=WEEKLY;BYDAY=MO\", \"EXDATE:20241225\", \"EXDATE:20250101\"]\nSupported RRULE parameters:\n- FREQ: MINUTELY, HOURLY, DAILY, WEEKLY, MONTHLY, YEARLY (required)\n- INTERVAL: Positive integer (default: 1)\n- COUNT: Positive integer (number of occurrences)\n- UNTIL: YYYYMMDDTHHMMSSZ (UTC required; Z suffix required for date-time)\n- BYDAY: SU,MO,TU,WE,TH,FR,SA (with optional ordinal: 1SU, -1MO)\n- BYMONTH: 1-12\n- BYMONTHDAY: 1-31\n- BYYEARDAY: 1-366\n- BYWEEKNO: 1-53\n- BYHOUR: 0-23\n- BYMINUTE: 0-59\n- BYSECOND: 0-59\n- BYSETPOS: 1-366 or -366 to -1\n- WKST: SU,MO,TU,WE,TH,FR,SA (week start)\nSupported EXDATE format:\n- EXDATE:YYYYMMDDTHHMMSSZ (UTC timezone)\n- EXDATE:YYYYMMDDTHHMMSS (floating/local time)\n- EXDATE:YYYYMMDD (date only for all-day events)\n- Multiple dates: Use separate EXDATE entries (not comma-separated)\nNote: TZID parameter not supported in this implementation",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string"
+              }
+            },
+            "attendees": {
+              "description": "List of event attendees. If provided, replaces the existing attendee list entirely. Set to null to clear all attendees.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "description": "The attendee's email address. Required when adding an attendee.",
+                    "type": "string",
+                    "format": "email",
+                    "nullable": true
+                  },
+                  "displayName": {
+                    "description": "The attendee's display name.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "organizer": {
+                    "description": "Whether the attendee is the organizer.",
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "self": {
+                    "description": "Whether the attendee is the user.",
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "resource": {
+                    "description": "Whether the attendee is a resource.",
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "optional": {
+                    "description": "Whether the attendee's presence is optional.",
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "responseStatus": {
+                    "description": "The attendee's response status.",
+                    "type": "string",
+                    "nullable": true,
+                    "enum": [
+                      "accepted",
+                      "declined",
+                      "tentative",
+                      "needsAction",
+                      "organizer"
+                    ]
+                  },
+                  "comment": {
+                    "description": "The attendee's comment.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "additionalGuests": {
+                    "description": "Number of additional guests.",
+                    "type": "integer",
+                    "nullable": true
+                  }
+                },
+                "required": []
+              }
+            },
+            "location": {
+              "description": "The location of the event. Set to null to clear.",
+              "type": "string",
+              "nullable": true
+            },
+            "reminders": {
+              "description": "The reminders of the event. If provided, individual sub-fields (useDefault, overrides) are merged with existing values. Set the top-level reminders to null to clear the entire reminders object. Set individual sub-fields to null to reset them to defaults (useDefault resets to true, overrides resets to empty array).",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "useDefault": {
+                  "description": "Whether to use the default reminders.",
+                  "type": "boolean",
+                  "default": null,
+                  "nullable": true
+                },
+                "overrides": {
+                  "description": "The list of reminder overrides.",
+                  "type": "array",
+                  "default": null,
+                  "nullable": true,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "description": "The method of the reminder (email, popup, sms). Required when adding a reminder.",
+                        "type": "string",
+                        "enum": [
+                          "email",
+                          "popup",
+                          "sms"
+                        ]
+                      },
+                      "minutes": {
+                        "description": "Minutes before the event to trigger the reminder. Required when adding a reminder.",
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "minutes"
+                    ]
+                  }
+                }
+              },
+              "required": []
+            },
+            "attachments": {
+              "description": "List of file attachments for the event. If provided, replaces the existing attachment list entirely. Set to null to clear all attachments.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "fileUrl": {
+                    "description": "URL of the attachment file.",
+                    "type": "string",
+                    "pattern": "^https?://.+"
+                  },
+                  "title": {
+                    "description": "Title of the attachment.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mimeType": {
+                    "description": "Internet media type (MIME type) of the attachment.",
+                    "type": "string",
+                    "pattern": "^[\\w!#$&.+\\-^]+/[\\w!#$&.+\\-^]+$",
+                    "nullable": true
+                  },
+                  "iconLink": {
+                    "description": "URL link to the attachment's icon.",
+                    "type": "string",
+                    "pattern": "^https?://\\S+$",
+                    "nullable": true
+                  },
+                  "fileId": {
+                    "description": "ID of the attached file. Read-only.",
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "fileUrl"
+                ]
+              }
+            },
+            "status": {
+              "description": "Status of the event: 'confirmed', 'tentative', or 'cancelled'. Set to null to reset to 'confirmed'.",
+              "type": "string",
+              "nullable": true,
+              "enum": [
+                "confirmed",
+                "tentative",
+                "cancelled"
+              ]
+            },
+            "organizer": {
+              "description": "The organizer of the event. Set to null to clear.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "email": {
+                  "description": "The email address of the organizer.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "displayName": {
+                  "description": "The display name of the organizer.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "self": {
+                  "description": "Whether the organizer is the current user.",
+                  "type": "boolean",
+                  "nullable": true
+                },
+                "id": {
+                  "description": "The profile ID of the organizer.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            },
+            "creator": {
+              "description": "The creator of the event. Set to null to clear.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "email": {
+                  "description": "The email address of the creator.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "displayName": {
+                  "description": "The display name of the creator.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "self": {
+                  "description": "Whether the creator is the current user.",
+                  "type": "boolean",
+                  "nullable": true
+                },
+                "id": {
+                  "description": "The profile ID of the creator.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            },
+            "extendedProperties": {
+              "description": "Extended properties of the event. If provided, merges with existing values (only provided sub-keys are updated, existing keys are preserved). Set the top-level extendedProperties to null to clear it entirely. Set private or shared to null to remove that entire sub-section. Set an individual key's value to null to delete that specific key.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "private": {
+                  "description": "Private extended properties, visible only to the event organizer. Dictionary of key-value pairs where keys are strings and values are strings or null (null deletes the key). Set to null to remove all private properties.",
+                  "type": "object",
+                  "nullable": true,
+                  "additionalProperties": {
+                    "description": "A string property value, or null to delete this key.",
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "shared": {
+                  "description": "Shared extended properties, visible to all event attendees. Dictionary of key-value pairs where keys are strings and values are strings or null (null deletes the key). Set to null to remove all shared properties.",
+                  "type": "object",
+                  "nullable": true,
+                  "additionalProperties": {
+                    "description": "A string property value, or null to delete this key.",
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              },
+              "required": []
+            }
+          },
+          "required": []
+        },
+        "sendUpdates": {
+          "description": "Whether to send updates about the patch.\nPossible values: \"all\", \"externalOnly\", \"none\". Defaults to \"none\".",
+          "type": "string",
+          "default": "none",
+          "enum": [
+            "all",
+            "externalOnly",
+            "none"
+          ]
+        }
+      },
+      "required": [
+        "eventId"
+      ]
+    }
+  },
+  {
+    "name": "query_free_busy",
+    "description": "Return free/busy information for a set of calendars over a time interval.\n\nArgs:\n    timeMin (Optional[str]):\n        The start of the interval (inclusive) for the query, as an RFC 3339 timestamp\n        (e.g., \"2026-06-15T00:00:00Z\"). Required. Required.\n    timeMax (Optional[str]):\n        The end of the interval (exclusive) for the query, as an RFC 3339 timestamp\n        (e.g., \"2026-06-16T00:00:00Z\"). Required and must be later than timeMin.\n        Required.\n    timeZone (str):\n        IANA time zone used to format the busy timestamps in the response. Optional;\n        defaults to UTC. An unrecognized time zone is ignored and UTC is used. Optional;\n        default: 'UTC'.\n    calendarExpansionMax (Optional[int]):\n        Maximum number of calendars for which free/busy information is returned.\n        Optional; maximum value is 50. Calendars beyond this limit are reported with a\n        tooManyCalendarsRequested error. Optional; nullable; default: None.\n    items (Optional[List[Dict[str, Any]]]):\n        List of calendars to query. Each entry has an `id`. Optional; an empty or\n        omitted list returns no calendar data. Optional; nullable; default: None.\n        Fields:\n        - items[].id (str): The identifier of a calendar to query. Use \"primary\" for the\n          authenticated user's primary calendar, or a calendar ID returned by\n          calendarList.list. Required.\n\nReturns:\n    dict:\n        Response body for the freebusy.query endpoint.\n        Fields:\n        - kind (str): Type of the resource; always \"calendar#freeBusy\". Optional;\n          default: 'calendar#freeBusy'.\n        - timeMin (str): The start of the queried interval, echoed back in UTC.\n          Required.\n        - timeMax (str): The end of the queried interval, echoed back in UTC. Required.\n        - calendars (dict): Free/busy information keyed by the requested calendar\n          identifier. Optional.\n\nRaises:\n    TypeError:\n        If timeMin or timeMax is not a string. If timeZone is not a string. If\n        calendarExpansionMax is not an integer. If an items[].id is not a string.\n    InvalidInputExceptionError:\n        If timeMin or timeMax is not a valid RFC 3339 datetime string. If the specified\n        time range is empty (timeMin is greater than or equal to timeMax). If\n        calendarExpansionMax is less than 1. If an items[].id is empty or whitespace.\n    ValidationError:\n        If timeMin or timeMax is missing or null. Raised if the response does not\n        conform to the expected schema.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "timeMin": {
+          "description": "The start of the interval (inclusive) for the query, as an RFC 3339 timestamp (e.g., \"2026-06-15T00:00:00Z\"). Required.",
+          "type": "string",
+          "nullable": false
+        },
+        "timeMax": {
+          "description": "The end of the interval (exclusive) for the query, as an RFC 3339 timestamp (e.g., \"2026-06-16T00:00:00Z\"). Required and must be later than timeMin.",
+          "type": "string",
+          "nullable": false
+        },
+        "timeZone": {
+          "description": "IANA time zone used to format the busy timestamps in the response. Optional; defaults to UTC. An unrecognized time zone is ignored and UTC is used.",
+          "type": "string",
+          "default": "UTC",
+          "nullable": false
+        },
+        "calendarExpansionMax": {
+          "description": "Maximum number of calendars for which free/busy information is returned. Optional; maximum value is 50. Calendars beyond this limit are reported with a tooManyCalendarsRequested error.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "items": {
+          "description": "List of calendars to query. Each entry has an `id`. Optional; an empty or omitted list returns no calendar data.",
+          "type": "array",
+          "items": {
+            "description": "A single calendar identifier to include in a free/busy query.",
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "The identifier of a calendar to query. Use \"primary\" for the authenticated user's primary calendar, or a calendar ID returned by calendarList.list.",
+                "type": "string",
+                "nullable": false
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "nullable": false
+          },
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "timeMin",
+        "timeMax"
+      ]
+    }
+  },
+  {
+    "name": "stop_notification_channel",
+    "description": "Stops watching resources through a channel. This operation removes the channel from the\n\nlist of active channels and prevents further notifications from being sent.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "description": "The resource to stop the channel with.",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "The identifier of the channel.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      },
+      "required": [
+        "resource"
+      ]
+    }
+  },
+  {
+    "name": "update_access_control_rule",
+    "description": "Replaces an existing access control rule with new data.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The ID of the calendar containing the rule.",
+          "type": "string"
+        },
+        "ruleId": {
+          "description": "The ID of the rule to update.",
+          "type": "string"
+        },
+        "resource": {
+          "description": "The complete new rule data:",
+          "type": "object",
+          "properties": {
+            "role": {
+              "description": "The role assigned to the scope. Possible values are: 'none', 'freeBusyReader', 'reader', 'writer', 'owner'.",
+              "type": "string",
+              "enum": [
+                "none",
+                "freeBusyReader",
+                "reader",
+                "writer",
+                "owner"
+              ]
+            },
+            "scope": {
+              "description": "The extent to which calendar access is granted by this ACL rule.",
+              "type": "object",
+              "properties": {
+                "type": {
+                  "description": "The type of scope. Possible values are 'default', 'user', 'group', 'domain'.",
+                  "type": "string",
+                  "enum": [
+                    "default",
+                    "user",
+                    "group",
+                    "domain"
+                  ]
+                },
+                "value": {
+                  "description": "The email address of a user or group, or the name of a domain, depending on the scope type. Omitted for type \"default\".",
+                  "type": "string",
+                  "default": ""
+                }
+              },
+              "required": [
+                "type"
+              ]
+            }
+          },
+          "required": [
+            "role",
+            "scope"
+          ]
+        },
+        "sendNotifications": {
+          "description": "Whether to send notifications. Defaults to True.",
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "calendarId",
+        "ruleId",
+        "resource"
+      ]
+    }
+  },
+  {
+    "name": "update_calendar_list_entry",
+    "description": "Updates an existing calendar list entry with the provided data.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The ID of the calendar list entry to update. Cannot be empty and must not exceed 255 characters. If \"primary\" is provided, the primary calendar will be updated.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "colorRgbFormat": {
+          "description": "Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.",
+          "type": "boolean",
+          "default": false
+        },
+        "resource": {
+          "description": "The resource containing the fields to update. Required. UPDATE semantic: fields not provided or set to None will be reset to their default values (unlike PATCH which preserves existing values). Note: id, summary, description, timeZone, location, and primary are read-only fields and cannot be updated.",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "READ-ONLY. The calendar ID comes from the calendarId parameter. This field is ignored if sent.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "summary": {
+              "description": "READ-ONLY. The summary comes from the underlying calendar. This field is ignored if sent.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "description": {
+              "description": "READ-ONLY. The description comes from the underlying calendar. This field is ignored if sent.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "timeZone": {
+              "description": "READ-ONLY. The timeZone comes from the underlying calendar. This field is ignored if sent.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "location": {
+              "description": "READ-ONLY. The location comes from the underlying calendar. This field is ignored if sent.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "primary": {
+              "description": "READ-ONLY. The primary flag comes from the underlying calendar. This field is ignored if sent.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "summaryOverride": {
+              "description": "The summary that the authenticated user has set for this calendar. If not provided or set to None, will be reset to None (UPDATE semantic). This overrides the read-only summary field for display purposes. XSS patterns are not allowed.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "selected": {
+              "description": "Whether the calendar content shows up in the calendar UI. If not provided or set to None, will be reset to False (UPDATE semantic).",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "colorId": {
+              "description": "The color of the calendar. This is an ID referring to an entry in the calendar section of the colors definition (see the colors endpoint). This property is superseded by the backgroundColor and foregroundColor properties and can be ignored when using these properties. Optional. If not provided or set to None, will be reset to None (UPDATE semantic).",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "backgroundColor": {
+              "description": "The main color of the calendar in the hexadecimal format '#0088aa'. This property supersedes the index-based colorId property. To set or change this property, you need to specify colorRgbFormat=true. Must be provided together with foregroundColor. If not provided or set to None, will be reset to None (UPDATE semantic).",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "foregroundColor": {
+              "description": "The foreground color of the calendar in the hexadecimal format '#ffffff'. This property supersedes the index-based colorId property. To set or change this property, you need to specify colorRgbFormat=true. Must be provided together with backgroundColor. If not provided or set to None, will be reset to None (UPDATE semantic).",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "hidden": {
+              "description": "Whether the calendar has been hidden from the list. If not provided or set to None, will be reset to False (UPDATE semantic).",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "notificationSettings": {
+              "description": "The notifications that the authenticated user is receiving for this calendar. If not provided or set to None, will be reset to empty notifications list (UPDATE semantic).",
+              "type": "object",
+              "nullable": true,
+              "default": null,
+              "properties": {
+                "notifications": {
+                  "description": "The list of notifications set for this calendar.",
+                  "type": "array",
+                  "default": [],
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "description": "The type of notification.",
+                        "type": "string",
+                        "enum": [
+                          "eventCreation",
+                          "eventChange",
+                          "eventCancellation",
+                          "eventResponse",
+                          "agenda"
+                        ]
+                      },
+                      "method": {
+                        "description": "The method used to deliver the notification.",
+                        "type": "string",
+                        "enum": [
+                          "email"
+                        ],
+                        "default": "email"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  }
+                }
+              },
+              "required": []
+            },
+            "defaultReminders": {
+              "description": "The default reminders that the authenticated user has for this calendar. If not provided or set to None, will be reset to empty list (UPDATE semantic).",
+              "type": "array",
+              "nullable": true,
+              "default": null,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "method": {
+                    "description": "Method used to deliver the reminder. Required when adding a reminder.",
+                    "type": "string",
+                    "enum": [
+                      "email",
+                      "popup",
+                      "sms"
+                    ]
+                  },
+                  "minutes": {
+                    "description": "Number of minutes before the event start time when the reminder should trigger. Required when adding a reminder.",
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "method",
+                  "minutes"
+                ]
+              }
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "calendarId",
+        "resource"
+      ]
+    }
+  },
+  {
+    "name": "update_calendar_metadata",
+    "description": "Updates an existing calendar with the provided fields. Fields not provided in the resource are preserved. To clear an optional field, explicitly set it to null.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The identifier of the calendar. To retrieve calendar IDs, call the list_calendar_list_entries tool. Use the keyword \"primary\" to access the primary calendar of the currently logged-in user.",
+          "type": "string"
+        },
+        "resource": {
+          "description": "The resource containing fields to update. Fields not provided are preserved; explicitly set to null to clear.",
+          "type": "object",
+          "properties": {
+            "summary": {
+              "description": "The summary of the calendar. Set to null or empty string to clear (defaults to empty string).",
+              "type": "string",
+              "nullable": true
+            },
+            "description": {
+              "description": "The description of the calendar. If explicitly set to null, defaults to empty string.",
+              "type": "string",
+              "nullable": true
+            },
+            "timeZone": {
+              "description": "The time zone of the calendar (e.g. \"America/New_York\"). Must be a valid IANA time zone identifier. Set to null to reset to default (\"UTC\").",
+              "type": "string",
+              "nullable": true
+            },
+            "location": {
+              "description": "Geographic location of the calendar. If explicitly set to null, defaults to empty string.",
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "calendarId",
+        "resource"
+      ]
+    }
+  },
+  {
+    "name": "update_event",
+    "description": "Replaces an existing event with new data.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "description": "The identifier of the event to update.",
+          "type": "string"
+        },
+        "calendarId": {
+          "description": "The identifier of the calendar. Defaults to \"primary\".",
+          "type": "string",
+          "default": "primary"
+        },
+        "resource": {
+          "description": "The event to update with keys:",
+          "type": "object",
+          "properties": {
+            "summary": {
+              "description": "The summary/title of the event.",
+              "type": "string",
+              "nullable": true
+            },
+            "description": {
+              "description": "The description of the event.",
+              "type": "string",
+              "nullable": true
+            },
+            "start": {
+              "description": "The start time of the event. Required.",
+              "type": "object",
+              "properties": {
+                "date": {
+                  "description": "The date of the start time in format YYYY-MM-DD. An event must have either date or dateTime field and cannot have both at the same time. Default to None.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "dateTime": {
+                  "description": "The date and time of the start time in RFC 3339 format YYYY-MM-DDTHH:MM:SSZ, YYYY-MM-DDTHH:MM:SS+/-HH:MM, or YYYY-MM-DDTHH:MM:SS format. If the dateTime string does not contain timezone information (YYYY-MM-DDTHH:MM:SS), then timeZone should be provided. If dateTime contains timezone information (YYYY-MM-DDTHH:MM:SSZ or YYYY-MM-DDTHH:MM:SS+/-HH:MM), then timeZone is ignored. An event must have either date or dateTime field and cannot have both at the same time. Default to None.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "timeZone": {
+                  "description": "The time zone of the start time in IANA format (e.g., \"America/New_York\"). The timeZone is required if the dateTime string does not contain timezone information (YYYY-MM-DDTHH:MM:SS). Defaults to None.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            },
+            "end": {
+              "description": "The end time of the event. Required.",
+              "type": "object",
+              "properties": {
+                "date": {
+                  "description": "The date of the end time in format YYYY-MM-DD. An event must have either date or dateTime field and cannot have both at the same time. Default to None.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "dateTime": {
+                  "description": "The date and time of the end time in RFC 3339 format YYYY-MM-DDTHH:MM:SSZ, YYYY-MM-DDTHH:MM:SS+/-HH:MM, or YYYY-MM-DDTHH:MM:SS format. If the dateTime string does not contain timezone information (YYYY-MM-DDTHH:MM:SS), then timeZone should be provided. If dateTime contains timezone information (YYYY-MM-DDTHH:MM:SSZ or YYYY-MM-DDTHH:MM:SS+/-HH:MM), then timeZone is ignored. An event must have either date or dateTime field and cannot have both at the same time. Default to None.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "timeZone": {
+                  "description": "The time zone of the end time in IANA format (e.g., \"America/New_York\"). The timeZone is required if the dateTime string does not contain timezone information (YYYY-MM-DDTHH:MM:SS). Defaults to None.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            },
+            "recurrence": {
+              "description": "The recurrence rules of the event in RRULE format and exception dates in EXDATE format.\n Examples:\n- Daily for 5 occurrences: [\"RRULE:FREQ=DAILY;COUNT=5\"]\n- Weekly on Monday and Wednesday: [\"RRULE:FREQ=WEEKLY;BYDAY=MO,WE\"]\n- Monthly on the 15th: [\"RRULE:FREQ=MONTHLY;BYMONTHDAY=15\"]\n- Yearly on January 1st: [\"RRULE:FREQ=YEARLY;BYMONTH=1;BYMONTHDAY=1\"]\n- Every 2 weeks: [\"RRULE:FREQ=WEEKLY;INTERVAL=2\"]\n- Until a specific date: [\"RRULE:FREQ=DAILY;UNTIL=20241231T235959Z\"]\n- With exception dates: [\"RRULE:FREQ=WEEKLY;BYDAY=MO\", \"EXDATE:20241225T120000Z\", \"EXDATE:20250101T120000Z\"]\n- Multiple exception dates: [\"RRULE:FREQ=DAILY;COUNT=10\", \"EXDATE:20241225T120000Z\", \"EXDATE:20241226T120000Z\"]\n- All-day event exceptions: [\"RRULE:FREQ=WEEKLY;BYDAY=MO\", \"EXDATE:20241225\", \"EXDATE:20250101\"]\nSupported RRULE parameters:\n- FREQ: MINUTELY, HOURLY, DAILY, WEEKLY, MONTHLY, YEARLY (required)\n- INTERVAL: Positive integer (default: 1)\n- COUNT: Positive integer (number of occurrences)\n- UNTIL: YYYYMMDDTHHMMSSZ (UTC required; Z suffix required for date-time)\n- BYDAY: SU,MO,TU,WE,TH,FR,SA (with optional ordinal: 1SU, -1MO)\n- BYMONTH: 1-12\n- BYMONTHDAY: 1-31\n- BYYEARDAY: 1-366\n- BYWEEKNO: 1-53\n- BYHOUR: 0-23\n- BYMINUTE: 0-59\n- BYSECOND: 0-59\n- BYSETPOS: 1-366 or -366 to -1\n- WKST: SU,MO,TU,WE,TH,FR,SA (week start)\nSupported EXDATE format:\n- EXDATE:YYYYMMDDTHHMMSSZ (UTC timezone)\n- EXDATE:YYYYMMDDTHHMMSS (floating/local time)\n- EXDATE:YYYYMMDD (date only for all-day events)\n- Multiple dates: Use separate EXDATE entries (not comma-separated)\nNote: TZID parameter not supported in this implementation",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string"
+              }
+            },
+            "attendees": {
+              "description": "List of event attendees. Each attendee can have:",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "description": "The attendee's email address",
+                    "type": "string",
+                    "format": "email",
+                    "nullable": true
+                  },
+                  "displayName": {
+                    "description": "The attendee's display name",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "organizer": {
+                    "description": "Whether the attendee is the organizer",
+                    "type": "boolean",
+                    "nullable": false,
+                    "default": false
+                  },
+                  "self": {
+                    "description": "Whether the attendee is the user",
+                    "type": "boolean",
+                    "nullable": false,
+                    "default": false
+                  },
+                  "resource": {
+                    "description": "Whether the attendee is a resource",
+                    "type": "boolean",
+                    "nullable": false,
+                    "default": false
+                  },
+                  "optional": {
+                    "description": "Whether the attendee's presence is optional",
+                    "type": "boolean",
+                    "nullable": false,
+                    "default": false
+                  },
+                  "responseStatus": {
+                    "description": "The attendee's response status",
+                    "type": "string",
+                    "nullable": false,
+                    "default": "needsAction",
+                    "enum": [
+                      "accepted",
+                      "declined",
+                      "tentative",
+                      "needsAction",
+                      "organizer"
+                    ]
+                  },
+                  "comment": {
+                    "description": "The attendee's comment",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "additionalGuests": {
+                    "description": "Number of additional guests",
+                    "type": "integer",
+                    "nullable": false,
+                    "default": 0
+                  }
+                },
+                "required": []
+              }
+            },
+            "reminders": {
+              "description": "The reminders of the event.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "useDefault": {
+                  "description": "Whether to use the default reminders.",
+                  "type": "boolean",
+                  "nullable": true
+                },
+                "overrides": {
+                  "description": "The list of overrides.",
+                  "type": "array",
+                  "nullable": true,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "description": "The method of the reminder.",
+                        "type": "string",
+                        "nullable": false,
+                        "enum": [
+                          "email",
+                          "popup",
+                          "sms"
+                        ]
+                      },
+                      "minutes": {
+                        "description": "The minutes of the reminder.",
+                        "type": "integer",
+                        "minimum": 0,
+                        "nullable": false
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "minutes"
+                    ]
+                  }
+                }
+              },
+              "required": []
+            },
+            "location": {
+              "description": "The location of the event.",
+              "type": "string",
+              "nullable": true
+            },
+            "attachments": {
+              "description": "List of file attachments associated with the event.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "fileUrl": {
+                    "description": "URL of the attached file. Required when adding an attachment.",
+                    "type": "string",
+                    "pattern": "^https?://.+"
+                  },
+                  "title": {
+                    "description": "Attachment title.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mimeType": {
+                    "description": "Internet media type (MIME type) of the attachment.",
+                    "type": "string",
+                    "pattern": "^[\\w!#$&.+\\-^]+/[\\w!#$&.+\\-^]+$",
+                    "nullable": true
+                  },
+                  "iconLink": {
+                    "description": "URL link to the attachment's icon.",
+                    "type": "string",
+                    "pattern": "^https?://\\S+$",
+                    "nullable": true
+                  },
+                  "fileId": {
+                    "description": "ID of the attached file. Read-only.",
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "fileUrl"
+                ]
+              }
+            },
+            "extendedProperties": {
+              "description": "Extended properties of the event. Allows storing custom metadata as key-value pairs. Extended properties can be private (visible only to the organizer) or shared (visible to all attendees).",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "private": {
+                  "description": "Private extended properties, visible only to the event organizer. Dictionary of key-value pairs where both keys and values are strings.",
+                  "type": "object",
+                  "nullable": true,
+                  "additionalProperties": {
+                    "description": "A key-value pair where the key is a string property name and the value is a string property value.",
+                    "type": "string"
+                  }
+                },
+                "shared": {
+                  "description": "Shared extended properties, visible to all event attendees. Dictionary of key-value pairs where both keys and values are strings.",
+                  "type": "object",
+                  "nullable": true,
+                  "additionalProperties": {
+                    "description": "A key-value pair where the key is a string property name and the value is a string property value.",
+                    "type": "string"
+                  }
+                }
+              },
+              "required": []
+            }
+          },
+          "required": [
+            "start",
+            "end"
+          ]
+        },
+        "sendUpdates": {
+          "description": "Whether to send updates about the update.\nPossible values: \"all\", \"externalOnly\", \"none\". Defaults to \"none\".",
+          "type": "string",
+          "enum": [
+            "all",
+            "externalOnly",
+            "none"
+          ],
+          "nullable": false,
+          "default": "none"
+        }
+      },
+      "required": [
+        "eventId",
+        "resource"
+      ]
+    }
+  },
+  {
+    "name": "watch_access_control_rule_changes",
+    "description": "Sets up a watch for changes to access control rules.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The ID of the calendar to watch.",
+          "type": "string"
+        },
+        "resource": {
+          "description": "Watch channel configuration. Contains the channel details for receiving push notifications.",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "A UUID or similar unique string that identifies this channel. Required.",
+              "type": "string"
+            },
+            "type": {
+              "description": "The type of delivery mechanism used for this channel. Must be \"web_hook\" or \"webhook\". If \"webhook\" is provided, it will be normalized to \"web_hook\" in the response. Required.",
+              "type": "string"
+            },
+            "address": {
+              "description": "The HTTPS address where notifications are delivered for this channel. Required.",
+              "type": "string"
+            },
+            "token": {
+              "description": "An arbitrary string delivered to the target address with each notification. Optional. Defaults to None.",
+              "type": "string",
+              "minLength": 1,
+              "pattern": ".*\\S.*",
+              "nullable": true,
+              "default": null
+            },
+            "params": {
+              "description": "Additional parameters controlling delivery channel behavior. Optional. Defaults to None.",
+              "type": "object",
+              "nullable": true,
+              "default": null,
+              "properties": {
+                "ttl": {
+                  "description": "The time-to-live in seconds for the notification channel. Must be a non-negative integer string (the channel expiration is computed as current time + ttl, so negative values would create an already-expired channel). Defaults to 604800 seconds (7 days).",
+                  "type": "string",
+                  "nullable": false,
+                  "default": "604800"
+                }
+              },
+              "required": []
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "address"
+          ]
+        }
+      },
+      "required": [
+        "calendarId",
+        "resource"
+      ]
+    }
+  },
+  {
+    "name": "watch_calendar_list_changes",
+    "description": "Sets up a watch for changes to CalendarList resources.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "description": "Watch configuration with channel details.",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "Channel ID. If not provided, one will be generated.",
+              "type": "string",
+              "nullable": true
+            },
+            "type": {
+              "description": "Delivery mechanism: \"web_hook\" or \"webhook\".",
+              "type": "string",
+              "default": "web_hook"
+            },
+            "address": {
+              "description": "HTTPS URL where notifications are delivered (required for web_hook channels).",
+              "type": "string"
+            },
+            "token": {
+              "description": "Optional opaque string echoed with notifications.",
+              "type": "string",
+              "minLength": 1,
+              "pattern": ".*\\S.*",
+              "nullable": true,
+              "default": null
+            },
+            "params": {
+              "description": "Optional; includes ttl (seconds) for channel lifetime.",
+              "type": "object",
+              "default": {
+                "ttl": "604800"
+              },
+              "properties": {
+                "ttl": {
+                  "description": "Time-to-live in seconds for the channel.",
+                  "type": "string",
+                  "default": "604800"
+                }
+              },
+              "required": []
+            }
+          },
+          "required": [
+            "address"
+          ]
+        }
+      },
+      "required": [
+        "resource"
+      ]
+    }
+  },
+  {
+    "name": "watch_event_changes",
+    "description": "Sets up a watch for changes to events in the specified calendar.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "calendarId": {
+          "description": "The identifier of the calendar. If you want to access the primary calendar of the currently logged in user, use the \"primary\" keyword. To retrieve calendar IDs, call the list_calendar_list_entries tool.",
+          "type": "string",
+          "nullable": true,
+          "default": "primary"
+        },
+        "resource": {
+          "description": "The watch configuration.",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "A UUID or similar unique string that identifies this channel. If not provided, one will be generated.",
+              "type": "string",
+              "nullable": true
+            },
+            "type": {
+              "description": "The type of delivery mechanism used for this channel. Valid values are \"web_hook\" (or \"webhook\"). Defaults to \"web_hook\".",
+              "type": "string",
+              "default": "web_hook"
+            },
+            "address": {
+              "description": "The address to send notifications to. Required.",
+              "type": "string"
+            },
+            "token": {
+              "description": "An arbitrary string delivered to the target address with each notification delivered over this channel. Defaults to None.",
+              "type": "string",
+              "minLength": 1,
+              "pattern": ".*\\S.*",
+              "nullable": true,
+              "default": null
+            },
+            "params": {
+              "description": "Additional parameters controlling delivery channel behavior.",
+              "type": "object",
+              "default": {
+                "ttl": "604800"
+              },
+              "properties": {
+                "ttl": {
+                  "description": "The time-to-live in seconds for the notification channel. Default is 604800 seconds.",
+                  "type": "string",
+                  "nullable": false,
+                  "default": "604800"
+                }
+              },
+              "required": []
+            }
+          },
+          "required": [
+            "address"
+          ]
+        }
+      },
+      "required": [
+        "resource"
+      ]
+    }
+  },
+  {
+    "name": "watch_settings",
+    "description": "Sets up a watch channel for changes to the authenticated user's settings. Settings are\nuser-scoped (users/me/settings), so unlike events/ACL watches there is no calendarId\nparameter.\n\nArgs:\n    resource (Dict[str, Union[str, Optional[str], Dict[str, Optional[str]]]]):\n        Watch channel configuration resource for settings changes. Inherits delivery\n        configuration from :class:`BaseWatchChannelConfig`; overrides ``id``/``type`` to\n        be required (no defaults) and ``params`` to the settings-specific params type.\n        Required.\n        Fields:\n        - resource.id (str): A UUID or similar unique string that identifies this\n          channel. Required. Required.\n        - resource.type (str): The type of delivery mechanism used for this channel.\n          Must be 'web_hook' or 'webhook'. If 'webhook' is provided, it will be\n          normalized to 'web_hook' in the response. Required. Required.\n        - resource.address (str): The address (URL) where notifications are delivered\n          for this channel. Required.\n        - resource.token (str | None): An arbitrary string delivered to the target\n          address with each notification. Used for verification and identification of\n          the notification source. Must be a non-empty, non-whitespace-only string when\n          provided. Optional; nullable; minimum length: 1; pattern: '.*\\\\S.*'; default:\n          None.\n        - resource.params (dict | None): Parameters for the settings watch channel\n          request (validates ttl). Optional; nullable; default: None.\n        - resource.params.ttl (str): The time-to-live in seconds for the notification\n          channel. Specifies how long the channel should remain active. Default is\n          604800 seconds (7 days). Optional; default: '604800'.\n\nReturns:\n    Dict[str, Any]:\n        Response model for ``watch_settings``. Inherits all channel fields from\n        :class:`BaseWatchChannelResponse`. ``type`` and ``address`` are required (no\n        defaults); ``resourceUri`` and ``resourceId`` are always computed by the\n        implementation, so they are non-optional here. ``params`` always carries the TTL\n        that was used.\n        Fields:\n        - id (str): Unique identifier for the channel. A UUID or similar unique string\n          that identifies this channel. Required.\n        - type (str): The delivery mechanism type (web_hook). Required.\n        - address (str): The HTTPS address where notifications are delivered. Required.\n        - token (str | None): An arbitrary string delivered to the target address with\n          each notification. Used for verification and identification of the\n          notification source. Must be a non-empty, non-whitespace-only string when\n          provided. Optional; nullable; minimum length: 1; pattern: '.*\\\\S.*'; default:\n          None.\n        - params (dict): Base parameters for watch channel configuration. Contains the\n          time-to-live setting shared across all notification channel parameter models\n          (request, response, and database). Required.\n        - params.ttl (str): The time-to-live in seconds for the notification channel.\n          Specifies how long the channel should remain active. Default is 604800 seconds\n          (7 days). Optional; default: '604800'.\n        - resource (str): The resource type being watched for changes. Values include\n          'events', 'calendar_list', 'acl_rules', 'settings'. Required.\n        - calendarId (str): ID of the calendar associated with this watch channel. For\n          persisted DB channels with resource='calendar_list', the sentinel 'all' (watch\n          all calendars) is exempt from Calendar FK checks in\n          GridwellCalendarDB.validate_channels_reference_existing_calendars and\n          GridwellCalendarDB.validate_all_references. Required.\n        - resourceUri (str): A version-specific identifier for the watched resource.\n          Always computed as the Calendar settings API endpoint URL. Required.\n        - expiration (str): Date and time of notification channel expiration, expressed\n          as a Unix timestamp in milliseconds (numeric string). When omitted, defaults\n          to approximately seven days from server evaluation time (UTC). Required;\n          pattern: '^\\\\d+$'.\n        - resourceId (str): An opaque ID that identifies the resource being watched on\n          this channel. Always computed from the channel id. Required.\n        - kind (str): Identifies this as a notification channel used to watch for\n          changes to a resource, which is 'api#channel'. Optional; allowed values:\n          ['api#channel']; default: 'api#channel'.\n        - payload (bool): Whether the channel should include a payload with change\n          notifications. Defaults to False when omitted. Optional; default: False.\n\nRaises:\n    ValidationError:\n        Raised if resource is not a dictionary or is None. Raised if required resource\n        fields (id, type, address) are missing or empty. Raised if resource.type is not\n        'web_hook' or 'webhook'. Raised if resource.address is not a valid HTTP(S) URL.\n        Raised if token is not a string. Raised if params.ttl is not a non-negative\n        integer string. Raised if resource contains extra fields (only id, type,\n        address, token, params allowed).\n    ResourceAlreadyExistsError:\n        Channel with the given id already exists. Retry with a new, unique UUID for the\n        channel id.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "description": "Watch channel configuration resource for settings changes.\n\nInherits delivery configuration from :class:`BaseWatchChannelConfig`; overrides\n``id``/``type`` to be required (no defaults) and ``params`` to the settings-specific\nparams type.",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "A UUID or similar unique string that identifies this channel. Required.",
+              "type": "string",
+              "nullable": false
+            },
+            "type": {
+              "description": "The type of delivery mechanism used for this channel. Must be 'web_hook' or 'webhook'. If 'webhook' is provided, it will be normalized to 'web_hook' in the response. Required.",
+              "type": "string",
+              "nullable": false
+            },
+            "address": {
+              "description": "The address (URL) where notifications are delivered for this channel.",
+              "type": "string",
+              "nullable": false
+            },
+            "token": {
+              "description": "An arbitrary string delivered to the target address with each notification. Used for verification and identification of the notification source. Must be a non-empty, non-whitespace-only string when provided.",
+              "type": "string",
+              "minLength": 1,
+              "pattern": ".*\\S.*",
+              "nullable": true,
+              "default": null
+            },
+            "params": {
+              "description": "Parameters for the settings watch channel request (validates ttl).",
+              "type": "object",
+              "properties": {
+                "ttl": {
+                  "description": "The time-to-live in seconds for the notification channel. Specifies how long the channel should remain active. Default is 604800 seconds (7 days).",
+                  "type": "string",
+                  "default": "604800",
+                  "nullable": false
+                }
+              },
+              "required": [],
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "address"
+          ],
+          "nullable": false
+        }
+      },
+      "required": [
+        "resource"
+      ]
+    }
+  }
+]

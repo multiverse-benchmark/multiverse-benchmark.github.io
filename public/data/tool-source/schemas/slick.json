@@ -1,0 +1,2253 @@
+[
+  {
+    "name": "add_reaction_to_message",
+    "description": "Adds a reaction to a message.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel_id": {
+          "description": "Existing channel ID (e.g., C1234567890). Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "name": {
+          "description": "Reaction (emoji) name. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "message_ts": {
+          "description": "Timestamp of the message. This should be a string representation of a Unix timestamp with up to 6 decimal places for microsecond precision. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "channel_id",
+        "name",
+        "message_ts"
+      ]
+    }
+  },
+  {
+    "name": "add_reminder",
+    "description": "Creates a reminder for the current user.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "description": "The content of the reminder. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "ts": {
+          "description": "When this reminder should happen (unix timestamp as a string). Must be a non-empty string representing a number (e.g., '1678886400'). Accepts seconds precision only. Maximum 5 years in the future.",
+          "type": "string",
+          "nullable": false
+        },
+        "channel_id": {
+          "description": "Channel ID to remind in. Defaults to None. If provided as a string, it can be empty (unlike text).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "text",
+        "ts"
+      ]
+    }
+  },
+  {
+    "name": "add_remote_file",
+    "description": "Add a remote file to the Slick workspace.\n\nThis function registers an external file in Slick's database, allowing it to be referenced\nand shared within the Slick workspace. The file itself remains hosted externally.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "external_id": {
+          "description": "A unique identifier for the file in the external system.\nMust be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "external_url": {
+          "description": "The URL where the file can be accessed.\nMust be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "title": {
+          "description": "The display title for the file in Slick.\nMust be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "filetype": {
+          "description": "The type/extension of the file (e.g., \"pdf\", \"docx\").\nMust be a non-empty string if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "indexable_file_contents": {
+          "description": "Text content that can be indexed for search.\nMust be a non-empty string if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "external_id",
+        "external_url",
+        "title"
+      ]
+    }
+  },
+  {
+    "name": "archive_conversation",
+    "description": "Archives a conversation by setting its archived status and closing it.\n\nThis function marks a conversation as archived (is_archived=True) and closes it (is_open=False)\nin the database. Archived conversations are typically hidden from regular channel lists and are\nno longer actively used.\n\nPermission Model: Uses type-aware validation - public channels can be archived by any user, while\nprivate channels, groups, and DMs require the user to be a member (user ID in conversations.members list).\nThe current_user from the database is used to determine the acting user.\n\nDatabase Resilience: Raises RuntimeError for severe corruption (channel data, non-public channel\nconversations/members structure). Public channels unaffected by conversations/members corruption.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "ID of an existing conversation to archive (e.g., C1234567890). Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "channel"
+      ]
+    }
+  },
+  {
+    "name": "close_conversation",
+    "description": "Closes a direct message or multi-person direct message. Requires authentication. User must be a member of the conversation. Only IM and MPIM types can be closed.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "Conversation ID to close (e.g., 'C1234567890' or 'D1234567890').",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "channel"
+      ]
+    }
+  },
+  {
+    "name": "complete_reminder",
+    "description": "Marks a reminder as complete.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "reminder_id": {
+          "description": "The ID of the reminder. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "complete_ts": {
+          "description": "Timestamp for when it was completed. Must be a non-empty string representing a valid numeric timestamp (e.g., '1678886400'). Timestamps are represented as a string containing a number.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "reminder_id",
+        "complete_ts"
+      ]
+    }
+  },
+  {
+    "name": "create_channel",
+    "description": "Initiates a public or private channel-based conversation.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Name of the channel, non-empty string, it must be unique.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "is_private": {
+          "description": "Create a private channel. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "team_id": {
+          "description": "Encoded team id. Can be null or a string if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "create_user_group",
+    "description": "Creates a new User Group.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Name of the User Group. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "handle": {
+          "description": "A mention handle for the User Group. Must be a non-empty string if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "team_id": {
+          "description": "ID of the team the User Group belongs to. Must be a string if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "description": {
+          "description": "Description of the User Group. Must be a string if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "channel_ids": {
+          "description": "List of existing channel IDs to include in the User Group (e.g., [\"C1234567890\", \"C0987654321\"]).\nIf provided, must be a list of non empty strings. Defaults to None.",
+          "type": "array",
+          "nullable": true,
+          "default": null,
+          "items": {
+            "description": "Channel ID",
+            "type": "string",
+            "nullable": false
+          }
+        },
+        "created_at": {
+          "description": "Timestamp when the User Group was created. Must be a positive timestamp not in the future. Defaults to None, which generates the current time as a string.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "delete_chat_message",
+    "description": "Deletes a message from a specified channel by its timestamp.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "The unique identifier of an existing channel containing the message (e.g., C1234567890). This must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "ts": {
+          "description": "A Unix timestamp with fractional seconds representing the message to be deleted. This must be a non-empty string representing a valid positive Unix timestamp.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "channel",
+        "ts"
+      ]
+    }
+  },
+  {
+    "name": "delete_file",
+    "description": "Deletes a file from the Slick workspace.\n\nThis function permanently removes a file from the Slick workspace, including\nfrom all channels where it was shared.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "file_id": {
+          "description": "The ID of the file to delete. This must be a non-empty string that uniquely identifies a file in the Slick workspace. The file ID is used to locate and permanently remove the file from both the main files database and all channels where it was shared. The file ID must not be empty or contain only whitespace characters. Validated by Pydantic model.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "file_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_reminder",
+    "description": "Deletes a reminder.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "reminder_id": {
+          "description": "The ID of the reminder. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "reminder_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_scheduled_message",
+    "description": "Deletes a pending scheduled message before it is sent. Requires authentication. Non-admin users can only delete their own scheduled messages in public channels or private channels they are a member of. Admins can delete any message in public channels, but must be members of private channels to delete messages there.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "Channel ID where the message was scheduled (e.g., 'C1234567890').",
+          "type": "string",
+          "nullable": false
+        },
+        "scheduled_message_id": {
+          "description": "Unique ID of the scheduled message to delete (e.g., 'Q1234567890').",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "channel",
+        "scheduled_message_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_user_photo",
+    "description": "Deletes the authenticated user's profile photo. Users can only delete their own photo. Requires authentication.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "The ID of the user whose profile photo should be deleted. If not provided or empty string, uses current_user from DB. Empty strings or only whitespace strings are treated as None. Example: 'U123ABC456'. Users can only delete their own photo - attempting to delete another user's photo will raise NotAllowedError. Raises UserNotFoundError if the user doesn't exist.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "disable_user_group",
+    "description": "Disables a User Group..",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "usergroup_id": {
+          "description": "The ID of the User Group to disable. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "date_delete": {
+          "description": "Timestamp string when the User Group was deleted. Must be a string if provided. Defaults to None",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "usergroup_id"
+      ]
+    }
+  },
+  {
+    "name": "enable_user_group",
+    "description": "Enables a disabled User Group, reactivating it by resetting disabled flag, date_delete timestamp, and deleted_by field. Requires admin privileges.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "usergroup_id": {
+          "description": "The ID of the usergroup to enable. Must be a non-empty string that matches an existing usergroup in the workspace. Example: 'S0614TZR7'. The usergroup will be reactivated by setting disabled=False, resetting date_delete to 0, and clearing deleted_by. Raises UserGroupNotFoundError if the ID doesn't exist.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "usergroup_id"
+      ]
+    }
+  },
+  {
+    "name": "finish_external_file_upload",
+    "description": "Finishes an external file upload started with `get_external_upload_url()`.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "files": {
+          "description": "List of file object dictionaries. Each dictionary must contain:",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Required. The ID of the file to update. Must be a non-empty string.",
+                "type": "string",
+                "nullable": false
+              },
+              "title": {
+                "description": "Optional. The new title for the file. Defaults to None.",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        "channel_id": {
+          "description": "Channel ID where the file will be shared. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "initial_comment": {
+          "description": "Initial comment for the file. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "thread_ts": {
+          "description": "Parent message timestamp. When provided along with channel_id, the file is shared as a reply to that thread. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "files"
+      ]
+    }
+  },
+  {
+    "name": "get_conversation_history",
+    "description": "Fetches a conversation's history of messages and events.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "Existing conversation ID (e.g., C1234567890). Must be a non-empty string.",
+          "type": "string"
+        },
+        "cursor": {
+          "description": "Pagination cursor. Defaults to None. If provided, must be a base64-encoded string\nwith the format \"ts:{timestamp}\" (e.g., \"dHM6MTY4ODY4MzA1NS41NTY2Nzk=\" for \"ts:1688683055.556679\").\nThe cursor contains the timestamp of the last message from the previous page, enabling accurate\npagination that continues from the exact position.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "include_all_metadata": {
+          "description": "Return all metadata. Defaults to False. Must be a boolean if provided.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "inclusive": {
+          "description": "Include messages with oldest/latest timestamps.\nDefaults to False. Must be a boolean if provided.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "latest": {
+          "description": "Only messages before this timestamp.\nDefaults to None (current time). If provided, must be a string in Unix timestamp format\nwith exactly 6 decimal places for microsecond precision (e.g. \"1688683055.556679\").\nThe timestamp must be a valid Unix timestamp that can be converted to a float.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "limit": {
+          "description": "Maximum number of items to return. Defaults to 100. Must be an integer between 1 and 999 if provided.",
+          "type": "integer",
+          "nullable": false,
+          "default": 100
+        },
+        "oldest": {
+          "description": "Only messages after this timestamp. Defaults to \"0.000000\" representing the Unix epoch.\nMust be a string in Unix timestamp format with exactly 6 decimal places for microsecond precision (e.g. \"1688683055.556679\").\nThe timestamp must be a valid Unix timestamp that can be converted to a float.",
+          "type": "string",
+          "nullable": false,
+          "default": "0.000000"
+        },
+        "user_id": {
+          "description": "If provided, only messages whose ``user`` field matches this ID will be\nreturned. Useful for filtering messages sent by a specific user.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "channel"
+      ]
+    }
+  },
+  {
+    "name": "get_conversation_members",
+    "description": "Retrieve members of a conversation.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "ID of an existing conversation (e.g., C1234567890). Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "cursor": {
+          "description": "Pagination cursor. Defaults to None. If provided, must be a base64-encoded string\nwith the format \"user:{user_id}\" (e.g., \"dXNlcjpVMDA0\" for \"user:U004\").\nThe cursor contains the user ID of the last member from the previous page, enabling accurate\npagination that continues from the exact position.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "limit": {
+          "description": "Maximum number of items to return. Defaults to 100. Must be positive and cannot exceed 10000.",
+          "type": "integer",
+          "nullable": true,
+          "default": 100
+        }
+      },
+      "required": [
+        "channel"
+      ]
+    }
+  },
+  {
+    "name": "get_conversation_replies",
+    "description": "Retrieve a thread of messages posted to a conversation.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "Existing conversation ID (e.g., C1234567890). Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "ts": {
+          "description": "Timestamp of the parent message or any message in the thread (Unix timestamp string, e.g., '1688683055.556679'). If the timestamp belongs to a reply, the parent message is automatically identified.",
+          "type": "string",
+          "nullable": false
+        },
+        "cursor": {
+          "description": "Pagination cursor. Defaults to None. If provided, must be a base64-encoded string with the format \"ts:{timestamp}\" (e.g., \"dHM6MTY4ODY4MzA1NS41NTY2Nzk=\" for \"ts:1688683055.556679\"). The cursor contains the timestamp of the last reply from the previous page, enabling accurate pagination that continues from the exact position. Returns only replies after this cursor, excluding the parent message.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "include_all_metadata": {
+          "description": "If True, returns complete message objects with all metadata. If False, returns only basic fields (ts, user, text). Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "inclusive": {
+          "description": "If True, includes messages exactly matching oldest/latest boundaries. If False, only messages strictly between boundaries are included. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "latest": {
+          "description": "Upper bound for timestamp filtering (Unix timestamp string). If None, defaults to current time. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "limit": {
+          "description": "Maximum number of messages to return. On first page, includes parent + replies. On subsequent pages, applies only to replies. Defaults to 1000. Must be a positive integer.",
+          "type": "integer",
+          "nullable": false,
+          "default": 1000
+        },
+        "oldest": {
+          "description": "Lower bound for timestamp filtering (Unix timestamp string). Defaults to '0' (Unix epoch).",
+          "type": "string",
+          "nullable": false,
+          "default": "0"
+        }
+      },
+      "required": [
+        "channel",
+        "ts"
+      ]
+    }
+  },
+  {
+    "name": "get_current_user_id",
+    "description": "Retrieves the ID of the currently authenticated user.\n\nThis function returns information about which user is currently set as the authenticated\nuser in the system. It does not require any input parameters and will return the user ID\nif a current user is set, or an error response if no user is currently authenticated.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_external_upload_url",
+    "description": "Generates a URL for uploading an external file to Slick. This function initiates the file upload process by providing a secure, temporary URL to which the file data can be sent. It takes basic file information, such as its name and size, and returns a unique file ID and the corresponding upload URL. It also starts a 1-minute timer to automatically delete the file record if the upload is not completed.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "filename": {
+          "description": "The name of the file to be uploaded. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "length": {
+          "description": "The size of the file in bytes. Must be greater than 0 and not exceed 50 MB (52,428,800 bytes).",
+          "type": "integer",
+          "nullable": false
+        },
+        "alt_txt": {
+          "description": "A description of the file used for accessibility purposes (e.g., by screen readers). Maximum 1000 characters. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "snippet_type": {
+          "description": "The specific type of snippet, which can be used to influence how the file is displayed. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "filename",
+        "length"
+      ]
+    }
+  },
+  {
+    "name": "get_file_info",
+    "description": "Get information about a file in the Slick workspace.\n\nThis function retrieves detailed information about a specific file, including its metadata,\nassociated channels, and paginated comments. The function supports pagination through file\ncomments using cursor-based pagination, allowing clients to retrieve comments in manageable chunks.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "file_id": {
+          "description": "The unique identifier of the file to retrieve information for. This is a Slick file ID that uniquely identifies a file within the workspace (e.g., 'F1234567890'). The file must exist in the Slick workspace database. This field is required and must be a non-empty string after stripping whitespace. Validated by Pydantic model.",
+          "type": "string",
+          "nullable": false
+        },
+        "cursor": {
+          "description": "Pagination cursor for retrieving subsequent pages of file comments. This is a string representation of a non-negative integer that represents the starting index for the current page of comments. When provided, the function returns comments starting from this index, enabling clients to paginate through long comment lists efficiently. The cursor must be a valid non-negative integer string (e.g., '0', '10', '25'). If the cursor is greater than the total number of available comments, a CursorOutOfBoundsError is raised. A cursor equal to the length returns an empty list. Defaults to None, which means start from the beginning of the comments list. Validated by Pydantic model.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "limit": {
+          "description": "Maximum number of comments to return in a single response. This integer controls how many file comments are included in the paginated results. Must be a positive integer (greater than or equal to 1). Setting a lower limit reduces response size and improves performance when only a subset of comments is needed, while higher limits return more comments per page but may increase response time. The actual number of comments returned may be less than the limit if there are fewer comments available. Defaults to 100. Validated by Pydantic model.",
+          "type": "integer",
+          "nullable": false,
+          "default": 100
+        }
+      },
+      "required": [
+        "file_id"
+      ]
+    }
+  },
+  {
+    "name": "get_message_reactions",
+    "description": "Gets reactions for a specific message in a channel.\n\nThis function is used to get reactions for a specific message in a channel.\nIt can return either a summary of the reactions or all the reaction details.\nIf full is True, it returns all the reaction details.\nIf full is False, it returns a summary of the reactions.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel_id": {
+          "description": "ID of the channel. This field is required and must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "message_ts": {
+          "description": "The timestamp of the message to get reactions for. This should be a string representation of a Unix timestamp with up to 6 decimal places for microsecond precision. Cannot be empty.",
+          "type": "string",
+          "nullable": false
+        },
+        "full": {
+          "description": "If True, return all reaction details. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        }
+      },
+      "required": [
+        "channel_id",
+        "message_ts"
+      ]
+    }
+  },
+  {
+    "name": "get_reminder_info",
+    "description": "Gets information about a reminder.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "reminder_id": {
+          "description": "The ID of the reminder. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "reminder_id"
+      ]
+    }
+  },
+  {
+    "name": "get_user_identity",
+    "description": "Get a user's identity information.\n\nThis function retrieves the identity information for the current authenticated user.\nIt returns the user's username, unique user ID, and the team ID of the team they belong to.\nThis information is essential for identifying users and understanding their team membership.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_user_info",
+    "description": "Gets information about a user in the Slick workspace with authorization.\n\nThis function retrieves detailed information about a specific user by their user ID.\nAuthorization: Users can only view their own information. Administrators can view any user.\nReturns comprehensive user data including profile information, admin status, bot status,\nand optionally locale information.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "User ID to get info on. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "include_locale": {
+          "description": "Optional. Whether to include locale information in the response. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        }
+      },
+      "required": [
+        "user_id"
+      ]
+    }
+  },
+  {
+    "name": "get_user_presence",
+    "description": "Gets user presence information for a specified user or the current authenticated user.\n\nThis function retrieves the presence status (active/away) for a user. If no user_id is provided,\nit uses the current authenticated user from the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "User ID to get presence info for (e.g., 'U123'). If not provided or empty string, uses current_user from DB. Empty strings treated as None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "invite_admin_user",
+    "description": "Invites a user to a Slick workspace.\n\nThis Admin API function requires the calling user to have admin privileges. It creates a\nnew user with the provided email address and optional parameters. It generates a unique\nuser ID, creates a user profile, and optionally adds the user to specified channels.\nIf the user already exists (based on email), it raises an error.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "description": "Email address of the user to invite. Must be a non-empty string and a valid email format.",
+          "type": "string",
+          "nullable": false
+        },
+        "channel_ids": {
+          "description": "Comma-separated list of channel IDs to add the user to. If provided, must be a string. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "real_name": {
+          "description": "Full name of the user. Defaults to None. If not provided (None), it is extracted from the email local part and capitalized.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "team_id": {
+          "description": "ID of the team to invite the user to. If provided, must be a string. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "email"
+      ]
+    }
+  },
+  {
+    "name": "invite_to_conversation",
+    "description": "Invites users to a channel.\n\nThis function invites one or more users (provided as a comma-separated string) to join a channel.\nIt validates each user against the database and tracks which users were successfully invited,\nwhich were already members, and which were invalid. The 'force' parameter allows the operation\nto continue even when some users are invalid.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "The ID of an existing conversation to invite users to (e.g., C1234567890). Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "users": {
+          "description": "A comma separated list of user IDs. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "force": {
+          "description": "Continue inviting valid users even if some are invalid. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        }
+      },
+      "required": [
+        "channel",
+        "users"
+      ]
+    }
+  },
+  {
+    "name": "join_conversation",
+    "description": "Joins an existing conversation.\n\nThis function adds the current authenticated user to a channel's member list. The user is\ndetermined from current_user in the database. If the user is already a member of the channel,\nthe function returns ok=False. If the user is successfully added to the channel, it returns ok=True.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "ID of an existing conversation to join (e.g., C1234567890). Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "channel"
+      ]
+    }
+  },
+  {
+    "name": "kick_from_conversation",
+    "description": "Removes a user from a conversation.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "ID of an existing conversation to remove user from (e.g., C1234567890). Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "user_id": {
+          "description": "ID of user to remove from conversation.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "channel",
+        "user_id"
+      ]
+    }
+  },
+  {
+    "name": "leave_conversation",
+    "description": "Leaves a conversation by removing the authenticated user from the channel's member list.\n\nThis function removes the current authenticated user from a channel. The user must be a member\nof the channel to leave it. The function is resilient to database corruption and validates all\ndata structures before modifying them.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "ID of conversation to leave (e.g., 'C1234567890'). Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "channel"
+      ]
+    }
+  },
+  {
+    "name": "list_channels",
+    "description": "Lists channels in a Slick workspace with optional filtering by type, archived status, and team. Supports pagination for efficient data retrieval. By default, returns only public channels.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "description": "Pagination cursor for retrieving additional pages of results. Must be a string representing a non-negative integer if provided. The cursor points to the starting index for the next page of channels. For example, if limit is 100 and you want to get channels 100-199, set cursor to '100'. The cursor is zero-indexed, so cursor='0' starts from the beginning. Defaults to None, which means start from the beginning.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "exclude_archived": {
+          "description": "When set to True, excludes archived channels from the results. Archived channels are channels that have been archived (is_archived=True) or closed (is_open=False at either channel or conversations level). This filter applies before pagination, so if you exclude archived channels, the total number of available channels will be reduced. Defaults to False, meaning archived channels are included in the results.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "limit": {
+          "description": "The maximum number of channel objects to return in a single page. This controls pagination size. The value must be between 1 and 1000 (inclusive). A limit of 1 returns one channel per page, while a limit of 1000 returns up to 1000 channels per page. Defaults to 100, which is a balanced pagination size for most use cases.",
+          "type": "integer",
+          "nullable": false,
+          "default": 100
+        },
+        "team_id": {
+          "description": "Filters channels to only those belonging to a specific team or workspace. This is an encoded team ID that identifies the Slick workspace. When provided, only channels that have a matching team_id property will be included in the results. If None, channels from all teams are included. This is useful in multi-tenant Slick environments where you need to filter channels by workspace. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "types": {
+          "description": "Filters channels by type using a comma-separated list of channel types. Valid types are: 'public_channel' (public channels visible to all team members), 'private_channel' (private channels with restricted access), 'mpim' (multi-person direct messages), and 'im' (direct messages between two users). You can combine multiple types like 'public_channel,private_channel' to get both public and private channels. The types are case-sensitive and must match exactly. Defaults to 'public_channel', which returns only public channels.",
+          "type": "string",
+          "nullable": false,
+          "default": "public_channel"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_files",
+    "description": "Lists files, optionally filtered by channel, user, and time.\n\nThis function retrieves files from the Slick workspace with optional filtering capabilities.\nFiles can be filtered by channel, user, timestamp range, and file types. Results are paginated\nfor efficient data retrieval.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel_id": {
+          "description": "Filter files shared in a specific channel. Must be a valid channel ID if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "user_id": {
+          "description": "Filter files uploaded by a specific user. Must be a valid user ID if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "ts_from": {
+          "description": "Filter files created after this timestamp (inclusive). Must be a Unix timestamp string if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "ts_to": {
+          "description": "Filter files created before this timestamp (inclusive). Must be a Unix timestamp string if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "types": {
+          "description": "Comma-separated list of file types to filter by (e.g., \"pdf,docx,jpg\"). Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "cursor": {
+          "description": "Pagination cursor. Defaults to None. If provided, must be a string representing a non-negative integer offset for retrieving the next page of results.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "count": {
+          "description": "Maximum number of files to return per page. This matches the Slick API's \"count\" parameter. Must be a positive integer. Defaults to 100.",
+          "type": "integer",
+          "nullable": false,
+          "default": 100
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_reminders",
+    "description": "Lists all reminders created by or for a given user.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "list_scheduled_messages",
+    "description": "Returns a paginated list of scheduled messages created by the authenticated user.\n\nThis function retrieves only the scheduled messages that were created by the currently\nauthenticated user. Messages scheduled by other users are not included in the results.\nOptional filtering by channel, time range (oldest/latest), and team_id is supported.\nCursor-based pagination is available via the limit and cursor parameters.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "Optional channel ID or name to filter scheduled messages. When provided, only messages scheduled for this specific channel will be returned. Must be a non-empty string if specified. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "cursor": {
+          "description": "Pagination cursor for retrieving the next page of results. Must be a string representing a non-negative integer. This value is obtained from the 'next_cursor' field in the 'response_metadata' of a previous response. When provided, results will start from the position indicated by this cursor. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "latest": {
+          "description": "Upper bound Unix timestamp filter for scheduled messages. Must be a string representing a valid numeric value (integer or float). Only messages with 'post_at' timestamp less than or equal to this value will be included. Can be used alone or in combination with 'oldest' to define a time range. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "limit": {
+          "description": "Maximum number of scheduled messages to return in a single response. Must be a non-negative integer. When the number of filtered results exceeds this limit, a 'next_cursor' will be provided in the response to retrieve the next page of results. Defaults to None.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "oldest": {
+          "description": "Lower bound Unix timestamp filter for scheduled messages. Must be a string representing a valid numeric value (integer or float). Only messages with 'post_at' timestamp greater than or equal to this value will be included. Can be used alone or in combination with 'latest' to define a time range. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "team_id": {
+          "description": "Encoded team ID to scope the scheduled messages query. Must be a non-empty string if specified. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_user_conversations",
+    "description": "Lists all conversations (channels) that the authenticated user can access.\n\nThis function retrieves a paginated list of conversations (channels, DMs, group DMs) that\nthe currently authenticated user can access. Uses the current_user from database context\nfor authentication.\n\nAuthorization Rules:\n- Non-admin users: Can only see conversations where they are members\n- Admin users: Can see all public channels + conversations where they are members\n\nSupports filtering by conversation type, archived status, and cursor-based pagination.\nMembership is determined by analyzing message/reaction history in each conversation.\nThe function validates all inputs via Pydantic models before executing business logic.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "description": "Pagination cursor for retrieving subsequent pages, encoded as base64 string 'channel:{channel_id}' (e.g., 'Y2hhbm5lbDpDMTIzNDU2' for 'channel:C123456'). Pass the next_cursor from the previous response's response_metadata to get the next page. When None, starts from the beginning. Empty strings are normalized to None. Raises InvalidCursorValueError if cursor cannot be decoded, doesn't start with 'channel:', or references a non-existent channel in the filtered results.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "exclude_archived": {
+          "description": "Whether to exclude archived channels from results. When False (default), includes both active and archived channels. When True, filters out channels where is_archived=True. Useful for showing only active conversations in user interfaces. Archived channels are read-only and cannot receive new messages.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "limit": {
+          "description": "Maximum number of conversations to return per page (1-1000). Defaults to 100 if not provided. Larger values reduce API calls but increase response size and latency. Smaller values provide finer-grained pagination. For optimal performance, use 100-200 for most use cases. The actual number returned may be less if fewer conversations exist.",
+          "type": "integer",
+          "nullable": true,
+          "default": 100
+        },
+        "types": {
+          "description": "Comma-separated list of conversation types to include. Valid types: 'public_channel', 'private_channel', 'mpim', 'im'. Examples: 'public_channel,private_channel' (only channels), 'im,mpim' (only direct messages). When None, includes all conversation types. Whitespace around commas is ignored. Invalid types raise ValueError. Empty strings after splitting (e.g., 'public_channel,,private_channel') are ignored.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_user_group_members",
+    "description": "Lists all users in a user group with optional filtering for disabled users.\n\nRequires authentication via current_user (simulates OAuth token authentication).\nThis function retrieves all users who are members of a specified user group. It returns\ncomplete user profile information for each member. The function is resilient to database\ncorruption and validates all data structures before accessing them.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "usergroup_id": {
+          "description": "User group ID to list members from (e.g., S1234567890). Must be a non-empty string. User group must exist in database.",
+          "type": "string",
+          "nullable": false
+        },
+        "include_disabled": {
+          "description": "Whether to include disabled users in results. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        }
+      },
+      "required": [
+        "usergroup_id"
+      ]
+    }
+  },
+  {
+    "name": "list_user_groups",
+    "description": "Lists all active User Groups for a team. Returns only usergroups that have not been soft-deleted (date_delete=0). Disabled usergroups can be included with include_disabled parameter.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "team_id": {
+          "description": "ID of the team to list User Groups for. If None (default), returns usergroups from all teams. Empty string is treated as a valid team_id and will filter for usergroups with empty team_id. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "include_disabled": {
+          "description": "Include disabled User Groups. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "include_count": {
+          "description": "Include the number of users. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "include_users": {
+          "description": "Include the list of user IDs. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_user_reactions",
+    "description": "Lists reactions made by the current authenticated user.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "full": {
+          "description": "If true, return all reaction details. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "cursor": {
+          "description": "Parameter for pagination. Defaults to None. If provided, must be a base64 encoded string representing a non-negative integer.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "limit": {
+          "description": "The maximum number of items to return. Defaults to 100. Must be a positive integer.",
+          "type": "integer",
+          "nullable": false,
+          "default": 100
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_users",
+    "description": "Lists all users in a Slick team. Supports optional filtering by team_id and pagination via cursor and limit parameters. Can optionally include locale information for each user.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "description": "Pagination cursor. Defaults to None. If provided, must be a base64-encoded string with the format \"user:{user_id}\" (e.g., \"dXNlcjpVMTIzNDU2\" for \"user:U123456\"). The cursor encodes the user ID of the last user from the previous page to enable accurate pagination.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "include_locale": {
+          "description": "Include locale information. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "limit": {
+          "description": "Maximum number of items to return. Must be positive and no larger than 1000. Defaults to 100.",
+          "type": "integer",
+          "nullable": false,
+          "default": 100
+        },
+        "team_id": {
+          "description": "Team ID to filter users by. Must be a non-empty string if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "lookup_user_by_email",
+    "description": "Find a user with an email address.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "description": "An email address belonging to a user. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "email"
+      ]
+    }
+  },
+  {
+    "name": "mark_conversation_read",
+    "description": "Sets the read cursor in a channel to mark messages as read.\n\nThis function updates the read cursor for a conversation, marking all messages\nat or before the specified timestamp as 'read' for the current user. The read\ncursor is stored per-user in the database, allowing each user to maintain their\nown independent read position. This indicates the last message the user has\nviewed in the conversation.\n\nThe current user must be a member of the conversation to update the read cursor.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "Conversation ID to set the read cursor in (e.g., 'C1234567890'). Must be a non-empty string representing an existing conversation.",
+          "type": "string",
+          "nullable": false
+        },
+        "ts": {
+          "description": "Timestamp of the message to mark as most recently read. Must be a valid Unix timestamp string with fractional seconds (e.g., '1678886400.123456') that is not negative or in the future or before the existing read cursor. The format is a numeric string that can be converted to a float.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "channel",
+        "ts"
+      ]
+    }
+  },
+  {
+    "name": "open_conversation",
+    "description": "Opens or resumes a direct message or multi-person direct message conversation. Can either resume an existing conversation by channel ID or create a new one with specified users. The current user is automatically included if not already present when creating conversations with the users parameter.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "Resume a conversation by supplying an existing conversation ID. Supply either this OR users, not both. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "prevent_creation": {
+          "description": "Set to True to prevent creating a new conversation if one doesn't exist. Only relevant when using the users parameter. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "return_im": {
+          "description": "If True, returns the full channel definition including all metadata. If False, returns minimal channel information (just ID). Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "users": {
+          "description": "Comma-separated list of user IDs to include in the conversation. The current user is automatically included if not already present. A conversation requires at least 2 participants, so provide at least one other user ID. Supply either this OR channel, not both. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "post_chat_message",
+    "description": "Sends a message to a channel.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "Existing channel ID or channel name (e.g., C1234567890 or #general). Channel IDs are recommended as they remain constant. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "ts": {
+          "description": "Message timestamp. Must be a non-empty string if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "attachments": {
+          "description": "JSON-based array of structured attachments. Must be a non-empty string if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "blocks": {
+          "description": "JSON-encoded array of Block Kit blocks for rich message formatting. Each block must include a type field specifying its type. Supported types include section, divider, image, actions, context, input, file, header, video, and rich_text. Maximum 50 blocks per message. Optional fields depend on the block type, such as text, accessory, elements, image_url, alt_text, fields, and block_id. Must be valid JSON. Must be non-empty if it is the sole content (when text and attachments are not provided).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "text": {
+          "description": "Message text. Must be a non-empty string if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "as_user": {
+          "description": "Post as user (legacy). Must be a boolean if provided.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "icon_emoji": {
+          "description": "Emoji to use as the icon. Must be a non-empty string if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "icon_url": {
+          "description": "URL to an image to use as the icon. Must be a non-empty string if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "link_names": {
+          "description": "Find and link user groups. Must be a boolean if provided.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "markdown_text": {
+          "description": "Message text formatted in markdown. Must be a non-empty string if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "metadata": {
+          "description": "JSON object with event_type and event_payload fields. Must be a non-empty string if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "mrkdwn": {
+          "description": "Disable Slick markup parsing. Must be a boolean if provided.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "parse": {
+          "description": "Change how messages are treated. Must be a non-empty string if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "reply_broadcast": {
+          "description": "Make reply visible to everyone. Must be a boolean if provided.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "thread_ts": {
+          "description": "Provide another message's ts value to make this message a reply. Must be a non-empty string if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "unfurl_links": {
+          "description": "Enable unfurling of primarily text-based content. Must be a boolean if provided.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "unfurl_media": {
+          "description": "Disable unfurling of media content. Must be a boolean if provided.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "username": {
+          "description": "Set your bot's user name. Must be a non-empty string if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "channel"
+      ]
+    }
+  },
+  {
+    "name": "post_ephemeral_message",
+    "description": "Sends an ephemeral message to a user in a channel.\nEphemeral messages are temporary messages visible only to the specified user in the given\nchannel. They are not stored permanently and are not visible to other channel members.\nThis function validates the channel, resolves channel names to IDs, validates user existence\nand membership, and stores the ephemeral message in the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "Existing channel ID or channel name (e.g., C1234567890 or #general) to send the message to. Channel IDs are recommended. Can't be empty.",
+          "type": "string",
+          "nullable": false
+        },
+        "user": {
+          "description": "User ID of the recipient (e.g., U1234567890). Must start with 'U' or 'W' and be an existing user who is a member of the channel. Can't be empty.",
+          "type": "string",
+          "nullable": false
+        },
+        "attachments": {
+          "description": "JSON-based array of structured attachments. Must be a valid JSON array string if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "blocks": {
+          "description": "Array of Block Kit structured blocks. Each block must be an object with at least a \"type\" field. Defaults to None.",
+          "type": "array",
+          "nullable": true,
+          "default": null,
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "description": "Block type (e.g., section, divider, header, image, actions, context).",
+                "type": "string",
+                "nullable": false
+              },
+              "block_id": {
+                "description": "Unique identifier for the block.",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              },
+              "text": {
+                "description": "Text content (string or TextObject with 'type' and 'text' fields).",
+                "nullable": true,
+                "default": null,
+                "anyOf": [
+                  {
+                    "description": "Text content as a plain string.",
+                    "type": "string",
+                    "nullable": false
+                  },
+                  {
+                    "description": "TextObject with 'type' and 'text' fields.",
+                    "type": "object",
+                    "nullable": false,
+                    "properties": {
+                      "type": {
+                        "description": "Text type: 'plain_text' or 'mrkdwn'.",
+                        "type": "string",
+                        "nullable": false
+                      },
+                      "text": {
+                        "description": "The actual text content.",
+                        "type": "string",
+                        "nullable": false
+                      },
+                      "emoji": {
+                        "description": "Whether to escape emoji (plain_text only).",
+                        "type": "boolean",
+                        "nullable": true,
+                        "default": null
+                      },
+                      "verbatim": {
+                        "description": "Whether to use verbatim mode (mrkdwn only).",
+                        "type": "boolean",
+                        "nullable": true,
+                        "default": null
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "text"
+                    ]
+                  }
+                ]
+              },
+              "metadata": {
+                "description": "Optional metadata for the block as a dict[str,str].",
+                "type": "object",
+                "nullable": true,
+                "default": null,
+                "additionalProperties": {
+                  "description": "Metadata value (string).",
+                  "type": "string",
+                  "nullable": false
+                }
+              }
+            },
+            "required": [
+              "type"
+            ]
+          }
+        },
+        "text": {
+          "description": "Message text. At least one of text, blocks, or attachments must be provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "as_user": {
+          "description": "Pass true to post as the authed user. When true, username/icon_emoji/icon_url are ignored. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "icon_emoji": {
+          "description": "Emoji to use as icon (e.g., :robot_face:). Ignored if as_user is true. Takes precedence over icon_url. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "icon_url": {
+          "description": "URL to image for icon. Ignored if as_user is true or icon_emoji is provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "link_names": {
+          "description": "Find and link channel names and usernames. Must be a boolean if provided. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "markdown_text": {
+          "description": "Message text formatted in markdown. Must be a string if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "parse": {
+          "description": "Change how messages are treated. Must be a string if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "thread_ts": {
+          "description": "Provide another message's ts value to post this message in a thread. Must be a string if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "username": {
+          "description": "Set your bot's or your user name. Must be a string if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "channel",
+        "user"
+      ]
+    }
+  },
+  {
+    "name": "remove_reaction_from_message",
+    "description": "Removes a reaction from a message.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "User ID. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "name": {
+          "description": "Reaction (emoji) name. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "channel_id": {
+          "description": "ID of the channel. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "message_ts": {
+          "description": "Timestamp of the message. This should be a string representation of a Unix timestamp with up to 6 decimal places for microsecond precision. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "user_id",
+        "name",
+        "channel_id",
+        "message_ts"
+      ]
+    }
+  },
+  {
+    "name": "remove_remote_file",
+    "description": "Remove a remote file and clean up all of its references.\n\nExactly one identifier must be supplied – either a Slick-generated file or\nthe external_id that was provided when the file was first registered.\nWhen the target is found, the file record is deleted from the workspace's internal\nstorage and its identifier is removed from every channel that had access to the file.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "description": "Slick-generated file ID to remove (e.g., F1234567890). Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "external_id": {
+          "description": "Creator-defined GUID that was supplied when the remote file was added via add_remote_file or the external upload flow. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "rename_conversation",
+    "description": "Renames a conversation by changing its channel name. Only admin users may rename channels. The new name must be unique across all existing channels.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "ID of an existing conversation to rename (e.g., C1234567890). Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "name": {
+          "description": "New name for conversation. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "channel",
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "schedule_chat_message",
+    "description": "Schedules a message to be sent to a channel.\n\nThis function validates all input parameters, resolves channel identifiers,\nand stores the scheduled message for later delivery.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "Target channel ID (e.g., 'C1234567890') or channel name (e.g., 'general' or '#general') where the scheduled message will be posted. Channel IDs are recommended for consistency. Must be a non-empty string representing an existing channel.",
+          "type": "string",
+          "nullable": false
+        },
+        "post_at": {
+          "description": "Unix timestamp (integer) specifying when the message should be sent. Must be a positive integer (greater than 0) representing a time in the future (not present or past) and cannot exceed 120 days from the current time. Float and string values are not accepted.",
+          "type": "integer",
+          "nullable": false
+        },
+        "attachments": {
+          "description": "JSON-formatted string representing an array of structured attachment objects. Each item must be an object. Attachments can include fields like 'fallback', 'color', 'pretext', 'text', 'title', 'author_name', 'image_url', 'footer', etc. If provided, must be valid JSON that decodes to an array of objects. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "blocks": {
+          "description": "JSON-formatted string representing an array of Slick Block Kit block objects. Each item must be a dictionary with at least a 'type' field (e.g., 'section', 'divider', 'context'). If provided, must be valid JSON that decodes to an array of dictionaries. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "text": {
+          "description": "Plain text content of the message. This is the primary message body. If provided, must be a non-empty string. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "as_user": {
+          "description": "When True, posts the message as the authenticated user instead of as a bot. This affects how the message appears in the channel. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "link_names": {
+          "description": "When True, automatically finds and links channel names (e.g., #general) and user mentions (e.g., @username) in the message text. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "markdown_text": {
+          "description": "Message text with Markdown formatting (Slick's mrkdwn format). Supports bold (*text*), italic (_text_), strikethrough (~text~), code (`code`), and links (<url|text>). If provided, must be non-empty. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "metadata": {
+          "description": "JSON-formatted string representing a metadata object. Must decode to an object with 'event_type' (string) and 'event_payload' (dictionary) fields. Used for tracking and workflows. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "parse": {
+          "description": "Controls how messages are parsed. Common values: 'full' (default Slick parsing), 'none' (no automatic parsing). Affects how URLs, mentions, and special content are processed. If provided, must be non-empty. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "reply_broadcast": {
+          "description": "When True and thread_ts is provided, the reply message will also be posted to the channel, making it visible to all channel members. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "thread_ts": {
+          "description": "Timestamp of another message to reply to, making this a threaded reply. Format is a Unix timestamp with microseconds (e.g., '1234567890.123456'). If provided, must be non-empty. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "unfurl_links": {
+          "description": "When True, enables unfurling of primarily text-based content like URLs, displaying previews of linked web pages. Defaults to True.",
+          "type": "boolean",
+          "nullable": true,
+          "default": true
+        },
+        "unfurl_media": {
+          "description": "When True, enables unfurling of media content. When False, media URLs are not automatically expanded into inline previews. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        }
+      },
+      "required": [
+        "channel",
+        "post_at"
+      ]
+    }
+  },
+  {
+    "name": "search_all_content",
+    "description": "Searches for messages and files matching a query.\n\nRequires authentication. Searches across both messages and files using a single query string.\nFor messages, only searches channels the current user is a member of. For files, searches\nall files the user has access to. The query supports text terms and various filters that\napply to either messages, files, or both.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "The search query string. Must be a non-empty string. The structure is a space-separated string\nof terms and filters.\n\n**Text Matching Behavior:**\n- For messages: Default is AND logic (all terms must be present). Use OR keyword to change to OR logic.\n- For files: Always uses OR logic (any term match in name or title).\n- Text matching is case-insensitive for both messages and files.\n\n**Filters applicable to both messages and files:**\n- `in:#<channel_name>` - Restricts search to a specific channel by name (e.g., `in:#general`).\n- `from:@<username>` - Restricts search to content from a specific user (e.g., `from:@alice`).\n- `has:star` - Narrows search to items that have been starred.\n- `before:YYYY-MM-DD` - Filters for content created before a specific date (exclusive).\n- `after:YYYY[-MM[-DD]]` - Filters for content created after a specific date (inclusive). Supports YYYY, YYYY-MM, or YYYY-MM-DD.\n- `during:YYYY[-MM[-DD]]` - Filters for content on a specific date/period. Supports YYYY, YYYY-MM, or YYYY-MM-DD.\n\n**Filters applicable to messages only:**\n- `has:link` - Narrows to messages containing a URL.\n- `has:reaction` - Narrows to messages with reactions.\n- `-<word>` - Excludes messages with the word.\n- `<prefix>*`, `*<suffix>`, `<prefix>*<suffix>` - Wildcard support for partial matching. Multiple wildcards can be used (e.g., `start* end*`) with AND logic by default.\n- `OR` operator - Changes logic to match any term or wildcard instead of all terms.\n\n**Filters applicable to files only:**\n- `type:<file_type>` or `filetype:<file_type>` - Narrows to a specific file type (e.g., `type:pdf`).\n- `filename:<name>` - Search for files containing text in filename or title.\n- `is:pinned` - Narrows to files that have been pinned.\n- `is:saved` - Narrows to files that have been saved.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  {
+    "name": "search_files",
+    "description": "Searches for files matching a query.\n\nThe query is a space-separated string of terms and filters. Text terms are\nmatched against the file's name and title. If multiple text terms are\nprovided, a match occurs if any term is found (OR logic).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "The search query. Must be a non-empty string that cannot contain only whitespace. The structure is a space-separated string of terms and filters. Supported filters for files are: `in:#<channel_name>`: Restricts the search to a specific channel by name (e.g., `in:#general`). `from:@<username>`: Restricts the search to files uploaded by a specific user (e.g., `from:@alice`). `type:<file_type>` or `filetype:<file_type>`: Narrows search to a specific file type. Supports both exact extensions (e.g., 'pdf', 'docx', 'png') and category names. Categories include: 'docs'/'documents' (doc, docx, odt, rtf, txt), 'images'/'photos' (jpg, jpeg, png, gif, etc.), 'pdfs' (pdf), 'spreadsheets' (xls, xlsx, csv), 'presentations' (ppt, pptx), 'videos' (mp4, avi, mov, etc.), 'audio' (mp3, wav, etc.), 'snippets'/'code' (py, js, java, etc.), 'zips'/'archives' (zip, rar, 7z, etc.). `filename:<name>`: Search for files containing the specified text in filename or title. `after:<date>`: Restricts to files uploaded after a specific date (YYYY-MM-DD format). `before:<date>`: Restricts to files uploaded before a specific date (YYYY-MM-DD format). `during:<date>`: Restricts to files uploaded during a specific time period. Supports YYYY for year, YYYY-MM for month, or YYYY-MM-DD for specific date. `has:star`: Narrows search to files that have been starred. `is:pinned`: Narrows search to files that have been pinned. `is:saved`: Narrows search to files that have been saved. Note: Exclusion (`-<word>`) and wildcards (`*`) are not applicable to file searches. Text terms are matched against the file's name and title. If multiple text terms are provided, a match occurs if any term is found (OR logic). Validated by Pydantic model.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  {
+    "name": "search_messages",
+    "description": "Searches for messages matching a query.\n\nRequires authentication. Only searches channels the current user is a member of.\nThis applies to both public and private channels. If a message exists but you're not a member\nof its channel, it will NOT be returned.\n\nThe query is a space-separated string of terms and filters. Text terms are matched against\nthe message's content. By default, all text terms must be present in the message (AND logic).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "The search query. Must be a non-empty string. The structure is a space-separated string\nof terms and filters. Text matching is case-insensitive. Supported filters are:\n- `from:@<username>`: Restricts the search to messages from a specific user (e.g., `from:@alice`).\n- `in:#<channel_name>`: Restricts the search to a specific channel by name (e.g., `in:#general`). User must be a member of the specified channel.\n- `has:link`: Narrows search to messages containing a URL (http://, https://, ftp://, www., or domain patterns).\n- `has:reaction`: Narrows search to messages that have a reaction.\n- `has:star`: Narrows search to messages that have been starred.\n- `before:YYYY[-MM[-DD]]`: Filters for messages sent before a specific date (exclusive). Supports YYYY, YYYY-MM, or YYYY-MM-DD formats.\n- `after:YYYY[-MM[-DD]]`: Filters for messages sent after a specific date (inclusive). Supports YYYY, YYYY-MM, or YYYY-MM-DD formats.\n- `during:YYYY[-MM[-DD]]`: Filters for messages on a specific date/period. Supports YYYY, YYYY-MM, or YYYY-MM-DD formats.\n- `-<word>`: Excludes messages containing the specified word (whole-word matching, e.g., `-test` excludes \"test\" but not \"testing\").\n- `<prefix>*`: Wildcard for prefix matching (e.g., `test*` matches test, testing, tester). Supports special characters (e.g., `http*` matches \"http://example.com\").\n- `*<suffix>`: Wildcard for suffix matching (e.g., `*ing` matches testing, running).\n- `<prefix>*<suffix>`: Wildcard for middle matching (e.g., `te*ing` matches testing, texting).\n- Multiple wildcards/asterisks supported (e.g., `te*st*ing`, `*a*b*c*`).\n- Multiple wildcards can be used in a single query (e.g., `start* end*`). By default, all wildcards must match (AND logic). Use `OR` between wildcards for OR logic (e.g., `start* OR end*`).\n- `OR`: When used between text terms or wildcards (e.g., \"hello OR world\" or \"hello OR test*\"), the\n  logic changes to match messages containing any of the terms or patterns. Default is AND logic.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  {
+    "name": "send_me_message",
+    "description": "Share a me message into a channel.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "The target channel where the me message will be posted. Can be specified as either a channel ID (e.g., 'C1234567890') or a channel name (e.g., 'general' or '#general'). Channel IDs are recommended for consistency. Must be a non-empty string representing an existing channel.",
+          "type": "string",
+          "nullable": false
+        },
+        "text": {
+          "description": "The content of the me message to be posted. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "channel",
+        "text"
+      ]
+    }
+  },
+  {
+    "name": "set_conversation_purpose",
+    "description": "Sets the channel description.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "Existing channel ID to set the description of (e.g., C1234567890). Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "purpose": {
+          "description": "The description of the channel. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "channel",
+        "purpose"
+      ]
+    }
+  },
+  {
+    "name": "set_conversation_topic",
+    "description": "Sets the topic for a conversation.\n\nThis function updates the topic field for a conversation. The current user must be\nan admin and a member of the conversation to set the topic.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "Existing channel ID to set the topic of (e.g., C1234567890). Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "topic": {
+          "description": "The new topic string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "channel",
+        "topic"
+      ]
+    }
+  },
+  {
+    "name": "set_user_photo",
+    "description": "Sets the authenticated user's profile photo. Requires authentication. This is a self-service method - users can only set their own photo.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "description": "A base64-encoded string of the image data.",
+          "type": "string",
+          "nullable": false
+        },
+        "crop_x": {
+          "description": "The x-coordinate for the top-left corner of the crop. Must be non-negative if provided.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "crop_y": {
+          "description": "The y-coordinate for the top-left corner of the crop. Must be non-negative if provided.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "crop_w": {
+          "description": "The width of the crop box. Must be non-negative if provided.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "image"
+      ]
+    }
+  },
+  {
+    "name": "set_user_presence",
+    "description": "Manually sets a user's presence.\n\nThis function updates the presence status for the current user, setting it\nto either 'active' or 'away'. It directly modifies the user's record in\nthe database. Upon successful execution, it confirms the operation was\nsuccessful.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "presence": {
+          "description": "The new presence status. Must be either 'active' or 'away'.",
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "active",
+            "away"
+          ]
+        }
+      },
+      "required": [
+        "presence"
+      ]
+    }
+  },
+  {
+    "name": "set_user_profile",
+    "description": "Set a user's profile information.",
+    "parameters": {
+      "description": "Set a user's profile information.",
+      "type": "object",
+      "properties": {
+        "profile": {
+          "description": "A collection of user profile attributes to be updated. Valid profile fields include: display_name (str), real_name (str), email (str, must contain '@'), phone (str, digits/spaces/hyphens/'+' only), pronouns (str), status_emoji (str), status_text (str), status_expiration (int, Unix timestamp or 0 for never expires), title (str), team (str), skype (str), first_name (str), last_name (str), start_date (str, yyyy-mm-dd format). All fields are optional.",
+          "type": "object",
+          "properties": {
+            "display_name": {
+              "description": "The user's display name",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "real_name": {
+              "description": "The user's real name",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "email": {
+              "description": "The user's email address. Must contain '@' character if provided",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "phone": {
+              "description": "The user's phone number. Must contain only digits, spaces, hyphens, and '+' if provided",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "pronouns": {
+              "description": "The user's pronouns",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "status_emoji": {
+              "description": "The user's status emoji",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "status_text": {
+              "description": "The user's status text",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "status_expiration": {
+              "description": "The Unix timestamp of when the status will expire. Providing 0 or omitting this field results in a custom status that will not expire.",
+              "type": "integer",
+              "nullable": true,
+              "default": null
+            },
+            "title": {
+              "description": "The user's title",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "team": {
+              "description": "The user's team",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "skype": {
+              "description": "The user's Skype handle",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "first_name": {
+              "description": "The user's first name",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "last_name": {
+              "description": "The user's last name",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "start_date": {
+              "description": "The date the person joined the organization (Business+ or Enterprise customers only), yyyy-mm-dd format.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "image": {
+              "description": "Base64 encoded image or URL to the user's profile picture.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "image_crop_x": {
+              "description": "X-coordinate for image crop positioning.",
+              "type": "integer",
+              "nullable": true,
+              "default": null
+            },
+            "image_crop_y": {
+              "description": "Y-coordinate for image crop positioning.",
+              "type": "integer",
+              "nullable": true,
+              "default": null
+            },
+            "image_crop_w": {
+              "description": "Width of the image crop.",
+              "type": "integer",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": false
+        },
+        "user_id": {
+          "description": "ID of user to change. This argument may only be specified by admins on paid teams, defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "profile"
+      ]
+    }
+  },
+  {
+    "name": "share_file",
+    "description": "Shares an existing file into one or more specified channels, making it accessible to channel members. The file must already exist in the workspace, and all target channels must be valid. This operation updates both the file's channel associations and each channel's file list to reflect the sharing relationship.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "file_id": {
+          "description": "The ID of the file to share. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "channel_ids": {
+          "description": "Comma-separated list of channel IDs. Must be non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "file_id",
+        "channel_ids"
+      ]
+    }
+  },
+  {
+    "name": "update_chat_message",
+    "description": "Updates a message in a Slick channel.\n\nThis function allows you to update an existing message by modifying its text, attachments, blocks, or other properties.\nThe message is identified by its timestamp within a specific channel. At least one content field (attachments, blocks, or text)\nmust be provided to update the message.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "Existing channel ID or channel name (e.g., C1234567890 or #general) containing the message. Channel IDs are recommended. This field is required and must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "ts": {
+          "description": "Timestamp of the message to be updated. This field is required and must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "attachments": {
+          "description": "JSON-formatted string representing an array of structured attachments. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "blocks": {
+          "description": "JSON-formatted string representing an array of structured block objects. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "text": {
+          "description": "The updated message text. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "as_user": {
+          "description": "Update the message as the authed user. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "file_ids": {
+          "description": "Array of new file IDs that will be sent with this message. Defaults to None.",
+          "type": "array",
+          "nullable": true,
+          "default": null,
+          "items": {
+            "type": "string"
+          }
+        },
+        "link_names": {
+          "description": "Find and link channel names and usernames. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "markdown_text": {
+          "description": "Message text formatted in markdown. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "parse": {
+          "description": "Change how messages are treated. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "reply_broadcast": {
+          "description": "Broadcast an existing thread reply. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "channel",
+        "ts"
+      ]
+    }
+  },
+  {
+    "name": "update_user_group",
+    "description": "Updates an existing User Group with new values for name, handle, description, channel associations, or update timestamp. This is a partial update operation - only provided fields are modified.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "usergroup_id": {
+          "description": "The ID of the usergroup to update. Must be a non-empty string that matches an existing usergroup in the workspace. Example: 'S0614TZR7'. This is the only required parameter - all other fields are optional and only update the usergroup if provided. Raises UserGroupNotFoundError if the ID doesn't exist.",
+          "type": "string",
+          "nullable": false
+        },
+        "name": {
+          "description": "New name for the usergroup. When provided, must be a non-empty string that doesn't consist only of whitespace. The name is used for display purposes and can be any descriptive text (e.g., 'Marketing Team', 'Engineering Leads'). Duplicate names are not allowed - raises ValueError if another usergroup already has this name (case-insensitive comparison). When None, the name is not updated.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "handle": {
+          "description": "New handle for the usergroup. Can be any string including empty string '' to clear the handle. Used to mention the group (e.g., 'marketing-team' allows '@marketing-team' mentions). Handles should be URL-friendly and lowercase, though validation is flexible. Whitespace-only strings are rejected. Duplicate non-empty handles are not allowed - raises ValueError if another usergroup already has this handle (case-insensitive comparison). When None, the handle is not updated.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "description": {
+          "description": "New description for the usergroup. When provided, must be a string describing the group's purpose or membership criteria. Can be empty string (unlike name/handle). Example: 'Marketing gurus, PR experts and product advocates.' When None, the description is not updated. This field has no length constraints.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "channel_ids": {
+          "description": "New list of channel IDs to associate with this usergroup. When provided, replaces the entire existing channel list (not a merge). Each channel ID must exist in the workspace - raises ValueError if any channel ID is invalid. Can be empty list [] to clear all channel associations. Example: ['C123ABC', 'C456DEF']. These channels become the default channels for usergroup members. When None, channel associations are not updated.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true,
+          "default": null
+        },
+        "date_update": {
+          "description": "Unix timestamp (in seconds) for when the usergroup was updated. When provided, must be a positive integer representing seconds since Unix epoch (1970-01-01). This allows backdating updates or setting specific update times. When None, the current timestamp is automatically used. Example: 1446747767 represents 2015-11-05 14:49:27 UTC.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "usergroup_id"
+      ]
+    }
+  },
+  {
+    "name": "update_user_group_members",
+    "description": "Replaces the entire user list of a User Group with a new set of user IDs. The User Group and all specified users must exist in the workspace. This operation completely replaces the existing user list, removing any user IDs not in the new list and adding all specified user IDs.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "usergroup": {
+          "description": "The unique identifier of the User Group to update. Must be non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "users": {
+          "description": "Comma-separated string of user IDs representing the complete new user list. Must be non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "include_count": {
+          "description": "Whether to include the user count in the response. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "date_update": {
+          "description": "Timestamp when the User Group was last updated. If None or empty, current timestamp is used. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "usergroup",
+        "users"
+      ]
+    }
+  },
+  {
+    "name": "upload_file",
+    "description": "Upload a file to Slick.\n\nThis function supports uploading files either by providing content directly or by specifying a file path.\nIt automatically detects file types, MIME types, and handles both text and binary files.\nFiles are subject to a 50MB size limit.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channels": {
+          "description": "Comma-separated list of channel IDs or names where the file will be shared (e.g., C1234567890 or #general or general). Channel IDs are recommended as they remain constant. Must be valid channel IDs or names if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "content": {
+          "description": "File contents as a string. If both content and file_path are provided, content takes precedence. Subject to 50MB size limit. This parameter should ONLY be used for text files - the content is stored as-is without any encoding. For binary files, use the file_path parameter instead. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "file_path": {
+          "description": "Path to a local file to upload. The file will be read and its content will be processed based on the file type (text or binary). Binary files are automatically base64-encoded. Subject to 50MB size limit. Required for binary files. Can also be used for text files. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "filename": {
+          "description": "Name of the file. If not provided and file_path is given, the filename will be extracted from the file path. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "filetype": {
+          "description": "File type identifier (e.g., 'pdf', 'txt', 'jpg'). If not provided, it will be auto-detected from the filename or file path. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "initial_comment": {
+          "description": "Initial comment to add with the file. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "thread_ts": {
+          "description": "Timestamp of parent message to reply to in a thread. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "title": {
+          "description": "Title of the file. If not provided, defaults to filename. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  }
+]

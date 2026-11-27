@@ -1,0 +1,98 @@
+[
+  {
+    "name": "play",
+    "description": "Search for songs, artists, albums, playlists or podcasts on a media provider.\n\nSearches for media content based on the provided query and intent type and returns a list of playable media items.\nAlso updates the recently_played list with the first result and timestamp in ISO 8601 format (\"2023-01-01T10:00:00Z\").",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "The search query or content identifier that the user wants to play. Must be a non-empty string. Can be an artist name, song title, album name, playlist name, or podcast title. Examples: 'Beatles', 'Bohemian Rhapsody', 'Top Hits 2023'.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "intent_type": {
+          "description": "Specifies what type of content the user intends to play. Determines how the query is interpreted and what results are prioritized. Options: 'ALBUM' for music albums, 'ARTIST' for artist discographies, 'GENERIC_MUSIC' for any music content, 'GENERIC_PODCAST' for podcast content, 'GENERIC_MUSIC_NEW' for new music releases, 'GENERIC_SOMETHING_ELSE' for unspecified content, 'LIKED_SONGS' for user's liked tracks, 'PERSONAL_PLAYLIST' for user's personal playlists, 'PODCAST_EPISODE' for specific podcast episodes, 'PODCAST_SHOW' for podcast series, 'PUBLIC_PLAYLIST' for publicly shared playlists, 'TRACK' for specific songs.",
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "ALBUM",
+            "ARTIST",
+            "GENERIC_MUSIC",
+            "GENERIC_PODCAST",
+            "GENERIC_MUSIC_NEW",
+            "GENERIC_SOMETHING_ELSE",
+            "LIKED_SONGS",
+            "PERSONAL_PLAYLIST",
+            "PODCAST_EPISODE",
+            "PODCAST_SHOW",
+            "PUBLIC_PLAYLIST",
+            "TRACK"
+          ]
+        },
+        "filtering_type": {
+          "description": "Optional filter to narrow results to a specific content type. Applied after the initial search based on intent_type. Options: 'ALBUM' to show only albums, 'PLAYLIST' to show only playlists, 'TRACK' to show only individual tracks. When null, no additional filtering is applied.",
+          "type": "string",
+          "nullable": true,
+          "enum": [
+            "ALBUM",
+            "PLAYLIST",
+            "TRACK"
+          ]
+        }
+      },
+      "required": [
+        "query",
+        "intent_type"
+      ]
+    }
+  },
+  {
+    "name": "search",
+    "description": "Search for songs, artists, albums, playlists or podcasts on a media provider.\n\nSearches for media content based on the provided query and intent type.\nReturns a list of matching media items with their metadata and provider information.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "The search query or content identifier. Must be a non-empty string. Can be an artist name, song title, album name, playlist name, or podcast title. Examples: 'Beatles', 'Bohemian Rhapsody', 'Top Hits 2023'.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "intent_type": {
+          "description": "Specifies what type of content to search for. Options: 'ALBUM' for music albums, 'ARTIST' for artist discographies, 'GENERIC_MUSIC' for any music content, 'GENERIC_PODCAST' for podcast content, 'GENERIC_MUSIC_NEW' for new music releases, 'GENERIC_SOMETHING_ELSE' for unspecified content, 'LIKED_SONGS' for user's liked tracks, 'PERSONAL_PLAYLIST' for user's personal playlists, 'PODCAST_EPISODE' for specific podcast episodes, 'PODCAST_SHOW' for podcast series, 'PUBLIC_PLAYLIST' for publicly shared playlists, 'TRACK' for specific songs.",
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "ALBUM",
+            "ARTIST",
+            "GENERIC_MUSIC",
+            "GENERIC_PODCAST",
+            "GENERIC_MUSIC_NEW",
+            "GENERIC_SOMETHING_ELSE",
+            "LIKED_SONGS",
+            "PERSONAL_PLAYLIST",
+            "PODCAST_EPISODE",
+            "PODCAST_SHOW",
+            "PUBLIC_PLAYLIST",
+            "TRACK"
+          ]
+        },
+        "filtering_type": {
+          "description": "Optional filter to narrow results to a specific content type. Options: 'ALBUM' to show only albums, 'PLAYLIST' to show only playlists, 'TRACK' to show only individual tracks. When null, no additional filtering is applied.",
+          "type": "string",
+          "nullable": true,
+          "enum": [
+            "ALBUM",
+            "PLAYLIST",
+            "TRACK"
+          ]
+        }
+      },
+      "required": [
+        "query",
+        "intent_type"
+      ]
+    }
+  }
+]

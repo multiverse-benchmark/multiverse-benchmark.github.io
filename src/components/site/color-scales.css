@@ -1,0 +1,111 @@
+/*
+ * Colour scales for the utility classes, as "R G B" triplets so that a class
+ * can add an opacity. tailwind.config.js maps Tailwind's emerald, slate,
+ * amber, and rose scales and its white onto these, which is what the task
+ * explorer's detail views are written with:
+ *
+ *   emerald  the accent (600 is --mv-purple of the light theme in paper.css)
+ *   slate    neutral surfaces, lines, and text; white is the card surface
+ *   amber    cautions
+ *   rose     failures
+ *
+ * Light theme: Tailwind's own values for slate, amber, and rose. Dark theme:
+ * each scale runs the other way, from a dark fill at 50 to light text at 900,
+ * so that a class such as "bg-slate-50 text-slate-700" keeps its meaning (a
+ * faint fill with readable text on it) in both themes.
+ */
+:root {
+  --mv-accent-50: 238 242 255;
+  --mv-accent-100: 220 230 255;
+  --mv-accent-200: 194 209 251;
+  --mv-accent-300: 154 177 245;
+  --mv-accent-400: 111 140 240;
+  --mv-accent-500: 63 99 230;
+  --mv-accent-600: 43 79 218;
+  --mv-accent-700: 35 66 184;
+  --mv-accent-800: 28 52 145;
+  --mv-accent-900: 21 38 104;
+
+  --mv-white: 255 255 255;
+  --mv-slate-50: 248 250 252;
+  --mv-slate-100: 241 245 249;
+  --mv-slate-200: 226 232 240;
+  --mv-slate-300: 203 213 225;
+  --mv-slate-400: 148 163 184;
+  --mv-slate-500: 100 116 139;
+  --mv-slate-600: 71 85 105;
+  --mv-slate-700: 51 65 85;
+  --mv-slate-800: 30 41 59;
+  --mv-slate-900: 15 23 42;
+  --mv-slate-950: 2 6 23;
+
+  --mv-amber-50: 255 251 235;
+  --mv-amber-100: 254 243 199;
+  --mv-amber-200: 253 230 138;
+  --mv-amber-300: 252 211 77;
+  --mv-amber-400: 251 191 36;
+  --mv-amber-500: 245 158 11;
+  --mv-amber-600: 217 119 6;
+  --mv-amber-700: 180 83 9;
+  --mv-amber-800: 146 64 14;
+  --mv-amber-900: 120 53 15;
+
+  --mv-rose-50: 255 241 242;
+  --mv-rose-100: 255 228 230;
+  --mv-rose-200: 254 205 211;
+  --mv-rose-300: 253 164 175;
+  --mv-rose-400: 251 113 133;
+  --mv-rose-500: 244 63 94;
+  --mv-rose-600: 225 29 72;
+  --mv-rose-700: 190 18 60;
+  --mv-rose-800: 159 18 57;
+  --mv-rose-900: 136 19 55;
+}
+
+:root[data-theme='dark'] {
+  --mv-accent-50: 24 31 56;
+  --mv-accent-100: 29 40 78;
+  --mv-accent-200: 39 55 110;
+  --mv-accent-300: 54 78 158;
+  --mv-accent-400: 80 110 208;
+  --mv-accent-500: 112 140 240;
+  --mv-accent-600: 142 168 255;
+  --mv-accent-700: 179 196 255;
+  --mv-accent-800: 205 216 255;
+  --mv-accent-900: 228 234 255;
+
+  --mv-white: 22 25 31;
+  --mv-slate-50: 27 30 37;
+  --mv-slate-100: 35 39 48;
+  --mv-slate-200: 42 46 55;
+  --mv-slate-300: 72 80 98;
+  --mv-slate-400: 128 136 152;
+  --mv-slate-500: 157 164 177;
+  --mv-slate-600: 180 186 198;
+  --mv-slate-700: 194 199 209;
+  --mv-slate-800: 215 219 227;
+  --mv-slate-900: 236 238 243;
+  --mv-slate-950: 246 247 250;
+
+  --mv-amber-50: 43 35 15;
+  --mv-amber-100: 58 46 17;
+  --mv-amber-200: 107 83 24;
+  --mv-amber-300: 142 110 32;
+  --mv-amber-400: 190 150 52;
+  --mv-amber-500: 224 179 86;
+  --mv-amber-600: 232 192 108;
+  --mv-amber-700: 240 205 130;
+  --mv-amber-800: 245 217 156;
+  --mv-amber-900: 250 231 186;
+
+  --mv-rose-50: 50 24 26;
+  --mv-rose-100: 68 31 35;
+  --mv-rose-200: 110 47 55;
+  --mv-rose-300: 150 62 73;
+  --mv-rose-400: 200 92 106;
+  --mv-rose-500: 235 122 136;
+  --mv-rose-600: 240 138 150;
+  --mv-rose-700: 245 162 171;
+  --mv-rose-800: 248 187 193;
+  --mv-rose-900: 252 211 216;
+}

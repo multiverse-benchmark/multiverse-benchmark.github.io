@@ -1,0 +1,12 @@
+{
+  "id": "media_control",
+  "name": "Media Control",
+  "icon": "./icons/media_control.svg",
+  "iconBackground": "linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%)",
+  "description": "Control media playback, transport, and seek",
+  "backendService": "media_control",
+  "defaultWindow": {
+    "width": 500,
+    "height": 650
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "photogram",
+  "name": "Photogram",
+  "icon": "./icons/photogram.svg",
+  "iconBackground": "linear-gradient(135deg, #059669 0%, #0F172A 100%)",
+  "description": "Photogram",
+  "backendService": "photogram",
+  "defaultWindow": {
+    "width": 900,
+    "height": 700
+  }
+}

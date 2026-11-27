@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <mask id="cal-cutout">
+      <rect width="128" height="128" fill="white"/>
+      <!-- header divider slot -->
+      <rect x="18" y="49" width="92" height="5" fill="black"/>
+      <!-- date grid cells punched out -->
+      <g fill="black">
+        <rect x="34" y="64" width="13" height="11" rx="2"/>
+        <rect x="57" y="64" width="13" height="11" rx="2"/>
+        <rect x="80" y="64" width="13" height="11" rx="2"/>
+        <rect x="34" y="83" width="13" height="11" rx="2"/>
+        <rect x="57" y="83" width="13" height="11" rx="2"/>
+        <rect x="80" y="83" width="13" height="11" rx="2"/>
+      </g>
+    </mask>
+  </defs>
+  <g fill="#FFFFFF">
+    <!-- hanging rings -->
+    <rect x="40" y="14" width="9" height="22" rx="4.5"/>
+    <rect x="79" y="14" width="9" height="22" rx="4.5"/>
+  </g>
+  <!-- calendar body with header divider and grid cells masked out -->
+  <path mask="url(#cal-cutout)" fill="#FFFFFF" d="M28 26h72a10 10 0 0 1 10 10v62a10 10 0 0 1-10 10H28a10 10 0 0 1-10-10V36a10 10 0 0 1 10-10z"/>
+</svg>

@@ -1,0 +1,74 @@
+{
+  "id": "figure1-message-demo",
+  "kind": "illustrative-adaptation",
+  "description": "Selected records from a locally replayed, authored demonstration. This is an adapted task, not a scored model attempt.",
+  "sourceSha256": "50a400d173f4cf7dc6ad813fea9b12ad29b2a3687a7612dfb7d8ead73b7e3ba9",
+  "sourceCache": "3c0d566fdd6af0bca0e1c3a2.json",
+  "selection": {
+    "mailThread": "thread-066",
+    "reminderId": "reminder_2",
+    "messages": "all"
+  },
+  "states": {
+    "initial": {
+      "mail": [
+        {
+          "id": "msg_0110",
+          "sender": "julian.vance@gridwellmail.com",
+          "recipient": "clara@vanceandcoproperties.com",
+          "subject": "Re: Sunday The Star",
+          "body": "Babe — booked The Star tonight. Cane Rosso, 6:30 PM, party of 3, patio if they can swing it.\nConfirmation #OT-44119921. Won't bother forwarding the Opentable email since I know you'll just\nskim it. Call me later if you want to add Leo's friend Tomas.\n\nxoxo J",
+          "date": "2026-02-15T13:48:00Z",
+          "internalDate": "1771163280000"
+        }
+      ],
+      "messages": [],
+      "reminder": {
+        "id": "reminder_2",
+        "title": "Message Julian - The Star",
+        "description": "Send Julian a message asking him to check the email about dinner.",
+        "completed": false,
+        "schedule": "February 15, 2026 at 02:00:00 PM"
+      }
+    },
+    "final": {
+      "mail": [
+        {
+          "id": "msg_0110",
+          "sender": "julian.vance@gridwellmail.com",
+          "recipient": "clara@vanceandcoproperties.com",
+          "subject": "Re: Sunday The Star",
+          "body": "Babe — booked The Star tonight. Cane Rosso, 6:30 PM, party of 3, patio if they can swing it.\nConfirmation #OT-44119921. Won't bother forwarding the Opentable email since I know you'll just\nskim it. Call me later if you want to add Leo's friend Tomas.\n\nxoxo J",
+          "date": "2026-02-15T13:48:00Z",
+          "internalDate": "1771163280000"
+        },
+        {
+          "id": "msg_354",
+          "sender": "clara@vanceandcoproperties.com",
+          "recipient": "julian.vance@gridwellmail.com",
+          "subject": "Re: Sunday The Star",
+          "body": "Hey babe — can you call The Star and move our reservation to 7:30 PM tonight? Still just the 3 of us, still on the patio.\n\nLove, Clara",
+          "date": "",
+          "internalDate": "1771180140000"
+        }
+      ],
+      "messages": [
+        {
+          "id": "msg_1",
+          "sender": "Clara Vance",
+          "recipient": "Julian Vance",
+          "body": "Hi Julian, please check the email I just sent about rescheduling dinner at The Star.\n\nLove, Clara",
+          "timestamp": "2026-02-15T18:29:00Z",
+          "status": "sent"
+        }
+      ],
+      "reminder": {
+        "id": "reminder_2",
+        "title": "Message Julian - The Star",
+        "description": "Send Julian a message asking him to check the email about dinner.",
+        "completed": true,
+        "schedule": "February 15, 2026 at 02:00 PM"
+      }
+    }
+  }
+}

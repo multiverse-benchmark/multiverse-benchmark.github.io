@@ -1,0 +1,12 @@
+{
+  "id": "notes_and_lists",
+  "name": "Notes & Lists",
+  "icon": "./icons/notes_and_lists.svg",
+  "iconBackground": "linear-gradient(135deg, #2563eb 0%, #1e40af 100%)",
+  "description": "Minimalist productivity app for managing notes and lists",
+  "backendService": "notes_and_lists",
+  "defaultWindow": {
+    "width": 1200,
+    "height": 700
+  }
+}

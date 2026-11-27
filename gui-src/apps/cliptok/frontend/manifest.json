@@ -1,0 +1,12 @@
+{
+  "id": "cliptok",
+  "name": "Cliptok",
+  "icon": "./icons/cliptok.svg",
+  "iconBackground": "linear-gradient(135deg, #CA8A04 0%, #166534 100%)",
+  "description": "Manage Cliptok business accounts and publish videos",
+  "backendService": "cliptok",
+  "defaultWindow": {
+    "width": 1200,
+    "height": 700
+  }
+}

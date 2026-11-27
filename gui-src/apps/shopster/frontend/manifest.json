@@ -1,0 +1,12 @@
+{
+  "id": "shopster",
+  "name": "Shopster Admin",
+  "icon": "./icons/shopster.svg",
+  "iconBackground": "linear-gradient(135deg, #4338CA 0%, #C2410C 100%)",
+  "description": "Manage your e-commerce store",
+  "backendService": "shopster",
+  "defaultWindow": {
+    "width": 1200,
+    "height": 800
+  }
+}

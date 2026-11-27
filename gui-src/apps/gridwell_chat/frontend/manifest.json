@@ -1,0 +1,12 @@
+{
+  "id": "gridwell_chat",
+  "name": "GridwellChat",
+  "icon": "./icons/gridwell_chat.svg",
+  "iconBackground": "linear-gradient(135deg, #059669 0%, #0F766E 100%)",
+  "description": "GridwellChat",
+  "backendService": "gridwell_chat",
+  "defaultWindow": {
+    "width": 1000,
+    "height": 600
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "slick",
+  "name": "Slick",
+  "icon": "./icons/slick.svg",
+  "iconBackground": "linear-gradient(135deg, #042F2E 0%, #18181B 100%)",
+  "description": "Slick",
+  "backendService": "slick",
+  "defaultWindow": {
+    "width": 1400,
+    "height": 860
+  }
+}

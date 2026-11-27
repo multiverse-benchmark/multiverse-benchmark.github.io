@@ -1,0 +1,76 @@
+[
+  {
+    "name": "get_notifications",
+    "description": "Get Device notifications with optional filtering.\n\nThis function retrieves device notifications with optional filtering by sender name and application name.\nIt supports filtering by read/unread status and automatically marks unread notifications as read when fetched.\n\nFiltering Behavior:\n- sender_name and app_name use exact match only (no prefix or partial matching)\n- Matching is case-insensitive (e.g., \"John Doe\" matches \"john doe\")\n- When multiple filters are provided (sender_name and app_name), they use AND logic (both must match)\n- Filters are applied after whitespace trimming",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "sender_name": {
+          "description": "Filter notifications by sender or group name. The value must be a non-empty string with a maximum length of 256 characters. Matching is case-insensitive and requires an exact match.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "app_name": {
+          "description": "Filter notifications by application name. The value must be a non-empty string with a maximum length of 256 characters. Matching is case-insensitive and requires an exact match (no prefix or partial matching). When combined with sender_name, uses AND logic (both filters must match).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "unread": {
+          "description": "If True (default), fetches only unread notifications and marks them as read.\nIf False, fetches only read notifications without changing their read status.",
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "reply_notification",
+    "description": "Reply to a notification with confirmation. If the service supports reply from notification trigger, it is handled by the service. A reply action is created in the notification DB only when the reply completes successfully; failed attempts are not tracked (e.g. failure due to missing bundle key)",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "description": "Unique bundle identifier to reply to. Must be a non-empty string\nwith maximum length of 256 characters.",
+          "type": "string"
+        },
+        "message_body": {
+          "description": "The reply message text. Must be a non-empty string with maximum length of 256 characters.",
+          "type": "string"
+        },
+        "recipient_name": {
+          "description": "Display name of the recipient. Must be a non-empty string\nwith maximum length of 256 characters.",
+          "type": "string"
+        },
+        "app_name": {
+          "description": "Optional application name for the reply.\nMust be a non-empty string with maximum length of 256 characters if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "app_package_name": {
+          "description": "Optional package name for the reply. If not provided, the bundle's app package name will be used.\nMust be a non-empty string with maximum length of 256 characters if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "key",
+        "message_body",
+        "recipient_name"
+      ]
+    }
+  },
+  {
+    "name": "reply_notification_message_or_contact_missing",
+    "description": "Handle cases where message body or recipient is missing.\n\nThis function is called when a reply attempt is made without\nproviding the necessary information (message body or recipient name).",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  }
+]

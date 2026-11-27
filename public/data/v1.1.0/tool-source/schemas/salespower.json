@@ -1,0 +1,3265 @@
+[
+  {
+    "name": "create_account",
+    "description": "Creates a new account with all standard Salespower Account fields.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "Name of the account. Required. Defines the account entity.",
+          "type": "string",
+          "nullable": false
+        },
+        "OwnerId": {
+          "description": "Foreign key (FK) to User.Id. Owner of the account. Must be a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores that exists in the User collection. Referential integrity is validated - if the ID doesn't exist, a referential integrity error is raised. # FK → User",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "ParentId": {
+          "description": "Foreign key (FK) to Account.Id. Parent account in hierarchy. Must be a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores that exists in the Account collection. Referential integrity is validated - if the ID doesn't exist, a referential integrity error is raised. # FK → Account",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Type": {
+          "description": "Account type classification. Optional value field.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Industry": {
+          "description": "Industry classification of the account. Optional.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "AccountNumber": {
+          "description": "Account reference number. Optional.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Phone": {
+          "description": "Work phone of the account. Optional.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Website": {
+          "description": "Website URL of the account. Optional.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "Name"
+      ]
+    }
+  },
+  {
+    "name": "create_contact",
+    "description": "Creates a new contact with all standard Salespower Contact fields.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "LastName": {
+          "description": "Last name of the contact. Required identity field.",
+          "type": "string",
+          "nullable": false
+        },
+        "AccountId": {
+          "description": "FK to Account.Id. Contact belongs to an account. Must be a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores if provided. # FK → Account",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "OwnerId": {
+          "description": "FK to User.Id. Owner of this contact. Must be a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores if provided. # FK → User",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "FirstName": {
+          "description": "First name of the contact. Optional identity field.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Email": {
+          "description": "Email of the contact. Optional identity field.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Phone": {
+          "description": "Phone number of the contact. Optional.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Title": {
+          "description": "Job title of the contact. Optional.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "LastName"
+      ]
+    }
+  },
+  {
+    "name": "create_event",
+    "description": "Creates a new event with all standard Salespower Event fields.\n\nThis function validates input using the EventInput Pydantic model, performs referential integrity checks on ID fields, generates system fields (Id, CreatedDate, SystemModstamp), auto-calculates DurationInMinutes from StartDateTime and EndDateTime (or EndDateTime from StartDateTime and DurationInMinutes, or StartDateTime from EndDateTime and DurationInMinutes) when not provided, and stores the event in the database.\n\nRecurrence Rules:\nWhen creating recurring events, the following validation rules apply:\n\nGeneral Consistency Rules:\n- If IsRecurrence is True, RecurrenceType must be provided (minimum requirement).\n- If any recurrence field is provided (RecurrenceType, RecurrenceInterval, RecurrenceEndDateOnly, RecurrenceMonthOfYear, RecurrenceDayOfWeekMask, RecurrenceDayOfMonth, or RecurrenceInstance), IsRecurrence must be set to True.\n- If RecurrenceType is provided, IsRecurrence must be set to True.\n\nRecurrenceType-Specific Required Fields:\n- RecursDaily (daily recurrence): RecurrenceInterval (required, positive integer specifying interval in days), RecurrenceEndDateOnly (required, YYYY-MM-DD format).\n- RecursWeekly (weekly recurrence): RecurrenceInterval (required, positive integer specifying interval in weeks), RecurrenceDayOfWeekMask (required, bitmask: Sunday=1, Monday=2, Tuesday=4, Wednesday=8, Thursday=16, Friday=32, Saturday=64), RecurrenceEndDateOnly (required).\n- RecursMonthly (monthly on specific day): RecurrenceInterval (required, positive integer specifying interval in months), RecurrenceDayOfMonth (required, 1-31), RecurrenceEndDateOnly (required).\n- RecursMonthlyNth (monthly on Nth weekday, e.g., \"second Tuesday\"): RecurrenceInterval (required), RecurrenceDayOfWeekMask (required), RecurrenceInstance (required, First/Second/Third/Fourth/Last), RecurrenceEndDateOnly (required).\n- RecursYearly (yearly on specific date): RecurrenceMonthOfYear (required, 1-12), RecurrenceDayOfMonth (required, 1-31), RecurrenceEndDateOnly (required).\n- RecursYearlyNth (yearly on Nth weekday of month, e.g., \"third Monday of March\"): RecurrenceMonthOfYear (required, 1-12), RecurrenceDayOfWeekMask (required), RecurrenceInstance (required), RecurrenceEndDateOnly (required).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The name of the event (maximum 255 characters).",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "maxLength": 255
+        },
+        "Subject": {
+          "description": "The subject of the event (maximum 255 characters).",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "maxLength": 255
+        },
+        "StartDateTime": {
+          "description": "Start time of the event in ISO 8601 format (e.g., '2024-01-15T10:30:00Z'). If not provided and both EndDateTime and DurationInMinutes are provided, this will be auto-calculated.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "EndDateTime": {
+          "description": "End time of the event in ISO 8601 format. Must be >= StartDateTime. If not provided and both StartDateTime and DurationInMinutes are provided, this will be auto-calculated.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Description": {
+          "description": "Description of the event (maximum 32,000 characters).",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "maxLength": 32000
+        },
+        "Location": {
+          "description": "Location of the event (maximum 255 characters).",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "maxLength": 255
+        },
+        "IsAllDayEvent": {
+          "description": "Whether the event is all day. If True, ActivityDate must be provided. Defaults to False when omitted.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "OwnerId": {
+          "description": "ID of the event owner (15-18 alphanumeric characters). Validated against the User collection.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "WhoId": {
+          "description": "ID of the related contact or lead (15-18 alphanumeric characters). Validated against Contact or Lead; if it references a Lead, WhatId must be empty.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "WhatId": {
+          "description": "ID of the related account, opportunity, or case (15-18 alphanumeric characters). Validated against Account, Opportunity, or Case; must be empty when WhoId references a Lead.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "ActivityDate": {
+          "description": "Date of the activity in YYYY-MM-DD format (required for all-day events).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "ActivityDateTime": {
+          "description": "Date and time of the activity in ISO 8601 format.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "DurationInMinutes": {
+          "description": "Duration of the event in minutes. Must be non-negative. If not provided and both StartDateTime and EndDateTime are provided, this will be auto-calculated. If provided, must match the calculated duration between StartDateTime and EndDateTime.",
+          "type": "integer",
+          "nullable": true,
+          "default": null,
+          "minimum": 0
+        },
+        "IsPrivate": {
+          "description": "Whether the event is private.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "ShowAs": {
+          "description": "How the event appears in calendar. Valid values: Busy, Free, OutOfOffice, Tentative (case-sensitive).",
+          "type": "string",
+          "enum": [
+            "Busy",
+            "Free",
+            "OutOfOffice",
+            "Tentative"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "Type": {
+          "description": "Type of the event. Valid values: Meeting, Call, Email, Other (case-sensitive).",
+          "type": "string",
+          "enum": [
+            "Meeting",
+            "Call",
+            "Email",
+            "Other"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "IsChild": {
+          "description": "Whether this is a child event.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "IsGroupEvent": {
+          "description": "Whether this is a group event. If True, GroupEventType must be provided.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "GroupEventType": {
+          "description": "Type of group event. Valid values: Group0, Group1 (case-sensitive). Required if IsGroupEvent is True. If provided, IsGroupEvent must be True.",
+          "type": "string",
+          "enum": [
+            "Group0",
+            "Group1"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "IsRecurrence": {
+          "description": "Whether the event is recurring. If True, RecurrenceType must be provided.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceType": {
+          "description": "Type of recurrence pattern. Valid values: RecursDaily, RecursWeekly, RecursMonthly, RecursMonthlyNth, RecursYearly, RecursYearlyNth (case-sensitive). Required if IsRecurrence is True. If provided, IsRecurrence must be True.",
+          "type": "string",
+          "enum": [
+            "RecursDaily",
+            "RecursWeekly",
+            "RecursMonthly",
+            "RecursMonthlyNth",
+            "RecursYearly",
+            "RecursYearlyNth"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceInterval": {
+          "description": "Interval between recurring event instances (e.g., 2 for every 2 weeks). Must be a positive integer. Required for RecursDaily, RecursWeekly, RecursMonthly, RecursMonthlyNth.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceEndDateOnly": {
+          "description": "End date for the recurrence series in YYYY-MM-DD format. Required for all recurrence types.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceMonthOfYear": {
+          "description": "Month of year for recurrence (1-12). Required for RecursYearly, RecursYearlyNth.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceDayOfWeekMask": {
+          "description": "Day of week mask for recurrence (bitmask representing days). Required for RecursWeekly, RecursMonthlyNth, RecursYearlyNth.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceDayOfMonth": {
+          "description": "Day of month for recurrence (1-31). Required for RecursMonthly, RecursYearly.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceInstance": {
+          "description": "Recurrence instance specification. Valid values: First, Second, Third, Fourth, Last (case-sensitive). Required for RecursMonthlyNth, RecursYearlyNth.",
+          "type": "string",
+          "enum": [
+            "First",
+            "Second",
+            "Third",
+            "Fourth",
+            "Last"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "IsReminderSet": {
+          "description": "Whether reminder is set. If True, ReminderDateTime must be provided.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "ReminderDateTime": {
+          "description": "Reminder date and time in ISO 8601 format. Required if IsReminderSet is True. If provided, IsReminderSet must be True.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "create_lead",
+    "description": "Creates a new lead with all standard Salespower Lead fields.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "LastName": {
+          "description": "Last name of the lead. Required identity field.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "Company": {
+          "description": "Lead company. Required identity field for Salespower.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "Status": {
+          "description": "Lead status. Required.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "OwnerId": {
+          "description": "FK to User.Id. Owner of the lead. Must be a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores if provided. # FK → User",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Email": {
+          "description": "Email of the lead. Optional identity field.",
+          "type": "string",
+          "nullable": true,
+          "minLength": 1,
+          "default": null
+        },
+        "Phone": {
+          "description": "Phone number of the lead. Optional identity field.",
+          "type": "string",
+          "nullable": true,
+          "minLength": 1,
+          "default": null
+        },
+        "Notes": {
+          "description": "Notes about the lead. Optional text field.",
+          "type": "string",
+          "nullable": true,
+          "minLength": 1,
+          "default": null
+        },
+        "ConvertedAccountId": {
+          "description": "FK to Account.Id. Account created after conversion. Must be a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores if provided. # FK → Account",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "ConvertedOpportunityId": {
+          "description": "FK to Opportunity.Id. Opportunity created after conversion. Must be a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores if provided. # FK → Opportunity",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "LastName",
+        "Company",
+        "Status"
+      ]
+    }
+  },
+  {
+    "name": "create_opportunity",
+    "description": "Creates a new opportunity with all standard Salespower Opportunity fields.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "Name of the opportunity. Required identity field.",
+          "type": "string",
+          "nullable": false
+        },
+        "StageName": {
+          "description": "Pipeline stage. Required.",
+          "type": "string",
+          "nullable": false
+        },
+        "CloseDate": {
+          "description": "Opportunity close date (YYYY-MM-DD). Required.",
+          "type": "string",
+          "nullable": false
+        },
+        "AccountId": {
+          "description": "FK to Account.Id. Opportunity belongs to an account. Must be a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores if provided. # FK → Account",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "OwnerId": {
+          "description": "FK to User.Id. Owner of the opportunity. Must be a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores if provided. # FK → User",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Amount": {
+          "description": "Opportunity amount. Optional value field.",
+          "type": "number",
+          "nullable": true,
+          "default": null
+        },
+        "Probability": {
+          "description": "Stage probability. Optional.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "Type": {
+          "description": "Opportunity type. Optional.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "Name",
+        "StageName",
+        "CloseDate"
+      ]
+    }
+  },
+  {
+    "name": "create_task",
+    "description": "Creates a new task with all standard Salespower Task fields and comprehensive validation.\n\nThis function implements strict validation including semantic consistency checks,\nrecurrence type compatibility checks, input sanitization, referential integrity validation,\nand prevention of contradictory states.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "Priority": {
+          "description": "Priority of the task (required). Must be one of: \"High\", \"Normal\", \"Low\".",
+          "type": "string",
+          "enum": [
+            "High",
+            "Normal",
+            "Low"
+          ]
+        },
+        "Status": {
+          "description": "Status of the task (required). Must be one of: \"Not Started\", \"In Progress\", \"Completed\", \"Waiting\", \"Waiting on someone else\", \"Deferred\", \"Open\", \"Closed\".",
+          "type": "string",
+          "enum": [
+            "Not Started",
+            "In Progress",
+            "Completed",
+            "Waiting",
+            "Waiting on someone else",
+            "Deferred",
+            "Open",
+            "Closed"
+          ]
+        },
+        "Name": {
+          "description": "The name of the task. Must be at least 1 character if provided. Maximum length: 80 characters.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "Subject": {
+          "description": "The subject of the task. Must be at least 1 character if provided. Maximum length: 255 characters.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "Description": {
+          "description": "Description of the task. Must be at least 1 character if provided. Maximum length: 32,000 characters.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1,
+          "maxLength": 32000
+        },
+        "ActivityDate": {
+          "description": "Due date of the task in ISO format (YYYY-MM-DD).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "DueDate": {
+          "description": "Alternative field for task due date in ISO format (YYYY-MM-DD).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "OwnerId": {
+          "description": "ID of the task owner. Must be 15-18 alphanumeric characters if provided. Validated against the User collection.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1
+        },
+        "WhoId": {
+          "description": "ID of the related contact or lead. Must be 15-18 alphanumeric characters if provided. Validated against Contact or Lead; if it references a Lead, WhatId must be empty.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1
+        },
+        "WhatId": {
+          "description": "ID of the related account, opportunity, or case. Must be 15-18 alphanumeric characters if provided. Validated against Account, Opportunity, or Case; must be empty when WhoId references a Lead.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1
+        },
+        "IsReminderSet": {
+          "description": "Whether reminder is set.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "ReminderDateTime": {
+          "description": "Reminder date and time in ISO format (YYYY-MM-DDTHH:MM:SS).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "CallDurationInSeconds": {
+          "description": "Duration of call in seconds. Must be non-negative.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "CallType": {
+          "description": "Type of call (Inbound, Outbound). Case-sensitive.",
+          "type": "string",
+          "enum": [
+            "Inbound",
+            "Outbound"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "CallObject": {
+          "description": "Call object identifier.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "CallDisposition": {
+          "description": "Call disposition (Connected, Left Voicemail, No Answer, Busy, Wrong Number, Disconnected, Other). Case-sensitive.",
+          "type": "string",
+          "enum": [
+            "Connected",
+            "Left Voicemail",
+            "No Answer",
+            "Busy",
+            "Wrong Number",
+            "Disconnected",
+            "Other"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "IsRecurrence": {
+          "description": "Whether task is recurring.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceType": {
+          "description": "Type of recurrence pattern. Valid values: RecursDaily, RecursWeekly, RecursMonthly, RecursMonthlyNth, RecursYearly, RecursYearlyNth (case-sensitive). Required if IsRecurrence is True.",
+          "type": "string",
+          "enum": [
+            "RecursDaily",
+            "RecursWeekly",
+            "RecursMonthly",
+            "RecursMonthlyNth",
+            "RecursYearly",
+            "RecursYearlyNth"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceInterval": {
+          "description": "Recurrence interval. Must be positive if provided.",
+          "type": "integer",
+          "minimum": 1,
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceEndDateOnly": {
+          "description": "End date for recurrence in YYYY-MM-DD format.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceMonthOfYear": {
+          "description": "Month of year for recurrence (1-12).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12,
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceDayOfWeekMask": {
+          "description": "Day of week mask for recurrence.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceDayOfMonth": {
+          "description": "Day of month for recurrence (1-31).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 31,
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceInstance": {
+          "description": "Recurrence instance specification. Valid values: First, Second, Third, Fourth, Last (case-sensitive).",
+          "type": "string",
+          "enum": [
+            "First",
+            "Second",
+            "Third",
+            "Fourth",
+            "Last"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "CompletedDateTime": {
+          "description": "Date and time when task was completed. Must be consistent with Status.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "IsClosed": {
+          "description": "Whether the task is closed. Must be consistent with Status.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "IsHighPriority": {
+          "description": "Whether the task is high priority. Must be consistent with Priority.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "IsArchived": {
+          "description": "Whether the task is archived.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "TaskSubtype": {
+          "description": "Subtype of the task (Task, Call, Email, Meeting, Other). Case-sensitive.",
+          "type": "string",
+          "enum": [
+            "Task",
+            "Call",
+            "Email",
+            "Meeting",
+            "Other"
+          ],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "Priority",
+        "Status"
+      ]
+    }
+  },
+  {
+    "name": "create_user",
+    "description": "Creates a new user with all standard Salespower User fields.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "Username": {
+          "description": "Unique username. Required identity field.",
+          "type": "string",
+          "nullable": false
+        },
+        "LastName": {
+          "description": "User's last name. Required identity field.",
+          "type": "string",
+          "nullable": false
+        },
+        "Email": {
+          "description": "User's email address. Required identity field.",
+          "type": "string",
+          "nullable": false
+        },
+        "ProfileId": {
+          "description": "Profile assignment. Required by Salespower.",
+          "type": "string",
+          "nullable": false
+        },
+        "TimeZoneSidKey": {
+          "description": "User timezone. Required.",
+          "type": "string",
+          "nullable": false
+        },
+        "LocaleSidKey": {
+          "description": "User locale key. Required.",
+          "type": "string",
+          "nullable": false
+        },
+        "EmailEncodingKey": {
+          "description": "Email encoding setting. Required.",
+          "type": "string",
+          "nullable": false
+        },
+        "LanguageLocaleKey": {
+          "description": "Language locale. Required.",
+          "type": "string",
+          "nullable": false
+        },
+        "ManagerId": {
+          "description": "FK to User.Id. Manager of this user. Must be a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores if provided. # FK → User",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Alias": {
+          "description": "User alias. Medium priority.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "IsActive": {
+          "description": "Whether user account is active.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "Username",
+        "LastName",
+        "Email",
+        "ProfileId",
+        "TimeZoneSidKey",
+        "LocaleSidKey",
+        "EmailEncodingKey",
+        "LanguageLocaleKey"
+      ]
+    }
+  },
+  {
+    "name": "delete_account",
+    "description": "Deletes an account from the Salespower system.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "description": "Unique identifier of the account to delete (a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores).",
+          "type": "string",
+          "nullable": false,
+          "pattern": "^[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*$"
+        }
+      },
+      "required": [
+        "account_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_contact",
+    "description": "Deletes a contact from the Salespower system.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "contact_id": {
+          "description": "Unique identifier of the contact to delete (a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores).",
+          "type": "string",
+          "nullable": false,
+          "pattern": "^[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*$"
+        }
+      },
+      "required": [
+        "contact_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_event",
+    "description": "Deletes an event by moving it to the DeletedEvents collection.\n\nThis function performs a soft delete operation. The event is marked as deleted (IsDeleted=True),\nmoved from the Event collection to the DeletedEvents collection, and its SystemModstamp is updated\nto the deletion timestamp. The event can be restored using the undelete_event function.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "event_id": {
+          "description": "The ID of the event to delete. Must be a non-empty string used to locate and delete the specific event from the active Event collection.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "event_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_lead",
+    "description": "Deletes a lead from the Salespower system.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "lead_id": {
+          "description": "Unique identifier of the lead to delete (a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores).",
+          "type": "string",
+          "nullable": false,
+          "pattern": "^[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*$"
+        }
+      },
+      "required": [
+        "lead_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_opportunity",
+    "description": "Deletes an opportunity from the Salespower system.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "opportunity_id": {
+          "description": "Unique identifier of the opportunity to delete (a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores).",
+          "type": "string",
+          "nullable": false,
+          "pattern": "^[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*$"
+        }
+      },
+      "required": [
+        "opportunity_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_task",
+    "description": "Deletes a task from the Salespower system.\n\nThis function performs a soft delete operation on a task record. The task is:\n1. Removed from the active Task collection\n2. Moved to the DeletedTasks collection with deletion metadata\n3. Marked with IsDeleted=True flag\n4. Timestamped with SystemModstamp and deletedDate fields\n\nAdditionally, this function performs cascade deletes on related child records. All child records\nwith cascadeDelete=True relationships (as defined in the TaskSObject metadata) are also soft-deleted\nand moved into the DeletedChildRecords sub-collection for their child sObject type. This ensures referential integrity is maintained.\n\nThe deleted task can be restored using the undelete_task function.\nDeleted tasks are excluded from query and search operations but can be retrieved\nusing get_deleted_tasks() for data replication purposes.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "description": "Unique identifier of the task to delete (non-empty string). The task must exist in the active Task collection. Cannot be empty or whitespace-only.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "task_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_user",
+    "description": "Deletes a user from the Salespower system.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "Unique identifier of the user to delete (a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores).",
+          "type": "string",
+          "nullable": false,
+          "pattern": "^[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*$"
+        }
+      },
+      "required": [
+        "user_id"
+      ]
+    }
+  },
+  {
+    "name": "describe_event_layout",
+    "description": "Describes the layout of a visible event by returning Event object metadata tailored to the event's record type. The function inspects the event record to determine its record type and returns layout information specific to that record type. Callers must not infer per-user record-type authorization from this response; record-type authorization flags such as available and defaultRecordTypeMapping are omitted.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "event_id": {
+          "description": "The ID of the event to describe the layout for (non-empty string).",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "event_id"
+      ]
+    }
+  },
+  {
+    "name": "describe_event_object",
+    "description": "Describes the object (Event).",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "describe_task_layout",
+    "description": "Describes the layout of a specific Task.\n\nThis function is used to describe the layout of a specific Task.\nIt is used to get the layout of a specific Task.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "layout_id": {
+          "description": "The ID of the Task layout to describe. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "layout_id"
+      ]
+    }
+  },
+  {
+    "name": "describe_task_object",
+    "description": "Describes Task SObjects.\n\nReturn all the fields of the Task's SObject Metadata.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "execute_soql_query",
+    "description": "Executes a SOQL-like query against the in-memory database.\n\nThe query string is first URL-decoded.\nThe parser has specific behaviors and improved parsing logic as detailed below.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "q": {
+          "description": "The SOQL-like query string. Examples:\n- \"SELECT Name, Location FROM Event WHERE Location = 'Boardroom' ORDER BY Name ASC OFFSET 0 LIMIT 5\"\n- \"SELECT Id, Subject, Status FROM Task WHERE (Status = 'Completed' OR Status = 'Closed') AND Subject LIKE '%important%'\"\n- \"SELECT Id, Subject, DueDate FROM Task WHERE DueDate = TODAY\"\n- \"SELECT Id, Subject, DueDate FROM Task WHERE DueDate >= NEXT_N_DAYS:7\"\nSupported top-level Salespower objects in this simulation are Event, Task, User, Account, Contact, Lead, and Opportunity. DeletedEvents and DeletedTasks are simulator deleted-record collections for deleted-record workflows. Case is supported only as a relationship subquery target in Task/Event semi-join or anti-join filters; do not query it as a top-level FROM object. Standard Salespower objects such as Note and Attachment are not available. \nLimitations: FIELDS(...) and TYPEOF are not supported. Use explicit SELECT fields instead.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "q"
+      ]
+    }
+  },
+  {
+    "name": "get_deleted_events",
+    "description": "Retrieves the list of individual records that have been deleted within the given timespan for the specified object.\n\nThis function implements Salespower API getDeleted() for data replication applications to retrieve a list\nof records that have been deleted from your organization's data within the specified timespan.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "sObjectType": {
+          "description": "The type of object to retrieve deleted records for. Must be \"Event\" for this function.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "start_date": {
+          "description": "Starting date/time (UTC) of the timespan for which to retrieve the data.\nFormat: ISO 8601 (e.g., \"2024-01-01T00:00:00Z\").\nThe API ignores the seconds portion of the specified dateTime value.\nIf None, no start date filter is applied.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "end_date": {
+          "description": "Ending date/time (UTC) of the timespan for which to retrieve the data.\nFormat: ISO 8601 (e.g., \"2024-01-31T23:59:00Z\").\nThe API ignores the seconds portion of the specified dateTime value.\nIf None, no end date filter is applied.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "sObjectType"
+      ]
+    }
+  },
+  {
+    "name": "get_deleted_tasks",
+    "description": "Retrieves the list of individual records that have been deleted within the given timespan for the specified object.\n\nThis function implements Salespower API getDeleted() for data replication applications to retrieve a list\nof records that have been deleted from your organization's data within the specified timespan.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "sObjectType": {
+          "description": "The type of object to retrieve deleted records for. Must be \"Task\".",
+          "type": "string",
+          "enum": [
+            "Task"
+          ],
+          "nullable": false
+        },
+        "start_date": {
+          "description": "Starting date/time (UTC) of the timespan for which to retrieve the data.\nFormat: ISO 8601 (e.g., \"2024-01-01T00:00:00Z\").\nThe API ignores the seconds portion of the specified dateTime value.\nIf None, no start date filter is applied.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "end_date": {
+          "description": "Ending date/time (UTC) of the timespan for which to retrieve the data.\nFormat: ISO 8601 (e.g., \"2024-01-31T23:59:00Z\").\nThe API ignores the seconds portion of the specified dateTime value.\nIf None, no end date filter is applied.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "sObjectType"
+      ]
+    }
+  },
+  {
+    "name": "get_updated_events",
+    "description": "Retrieves updated events between start_date_time and end_date_time.\n\nRetrieves updated events between start_date_time and end_date_time. The events are returned if the property SystemModstamp is between the provided dates (inclusive of start_date_time, exclusive of end_date_time).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "start_date_time": {
+          "description": "Start time to look for updated events in ISO 8601 format (UTC). Must chronologically precede end_date_time. The boundary is inclusive (events with SystemModstamp >= start_date_time are included).",
+          "type": "string",
+          "nullable": false
+        },
+        "end_date_time": {
+          "description": "End time to look for updated events in ISO 8601 format (UTC). Must be after start_date_time. The boundary is exclusive (events with SystemModstamp < end_date_time are included).",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "start_date_time",
+        "end_date_time"
+      ]
+    }
+  },
+  {
+    "name": "get_updated_tasks",
+    "description": "Retrieves the list of individual Task records that have been updated (added or changed) or deleted within the given timespan.\n\nThis function is used to get the list of Task records that have been updated (added or changed) or deleted within the given timespan. The function includes both active tasks (from the Task collection) and deleted tasks (from the DeletedTasks collection) that were modified or deleted within the specified time range.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "start_date": {
+          "description": "Starting date/time (UTC) of the timespan for which to retrieve the data. ISO 8601 format. Seconds are ignored.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "end_date": {
+          "description": "Ending date/time (UTC) of the timespan for which to retrieve the data. ISO 8601 format. Seconds are ignored.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "parse_where_clause_conditions",
+    "description": "Parse the conditions in the WHERE clause.\n\nHandles '=', 'IN', 'NOT IN', 'LIKE', 'CONTAINS', '>', '<', 'IS NULL', and 'IS NOT NULL'.\n\nValues are automatically converted to their appropriate types:\n- Boolean literals ('true', 'false') are converted to bool\n- Numeric strings are converted to int or float\n- Other values remain as strings\n\nNote: 'LIKE' and 'CONTAINS' operators keep values as strings (they are pattern matching operators).\nNote: 'IS NULL' and 'IS NOT NULL' operators do not require a value and will set the value to None.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "description": "List of condition strings to parse. Example:\n- \"Subject = 'Meeting'\"\n- \"IsAllDayEvent = true\"\n- \"Location IN ('Boardroom', 'Conference Room')\"\n- \"Status NOT IN ('Completed', 'Closed')\"\n- \"Description LIKE '%important%'\"\n- \"Subject CONTAINS 'review'\",\n- \"Priority < 'High'\"",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "nullable": false
+        }
+      },
+      "required": [
+        "conditions"
+      ]
+    }
+  },
+  {
+    "name": "query_accounts",
+    "description": "Queries accounts based on specified criteria.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "criteria": {
+          "description": "A dictionary containing search criteria for filtering accounts.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "Name": {
+              "description": "Name of the account",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "OwnerId": {
+              "description": "Foreign key (FK) to User.Id. Owner of the account. # FK → User",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "ParentId": {
+              "description": "Foreign key (FK) to Account.Id. Parent account in hierarchy. # FK → Account",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Type": {
+              "description": "Account type classification",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Industry": {
+              "description": "Industry classification of the account",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "AccountNumber": {
+              "description": "Account reference number",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Phone": {
+              "description": "Work phone of the account",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Website": {
+              "description": "Website URL of the account",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": []
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "query_contacts",
+    "description": "Queries contacts based on specified criteria.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "criteria": {
+          "description": "A dictionary containing search criteria for filtering contacts.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "LastName": {
+              "description": "Last name of the contact",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "AccountId": {
+              "description": "FK to Account.Id. Contact belongs to an account. # FK → Account",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "OwnerId": {
+              "description": "FK to User.Id. Owner of this contact. # FK → User",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "FirstName": {
+              "description": "First name of the contact",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Email": {
+              "description": "Email of the contact",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Phone": {
+              "description": "Phone number of the contact",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Title": {
+              "description": "Job title of the contact",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": []
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "query_events",
+    "description": "Query events based on specified criteria.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "criteria": {
+          "description": "Key-value pairs to filter events. The default value is None. All keys are optional for flexible filtering. If criteria is None or an empty dict ({}), all non-deleted events are returned. Known filterable keys include: 'Subject' (Optional[str]): The subject of the event (case-insensitive comparison); 'IsAllDayEvent' (Optional[bool]): Whether the event is all day; 'StartDateTime' (Optional[str]): Start time of the event in ISO 8601 format (case-sensitive comparison); 'EndDateTime' (Optional[str]): End time of the event in ISO 8601 format (case-sensitive comparison); 'Description' (Optional[str]): Description of the event (case-insensitive comparison); 'Location' (Optional[str]): Location of the event (case-insensitive comparison); 'Name' (Optional[str]): Name of the event (case-insensitive comparison); 'OwnerId' (Optional[str]): ID of the event owner (case-sensitive comparison); 'WhoId' (Optional[str]): ID of the related contact or lead (case-sensitive comparison); 'WhatId' (Optional[str]): ID of the related account, opportunity, campaign, case, or contract (case-sensitive comparison); 'Id' (Optional[str]): Unique identifier for the event (case-sensitive comparison); 'CreatedDate' (Optional[str]): Creation timestamp in ISO 8601 format (case-sensitive comparison); 'SystemModstamp' (Optional[str]): Last modification timestamp in ISO 8601 format (case-sensitive comparison); 'deletedDate' (Optional[str]): Deletion timestamp in ISO 8601 format (present only for deleted events, case-sensitive comparison); 'ActivityDate' (Optional[str]): Date of the activity in ISO 8601 format (case-sensitive comparison); 'ActivityDateTime' (Optional[str]): Activity date and time in ISO 8601 format (case-sensitive comparison); 'DurationInMinutes' (Optional[int]): Duration of the event in minutes; 'IsPrivate' (Optional[bool]): Whether the event is private; 'ShowAs' (Optional[str]): How the event appears in calendar. Valid values: Busy, Free, OutOfOffice, Tentative (case-sensitive); 'Type' (Optional[str]): Type of the event. Valid values: Meeting, Call, Email, Other (case-sensitive); 'IsChild' (Optional[bool]): Whether the event is a child event in a recurring series; 'IsGroupEvent' (Optional[bool]): Whether the event is a group event; 'GroupEventType' (Optional[str]): Type of group event. Valid values: Group0, Group1 (case-sensitive); 'IsRecurrence' (Optional[bool]): Whether the event is part of a recurring series; 'RecurrenceType' (Optional[str]): Type of recurrence pattern. Valid values: RecursDaily, RecursWeekly, RecursMonthly, RecursMonthlyNth, RecursYearly, RecursYearlyNth (case-sensitive); 'RecurrenceInterval' (Optional[int]): Interval between recurring event instances (positive integer); 'RecurrenceEndDateOnly' (Optional[str]): Recurrence end date in YYYY-MM-DD format (case-sensitive comparison); 'RecurrenceMonthOfYear' (Optional[int]): Month of year for recurrence (1-12); 'RecurrenceDayOfWeekMask' (Optional[int]): Day of week mask for recurrence; 'RecurrenceDayOfMonth' (Optional[int]): Day of month for recurrence (1-31); 'RecurrenceInstance' (Optional[str]): Recurrence instance specification. Valid values: First, Second, Third, Fourth, Last (case-sensitive); 'IsReminderSet' (Optional[bool]): Whether a reminder has been set for this event; 'ReminderDateTime' (Optional[str]): Reminder date and time in ISO 8601 format (case-sensitive comparison). These keys are type-validated when present. Case sensitivity for string comparisons is determined by field metadata: fields marked as case-sensitive, ID fields (type='id' or idLookup=True), and datetime fields (type='datetime') are compared case-sensitively, while other string fields are compared case-insensitively. Additional keys are allowed and will be used for exact field matching when they exist on event records, with case sensitivity determined by their metadata. Keys that are not present in the criteria dict are simply ignored (not used for filtering).",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "Subject": {
+              "description": "The subject of the event.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "IsAllDayEvent": {
+              "description": "Whether the event is all day.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "StartDateTime": {
+              "description": "Start time of the event.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "EndDateTime": {
+              "description": "End time of the event.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Description": {
+              "description": "Description of the event.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Location": {
+              "description": "Location of the event.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Name": {
+              "description": "Name of the event to filter by (case-insensitive comparison).",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "OwnerId": {
+              "description": "ID of the event owner. Compared case-sensitively.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "WhoId": {
+              "description": "ID of the related contact or lead associated with the event. Compared case-sensitively.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "WhatId": {
+              "description": "ID of the related account, opportunity, campaign, case, or contract. Compared case-sensitively.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Id": {
+              "description": "Unique identifier for the event. Compared case-sensitively.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "CreatedDate": {
+              "description": "Creation timestamp in ISO 8601 format. Compared case-sensitively.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "SystemModstamp": {
+              "description": "Last modification timestamp in ISO 8601 format. Compared case-sensitively.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "deletedDate": {
+              "description": "Deletion timestamp in ISO 8601 format (present only for deleted events). Use to filter DeletedEvents entries. Compared case-sensitively.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "ActivityDate": {
+              "description": "Date of the activity in ISO 8601 format (date or dateTime). Compared case-sensitively.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "ActivityDateTime": {
+              "description": "Date and time of the activity in ISO 8601 format. Compared case-sensitively.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "ReminderDateTime": {
+              "description": "Date and time when the reminder should trigger in ISO 8601 format. Compared case-sensitively.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "RecurrenceEndDateOnly": {
+              "description": "End date for the recurrence series in YYYY-MM-DD format. Compared case-sensitively.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "DurationInMinutes": {
+              "description": "Duration of the event in minutes. Must be non-negative.",
+              "type": "integer",
+              "nullable": true,
+              "default": null,
+              "minimum": 0
+            },
+            "IsPrivate": {
+              "description": "Whether the event is private.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "ShowAs": {
+              "description": "How the event appears in calendar. Valid values: Busy, Free, OutOfOffice, Tentative (case-sensitive).",
+              "type": "string",
+              "enum": [
+                "Busy",
+                "Free",
+                "OutOfOffice",
+                "Tentative"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "Type": {
+              "description": "Type of the event. Valid values: Meeting, Call, Email, Other (case-sensitive).",
+              "type": "string",
+              "enum": [
+                "Meeting",
+                "Call",
+                "Email",
+                "Other"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "IsChild": {
+              "description": "Whether the event is a child event in a recurring series.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "IsGroupEvent": {
+              "description": "Whether the event is a group event involving multiple participants.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "GroupEventType": {
+              "description": "Type of group event. Valid values: Group0, Group1 (case-sensitive).",
+              "type": "string",
+              "enum": [
+                "Group0",
+                "Group1"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "IsRecurrence": {
+              "description": "Whether the event is part of a recurring series.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "RecurrenceType": {
+              "description": "Type of recurrence pattern. Valid values: RecursDaily, RecursWeekly, RecursMonthly, RecursMonthlyNth, RecursYearly, RecursYearlyNth (case-sensitive).",
+              "type": "string",
+              "enum": [
+                "RecursDaily",
+                "RecursWeekly",
+                "RecursMonthly",
+                "RecursMonthlyNth",
+                "RecursYearly",
+                "RecursYearlyNth"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "RecurrenceInterval": {
+              "description": "Interval between recurring event instances (e.g., every 2 weeks). Must be positive.",
+              "type": "integer",
+              "minimum": 1,
+              "nullable": true,
+              "default": null
+            },
+            "RecurrenceMonthOfYear": {
+              "description": "Month of year for recurrence (1-12) for yearly recurrence patterns.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 12,
+              "nullable": true,
+              "default": null
+            },
+            "RecurrenceDayOfWeekMask": {
+              "description": "Day of week mask for recurrence (bitmask representing days).",
+              "type": "integer",
+              "nullable": true,
+              "default": null
+            },
+            "RecurrenceDayOfMonth": {
+              "description": "Day of month for recurrence (1-31) for monthly recurrence patterns.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 31,
+              "nullable": true,
+              "default": null
+            },
+            "RecurrenceInstance": {
+              "description": "Recurrence instance specification. Valid values: First, Second, Third, Fourth, Last (case-sensitive).",
+              "type": "string",
+              "enum": [
+                "First",
+                "Second",
+                "Third",
+                "Fourth",
+                "Last"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "IsReminderSet": {
+              "description": "Whether a reminder has been set for this event.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": []
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "query_leads",
+    "description": "Queries leads based on specified criteria.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "criteria": {
+          "description": "A dictionary containing search criteria for filtering leads.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "LastName": {
+              "description": "Last name of the lead",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Company": {
+              "description": "Lead company",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Status": {
+              "description": "Lead status",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "OwnerId": {
+              "description": "FK to User.Id. Owner of the lead. # FK → User",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Email": {
+              "description": "Email of the lead",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Phone": {
+              "description": "Phone number of the lead",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Notes": {
+              "description": "Notes about the lead",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "ConvertedAccountId": {
+              "description": "FK to Account.Id. Account created after conversion. # FK → Account",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "ConvertedOpportunityId": {
+              "description": "FK to Opportunity.Id. Opportunity created after conversion. # FK → Opportunity",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": []
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "query_opportunities",
+    "description": "Queries opportunities based on specified criteria.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "criteria": {
+          "description": "A dictionary containing search criteria for filtering opportunities.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "Name": {
+              "description": "Name of the opportunity",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "StageName": {
+              "description": "Pipeline stage",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "CloseDate": {
+              "description": "Opportunity close date (YYYY-MM-DD)",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "AccountId": {
+              "description": "FK to Account.Id. Opportunity belongs to an account. # FK → Account",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "OwnerId": {
+              "description": "FK to User.Id. Owner of the opportunity. # FK → User",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Amount": {
+              "description": "Opportunity amount",
+              "type": "number",
+              "nullable": true,
+              "default": null
+            },
+            "Probability": {
+              "description": "Stage probability",
+              "type": "integer",
+              "nullable": true,
+              "default": null
+            },
+            "Type": {
+              "description": "Opportunity type",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": []
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "query_tasks",
+    "description": "Queries tasks based on specified criteria.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "criteria": {
+          "description": "A dictionary containing search criteria for filtering tasks. Defaults to None. If not provided (i.e., None), all non-deleted tasks in the database will be returned. If provided, the dictionary structure is validated. All keys within the criteria dictionary are optional.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "Subject": {
+              "description": "The subject of the task.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Priority": {
+              "description": "The priority of the task.",
+              "type": "string",
+              "enum": [
+                "High",
+                "Normal",
+                "Low"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "Status": {
+              "description": "The status of the task.",
+              "type": "string",
+              "enum": [
+                "Not Started",
+                "In Progress",
+                "Completed",
+                "Waiting",
+                "Waiting on someone else",
+                "Deferred",
+                "Open",
+                "Closed"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "ActivityDate": {
+              "description": "The due date of the task. Format: \"YYYY-MM-DD\".",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Name": {
+              "description": "The name of the task.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Description": {
+              "description": "Description of the task.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "DueDate": {
+              "description": "Due date of the task. Format: \"YYYY-MM-DD\".",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "OwnerId": {
+              "description": "ID of the task owner. Must be 15-18 alphanumeric characters if provided.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "WhoId": {
+              "description": "ID of the related contact. Must be 15-18 alphanumeric characters if provided.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "WhatId": {
+              "description": "ID of the related record. Must be 15-18 alphanumeric characters if provided.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "IsReminderSet": {
+              "description": "Whether reminder is set.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "ReminderDateTime": {
+              "description": "Reminder date and time. Format: ISO 8601 (YYYY-MM-DDTHH:MM:SS).",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": []
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "query_users",
+    "description": "Queries users based on specified criteria.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "criteria": {
+          "description": "A dictionary containing search criteria for filtering users.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "Username": {
+              "description": "Unique username",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "LastName": {
+              "description": "User's last name",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Email": {
+              "description": "User's email address",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "ProfileId": {
+              "description": "Profile assignment",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "TimeZoneSidKey": {
+              "description": "User timezone",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "LocaleSidKey": {
+              "description": "User locale key",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "EmailEncodingKey": {
+              "description": "Email encoding setting",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "LanguageLocaleKey": {
+              "description": "Language locale",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "ManagerId": {
+              "description": "FK to User.Id. Manager of this user. # FK → User",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "Alias": {
+              "description": "User alias",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "IsActive": {
+              "description": "Whether user account is active",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": []
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "retrieve_account_details",
+    "description": "Retrieves details of a specific account by its ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "description": "The ID of the account to retrieve. Must be a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "account_id"
+      ]
+    }
+  },
+  {
+    "name": "retrieve_contact_details",
+    "description": "Retrieves details of a specific contact by its ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "contact_id": {
+          "description": "The ID of the contact to retrieve. Must be a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "contact_id"
+      ]
+    }
+  },
+  {
+    "name": "retrieve_event_details",
+    "description": "Retrieves details of a specific event by its ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "event_id": {
+          "description": "The ID of the event to retrieve (non-empty string).",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "event_id"
+      ]
+    }
+  },
+  {
+    "name": "retrieve_lead_details",
+    "description": "Retrieves details of a specific lead by its ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "lead_id": {
+          "description": "The ID of the lead to retrieve. Must be a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "lead_id"
+      ]
+    }
+  },
+  {
+    "name": "retrieve_opportunity_details",
+    "description": "Retrieves details of a specific opportunity by its ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "opportunity_id": {
+          "description": "The ID of the opportunity to retrieve. Must be a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "opportunity_id"
+      ]
+    }
+  },
+  {
+    "name": "retrieve_task_details",
+    "description": "Retrieves details of a specific task by its ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "description": "The ID of the task to retrieve. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "task_id"
+      ]
+    }
+  },
+  {
+    "name": "retrieve_user_details",
+    "description": "Retrieves details of a specific user by its ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "The ID of the user to retrieve. Must be a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "user_id"
+      ]
+    }
+  },
+  {
+    "name": "search_events",
+    "description": "Searches for events based on specified search criteria.\n\nThis function performs a case-insensitive search across all event fields.\nThe search looks for the search term as a substring within any field value.\nIf the search term is empty or contains only whitespace, all events are returned.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "search_term": {
+          "description": "The term to search for in event fields. If an empty string is provided,\nall events will be returned.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "search_term"
+      ]
+    }
+  },
+  {
+    "name": "search_tasks",
+    "description": "Searches for tasks based on specified search criteria.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "search_term": {
+          "description": "The term to search for in task fields. If empty or contains only whitespace,\nreturns all non-deleted tasks. Maximum length limit is 32,000 characters.",
+          "type": "string",
+          "nullable": false,
+          "maxLength": 32000
+        }
+      },
+      "required": [
+        "search_term"
+      ]
+    }
+  },
+  {
+    "name": "undelete_event",
+    "description": "Restores a deleted event.\n\nThis function restores a deleted event by moving it from the DeletedEvents collection back to the Event collection. The function also sets the IsDeleted flag to False and removes the deletedDate field from the event record.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "event_id": {
+          "description": "The ID of the event to undelete (non-empty string).",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "event_id"
+      ]
+    }
+  },
+  {
+    "name": "undelete_task",
+    "description": "Restores a deleted task. Additionally, this function performs cascade restores on related child records. All child records with cascadeDelete=True relationships (as defined in the TaskSObject metadata) that were cascade-deleted into DeletedChildRecords are also restored and moved back to their respective active collections.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "description": "The ID of the task to undelete. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "task_id"
+      ]
+    }
+  },
+  {
+    "name": "update_account",
+    "description": "Updates an existing account with the provided fields.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "description": "The unique identifier of the account to be updated.",
+          "type": "string",
+          "nullable": false
+        },
+        "Name": {
+          "description": "Name of the account. Required field — cannot be cleared.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "OwnerId": {
+          "description": "Foreign key (FK) to User.Id. Owner of the account. Must be a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores that exists in the User collection. Referential integrity is validated - if the ID doesn't exist, a referential integrity error is raised. Pass empty string (\"\") to clear the field. Defaults to None. # FK → User",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "ParentId": {
+          "description": "Foreign key (FK) to Account.Id. Parent account in hierarchy. Must be a non-empty fixture-compatible identifier using letters and digits with internal hyphens or underscores that exists in the Account collection. Referential integrity is validated - if the ID doesn't exist, a referential integrity error is raised. Pass empty string (\"\") to clear the field. Defaults to None. # FK → Account",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Type": {
+          "description": "Account type classification. Pass empty string (\"\") to clear the field.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Industry": {
+          "description": "Industry classification of the account. Pass empty string (\"\") to clear the field.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "AccountNumber": {
+          "description": "Account reference number. Pass empty string (\"\") to clear the field.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Phone": {
+          "description": "Work phone of the account. Pass empty string (\"\") to clear the field.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Website": {
+          "description": "Website URL of the account. Pass empty string (\"\") to clear the field.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "account_id"
+      ]
+    }
+  },
+  {
+    "name": "update_contact",
+    "description": "Updates an existing contact with the provided fields.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "contact_id": {
+          "description": "The unique identifier of the contact to be updated.",
+          "type": "string",
+          "nullable": false
+        },
+        "LastName": {
+          "description": "Last name of the contact. Required field — cannot be cleared.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "OwnerId": {
+          "description": "FK to User.Id. Owner of the contact. Pass empty string (\"\") to clear the field. # FK → User",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "AccountId": {
+          "description": "FK to Account.Id. Contact belongs to an account. Pass empty string (\"\") to clear the field. # FK → Account",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "FirstName": {
+          "description": "First name of the contact. Pass empty string (\"\") to clear the field.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Email": {
+          "description": "Email of the contact. Pass empty string (\"\") to clear the field.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Phone": {
+          "description": "Phone number of the contact. Pass empty string (\"\") to clear the field.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Title": {
+          "description": "Job title of the contact. Pass empty string (\"\") to clear the field.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "contact_id"
+      ]
+    }
+  },
+  {
+    "name": "update_event",
+    "description": "Updates an existing event.\n\nThis function validates input using the EventUpdateRequest Pydantic model, performs referential\nintegrity checks on ID fields, auto-calculates DurationInMinutes from StartDateTime and EndDateTime (or EndDateTime from StartDateTime and DurationInMinutes, or StartDateTime from EndDateTime and DurationInMinutes) when not provided, updates\nSystemModstamp to current time, and stores the updated event in the database.\n\nTo clear a string field, pass an empty string (\"\"). Passing None will leave the field unchanged.\n\nRecurrence Rules:\nWhen updating recurring events, the following validation rules apply:\n\nGeneral Consistency Rules:\n- If IsRecurrence is True, RecurrenceType must be provided (minimum requirement).\n- If any recurrence field is provided (RecurrenceType, RecurrenceInterval, RecurrenceEndDateOnly, RecurrenceMonthOfYear, RecurrenceDayOfWeekMask, RecurrenceDayOfMonth, or RecurrenceInstance), IsRecurrence must be set to True.\n- If RecurrenceType is provided, IsRecurrence must be set to True.\n\nRecurrenceType-Specific Required Fields:\n- RecursDaily (daily recurrence): RecurrenceInterval (required, positive integer specifying interval in days), RecurrenceEndDateOnly (required, YYYY-MM-DD format).\n- RecursWeekly (weekly recurrence): RecurrenceInterval (required, positive integer specifying interval in weeks), RecurrenceDayOfWeekMask (required, bitmask: Sunday=1, Monday=2, Tuesday=4, Wednesday=8, Thursday=16, Friday=32, Saturday=64), RecurrenceEndDateOnly (required).\n- RecursMonthly (monthly on specific day): RecurrenceInterval (required, positive integer specifying interval in months), RecurrenceDayOfMonth (required, 1-31), RecurrenceEndDateOnly (required).\n- RecursMonthlyNth (monthly on Nth weekday, e.g., \"second Tuesday\"): RecurrenceInterval (required), RecurrenceDayOfWeekMask (required), RecurrenceInstance (required, First/Second/Third/Fourth/Last), RecurrenceEndDateOnly (required).\n- RecursYearly (yearly on specific date): RecurrenceMonthOfYear (required, 1-12), RecurrenceDayOfMonth (required, 1-31), RecurrenceEndDateOnly (required).\n- RecursYearlyNth (yearly on Nth weekday of month, e.g., \"third Monday of March\"): RecurrenceMonthOfYear (required, 1-12), RecurrenceDayOfWeekMask (required), RecurrenceInstance (required), RecurrenceEndDateOnly (required).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "event_id": {
+          "description": "The ID of the event to update (non-empty string).",
+          "type": "string",
+          "nullable": false
+        },
+        "Name": {
+          "description": "The name of the event (maximum 255 characters). Pass empty string (\"\") to clear. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "maxLength": 255
+        },
+        "Subject": {
+          "description": "The subject of the event (maximum 255 characters). Pass empty string (\"\") to clear. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "maxLength": 255
+        },
+        "StartDateTime": {
+          "description": "Start time of the event in ISO 8601 format (e.g., '2024-01-15T10:30:00Z'). If not provided, will be automatically calculated from EndDateTime and DurationInMinutes. Pass empty string (\"\") to clear. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "EndDateTime": {
+          "description": "End time of the event in ISO 8601 format. Must be >= StartDateTime. If not provided, will be automatically calculated from StartDateTime and DurationInMinutes. Pass empty string (\"\") to clear. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Description": {
+          "description": "Description of the event (maximum 32,000 characters). Pass empty string (\"\") to clear. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "maxLength": 32000
+        },
+        "Location": {
+          "description": "Location of the event (maximum 255 characters). Pass empty string (\"\") to clear. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "maxLength": 255
+        },
+        "IsAllDayEvent": {
+          "description": "Whether the event is all day. If True, ActivityDate must be provided. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "OwnerId": {
+          "description": "ID of the event owner (15-18 alphanumeric characters). Validated against the User collection. Pass empty string (\"\") to clear. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "WhoId": {
+          "description": "ID of the related contact or lead (15-18 alphanumeric characters). Validated against Contact or Lead; if it references a Lead, WhatId must be empty. Pass empty string (\"\") to clear. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "WhatId": {
+          "description": "ID of the related account, opportunity, or case (15-18 alphanumeric characters). Validated against Account, Opportunity, or Case; must be empty when WhoId references a Lead. Pass empty string (\"\") to clear. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "DurationInMinutes": {
+          "description": "Duration of the event in minutes. Must be non-negative (>= 0). If not provided and both StartDateTime and EndDateTime are provided, this will be auto-calculated. If provided with StartDateTime (without EndDateTime), EndDateTime will be auto-calculated. If provided with EndDateTime (without StartDateTime), StartDateTime will be auto-calculated. If provided, must match the calculated duration between StartDateTime and EndDateTime. Defaults to None.",
+          "type": "integer",
+          "nullable": true,
+          "default": null,
+          "minimum": 0
+        },
+        "ShowAs": {
+          "description": "How the event appears in calendar. Valid values: Busy, Free, OutOfOffice, Tentative (case-sensitive). Defaults to None.",
+          "type": "string",
+          "enum": [
+            "Busy",
+            "Free",
+            "OutOfOffice",
+            "Tentative"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "ActivityDate": {
+          "description": "Date of the activity in YYYY-MM-DD format (required for all-day events). Pass empty string (\"\") to clear. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "ActivityDateTime": {
+          "description": "Date and time of the activity in ISO 8601 format. Pass empty string (\"\") to clear. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "IsPrivate": {
+          "description": "Whether the event is marked as private. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "Type": {
+          "description": "Type of the event. Valid values: Meeting, Call, Email, Other (case-sensitive). Defaults to None.",
+          "type": "string",
+          "enum": [
+            "Meeting",
+            "Call",
+            "Email",
+            "Other"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "IsChild": {
+          "description": "Whether this is a child event. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "IsGroupEvent": {
+          "description": "Whether this is a group event. If True, GroupEventType must be provided. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "GroupEventType": {
+          "description": "Type of group event. Valid values: Group0, Group1 (case-sensitive). Required if IsGroupEvent is True. If provided, IsGroupEvent must be True. Defaults to None.",
+          "type": "string",
+          "enum": [
+            "Group0",
+            "Group1"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "IsRecurrence": {
+          "description": "Whether the event is recurring. If True, RecurrenceType must be provided. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceType": {
+          "description": "Type of recurrence pattern. Valid values: RecursDaily, RecursWeekly, RecursMonthly, RecursMonthlyNth, RecursYearly, RecursYearlyNth (case-sensitive). Required if IsRecurrence is True. If provided, IsRecurrence must be True. Defaults to None.",
+          "type": "string",
+          "enum": [
+            "RecursDaily",
+            "RecursWeekly",
+            "RecursMonthly",
+            "RecursMonthlyNth",
+            "RecursYearly",
+            "RecursYearlyNth"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceInterval": {
+          "description": "Interval between recurring event instances (e.g., 2 for every 2 weeks). Must be a positive integer. Required for RecursDaily, RecursWeekly, RecursMonthly, RecursMonthlyNth. Defaults to None.",
+          "type": "integer",
+          "minimum": 1,
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceEndDateOnly": {
+          "description": "End date for the recurrence series in YYYY-MM-DD format. Required for all recurrence types. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceMonthOfYear": {
+          "description": "Month of year for recurrence (1-12). Required for RecursYearly, RecursYearlyNth. Defaults to None.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12,
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceDayOfWeekMask": {
+          "description": "Day of week mask for recurrence (bitmask representing days). Required for RecursWeekly, RecursMonthlyNth, RecursYearlyNth. Defaults to None.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceDayOfMonth": {
+          "description": "Day of month for recurrence (1-31). Required for RecursMonthly, RecursYearly. Defaults to None.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 31,
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceInstance": {
+          "description": "Recurrence instance specification. Valid values: First, Second, Third, Fourth, Last (case-sensitive). Required for RecursMonthlyNth, RecursYearlyNth. Defaults to None.",
+          "type": "string",
+          "enum": [
+            "First",
+            "Second",
+            "Third",
+            "Fourth",
+            "Last"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "IsReminderSet": {
+          "description": "Whether reminder is set. If True, ReminderDateTime must be provided. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "ReminderDateTime": {
+          "description": "Reminder date and time in ISO 8601 format. Required if IsReminderSet is True. If provided, IsReminderSet must be True. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "event_id"
+      ]
+    }
+  },
+  {
+    "name": "update_lead",
+    "description": "Updates an existing lead with the provided fields.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "lead_id": {
+          "description": "The unique identifier of the lead to be updated.",
+          "type": "string",
+          "nullable": false
+        },
+        "LastName": {
+          "description": "Last name of the lead.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Company": {
+          "description": "Lead company.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Status": {
+          "description": "Lead status.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "OwnerId": {
+          "description": "FK to User.Id. Owner of the lead. Pass empty string (\"\") to clear the field. # FK → User",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Email": {
+          "description": "Email of the lead. Pass empty string (\"\") to clear the field.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Phone": {
+          "description": "Phone number of the lead. Pass empty string (\"\") to clear the field.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Notes": {
+          "description": "Notes about the lead. Pass empty string (\"\") to clear the field.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "ConvertedAccountId": {
+          "description": "FK to Account.Id. Account created after conversion. Pass empty string (\"\") to clear the field. # FK → Account",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "ConvertedOpportunityId": {
+          "description": "FK to Opportunity.Id. Opportunity created after conversion. Pass empty string (\"\") to clear the field. # FK → Opportunity",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "lead_id"
+      ]
+    }
+  },
+  {
+    "name": "update_opportunity",
+    "description": "Updates an existing opportunity with the provided fields.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "opportunity_id": {
+          "description": "The unique identifier of the opportunity to be updated.",
+          "type": "string",
+          "nullable": false
+        },
+        "Name": {
+          "description": "Name of the opportunity.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "StageName": {
+          "description": "Pipeline stage.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "CloseDate": {
+          "description": "Opportunity close date (YYYY-MM-DD).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "AccountId": {
+          "description": "FK to Account.Id. Opportunity belongs to an account. Pass empty string (\"\") to clear the field. # FK → Account",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "OwnerId": {
+          "description": "FK to User.Id. Owner of the opportunity. Pass empty string (\"\") to clear the field. # FK → User",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Amount": {
+          "description": "Opportunity amount. Optional numeric field.",
+          "type": "number",
+          "nullable": true,
+          "default": null
+        },
+        "Probability": {
+          "description": "Stage probability. Optional integer field.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "Type": {
+          "description": "Opportunity type. Pass empty string (\"\") to clear the field.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "opportunity_id"
+      ]
+    }
+  },
+  {
+    "name": "update_task",
+    "description": "Updates an existing task.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "description": "The unique identifier of the task to be updated (non-empty string).",
+          "type": "string",
+          "nullable": false
+        },
+        "Name": {
+          "description": "The name/title of the task. Maximum length: 80 characters. Pass empty string (\"\") to clear the field. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "maxLength": 80
+        },
+        "Subject": {
+          "description": "The subject of the task. Maximum length: 255 characters. Pass empty string (\"\") to clear the field. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "maxLength": 255
+        },
+        "Priority": {
+          "description": "The priority level of the task. Must be one of: \"High\", \"Normal\", \"Low\".",
+          "type": "string",
+          "enum": [
+            "High",
+            "Normal",
+            "Low"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "Status": {
+          "description": "The current status of the task. Must be one of: \"Not Started\", \"In Progress\", \"Completed\", \"Waiting\", \"Waiting on someone else\", \"Deferred\", \"Open\", \"Closed\".",
+          "type": "string",
+          "enum": [
+            "Not Started",
+            "In Progress",
+            "Completed",
+            "Waiting",
+            "Waiting on someone else",
+            "Deferred",
+            "Open",
+            "Closed"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "Description": {
+          "description": "A brief description of the task. Maximum length: 32,000 characters. Pass empty string (\"\") to clear the field. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "maxLength": 32000
+        },
+        "ActivityDate": {
+          "description": "The due date of the task (ISO 8601 format recommended). Pass empty string (\"\") to clear the field. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "DueDate": {
+          "description": "Alternative due date in YYYY-MM-DD format. Pass empty string (\"\") to clear the field. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "OwnerId": {
+          "description": "The ID of the task owner (15 or 18 alphanumeric characters). Pass empty string (\"\") to clear the field. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "WhoId": {
+          "description": "The ID of the contact related to the task (15 or 18 alphanumeric characters). Pass empty string (\"\") to clear the field. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "WhatId": {
+          "description": "The ID of the related record (15 or 18 alphanumeric characters). Pass empty string (\"\") to clear the field. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "IsReminderSet": {
+          "description": "Whether a reminder is set for the task.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "ReminderDateTime": {
+          "description": "The date and time of the reminder (ISO 8601 format recommended). Pass empty string (\"\") to clear the field. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "CallDurationInSeconds": {
+          "description": "Duration of a call task in seconds. Defaults to None.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "CallType": {
+          "description": "Type of call for call-type tasks (Inbound, Outbound). Case-sensitive. Pass empty string (\"\") to clear the field. Defaults to None.",
+          "type": "string",
+          "enum": [
+            "Inbound",
+            "Outbound",
+            ""
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "CallObject": {
+          "description": "Call object identifier for call-type tasks. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "CallDisposition": {
+          "description": "Call disposition indicating the outcome of the call (Connected, Left Voicemail, No Answer, Busy, Wrong Number, Disconnected, Other). Case-sensitive. Pass empty string (\"\") to clear the field. Defaults to None.",
+          "type": "string",
+          "enum": [
+            "Connected",
+            "Left Voicemail",
+            "No Answer",
+            "Busy",
+            "Wrong Number",
+            "Disconnected",
+            "Other",
+            ""
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "TaskSubtype": {
+          "description": "Subtype of the task (Task, Call, Email, Meeting, Other). Case-sensitive. Pass empty string (\"\") to clear the field. Defaults to None.",
+          "type": "string",
+          "enum": [
+            "Task",
+            "Call",
+            "Email",
+            "Meeting",
+            "Other",
+            ""
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "IsArchived": {
+          "description": "Whether the task is archived. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "IsRecurrence": {
+          "description": "Whether task is part of a recurring series.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceType": {
+          "description": "Type of recurrence pattern. Valid values: RecursDaily, RecursWeekly, RecursMonthly, RecursMonthlyNth, RecursYearly, RecursYearlyNth (case-sensitive). Pass empty string (\"\") to clear the field. Defaults to None.",
+          "type": "string",
+          "enum": [
+            "RecursDaily",
+            "RecursWeekly",
+            "RecursMonthly",
+            "RecursMonthlyNth",
+            "RecursYearly",
+            "RecursYearlyNth"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceInterval": {
+          "description": "Interval between recurring task instances (e.g., every 2 weeks), must be positive.",
+          "type": "integer",
+          "minimum": 1,
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceEndDateOnly": {
+          "description": "End date for the recurrence series in YYYY-MM-DD format. Pass empty string (\"\") to clear the field. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceMonthOfYear": {
+          "description": "Month of year for recurrence (1-12) for yearly recurrence patterns.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12,
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceDayOfWeekMask": {
+          "description": "Day of week mask for recurrence (bitmask representing days).",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceDayOfMonth": {
+          "description": "Day of month for recurrence (1-31) for monthly recurrence patterns.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 31,
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceInstance": {
+          "description": "Recurrence instance specification. Valid values: First, Second, Third, Fourth, Last (case-sensitive). Pass empty string (\"\") to clear the field. Defaults to None.",
+          "type": "string",
+          "enum": [
+            "First",
+            "Second",
+            "Third",
+            "Fourth",
+            "Last"
+          ],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "task_id"
+      ]
+    }
+  },
+  {
+    "name": "update_user",
+    "description": "Updates an existing user with the provided fields.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "The unique identifier of the user to be updated.",
+          "type": "string",
+          "nullable": false
+        },
+        "Username": {
+          "description": "Unique username. Required field — cannot be cleared.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "LastName": {
+          "description": "User's last name. Required field — cannot be cleared.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Email": {
+          "description": "User's email address. Required field — cannot be cleared.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "ProfileId": {
+          "description": "Profile assignment. Required field — cannot be cleared.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "TimeZoneSidKey": {
+          "description": "User timezone. Required field — cannot be cleared.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "LocaleSidKey": {
+          "description": "User locale key. Required field — cannot be cleared.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "EmailEncodingKey": {
+          "description": "Email encoding setting. Required field — cannot be cleared.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "LanguageLocaleKey": {
+          "description": "Language locale. Required field — cannot be cleared.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "ManagerId": {
+          "description": "FK to User.Id. Manager of this user. Pass empty string (\"\") to clear the field. # FK → User",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Alias": {
+          "description": "User alias. Pass empty string (\"\") to clear the field.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "IsActive": {
+          "description": "Whether user account is active.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "user_id"
+      ]
+    }
+  },
+  {
+    "name": "upsert_event",
+    "description": "Creates or updates an event.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The name of the event (maximum 255 characters).",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "maxLength": 255
+        },
+        "Id": {
+          "description": "Event ID used to determine update vs create behavior. If provided and the ID exists in the database, the existing event is updated. If not provided or the ID does not exist, a new event is created with an auto-generated ID (any provided ID is ignored for creation). Must be a non-empty string if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Subject": {
+          "description": "The subject of the event (maximum 255 characters).",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "maxLength": 255
+        },
+        "StartDateTime": {
+          "description": "Start time of the event in ISO 8601 format (e.g., '2024-01-15T10:30:00Z'). If not provided and both EndDateTime and DurationInMinutes are provided, this will be auto-calculated.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "EndDateTime": {
+          "description": "End time of the event in ISO 8601 format. Must be >= StartDateTime. If not provided and both StartDateTime and DurationInMinutes are provided, this will be auto-calculated.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Description": {
+          "description": "Description of the event (maximum 32,000 characters).",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "maxLength": 32000
+        },
+        "Location": {
+          "description": "Location of the event (maximum 255 characters).",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "maxLength": 255
+        },
+        "IsAllDayEvent": {
+          "description": "Whether the event is all day.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "OwnerId": {
+          "description": "ID of the event owner (15 or 18 alphanumeric characters).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "WhoId": {
+          "description": "ID of the related contact (15 or 18 alphanumeric characters).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "WhatId": {
+          "description": "ID of the related record (15 or 18 alphanumeric characters).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "ActivityDate": {
+          "description": "Date of the activity in YYYY-MM-DD format (for all-day events).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "ActivityDateTime": {
+          "description": "Date and time of the activity in ISO 8601 format.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "DurationInMinutes": {
+          "description": "Duration of the event in minutes. Must be a non-negative integer (auto-calculated from StartDateTime and EndDateTime when not provided).",
+          "type": "integer",
+          "nullable": true,
+          "default": null,
+          "minimum": 0
+        },
+        "IsPrivate": {
+          "description": "Whether the event is marked as private (not visible to others).",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "ShowAs": {
+          "description": "How the event appears in calendar. Valid values: Busy, Free, OutOfOffice, Tentative (case-sensitive).",
+          "type": "string",
+          "enum": [
+            "Busy",
+            "Free",
+            "OutOfOffice",
+            "Tentative"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "Type": {
+          "description": "Type of the event. Valid values: Meeting, Call, Email, Other (case-sensitive).",
+          "type": "string",
+          "enum": [
+            "Meeting",
+            "Call",
+            "Email",
+            "Other"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "IsChild": {
+          "description": "Whether this is a child event in a recurring series.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "IsGroupEvent": {
+          "description": "Whether this is a group event involving multiple participants.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "GroupEventType": {
+          "description": "Type of group event. Valid values: Group0, Group1 (case-sensitive).",
+          "type": "string",
+          "enum": [
+            "Group0",
+            "Group1"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "IsRecurrence": {
+          "description": "Whether the event is part of a recurring series.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceType": {
+          "description": "Type of recurrence pattern. Valid values: RecursDaily, RecursWeekly, RecursMonthly, RecursMonthlyNth, RecursYearly, RecursYearlyNth (case-sensitive).",
+          "type": "string",
+          "enum": [
+            "RecursDaily",
+            "RecursWeekly",
+            "RecursMonthly",
+            "RecursMonthlyNth",
+            "RecursYearly",
+            "RecursYearlyNth"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceInterval": {
+          "description": "Interval between recurring event instances. Must be positive if provided.",
+          "type": "integer",
+          "minimum": 1,
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceEndDateOnly": {
+          "description": "End date for the recurrence series in YYYY-MM-DD format.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceMonthOfYear": {
+          "description": "Month of year for recurrence (1-12).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12,
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceDayOfWeekMask": {
+          "description": "Day of week mask for recurrence (bitmask).",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceDayOfMonth": {
+          "description": "Day of month for recurrence (1-31).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 31,
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceInstance": {
+          "description": "Recurrence instance specification. Valid values: First, Second, Third, Fourth, Last (case-sensitive).",
+          "type": "string",
+          "enum": [
+            "First",
+            "Second",
+            "Third",
+            "Fourth",
+            "Last"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "IsReminderSet": {
+          "description": "Whether a reminder has been set for this event.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "ReminderDateTime": {
+          "description": "Date and time when the reminder should trigger in ISO 8601 format.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "upsert_task",
+    "description": "Creates or updates a task. When creating a new task (Id not provided or not found), Status and Priority are required. When updating an existing task (Id provided and exists), only Id is required and other fields are optional. Supports call-related fields (CallType, CallDisposition, TaskSubtype) and recurrence fields (IsRecurrence, RecurrenceType, RecurrenceInterval, etc.) for both create and update operations.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "Id": {
+          "description": "Task ID (required for update). If not provided or not found, a new task will be created.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "Name": {
+          "description": "The name of the task. Maximum length: 80 characters.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "Subject": {
+          "description": "The subject of the task. Maximum length: 255 characters.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "Priority": {
+          "description": "Priority of the task. Required when creating a new task. Must be one of: \"High\", \"Normal\", \"Low\".",
+          "type": "string",
+          "enum": [
+            "High",
+            "Normal",
+            "Low"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "Status": {
+          "description": "Status of the task. Required when creating a new task. Must be one of: \"Not Started\", \"In Progress\", \"Completed\", \"Waiting\", \"Waiting on someone else\", \"Deferred\", \"Open\", \"Closed\".",
+          "type": "string",
+          "enum": [
+            "Not Started",
+            "In Progress",
+            "Completed",
+            "Waiting",
+            "Waiting on someone else",
+            "Deferred",
+            "Open",
+            "Closed"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "Description": {
+          "description": "Description of the task. Maximum length: 32,000 characters.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1,
+          "maxLength": 32000
+        },
+        "ActivityDate": {
+          "description": "Due date of the task in ISO format (e.g., '2024-01-01T10:00:00Z' or '2024-01-01').",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "OwnerId": {
+          "description": "ID of the task owner. Must be 15-18 alphanumeric characters if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1
+        },
+        "WhoId": {
+          "description": "ID of the related contact. Must be 15-18 alphanumeric characters if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1
+        },
+        "WhatId": {
+          "description": "ID of the related record. Must be 15-18 alphanumeric characters if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1
+        },
+        "IsReminderSet": {
+          "description": "Whether reminder is set.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "ReminderDateTime": {
+          "description": "Reminder date and time in ISO format (e.g., '2024-01-01T10:00:00Z').",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "CallType": {
+          "description": "Type of call for call-type tasks (Inbound, Outbound). Case-sensitive.",
+          "type": "string",
+          "enum": [
+            "Inbound",
+            "Outbound"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "CallDisposition": {
+          "description": "Call disposition indicating the outcome of the call (Connected, Left Voicemail, No Answer, Busy, Wrong Number, Disconnected, Other). Case-sensitive.",
+          "type": "string",
+          "enum": [
+            "Connected",
+            "Left Voicemail",
+            "No Answer",
+            "Busy",
+            "Wrong Number",
+            "Disconnected",
+            "Other"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "TaskSubtype": {
+          "description": "Subtype of the task (Task, Call, Email, Meeting, Other). Case-sensitive.",
+          "type": "string",
+          "enum": [
+            "Task",
+            "Call",
+            "Email",
+            "Meeting",
+            "Other"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "IsRecurrence": {
+          "description": "Whether task is part of a recurring series.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceType": {
+          "description": "Type of recurrence pattern. Valid values: RecursDaily, RecursWeekly, RecursMonthly, RecursMonthlyNth, RecursYearly, RecursYearlyNth (case-sensitive).",
+          "type": "string",
+          "enum": [
+            "RecursDaily",
+            "RecursWeekly",
+            "RecursMonthly",
+            "RecursMonthlyNth",
+            "RecursYearly",
+            "RecursYearlyNth"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceInterval": {
+          "description": "Interval between recurring task instances (e.g., every 2 weeks), must be positive.",
+          "type": "integer",
+          "minimum": 1,
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceEndDateOnly": {
+          "description": "End date for the recurrence series in YYYY-MM-DD format.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceMonthOfYear": {
+          "description": "Month of year for recurrence (1-12) for yearly recurrence patterns.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12,
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceDayOfWeekMask": {
+          "description": "Day of week mask for recurrence (bitmask representing days).",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceDayOfMonth": {
+          "description": "Day of month for recurrence (1-31) for monthly recurrence patterns.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 31,
+          "nullable": true,
+          "default": null
+        },
+        "RecurrenceInstance": {
+          "description": "Recurrence instance specification. Valid values: First, Second, Third, Fourth, Last (case-sensitive).",
+          "type": "string",
+          "enum": [
+            "First",
+            "Second",
+            "Third",
+            "Fourth",
+            "Last"
+          ],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  }
+]

@@ -1,0 +1,3225 @@
+[
+  {
+    "name": "batch_update_presentation",
+    "description": "Apply a batch of updates to a GridwellSlides presentation.\n\nThis function applies a series of specified update operations to a GridwellSlides\npresentation in a single batch request. It allows for various modifications\nsuch as creating slides, adding shapes, inserting text, deleting objects,\nupdating styles, and managing object groups, as defined by the list of `requests`.\n\nIMPORTANT: Request parameter validation is performed by helper functions using\nPydantic models. This validation includes:\n- Required fields: All required fields specified in the request type schemas (e.g.,\n  'objectId' for deleteObject, 'objectId' and 'text' for insertText) are validated\n  by the helper functions. Missing required fields will raise InvalidInputError.\n- Enum values: All enum parameters (e.g., 'shapeType', 'predefinedLayout',\n  'textRange.type') are validated by the helper functions to match the specified\n  enum values. Invalid enum values will raise InvalidInputError.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "presentationId": {
+          "description": "The ID of the presentation to update.",
+          "type": "string",
+          "minLength": 1
+        },
+        "requests": {
+          "description": "A list of update requests to apply. Each object\nin the array must be one of the specified request types. Each request\nobject typically has a single key identifying the type of request (e.g.,\n'createSlide'), and its value is a dictionary containing the parameters\nfor that request.\n\nVALIDATION: All required fields and enum values are validated by helper\nfunctions using Pydantic models. Missing required fields or invalid enum\nvalues will raise InvalidInputError.\n\nThe supported request types and their structures are:\n- CreateSlideRequest: Corresponds to a dictionary with a 'createSlide' key.\n- CreateShapeRequest: Corresponds to a dictionary with a 'createShape' key.\n- InsertTextRequest: Corresponds to a dictionary with an 'insertText' key.\n- ReplaceAllTextRequest: Corresponds to a dictionary with a 'replaceAllText' key.\n- DeleteObjectRequest: Corresponds to a dictionary with a 'deleteObject' key.\n- DeleteTextRequest: Corresponds to a dictionary with a 'deleteText' key.\n- UpdateTextStyleRequest: Corresponds to a dictionary with an 'updateTextStyle' key.\n- GroupObjectsRequest: Corresponds to a dictionary with a 'groupObjects' key.\n- UngroupObjectsRequest: Corresponds to a dictionary with an 'ungroupObjects' key.\n- UpdatePageElementAltTextRequest: Corresponds to a dictionary with an\n  'updatePageElementAltText' key.\n- UpdateSlidePropertiesRequest: Corresponds to a dictionary with an\n  'updateSlideProperties' key.\n(Note: For a complete list and details of all request types and their\nparameters, refer to the GridwellSlides API documentation.)",
+          "type": "array",
+          "items": {
+            "description": "A single request item in a batch update.\n\nEach field uses a specific request model that defines the expected properties.\n\nValidation: Exactly one request type field must be set per item.",
+            "type": "object",
+            "properties": {
+              "createSlide": {
+                "description": "Creates a new slide.",
+                "type": "object",
+                "properties": {
+                  "objectId": {
+                    "description": "A user-supplied object ID. If specified, must be unique (1-50 chars, pattern [a-zA-Z0-9_][a-zA-Z0-9_-:]*). If empty, a unique ID is generated.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "insertionIndex": {
+                    "description": "Optional zero-based index where to insert the slides. If unspecified, created at the end.",
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "slideLayoutReference": {
+                    "description": "Layout reference of the slide. If unspecified, uses a predefined BLANK layout. One of 'predefinedLayout' or 'layoutId' must be provided if 'slideLayoutReference' itself is provided.",
+                    "type": "object",
+                    "nullable": true,
+                    "properties": {
+                      "predefinedLayout": {
+                        "description": "A predefined layout type. Enum: [\"PREDEFINED_LAYOUT_UNSPECIFIED\", \"BLANK\", \"CAPTION_ONLY\", \"TITLE\", \"TITLE_AND_BODY\", \"TITLE_AND_TWO_COLUMNS\", \"TITLE_ONLY\", \"SECTION_HEADER\", \"SECTION_TITLE_AND_DESCRIPTION\", \"ONE_COLUMN_TEXT\", \"MAIN_POINT\", \"BIG_NUMBER\"].",
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "layoutId": {
+                        "description": "Layout ID of one of the layouts in the presentation.",
+                        "type": "string",
+                        "nullable": true
+                      }
+                    },
+                    "required": []
+                  },
+                  "placeholderIdMappings": {
+                    "description": "Optional list of object ID mappings from layout placeholders to slide placeholders. Used only when 'slideLayoutReference' is specified. One of 'layoutPlaceholder' or 'layoutPlaceholderObjectId' must be provided.",
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                      "description": "Mapping from layout placeholder to slide placeholder.",
+                      "type": "object",
+                      "properties": {
+                        "objectId": {
+                          "description": "User-supplied object ID for the new placeholder on the slide (1-50 chars, pattern [a-zA-Z0-9_][a-zA-Z0-9_-:]*). If empty, a unique ID is generated.",
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "layoutPlaceholder": {
+                          "description": "The placeholder on a layout to be applied to a slide.",
+                          "type": "object",
+                          "nullable": true,
+                          "properties": {
+                            "type": {
+                              "description": "The type of the placeholder. Enum: [\"TITLE\", \"BODY\", \"CENTERED_TITLE\", \"SUBTITLE\", \"DATE_AND_TIME\", \"FOOTER\", \"HEADER\", \"OBJECT\", \"CHART\", \"TABLE\", \"CLIP_ART\", \"PICTURE\", \"SLIDE_IMAGE\", \"SLIDE_NUMBER\"].",
+                              "type": "string",
+                              "nullable": true
+                            },
+                            "index": {
+                              "description": "The index of the placeholder. Usually 0. REQUIRED when layoutPlaceholder is present.",
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "index"
+                          ]
+                        },
+                        "layoutPlaceholderObjectId": {
+                          "description": "The object ID of the placeholder on a layout.",
+                          "type": "string",
+                          "nullable": true
+                        }
+                      },
+                      "required": []
+                    }
+                  }
+                },
+                "required": [],
+                "nullable": true
+              },
+              "createShape": {
+                "description": "Creates a new shape.",
+                "type": "object",
+                "properties": {
+                  "objectId": {
+                    "description": "Optional user-supplied object ID for the shape (1-50 chars, pattern [a-zA-Z0-9_][a-zA-Z0-9_-:]*). If empty, a unique ID is generated.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "elementProperties": {
+                    "description": "Element properties for the shape.",
+                    "type": "object",
+                    "nullable": true,
+                    "properties": {
+                      "pageObjectId": {
+                        "description": "The object ID of the page where the element is located.",
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "size": {
+                        "description": "The size of the page element.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "width": {
+                            "description": "Width dimension.",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "magnitude": {
+                                "description": "Magnitude of the dimension.",
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              "unit": {
+                                "description": "Unit of the dimension.",
+                                "type": "string",
+                                "enum": [
+                                  "EMU",
+                                  "IN",
+                                  "PT",
+                                  "UNIT_UNSPECIFIED"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "magnitude",
+                              "unit"
+                            ]
+                          },
+                          "height": {
+                            "description": "Height dimension.",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "magnitude": {
+                                "description": "Magnitude of the dimension.",
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              "unit": {
+                                "description": "Unit of the dimension.",
+                                "type": "string",
+                                "enum": [
+                                  "EMU",
+                                  "IN",
+                                  "PT",
+                                  "UNIT_UNSPECIFIED"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "magnitude",
+                              "unit"
+                            ]
+                          }
+                        },
+                        "required": []
+                      },
+                      "transform": {
+                        "description": "The transform of the page element.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "scaleX": {
+                            "description": "The X scaling factor.",
+                            "type": "number",
+                            "nullable": true,
+                            "default": 1.0
+                          },
+                          "scaleY": {
+                            "description": "The Y scaling factor.",
+                            "type": "number",
+                            "nullable": true,
+                            "default": 1.0
+                          },
+                          "shearX": {
+                            "description": "The X shearing factor.",
+                            "type": "number",
+                            "nullable": true,
+                            "default": 0.0
+                          },
+                          "shearY": {
+                            "description": "The Y shearing factor.",
+                            "type": "number",
+                            "nullable": true,
+                            "default": 0.0
+                          },
+                          "translateX": {
+                            "description": "The X translation.",
+                            "type": "number",
+                            "nullable": true,
+                            "default": 0.0
+                          },
+                          "translateY": {
+                            "description": "The Y translation.",
+                            "type": "number",
+                            "nullable": true,
+                            "default": 0.0
+                          },
+                          "unit": {
+                            "description": "Unit for translate.",
+                            "type": "string",
+                            "nullable": true,
+                            "default": "PT",
+                            "enum": [
+                              "EMU",
+                              "IN",
+                              "PT",
+                              "UNIT_UNSPECIFIED"
+                            ]
+                          }
+                        },
+                        "required": []
+                      }
+                    },
+                    "required": []
+                  },
+                  "shapeType": {
+                    "description": "The type of shape to create.",
+                    "type": "string",
+                    "enum": [
+                      "TYPE_UNSPECIFIED",
+                      "TEXT_BOX",
+                      "RECTANGLE",
+                      "ROUND_RECTANGLE",
+                      "ELLIPSE",
+                      "ARC",
+                      "BENT_ARROW",
+                      "BENT_UP_ARROW",
+                      "BEVEL",
+                      "BLOCK_ARC",
+                      "BRACE_PAIR",
+                      "BRACKET_PAIR",
+                      "CAN",
+                      "CHEVRON",
+                      "CHORD",
+                      "CLOUD",
+                      "CORNER",
+                      "CUBE",
+                      "CURVED_DOWN_ARROW",
+                      "CURVED_LEFT_ARROW",
+                      "CURVED_RIGHT_ARROW",
+                      "CURVED_UP_ARROW",
+                      "DECAGON",
+                      "DIAGONAL_STROPE",
+                      "DIAMOND",
+                      "DODECAGON",
+                      "DONUT",
+                      "DOUBLE_WAVE",
+                      "DOWN_ARROW",
+                      "DOWN_ARROW_CALLOUT",
+                      "FOLDED_CORNER",
+                      "FRAME",
+                      "HALF_FRAME",
+                      "HEART",
+                      "HEPTAGON",
+                      "HEXAGON",
+                      "HOME_PLATE",
+                      "HORIZONTAL_SCROLL",
+                      "IRREGULAR_SEAL_1",
+                      "IRREGULAR_SEAL_2",
+                      "LEFT_ARROW",
+                      "LEFT_ARROW_CALLOUT",
+                      "LEFT_BRACE",
+                      "LEFT_BRACKET",
+                      "LEFT_RIGHT_ARROW",
+                      "LEFT_RIGHT_ARROW_CALLOUT",
+                      "LEFT_RIGHT_UP_ARROW",
+                      "LEFT_UP_ARROW",
+                      "LIGHTNING_BOLT",
+                      "MATH_DIVIDE",
+                      "MATH_EQUAL",
+                      "MATH_MINUS",
+                      "MATH_MULTIPLY",
+                      "MATH_NOT_EQUAL",
+                      "MATH_PLUS",
+                      "MOON",
+                      "NO_SMOKING",
+                      "NOTCHED_RIGHT_ARROW",
+                      "OCTAGON",
+                      "PARALLELOGRAM",
+                      "PENTAGON",
+                      "PIE",
+                      "PLAQUE",
+                      "PLUS",
+                      "QUAD_ARROW",
+                      "QUAD_ARROW_CALLOUT",
+                      "RIBBON",
+                      "RIBBON_2",
+                      "RIGHT_ARROW",
+                      "RIGHT_ARROW_CALLOUT",
+                      "RIGHT_BRACE",
+                      "RIGHT_BRACKET",
+                      "ROUND_1_RECTANGLE",
+                      "ROUND_2_DIAGONAL_RECTANGLE",
+                      "ROUND_2_SAME_RECTANGLE",
+                      "RIGHT_TRIANGLE",
+                      "SMILEY_FACE",
+                      "SNIP_1_RECTANGLE",
+                      "SNIP_2_DIAGONAL_RECTANGLE",
+                      "SNIP_2_SAME_RECTANGLE",
+                      "SNIP_ROUND_RECTANGLE",
+                      "STAR_10",
+                      "STAR_12",
+                      "STAR_16",
+                      "STAR_24",
+                      "STAR_32",
+                      "STAR_4",
+                      "STAR_5",
+                      "STAR_6",
+                      "STAR_7",
+                      "STAR_8",
+                      "STRIPED_RIGHT_ARROW",
+                      "SUN",
+                      "TRAPEZOID",
+                      "TRIANGLE",
+                      "UP_ARROW",
+                      "UP_ARROW_CALLOUT",
+                      "UP_DOWN_ARROW",
+                      "UTURN_ARROW",
+                      "VERTICAL_SCROLL",
+                      "WAVE",
+                      "WEDGE_ELLIPSE_CALLOUT",
+                      "WEDGE_RECTANGLE_CALLOUT",
+                      "WEDGE_ROUND_RECTANGLE_CALLOUT",
+                      "FLOW_CHART_ALTERNATE_PROCESS",
+                      "FLOW_CHART_COLLATE",
+                      "FLOW_CHART_CONNECTOR",
+                      "FLOW_CHART_DECISION",
+                      "FLOW_CHART_DELAY",
+                      "FLOW_CHART_DISPLAY",
+                      "FLOW_CHART_DOCUMENT",
+                      "FLOW_CHART_EXTRACT",
+                      "FLOW_CHART_INPUT_OUTPUT",
+                      "FLOW_CHART_INTERNAL_STORAGE",
+                      "FLOW_CHART_MAGNETIC_DISK",
+                      "FLOW_CHART_MAGNETIC_DRUM",
+                      "FLOW_CHART_MAGNETIC_TAPE",
+                      "FLOW_CHART_MANUAL_INPUT",
+                      "FLOW_CHART_MANUAL_OPERATION",
+                      "FLOW_CHART_MERGE",
+                      "FLOW_CHART_MULTIDOCUMENT",
+                      "FLOW_CHART_OFFLINE_STORAGE",
+                      "FLOW_CHART_OFFPAGE_CONNECTOR",
+                      "FLOW_CHART_ONLINE_STORAGE",
+                      "FLOW_CHART_OR",
+                      "FLOW_CHART_PREDEFINED_PROCESS",
+                      "FLOW_CHART_PREPARATION",
+                      "FLOW_CHART_PROCESS",
+                      "FLOW_CHART_PUNCHED_CARD",
+                      "FLOW_CHART_PUNCHED_TAPE",
+                      "FLOW_CHART_SORT",
+                      "FLOW_CHART_SUMMING_JUNCTION",
+                      "FLOW_CHART_TERMINATOR",
+                      "ARROW_EAST",
+                      "ARROW_NORTH_EAST",
+                      "ARROW_NORTH",
+                      "SPEECH",
+                      "STARBURST",
+                      "TEARDROP",
+                      "ELLIPSE_RIBBON",
+                      "ELLIPSE_RIBBON_2",
+                      "CLOUD_CALLOUT",
+                      "CUSTOM"
+                    ]
+                  }
+                },
+                "required": [
+                  "shapeType"
+                ],
+                "nullable": true
+              },
+              "insertText": {
+                "description": "Inserts text into a shape or table cell.",
+                "type": "object",
+                "properties": {
+                  "objectId": {
+                    "description": "Object ID of the shape or table.",
+                    "type": "string"
+                  },
+                  "cellLocation": {
+                    "description": "Optional table cell location.",
+                    "type": "object",
+                    "nullable": true,
+                    "properties": {
+                      "rowIndex": {
+                        "description": "0-based row index.",
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "columnIndex": {
+                        "description": "0-based column index.",
+                        "type": "integer",
+                        "nullable": true
+                      }
+                    },
+                    "required": []
+                  },
+                  "text": {
+                    "description": "The text to insert.",
+                    "type": "string"
+                  },
+                  "insertionIndex": {
+                    "description": "Optional 0-based index where text will be inserted in Unicode code units.",
+                    "type": "integer",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "objectId",
+                  "text"
+                ],
+                "nullable": true
+              },
+              "replaceAllText": {
+                "description": "Replaces all instances of specified text.",
+                "type": "object",
+                "properties": {
+                  "replaceText": {
+                    "description": "The text that will replace matched text.",
+                    "type": "string"
+                  },
+                  "containsText": {
+                    "description": "Criteria for matching text.",
+                    "type": "object",
+                    "properties": {
+                      "text": {
+                        "description": "The text to search for.",
+                        "type": "string"
+                      },
+                      "matchCase": {
+                        "description": "Indicates if the search should be case sensitive. Defaults to False.",
+                        "type": "boolean",
+                        "nullable": true
+                      },
+                      "searchByRegex": {
+                        "description": "Optional. True if the find value should be treated as a regular expression. Defaults to False.",
+                        "type": "boolean",
+                        "nullable": true
+                      }
+                    },
+                    "required": [
+                      "text"
+                    ]
+                  },
+                  "pageObjectIds": {
+                    "description": "Optional. Limits matches to page elements only on the given page IDs.",
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "replaceText",
+                  "containsText"
+                ],
+                "nullable": true
+              },
+              "deleteObject": {
+                "description": "Deletes a page or page element.",
+                "type": "object",
+                "properties": {
+                  "objectId": {
+                    "description": "Object ID of the page or page element to delete.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "objectId"
+                ],
+                "nullable": true
+              },
+              "deleteText": {
+                "description": "Deletes text from a shape or table cell.",
+                "type": "object",
+                "properties": {
+                  "objectId": {
+                    "description": "Object ID of the shape or table.",
+                    "type": "string"
+                  },
+                  "cellLocation": {
+                    "description": "Optional table cell location.",
+                    "type": "object",
+                    "nullable": true,
+                    "properties": {
+                      "rowIndex": {
+                        "description": "0-based row index.",
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "columnIndex": {
+                        "description": "0-based column index.",
+                        "type": "integer",
+                        "nullable": true
+                      }
+                    },
+                    "required": []
+                  },
+                  "textRange": {
+                    "description": "The range of text to delete.",
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "description": "The type of range. ALL selects all text and takes no indices. FIXED_RANGE selects [startIndex, endIndex) and requires both. FROM_START_INDEX selects from startIndex to the end and requires startIndex only. RANGE_TYPE_UNSPECIFIED must not be used.",
+                        "type": "string",
+                        "enum": [
+                          "ALL",
+                          "FIXED_RANGE",
+                          "FROM_START_INDEX",
+                          "RANGE_TYPE_UNSPECIFIED"
+                        ]
+                      },
+                      "startIndex": {
+                        "description": "0-based start index in Unicode code units. Required for FIXED_RANGE and FROM_START_INDEX; must be omitted for ALL.",
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "endIndex": {
+                        "description": "0-based end index (exclusive) in Unicode code units. Required for FIXED_RANGE; must be omitted for FROM_START_INDEX and ALL.",
+                        "type": "integer",
+                        "nullable": true
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  }
+                },
+                "required": [
+                  "objectId",
+                  "textRange"
+                ],
+                "nullable": true
+              },
+              "updateTextStyle": {
+                "description": "Updates the styling of text within a Shape or Table.",
+                "type": "object",
+                "properties": {
+                  "objectId": {
+                    "description": "Object ID of the shape or table with the text to be styled.",
+                    "type": "string"
+                  },
+                  "cellLocation": {
+                    "description": "Optional table cell location.",
+                    "type": "object",
+                    "nullable": true,
+                    "properties": {
+                      "rowIndex": {
+                        "description": "0-based row index.",
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "columnIndex": {
+                        "description": "0-based column index.",
+                        "type": "integer",
+                        "nullable": true
+                      }
+                    },
+                    "required": []
+                  },
+                  "style": {
+                    "description": "The TextStyle to apply.",
+                    "type": "object",
+                    "properties": {
+                      "bold": {
+                        "description": "Whether the text is bold.",
+                        "type": "boolean",
+                        "nullable": true
+                      },
+                      "italic": {
+                        "description": "Whether the text is italic.",
+                        "type": "boolean",
+                        "nullable": true
+                      },
+                      "underline": {
+                        "description": "Whether the text is underlined.",
+                        "type": "boolean",
+                        "nullable": true
+                      },
+                      "strikethrough": {
+                        "description": "Whether the text is struck through.",
+                        "type": "boolean",
+                        "nullable": true
+                      },
+                      "fontFamily": {
+                        "description": "The font family.",
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "fontSize": {
+                        "description": "The font size.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "magnitude": {
+                            "description": "The magnitude of the font size.",
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "unit": {
+                            "description": "The unit of the font size.",
+                            "type": "string",
+                            "enum": [
+                              "EMU",
+                              "IN",
+                              "PT",
+                              "UNIT_UNSPECIFIED"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "magnitude",
+                          "unit"
+                        ]
+                      },
+                      "foregroundColor": {
+                        "description": "Color of the text.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "opaqueColor": {
+                            "description": "Color container with keys: rgbColor, themeColor.",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "rgbColor": {
+                                "description": "RGB components with keys: red, green, blue.",
+                                "type": "object",
+                                "nullable": true,
+                                "properties": {
+                                  "red": {
+                                    "description": "Red component (0.0-1.0).",
+                                    "type": "number",
+                                    "minimum": 0.0,
+                                    "maximum": 1.0
+                                  },
+                                  "green": {
+                                    "description": "Green component (0.0-1.0).",
+                                    "type": "number",
+                                    "minimum": 0.0,
+                                    "maximum": 1.0
+                                  },
+                                  "blue": {
+                                    "description": "Blue component (0.0-1.0).",
+                                    "type": "number",
+                                    "minimum": 0.0,
+                                    "maximum": 1.0
+                                  }
+                                },
+                                "required": [
+                                  "red",
+                                  "green",
+                                  "blue"
+                                ]
+                              },
+                              "themeColor": {
+                                "description": "Theme color reference if applicable.",
+                                "type": "string",
+                                "nullable": true,
+                                "enum": [
+                                  "ACCENT1",
+                                  "ACCENT2",
+                                  "ACCENT3",
+                                  "ACCENT4",
+                                  "ACCENT5",
+                                  "ACCENT6",
+                                  "BACKGROUND1",
+                                  "BACKGROUND2",
+                                  "DARK1",
+                                  "DARK2",
+                                  "FOLLOWED_HYPERLINK",
+                                  "HYPERLINK",
+                                  "LIGHT1",
+                                  "LIGHT2",
+                                  "TEXT1",
+                                  "TEXT2",
+                                  "THEME_COLOR_TYPE_UNSPECIFIED"
+                                ]
+                              }
+                            },
+                            "required": []
+                          }
+                        },
+                        "required": []
+                      },
+                      "backgroundColor": {
+                        "description": "Background color of the text.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "opaqueColor": {
+                            "description": "Color container with keys: rgbColor, themeColor.",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "rgbColor": {
+                                "description": "RGB components.",
+                                "type": "object",
+                                "nullable": true,
+                                "properties": {
+                                  "red": {
+                                    "description": "Red component (0.0-1.0).",
+                                    "type": "number",
+                                    "minimum": 0.0,
+                                    "maximum": 1.0
+                                  },
+                                  "green": {
+                                    "description": "Green component (0.0-1.0).",
+                                    "type": "number",
+                                    "minimum": 0.0,
+                                    "maximum": 1.0
+                                  },
+                                  "blue": {
+                                    "description": "Blue component (0.0-1.0).",
+                                    "type": "number",
+                                    "minimum": 0.0,
+                                    "maximum": 1.0
+                                  }
+                                },
+                                "required": [
+                                  "red",
+                                  "green",
+                                  "blue"
+                                ]
+                              },
+                              "themeColor": {
+                                "description": "Theme color reference.",
+                                "type": "string",
+                                "nullable": true,
+                                "enum": [
+                                  "ACCENT1",
+                                  "ACCENT2",
+                                  "ACCENT3",
+                                  "ACCENT4",
+                                  "ACCENT5",
+                                  "ACCENT6",
+                                  "BACKGROUND1",
+                                  "BACKGROUND2",
+                                  "DARK1",
+                                  "DARK2",
+                                  "FOLLOWED_HYPERLINK",
+                                  "HYPERLINK",
+                                  "LIGHT1",
+                                  "LIGHT2",
+                                  "TEXT1",
+                                  "TEXT2",
+                                  "THEME_COLOR_TYPE_UNSPECIFIED"
+                                ]
+                              }
+                            },
+                            "required": []
+                          }
+                        },
+                        "required": []
+                      },
+                      "link": {
+                        "description": "A hyperlink in the text.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "url": {
+                            "description": "The URL of the hyperlink.",
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "slideIndex": {
+                            "description": "The zero-based index of the slide to link to.",
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "relativeLink": {
+                            "description": "The type of relative link.",
+                            "type": "string",
+                            "nullable": true,
+                            "enum": [
+                              "FIRST_SLIDE",
+                              "LAST_SLIDE",
+                              "NEXT_SLIDE",
+                              "PREVIOUS_SLIDE",
+                              "RELATIVE_SLIDE_LINK_UNSPECIFIED"
+                            ]
+                          },
+                          "pageObjectId": {
+                            "description": "The object ID of the page to link to.",
+                            "type": "string",
+                            "nullable": true
+                          }
+                        },
+                        "required": []
+                      },
+                      "baselineOffset": {
+                        "description": "The text's vertical offset from its normal position.",
+                        "type": "string",
+                        "nullable": true,
+                        "enum": [
+                          "BASELINE_OFFSET_UNSPECIFIED",
+                          "NONE",
+                          "SUPERSCRIPT",
+                          "SUBSCRIPT"
+                        ]
+                      },
+                      "smallCaps": {
+                        "description": "Whether the text is in small capital letters.",
+                        "type": "boolean",
+                        "nullable": true
+                      },
+                      "weightedFontFamily": {
+                        "description": "The font family and rendered weight of the text.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "fontFamily": {
+                            "description": "The font family name.",
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "weight": {
+                            "description": "The font weight (100-900).",
+                            "type": "integer",
+                            "nullable": true,
+                            "minimum": 100,
+                            "maximum": 900
+                          }
+                        },
+                        "required": []
+                      }
+                    },
+                    "required": []
+                  },
+                  "textRange": {
+                    "description": "The range of text to style.",
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "description": "The type of range. ALL selects all text and takes no indices. FIXED_RANGE selects [startIndex, endIndex) and requires both. FROM_START_INDEX selects from startIndex to the end and requires startIndex only. RANGE_TYPE_UNSPECIFIED must not be used.",
+                        "type": "string",
+                        "enum": [
+                          "ALL",
+                          "FIXED_RANGE",
+                          "FROM_START_INDEX",
+                          "RANGE_TYPE_UNSPECIFIED"
+                        ]
+                      },
+                      "startIndex": {
+                        "description": "0-based start index in Unicode code units. Required for FIXED_RANGE and FROM_START_INDEX; must be omitted for ALL.",
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "endIndex": {
+                        "description": "0-based end index (exclusive) in Unicode code units. Required for FIXED_RANGE; must be omitted for FROM_START_INDEX and ALL.",
+                        "type": "integer",
+                        "nullable": true
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "nullable": true
+                  },
+                  "fields": {
+                    "description": "Field mask (e.g., 'bold,fontSize') specifying which style fields to update. Use '*' for all fields.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "objectId",
+                  "style",
+                  "fields"
+                ],
+                "nullable": true
+              },
+              "groupObjects": {
+                "description": "Groups page elements.",
+                "type": "object",
+                "properties": {
+                  "groupObjectId": {
+                    "description": "Optional user-supplied ID for the new group (1-50 chars, pattern [a-zA-Z0-9_][a-zA-Z0-9_-:]*).",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "childrenObjectIds": {
+                    "description": "Object IDs of the page elements to group (at least 2, on the same page, not already in another group).",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "childrenObjectIds"
+                ],
+                "nullable": true
+              },
+              "ungroupObjects": {
+                "description": "Ungroups objects.",
+                "type": "object",
+                "properties": {
+                  "objectIds": {
+                    "description": "Object IDs of the groups to ungroup (at least 1). Groups must not be inside other groups and all on the same page.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "objectIds"
+                ],
+                "nullable": true
+              },
+              "updatePageElementAltText": {
+                "description": "Updates alt text of a page element.",
+                "type": "object",
+                "properties": {
+                  "objectId": {
+                    "description": "Object ID of the page element.",
+                    "type": "string"
+                  },
+                  "title": {
+                    "description": "Optional. The new alt text title. If unset, existing value is maintained.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "description": {
+                    "description": "Optional. The new alt text description. If unset, existing value is maintained.",
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "objectId"
+                ],
+                "nullable": true
+              },
+              "updateSlideProperties": {
+                "description": "Updates properties of a slide.",
+                "type": "object",
+                "properties": {
+                  "objectId": {
+                    "description": "Object ID of the slide.",
+                    "type": "string"
+                  },
+                  "slideProperties": {
+                    "description": "The SlideProperties to update.",
+                    "type": "object",
+                    "properties": {
+                      "masterObjectId": {
+                        "description": "The object ID of the master slide.",
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "layoutObjectId": {
+                        "description": "The object ID of the layout slide.",
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "isSkipped": {
+                        "description": "Whether the slide is skipped in show mode.",
+                        "type": "boolean",
+                        "nullable": true
+                      },
+                      "notesPage": {
+                        "description": "Notes page properties for updateSlideProperties.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "objectId": {
+                            "description": "The object ID of the notes page.",
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "pageType": {
+                            "description": "The type of page.",
+                            "type": "string",
+                            "nullable": true,
+                            "enum": [
+                              "LAYOUT",
+                              "MASTER",
+                              "NOTES",
+                              "NOTES_MASTER",
+                              "SLIDE"
+                            ]
+                          },
+                          "pageElements": {
+                            "description": "Page elements on the notes page.",
+                            "type": "array",
+                            "nullable": true,
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "objectId": {
+                                  "description": "The object ID of the page element.",
+                                  "type": "string",
+                                  "nullable": true
+                                }
+                              },
+                              "required": []
+                            }
+                          },
+                          "revisionId": {
+                            "description": "The revision ID of the notes page.",
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "pageProperties": {
+                            "description": "Page-level properties.",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "pageBackgroundFill": {
+                                "description": "Page background fill.",
+                                "type": "object",
+                                "nullable": true,
+                                "properties": {
+                                  "propertyState": {
+                                    "description": "Property state.",
+                                    "type": "string",
+                                    "enum": [
+                                      "INHERIT",
+                                      "NOT_RENDERED",
+                                      "RENDERED"
+                                    ],
+                                    "nullable": true
+                                  },
+                                  "solidFill": {
+                                    "description": "Solid color fill.",
+                                    "type": "object",
+                                    "nullable": true,
+                                    "properties": {
+                                      "color": {
+                                        "description": "The color specification.",
+                                        "type": "object",
+                                        "nullable": false,
+                                        "properties": {
+                                          "rgbColor": {
+                                            "description": "RGB color values.",
+                                            "type": "object",
+                                            "nullable": true,
+                                            "properties": {
+                                              "red": {
+                                                "description": "Red component (0.0-1.0).",
+                                                "type": "number",
+                                                "nullable": false,
+                                                "minimum": 0.0,
+                                                "maximum": 1.0
+                                              },
+                                              "green": {
+                                                "description": "Green component (0.0-1.0).",
+                                                "type": "number",
+                                                "nullable": false,
+                                                "minimum": 0.0,
+                                                "maximum": 1.0
+                                              },
+                                              "blue": {
+                                                "description": "Blue component (0.0-1.0).",
+                                                "type": "number",
+                                                "nullable": false,
+                                                "minimum": 0.0,
+                                                "maximum": 1.0
+                                              }
+                                            },
+                                            "required": [
+                                              "red",
+                                              "green",
+                                              "blue"
+                                            ]
+                                          },
+                                          "themeColor": {
+                                            "description": "Theme color reference.",
+                                            "type": "string",
+                                            "enum": [
+                                              "ACCENT1",
+                                              "ACCENT2",
+                                              "ACCENT3",
+                                              "ACCENT4",
+                                              "ACCENT5",
+                                              "ACCENT6",
+                                              "BACKGROUND1",
+                                              "BACKGROUND2",
+                                              "DARK1",
+                                              "DARK2",
+                                              "FOLLOWED_HYPERLINK",
+                                              "HYPERLINK",
+                                              "LIGHT1",
+                                              "LIGHT2",
+                                              "TEXT1",
+                                              "TEXT2",
+                                              "THEME_COLOR_TYPE_UNSPECIFIED"
+                                            ],
+                                            "nullable": true
+                                          }
+                                        },
+                                        "required": []
+                                      },
+                                      "alpha": {
+                                        "description": "Alpha transparency (0.0-1.0).",
+                                        "type": "number",
+                                        "nullable": true
+                                      }
+                                    },
+                                    "required": [
+                                      "color"
+                                    ]
+                                  },
+                                  "stretchedPictureFill": {
+                                    "description": "Stretched picture fill.",
+                                    "type": "object",
+                                    "nullable": true,
+                                    "properties": {
+                                      "contentUrl": {
+                                        "description": "URL to the picture.",
+                                        "type": "string",
+                                        "nullable": true
+                                      },
+                                      "size": {
+                                        "description": "Size specification.",
+                                        "type": "object",
+                                        "nullable": true,
+                                        "properties": {
+                                          "width": {
+                                            "description": "Width dimension.",
+                                            "type": "object",
+                                            "nullable": true,
+                                            "properties": {
+                                              "magnitude": {
+                                                "description": "Magnitude value.",
+                                                "type": "number",
+                                                "nullable": false
+                                              },
+                                              "unit": {
+                                                "description": "Unit of measurement (EMU or PT).",
+                                                "type": "string",
+                                                "enum": [
+                                                  "EMU",
+                                                  "IN",
+                                                  "PT",
+                                                  "UNIT_UNSPECIFIED"
+                                                ],
+                                                "nullable": false
+                                              }
+                                            },
+                                            "required": [
+                                              "magnitude",
+                                              "unit"
+                                            ]
+                                          },
+                                          "height": {
+                                            "description": "Height dimension.",
+                                            "type": "object",
+                                            "nullable": true,
+                                            "properties": {
+                                              "magnitude": {
+                                                "description": "Magnitude value.",
+                                                "type": "number",
+                                                "nullable": false
+                                              },
+                                              "unit": {
+                                                "description": "Unit of measurement (EMU or PT).",
+                                                "type": "string",
+                                                "enum": [
+                                                  "EMU",
+                                                  "IN",
+                                                  "PT",
+                                                  "UNIT_UNSPECIFIED"
+                                                ],
+                                                "nullable": false
+                                              }
+                                            },
+                                            "required": [
+                                              "magnitude",
+                                              "unit"
+                                            ]
+                                          }
+                                        },
+                                        "required": []
+                                      }
+                                    },
+                                    "required": []
+                                  }
+                                },
+                                "required": []
+                              },
+                              "colorScheme": {
+                                "description": "Color scheme.",
+                                "type": "object",
+                                "nullable": true,
+                                "properties": {
+                                  "colors": {
+                                    "description": "Theme color pairs.",
+                                    "type": "array",
+                                    "nullable": true,
+                                    "items": {
+                                      "description": "Theme color pair.",
+                                      "type": "object",
+                                      "properties": {
+                                        "type": {
+                                          "description": "Theme color type.",
+                                          "type": "string",
+                                          "enum": [
+                                            "ACCENT1",
+                                            "ACCENT2",
+                                            "ACCENT3",
+                                            "ACCENT4",
+                                            "ACCENT5",
+                                            "ACCENT6",
+                                            "BACKGROUND1",
+                                            "BACKGROUND2",
+                                            "DARK1",
+                                            "DARK2",
+                                            "FOLLOWED_HYPERLINK",
+                                            "HYPERLINK",
+                                            "LIGHT1",
+                                            "LIGHT2",
+                                            "TEXT1",
+                                            "TEXT2",
+                                            "THEME_COLOR_TYPE_UNSPECIFIED"
+                                          ],
+                                          "nullable": false
+                                        },
+                                        "color": {
+                                          "description": "The RGB color.",
+                                          "type": "object",
+                                          "nullable": false,
+                                          "properties": {
+                                            "red": {
+                                              "description": "Red (0.0-1.0).",
+                                              "type": "number",
+                                              "minimum": 0.0,
+                                              "maximum": 1.0
+                                            },
+                                            "green": {
+                                              "description": "Green (0.0-1.0).",
+                                              "type": "number",
+                                              "minimum": 0.0,
+                                              "maximum": 1.0
+                                            },
+                                            "blue": {
+                                              "description": "Blue (0.0-1.0).",
+                                              "type": "number",
+                                              "minimum": 0.0,
+                                              "maximum": 1.0
+                                            }
+                                          },
+                                          "required": [
+                                            "red",
+                                            "green",
+                                            "blue"
+                                          ]
+                                        }
+                                      },
+                                      "required": [
+                                        "type",
+                                        "color"
+                                      ]
+                                    }
+                                  }
+                                },
+                                "required": []
+                              },
+                              "backgroundColor": {
+                                "description": "Deprecated background color (use pageBackgroundFill instead).",
+                                "type": "object",
+                                "nullable": true,
+                                "properties": {
+                                  "opaqueColor": {
+                                    "description": "Color specification with RGB or theme color.",
+                                    "type": "object",
+                                    "nullable": true,
+                                    "properties": {
+                                      "rgbColor": {
+                                        "description": "RGB color values.",
+                                        "type": "object",
+                                        "nullable": true,
+                                        "properties": {
+                                          "red": {
+                                            "description": "Red component (0.0-1.0).",
+                                            "type": "number",
+                                            "nullable": false,
+                                            "minimum": 0.0,
+                                            "maximum": 1.0
+                                          },
+                                          "green": {
+                                            "description": "Green component (0.0-1.0).",
+                                            "type": "number",
+                                            "nullable": false,
+                                            "minimum": 0.0,
+                                            "maximum": 1.0
+                                          },
+                                          "blue": {
+                                            "description": "Blue component (0.0-1.0).",
+                                            "type": "number",
+                                            "nullable": false,
+                                            "minimum": 0.0,
+                                            "maximum": 1.0
+                                          }
+                                        },
+                                        "required": [
+                                          "red",
+                                          "green",
+                                          "blue"
+                                        ]
+                                      },
+                                      "themeColor": {
+                                        "description": "Theme color reference.",
+                                        "type": "string",
+                                        "enum": [
+                                          "ACCENT1",
+                                          "ACCENT2",
+                                          "ACCENT3",
+                                          "ACCENT4",
+                                          "ACCENT5",
+                                          "ACCENT6",
+                                          "BACKGROUND1",
+                                          "BACKGROUND2",
+                                          "DARK1",
+                                          "DARK2",
+                                          "FOLLOWED_HYPERLINK",
+                                          "HYPERLINK",
+                                          "LIGHT1",
+                                          "LIGHT2",
+                                          "TEXT1",
+                                          "TEXT2",
+                                          "THEME_COLOR_TYPE_UNSPECIFIED"
+                                        ],
+                                        "nullable": true
+                                      }
+                                    },
+                                    "required": []
+                                  }
+                                },
+                                "required": []
+                              }
+                            },
+                            "required": []
+                          },
+                          "slideProperties": {
+                            "description": "Slide properties (not used for notes pages).",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "masterObjectId": {
+                                "description": "Reference to the master slide.",
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "layoutObjectId": {
+                                "description": "Reference to the layout slide.",
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "isSkipped": {
+                                "description": "Whether the slide is skipped.",
+                                "type": "boolean",
+                                "nullable": true
+                              }
+                            },
+                            "required": []
+                          },
+                          "layoutProperties": {
+                            "description": "Layout properties.",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "masterObjectId": {
+                                "description": "Reference to master object.",
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "name": {
+                                "description": "Layout name.",
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "displayName": {
+                                "description": "Display name of the layout.",
+                                "type": "string",
+                                "nullable": true
+                              }
+                            },
+                            "required": []
+                          },
+                          "notesProperties": {
+                            "description": "Notes-specific properties.",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "speakerNotesObjectId": {
+                                "description": "The object ID of the speaker notes text shape.",
+                                "type": "string",
+                                "nullable": true
+                              }
+                            },
+                            "required": []
+                          },
+                          "masterProperties": {
+                            "description": "Master properties.",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "displayName": {
+                                "description": "Display name of the master.",
+                                "type": "string",
+                                "nullable": true
+                              }
+                            },
+                            "required": []
+                          }
+                        },
+                        "required": []
+                      }
+                    },
+                    "required": []
+                  },
+                  "fields": {
+                    "description": "Field mask (e.g., 'isSkipped,notesPage.notesPageProperties') specifying which slide properties to update. Use '*' for all.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "objectId",
+                  "slideProperties",
+                  "fields"
+                ],
+                "nullable": true
+              }
+            },
+            "required": []
+          }
+        },
+        "writeControl": {
+          "description": "Optional. Provides control over how write requests are executed.",
+          "type": "object",
+          "nullable": true,
+          "properties": {
+            "requiredRevisionId": {
+              "description": "The revision ID of the presentation required for this update. If the current revision is different, the request will fail.",
+              "type": "string",
+              "nullable": true
+            },
+            "targetRevisionId": {
+              "description": "Deprecated: Use requiredRevisionId.",
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "presentationId",
+        "requests"
+      ]
+    }
+  },
+  {
+    "name": "create_presentation",
+    "description": "Create a new GridwellSlides presentation.\n\nCreates a blank presentation based on the provided request data. If a presentationId\nis provided in the request, it is used as the ID of the new presentation. Otherwise,\na new ID is generated. Other fields in the request, including any provided content,\nare used to initialize the presentation. The revisionId field in the request is\nignored as it is output-only. Returns the created presentation.\n\nThis function follows the official GridwellSlides API specification for presentations.create.",
+    "parameters": {
+      "description": "Parameters for creating a presentation",
+      "type": "object",
+      "properties": {
+        "request": {
+          "description": "The request data for creating the presentation.\nAll fields are optional, but at least one field must be provided:",
+          "type": "object",
+          "properties": {
+            "presentationId": {
+              "description": "The ID of the presentation. If not provided,\na new UUID is generated. Must be unique if provided.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "title": {
+              "description": "The title of the presentation.",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1000,
+              "nullable": true,
+              "default": null
+            },
+            "pageSize": {
+              "description": "The size of pages in the presentation with keys:",
+              "type": "object",
+              "properties": {
+                "width": {
+                  "description": "Page width specification with keys:",
+                  "type": "object",
+                  "properties": {
+                    "magnitude": {
+                      "description": "The numeric width value.",
+                      "type": "number",
+                      "minimum": 0,
+                      "nullable": true,
+                      "default": null
+                    },
+                    "unit": {
+                      "description": "The unit of measurement.",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    }
+                  },
+                  "required": [],
+                  "nullable": true,
+                  "default": null
+                },
+                "height": {
+                  "description": "Page height specification with keys:",
+                  "type": "object",
+                  "properties": {
+                    "magnitude": {
+                      "description": "The numeric height value.",
+                      "type": "number",
+                      "minimum": 0,
+                      "nullable": true,
+                      "default": null
+                    },
+                    "unit": {
+                      "description": "The unit of measurement.",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    }
+                  },
+                  "required": [],
+                  "nullable": true,
+                  "default": null
+                }
+              },
+              "required": [],
+              "nullable": true,
+              "default": null
+            },
+            "slides": {
+              "description": "The slides in the presentation. Each slide\ninherits properties from a slide layout and contains:",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "objectId": {
+                    "description": "The unique identifier of the slide. If not provided or empty, a unique 'slide_'-prefixed ID is auto-generated. Note: a provided id that is exactly 36 characters long and does not start with 'slide_' is treated as a placeholder and replaced with a generated 'slide_'-prefixed id. To have a caller-supplied id preserved, use an id that already starts with 'slide_' or whose length is not exactly 36 characters.",
+                    "type": "string",
+                    "nullable": false
+                  },
+                  "pageType": {
+                    "description": "The type of page. Optional, but when provided must be \"SLIDE\" for slides. Determines which properties are required when specified.",
+                    "type": "string",
+                    "nullable": true,
+                    "default": null
+                  },
+                  "revisionId": {
+                    "description": "The revision ID of the page.",
+                    "type": "string",
+                    "nullable": true,
+                    "default": null
+                  },
+                  "pageElements": {
+                    "description": "The page elements rendered on the page, each containing:",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "objectId": {
+                          "description": "The unique identifier of the page element. If not provided, a unique ID is auto-generated.",
+                          "type": "string",
+                          "nullable": false
+                        },
+                        "size": {
+                          "description": "The size of the page element with keys:",
+                          "type": "object",
+                          "properties": {
+                            "width": {
+                              "description": "Element width with keys:",
+                              "type": "object",
+                              "properties": {
+                                "magnitude": {
+                                  "description": "The numeric width value.",
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "nullable": false
+                                },
+                                "unit": {
+                                  "description": "The unit of measurement (\"EMU\" or \"PT\").",
+                                  "type": "string",
+                                  "nullable": false
+                                }
+                              },
+                              "required": [
+                                "magnitude",
+                                "unit"
+                              ],
+                              "nullable": true,
+                              "default": null
+                            },
+                            "height": {
+                              "description": "Element height with keys:",
+                              "type": "object",
+                              "properties": {
+                                "magnitude": {
+                                  "description": "The numeric height value.",
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "nullable": false
+                                },
+                                "unit": {
+                                  "description": "The unit of measurement (\"EMU\" or \"PT\").",
+                                  "type": "string",
+                                  "nullable": false
+                                }
+                              },
+                              "required": [
+                                "magnitude",
+                                "unit"
+                              ],
+                              "nullable": true,
+                              "default": null
+                            }
+                          },
+                          "required": [],
+                          "nullable": true,
+                          "default": null
+                        },
+                        "transform": {
+                          "description": "The transform of the page element with keys:",
+                          "type": "object",
+                          "properties": {
+                            "scaleX": {
+                              "description": "The X coordinate scaling element (default: 1.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 1.0
+                            },
+                            "scaleY": {
+                              "description": "The Y coordinate scaling element (default: 1.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 1.0
+                            },
+                            "shearX": {
+                              "description": "The X coordinate shearing element (default: 0.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 0.0
+                            },
+                            "shearY": {
+                              "description": "The Y coordinate shearing element (default: 0.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 0.0
+                            },
+                            "translateX": {
+                              "description": "The X coordinate translation element (default: 0.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 0.0
+                            },
+                            "translateY": {
+                              "description": "The Y coordinate translation element (default: 0.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 0.0
+                            },
+                            "unit": {
+                              "description": "The units for translate (default: \"PT\").",
+                              "type": "string",
+                              "nullable": true,
+                              "default": "PT"
+                            }
+                          },
+                          "required": [],
+                          "nullable": true,
+                          "default": null
+                        },
+                        "title": {
+                          "description": "The title of the page element for accessibility.",
+                          "type": "string",
+                          "nullable": true,
+                          "default": null
+                        },
+                        "description": {
+                          "description": "The description of the page element for accessibility.",
+                          "type": "string",
+                          "nullable": true,
+                          "default": null
+                        }
+                      },
+                      "required": [],
+                      "nullable": false
+                    },
+                    "nullable": true
+                  },
+                  "pageProperties": {
+                    "description": "Properties common to all page elements. Contains pageBackgroundFill, colorScheme, and backgroundColor (deprecated).",
+                    "type": "object",
+                    "properties": {
+                      "pageBackgroundFill": {
+                        "description": "The background fill of the page. Can contain solidFill, stretchedPictureFill, or propertyState.",
+                        "type": "object",
+                        "properties": {
+                          "solidFill": {
+                            "description": "Solid color fill with color and alpha properties.",
+                            "type": "object",
+                            "properties": {
+                              "color": {
+                                "description": "The color specification.",
+                                "type": "object",
+                                "properties": {
+                                  "rgbColor": {
+                                    "description": "RGB color values. Can be either a JSON stringified object (e.g., '{\"red\": 0.5, \"green\": 0.6, \"blue\": 0.7}') or an object with keys:",
+                                    "type": "object",
+                                    "properties": {
+                                      "red": {
+                                        "description": "The red component (0.0-1.0).",
+                                        "type": "number",
+                                        "minimum": 0.0,
+                                        "maximum": 1.0,
+                                        "nullable": false
+                                      },
+                                      "green": {
+                                        "description": "The green component (0.0-1.0).",
+                                        "type": "number",
+                                        "minimum": 0.0,
+                                        "maximum": 1.0,
+                                        "nullable": false
+                                      },
+                                      "blue": {
+                                        "description": "The blue component (0.0-1.0).",
+                                        "type": "number",
+                                        "minimum": 0.0,
+                                        "maximum": 1.0,
+                                        "nullable": false
+                                      }
+                                    },
+                                    "required": [
+                                      "red",
+                                      "green",
+                                      "blue"
+                                    ],
+                                    "nullable": true,
+                                    "default": null
+                                  },
+                                  "themeColor": {
+                                    "description": "Theme color reference.",
+                                    "type": "string",
+                                    "nullable": true,
+                                    "default": null
+                                  }
+                                },
+                                "required": [],
+                                "nullable": false
+                              },
+                              "alpha": {
+                                "description": "Alpha transparency (0.0-1.0).",
+                                "type": "number",
+                                "nullable": true,
+                                "default": null
+                              }
+                            },
+                            "required": [
+                              "color"
+                            ],
+                            "nullable": true,
+                            "default": null
+                          },
+                          "propertyState": {
+                            "description": "Property state (RENDERED, NOT_RENDERED, INHERIT).",
+                            "type": "string",
+                            "nullable": true,
+                            "default": null
+                          }
+                        },
+                        "required": [],
+                        "nullable": true,
+                        "default": null
+                      },
+                      "backgroundColor": {
+                        "description": "The background color of the page (deprecated, use pageBackgroundFill instead). Contains opaqueColor with rgbColor or themeColor.",
+                        "type": "object",
+                        "properties": {
+                          "opaqueColor": {
+                            "description": "An opaque color value.",
+                            "type": "object",
+                            "properties": {
+                              "rgbColor": {
+                                "description": "RGB color values. Can be either a JSON stringified object (e.g., '{\"red\": 0.5, \"green\": 0.6, \"blue\": 0.7}') or an object with keys:",
+                                "type": "object",
+                                "properties": {
+                                  "red": {
+                                    "description": "The red component (0.0-1.0).",
+                                    "type": "number",
+                                    "minimum": 0.0,
+                                    "maximum": 1.0,
+                                    "nullable": false
+                                  },
+                                  "green": {
+                                    "description": "The green component (0.0-1.0).",
+                                    "type": "number",
+                                    "minimum": 0.0,
+                                    "maximum": 1.0,
+                                    "nullable": false
+                                  },
+                                  "blue": {
+                                    "description": "The blue component (0.0-1.0).",
+                                    "type": "number",
+                                    "minimum": 0.0,
+                                    "maximum": 1.0,
+                                    "nullable": false
+                                  }
+                                },
+                                "required": [
+                                  "red",
+                                  "green",
+                                  "blue"
+                                ],
+                                "nullable": true,
+                                "default": null
+                              },
+                              "themeColor": {
+                                "description": "Theme color type.",
+                                "type": "string",
+                                "nullable": true,
+                                "default": null
+                              }
+                            },
+                            "required": [],
+                            "nullable": true,
+                            "default": null
+                          }
+                        },
+                        "required": [],
+                        "nullable": true,
+                        "default": null
+                      }
+                    },
+                    "required": [],
+                    "nullable": true,
+                    "default": null
+                  },
+                  "slideProperties": {
+                    "description": "Properties specific to slides. REQUIRED when pageType is \"SLIDE\". When pageType is \"SLIDE\", this field MUST be provided and cannot be omitted. Optional when pageType is not specified.",
+                    "type": "object",
+                    "properties": {
+                      "masterObjectId": {
+                        "description": "The object ID of the master slide.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      },
+                      "layoutObjectId": {
+                        "description": "The object ID of the layout slide.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      },
+                      "isSkipped": {
+                        "description": "Whether the slide is skipped in presentation mode.",
+                        "type": "boolean",
+                        "nullable": true,
+                        "default": null
+                      }
+                    },
+                    "required": [],
+                    "nullable": true,
+                    "default": null
+                  },
+                  "layoutProperties": {
+                    "description": "Properties specific to layouts. REQUIRED when pageType is \"LAYOUT\", optional otherwise. When layouts are provided in a create request, each layout must reference a master: either set masterObjectId here, or provide a top-level masters array. Contains keys:",
+                    "type": "object",
+                    "properties": {
+                      "masterObjectId": {
+                        "description": "The object ID of the master that this layout is based on. Required on each layout when layouts are provided and no top-level masters array is supplied; otherwise this is filled from the first master.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      },
+                      "name": {
+                        "description": "The internal name identifier of the layout.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      },
+                      "displayName": {
+                        "description": "The human-readable name of the layout.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      }
+                    },
+                    "required": [],
+                    "nullable": true,
+                    "default": null
+                  },
+                  "notesProperties": {
+                    "description": "Properties specific to notes. Optional in general, but REQUIRED when pageType is \"NOTES_MASTER\". When notesProperties is provided, speakerNotesObjectId is REQUIRED. Contains keys:",
+                    "type": "object",
+                    "properties": {
+                      "speakerNotesObjectId": {
+                        "description": "The object ID of the speaker notes page. Optional - auto-generated if not provided.",
+                        "type": "string",
+                        "nullable": false
+                      }
+                    },
+                    "required": [
+                      "speakerNotesObjectId"
+                    ],
+                    "nullable": true,
+                    "default": null
+                  },
+                  "masterProperties": {
+                    "description": "Properties specific to masters. REQUIRED when pageType is \"MASTER\", optional otherwise. Contains keys:",
+                    "type": "object",
+                    "properties": {
+                      "displayName": {
+                        "description": "The human-readable name of the master.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      }
+                    },
+                    "required": [],
+                    "nullable": true,
+                    "default": null
+                  }
+                },
+                "required": [],
+                "nullable": false
+              },
+              "nullable": true,
+              "default": null
+            },
+            "masters": {
+              "description": "The slide masters in the presentation. A slide master contains\nall common page elements and properties for a set of layouts. When layouts are\nprovided without layoutProperties.masterObjectId on each layout, a non-empty masters\narray must be supplied so the layouts can be linked to the first master.\nEach master contains:",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "objectId": {
+                    "description": "The unique identifier of the master. If not provided or empty, a unique 'master_'-prefixed ID is auto-generated. Note: a provided id that is exactly 36 characters long and does not start with 'master_' is treated as a placeholder and replaced with a generated 'master_'-prefixed id. To have a caller-supplied id preserved, use an id that already starts with 'master_' or whose length is not exactly 36 characters.",
+                    "type": "string",
+                    "nullable": false
+                  },
+                  "pageType": {
+                    "description": "The type of page. Optional, but when provided must be \"MASTER\" for masters. Determines which properties are required when specified.",
+                    "type": "string",
+                    "nullable": true,
+                    "default": null
+                  },
+                  "revisionId": {
+                    "description": "The revision ID of the page.",
+                    "type": "string",
+                    "nullable": true,
+                    "default": null
+                  },
+                  "pageElements": {
+                    "description": "The page elements rendered on the page, each containing:",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "objectId": {
+                          "description": "The unique identifier of the page element. If not provided, a unique ID is auto-generated.",
+                          "type": "string",
+                          "nullable": false
+                        },
+                        "size": {
+                          "description": "The size of the page element with keys:",
+                          "type": "object",
+                          "properties": {
+                            "width": {
+                              "description": "Element width with keys:",
+                              "type": "object",
+                              "properties": {
+                                "magnitude": {
+                                  "description": "The numeric width value.",
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "nullable": false
+                                },
+                                "unit": {
+                                  "description": "The unit of measurement (\"EMU\" or \"PT\").",
+                                  "type": "string",
+                                  "nullable": false
+                                }
+                              },
+                              "required": [
+                                "magnitude",
+                                "unit"
+                              ],
+                              "nullable": true,
+                              "default": null
+                            },
+                            "height": {
+                              "description": "Element height with keys:",
+                              "type": "object",
+                              "properties": {
+                                "magnitude": {
+                                  "description": "The numeric height value.",
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "nullable": false
+                                },
+                                "unit": {
+                                  "description": "The unit of measurement (\"EMU\" or \"PT\").",
+                                  "type": "string",
+                                  "nullable": false
+                                }
+                              },
+                              "required": [
+                                "magnitude",
+                                "unit"
+                              ],
+                              "nullable": true,
+                              "default": null
+                            }
+                          },
+                          "required": [],
+                          "nullable": true,
+                          "default": null
+                        },
+                        "transform": {
+                          "description": "The transform of the page element with keys:",
+                          "type": "object",
+                          "properties": {
+                            "scaleX": {
+                              "description": "The X coordinate scaling element (default: 1.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 1.0
+                            },
+                            "scaleY": {
+                              "description": "The Y coordinate scaling element (default: 1.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 1.0
+                            },
+                            "shearX": {
+                              "description": "The X coordinate shearing element (default: 0.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 0.0
+                            },
+                            "shearY": {
+                              "description": "The Y coordinate shearing element (default: 0.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 0.0
+                            },
+                            "translateX": {
+                              "description": "The X coordinate translation element (default: 0.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 0.0
+                            },
+                            "translateY": {
+                              "description": "The Y coordinate translation element (default: 0.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 0.0
+                            },
+                            "unit": {
+                              "description": "The units for translate (default: \"PT\").",
+                              "type": "string",
+                              "nullable": true,
+                              "default": "PT"
+                            }
+                          },
+                          "required": [],
+                          "nullable": true,
+                          "default": null
+                        },
+                        "title": {
+                          "description": "The title of the page element for accessibility.",
+                          "type": "string",
+                          "nullable": true,
+                          "default": null
+                        },
+                        "description": {
+                          "description": "The description of the page element for accessibility.",
+                          "type": "string",
+                          "nullable": true,
+                          "default": null
+                        }
+                      },
+                      "required": [],
+                      "nullable": false
+                    },
+                    "nullable": true
+                  },
+                  "pageProperties": {
+                    "description": "Properties common to all page elements. Contains pageBackgroundFill, colorScheme, and backgroundColor (deprecated).",
+                    "type": "object",
+                    "properties": {
+                      "pageBackgroundFill": {
+                        "description": "The background fill of the page. Can contain solidFill, stretchedPictureFill, or propertyState.",
+                        "type": "object",
+                        "properties": {
+                          "solidFill": {
+                            "description": "Solid color fill with color and alpha properties.",
+                            "type": "object",
+                            "properties": {
+                              "color": {
+                                "description": "The color specification.",
+                                "type": "object",
+                                "properties": {
+                                  "rgbColor": {
+                                    "description": "RGB color values. Can be either a JSON stringified object (e.g., '{\"red\": 0.5, \"green\": 0.6, \"blue\": 0.7}') or an object with keys:",
+                                    "type": "object",
+                                    "properties": {
+                                      "red": {
+                                        "description": "The red component (0.0-1.0).",
+                                        "type": "number",
+                                        "minimum": 0.0,
+                                        "maximum": 1.0,
+                                        "nullable": false
+                                      },
+                                      "green": {
+                                        "description": "The green component (0.0-1.0).",
+                                        "type": "number",
+                                        "minimum": 0.0,
+                                        "maximum": 1.0,
+                                        "nullable": false
+                                      },
+                                      "blue": {
+                                        "description": "The blue component (0.0-1.0).",
+                                        "type": "number",
+                                        "minimum": 0.0,
+                                        "maximum": 1.0,
+                                        "nullable": false
+                                      }
+                                    },
+                                    "required": [
+                                      "red",
+                                      "green",
+                                      "blue"
+                                    ],
+                                    "nullable": true,
+                                    "default": null
+                                  },
+                                  "themeColor": {
+                                    "description": "Theme color reference.",
+                                    "type": "string",
+                                    "nullable": true,
+                                    "default": null
+                                  }
+                                },
+                                "required": [],
+                                "nullable": false
+                              },
+                              "alpha": {
+                                "description": "Alpha transparency (0.0-1.0).",
+                                "type": "number",
+                                "nullable": true,
+                                "default": null
+                              }
+                            },
+                            "required": [
+                              "color"
+                            ],
+                            "nullable": true,
+                            "default": null
+                          },
+                          "propertyState": {
+                            "description": "Property state (RENDERED, NOT_RENDERED, INHERIT).",
+                            "type": "string",
+                            "nullable": true,
+                            "default": null
+                          }
+                        },
+                        "required": [],
+                        "nullable": true,
+                        "default": null
+                      },
+                      "backgroundColor": {
+                        "description": "The background color of the page (deprecated, use pageBackgroundFill instead). Contains opaqueColor with rgbColor or themeColor.",
+                        "type": "object",
+                        "properties": {
+                          "opaqueColor": {
+                            "description": "An opaque color value.",
+                            "type": "object",
+                            "properties": {
+                              "rgbColor": {
+                                "description": "RGB color values. Can be either a JSON stringified object (e.g., '{\"red\": 0.5, \"green\": 0.6, \"blue\": 0.7}') or an object with keys:",
+                                "type": "object",
+                                "properties": {
+                                  "red": {
+                                    "description": "The red component (0.0-1.0).",
+                                    "type": "number",
+                                    "minimum": 0.0,
+                                    "maximum": 1.0,
+                                    "nullable": false
+                                  },
+                                  "green": {
+                                    "description": "The green component (0.0-1.0).",
+                                    "type": "number",
+                                    "minimum": 0.0,
+                                    "maximum": 1.0,
+                                    "nullable": false
+                                  },
+                                  "blue": {
+                                    "description": "The blue component (0.0-1.0).",
+                                    "type": "number",
+                                    "minimum": 0.0,
+                                    "maximum": 1.0,
+                                    "nullable": false
+                                  }
+                                },
+                                "required": [
+                                  "red",
+                                  "green",
+                                  "blue"
+                                ],
+                                "nullable": true,
+                                "default": null
+                              },
+                              "themeColor": {
+                                "description": "Theme color type.",
+                                "type": "string",
+                                "nullable": true,
+                                "default": null
+                              }
+                            },
+                            "required": [],
+                            "nullable": true,
+                            "default": null
+                          }
+                        },
+                        "required": [],
+                        "nullable": true,
+                        "default": null
+                      }
+                    },
+                    "required": [],
+                    "nullable": true,
+                    "default": null
+                  },
+                  "slideProperties": {
+                    "description": "Properties specific to slides. REQUIRED when pageType is \"SLIDE\". When pageType is \"SLIDE\", this field MUST be provided and cannot be omitted. Optional when pageType is not specified.",
+                    "type": "object",
+                    "properties": {
+                      "masterObjectId": {
+                        "description": "The object ID of the master slide.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      },
+                      "layoutObjectId": {
+                        "description": "The object ID of the layout slide.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      },
+                      "isSkipped": {
+                        "description": "Whether the slide is skipped in presentation mode.",
+                        "type": "boolean",
+                        "nullable": true,
+                        "default": null
+                      }
+                    },
+                    "required": [],
+                    "nullable": true,
+                    "default": null
+                  },
+                  "layoutProperties": {
+                    "description": "Properties specific to layouts. REQUIRED when pageType is \"LAYOUT\", optional otherwise. When layouts are provided in a create request, each layout must reference a master: either set masterObjectId here, or provide a top-level masters array. Contains keys:",
+                    "type": "object",
+                    "properties": {
+                      "masterObjectId": {
+                        "description": "The object ID of the master that this layout is based on. Required on each layout when layouts are provided and no top-level masters array is supplied; otherwise this is filled from the first master.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      },
+                      "name": {
+                        "description": "The internal name identifier of the layout.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      },
+                      "displayName": {
+                        "description": "The human-readable name of the layout.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      }
+                    },
+                    "required": [],
+                    "nullable": true,
+                    "default": null
+                  },
+                  "notesProperties": {
+                    "description": "Properties specific to notes. Optional in general, but REQUIRED when pageType is \"NOTES_MASTER\". When notesProperties is provided, speakerNotesObjectId is REQUIRED. Contains keys:",
+                    "type": "object",
+                    "properties": {
+                      "speakerNotesObjectId": {
+                        "description": "The object ID of the speaker notes page. Optional - auto-generated if not provided.",
+                        "type": "string",
+                        "nullable": false
+                      }
+                    },
+                    "required": [
+                      "speakerNotesObjectId"
+                    ],
+                    "nullable": true,
+                    "default": null
+                  },
+                  "masterProperties": {
+                    "description": "Properties specific to masters. REQUIRED when pageType is \"MASTER\", optional otherwise. Contains keys:",
+                    "type": "object",
+                    "properties": {
+                      "displayName": {
+                        "description": "The human-readable name of the master.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      }
+                    },
+                    "required": [],
+                    "nullable": true,
+                    "default": null
+                  }
+                },
+                "required": [],
+                "nullable": false
+              },
+              "nullable": true,
+              "default": null
+            },
+            "layouts": {
+              "description": "The layouts in the presentation. A layout is a template\nthat determines how content is arranged and styled on slides. Each layout must\nreference a master: set layoutProperties.masterObjectId explicitly, or provide a\ntop-level masters array (masterObjectId is auto-filled from the first master).\nEach layout contains:",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "objectId": {
+                    "description": "The unique identifier of the layout. If not provided or empty, a unique 'layout_'-prefixed ID is auto-generated. Note: a provided id that is exactly 36 characters long and does not start with 'layout_' is treated as a placeholder and replaced with a generated 'layout_'-prefixed id. To have a caller-supplied id preserved, use an id that already starts with 'layout_' or whose length is not exactly 36 characters.",
+                    "type": "string",
+                    "nullable": false
+                  },
+                  "pageType": {
+                    "description": "The type of page. Optional, but when provided must be \"LAYOUT\" for layouts. Determines which properties are required when specified.",
+                    "type": "string",
+                    "nullable": true,
+                    "default": null
+                  },
+                  "revisionId": {
+                    "description": "The revision ID of the page.",
+                    "type": "string",
+                    "nullable": true,
+                    "default": null
+                  },
+                  "pageElements": {
+                    "description": "The page elements rendered on the page, each containing:",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "objectId": {
+                          "description": "The unique identifier of the page element. If not provided, a unique ID is auto-generated.",
+                          "type": "string",
+                          "nullable": false
+                        },
+                        "size": {
+                          "description": "The size of the page element with keys:",
+                          "type": "object",
+                          "properties": {
+                            "width": {
+                              "description": "Element width with keys:",
+                              "type": "object",
+                              "properties": {
+                                "magnitude": {
+                                  "description": "The numeric width value.",
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "nullable": false
+                                },
+                                "unit": {
+                                  "description": "The unit of measurement (\"EMU\" or \"PT\").",
+                                  "type": "string",
+                                  "nullable": false
+                                }
+                              },
+                              "required": [
+                                "magnitude",
+                                "unit"
+                              ],
+                              "nullable": true,
+                              "default": null
+                            },
+                            "height": {
+                              "description": "Element height with keys:",
+                              "type": "object",
+                              "properties": {
+                                "magnitude": {
+                                  "description": "The numeric height value.",
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "nullable": false
+                                },
+                                "unit": {
+                                  "description": "The unit of measurement (\"EMU\" or \"PT\").",
+                                  "type": "string",
+                                  "nullable": false
+                                }
+                              },
+                              "required": [
+                                "magnitude",
+                                "unit"
+                              ],
+                              "nullable": true,
+                              "default": null
+                            }
+                          },
+                          "required": [],
+                          "nullable": true,
+                          "default": null
+                        },
+                        "transform": {
+                          "description": "The transform of the page element with keys:",
+                          "type": "object",
+                          "properties": {
+                            "scaleX": {
+                              "description": "The X coordinate scaling element (default: 1.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 1.0
+                            },
+                            "scaleY": {
+                              "description": "The Y coordinate scaling element (default: 1.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 1.0
+                            },
+                            "shearX": {
+                              "description": "The X coordinate shearing element (default: 0.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 0.0
+                            },
+                            "shearY": {
+                              "description": "The Y coordinate shearing element (default: 0.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 0.0
+                            },
+                            "translateX": {
+                              "description": "The X coordinate translation element (default: 0.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 0.0
+                            },
+                            "translateY": {
+                              "description": "The Y coordinate translation element (default: 0.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": 0.0
+                            },
+                            "unit": {
+                              "description": "The units for translate (default: \"PT\").",
+                              "type": "string",
+                              "nullable": true,
+                              "default": "PT"
+                            }
+                          },
+                          "required": [],
+                          "nullable": true,
+                          "default": null
+                        },
+                        "title": {
+                          "description": "The title of the page element for accessibility.",
+                          "type": "string",
+                          "nullable": true,
+                          "default": null
+                        },
+                        "description": {
+                          "description": "The description of the page element for accessibility.",
+                          "type": "string",
+                          "nullable": true,
+                          "default": null
+                        }
+                      },
+                      "required": [],
+                      "nullable": false
+                    },
+                    "nullable": true
+                  },
+                  "pageProperties": {
+                    "description": "Properties common to all page elements. Contains pageBackgroundFill, colorScheme, and backgroundColor (deprecated).",
+                    "type": "object",
+                    "properties": {
+                      "pageBackgroundFill": {
+                        "description": "The background fill of the page. Can contain solidFill, stretchedPictureFill, or propertyState.",
+                        "type": "object",
+                        "properties": {
+                          "solidFill": {
+                            "description": "Solid color fill with color and alpha properties.",
+                            "type": "object",
+                            "properties": {
+                              "color": {
+                                "description": "The color specification.",
+                                "type": "object",
+                                "properties": {
+                                  "rgbColor": {
+                                    "description": "RGB color values. Can be either a JSON stringified object (e.g., '{\"red\": 0.5, \"green\": 0.6, \"blue\": 0.7}') or an object with keys:",
+                                    "type": "object",
+                                    "properties": {
+                                      "red": {
+                                        "description": "The red component (0.0-1.0).",
+                                        "type": "number",
+                                        "minimum": 0.0,
+                                        "maximum": 1.0,
+                                        "nullable": false
+                                      },
+                                      "green": {
+                                        "description": "The green component (0.0-1.0).",
+                                        "type": "number",
+                                        "minimum": 0.0,
+                                        "maximum": 1.0,
+                                        "nullable": false
+                                      },
+                                      "blue": {
+                                        "description": "The blue component (0.0-1.0).",
+                                        "type": "number",
+                                        "minimum": 0.0,
+                                        "maximum": 1.0,
+                                        "nullable": false
+                                      }
+                                    },
+                                    "required": [
+                                      "red",
+                                      "green",
+                                      "blue"
+                                    ],
+                                    "nullable": true,
+                                    "default": null
+                                  },
+                                  "themeColor": {
+                                    "description": "Theme color reference.",
+                                    "type": "string",
+                                    "nullable": true,
+                                    "default": null
+                                  }
+                                },
+                                "required": [],
+                                "nullable": false
+                              },
+                              "alpha": {
+                                "description": "Alpha transparency (0.0-1.0).",
+                                "type": "number",
+                                "nullable": true,
+                                "default": null
+                              }
+                            },
+                            "required": [
+                              "color"
+                            ],
+                            "nullable": true,
+                            "default": null
+                          },
+                          "propertyState": {
+                            "description": "Property state (RENDERED, NOT_RENDERED, INHERIT).",
+                            "type": "string",
+                            "nullable": true,
+                            "default": null
+                          }
+                        },
+                        "required": [],
+                        "nullable": true,
+                        "default": null
+                      },
+                      "backgroundColor": {
+                        "description": "The background color of the page (deprecated, use pageBackgroundFill instead). Contains opaqueColor with rgbColor or themeColor.",
+                        "type": "object",
+                        "properties": {
+                          "opaqueColor": {
+                            "description": "An opaque color value.",
+                            "type": "object",
+                            "properties": {
+                              "rgbColor": {
+                                "description": "RGB color values. Can be either a JSON stringified object (e.g., '{\"red\": 0.5, \"green\": 0.6, \"blue\": 0.7}') or an object with keys:",
+                                "type": "object",
+                                "properties": {
+                                  "red": {
+                                    "description": "The red component (0.0-1.0).",
+                                    "type": "number",
+                                    "minimum": 0.0,
+                                    "maximum": 1.0,
+                                    "nullable": false
+                                  },
+                                  "green": {
+                                    "description": "The green component (0.0-1.0).",
+                                    "type": "number",
+                                    "minimum": 0.0,
+                                    "maximum": 1.0,
+                                    "nullable": false
+                                  },
+                                  "blue": {
+                                    "description": "The blue component (0.0-1.0).",
+                                    "type": "number",
+                                    "minimum": 0.0,
+                                    "maximum": 1.0,
+                                    "nullable": false
+                                  }
+                                },
+                                "required": [
+                                  "red",
+                                  "green",
+                                  "blue"
+                                ],
+                                "nullable": true,
+                                "default": null
+                              },
+                              "themeColor": {
+                                "description": "Theme color type.",
+                                "type": "string",
+                                "nullable": true,
+                                "default": null
+                              }
+                            },
+                            "required": [],
+                            "nullable": true,
+                            "default": null
+                          }
+                        },
+                        "required": [],
+                        "nullable": true,
+                        "default": null
+                      }
+                    },
+                    "required": [],
+                    "nullable": true,
+                    "default": null
+                  },
+                  "slideProperties": {
+                    "description": "Properties specific to slides. REQUIRED when pageType is \"SLIDE\". When pageType is \"SLIDE\", this field MUST be provided and cannot be omitted. Optional when pageType is not specified.",
+                    "type": "object",
+                    "properties": {
+                      "masterObjectId": {
+                        "description": "The object ID of the master slide.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      },
+                      "layoutObjectId": {
+                        "description": "The object ID of the layout slide.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      },
+                      "isSkipped": {
+                        "description": "Whether the slide is skipped in presentation mode.",
+                        "type": "boolean",
+                        "nullable": true,
+                        "default": null
+                      }
+                    },
+                    "required": [],
+                    "nullable": true,
+                    "default": null
+                  },
+                  "layoutProperties": {
+                    "description": "Properties specific to layouts. REQUIRED when pageType is \"LAYOUT\", optional otherwise. When layouts are provided in a create request, each layout must reference a master: either set masterObjectId here, or provide a top-level masters array. Contains keys:",
+                    "type": "object",
+                    "properties": {
+                      "masterObjectId": {
+                        "description": "The object ID of the master that this layout is based on. Required on each layout when layouts are provided and no top-level masters array is supplied; otherwise this is filled from the first master.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      },
+                      "name": {
+                        "description": "The internal name identifier of the layout.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      },
+                      "displayName": {
+                        "description": "The human-readable name of the layout.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      }
+                    },
+                    "required": [],
+                    "nullable": true,
+                    "default": null
+                  },
+                  "notesProperties": {
+                    "description": "Properties specific to notes. Optional in general, but REQUIRED when pageType is \"NOTES_MASTER\". When notesProperties is provided, speakerNotesObjectId is REQUIRED. Contains keys:",
+                    "type": "object",
+                    "properties": {
+                      "speakerNotesObjectId": {
+                        "description": "The object ID of the speaker notes page. Optional - auto-generated if not provided.",
+                        "type": "string",
+                        "nullable": false
+                      }
+                    },
+                    "required": [
+                      "speakerNotesObjectId"
+                    ],
+                    "nullable": true,
+                    "default": null
+                  },
+                  "masterProperties": {
+                    "description": "Properties specific to masters. REQUIRED when pageType is \"MASTER\", optional otherwise. Contains keys:",
+                    "type": "object",
+                    "properties": {
+                      "displayName": {
+                        "description": "The human-readable name of the master.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      }
+                    },
+                    "required": [],
+                    "nullable": true,
+                    "default": null
+                  }
+                },
+                "required": [],
+                "nullable": false
+              },
+              "nullable": true,
+              "default": null
+            },
+            "locale": {
+              "description": "The locale of the presentation as an IETF BCP 47 language tag (e.g., \"en-US\", \"fr-FR\").",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "revisionId": {
+              "description": "Ignored in create requests (output-only field). This field is present in the API specification but is not used during creation.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "notesMaster": {
+              "description": "The notes master in the presentation. Contains properties for formatting notes pages.",
+              "type": "object",
+              "properties": {
+                "objectId": {
+                  "description": "The unique identifier of the notes master. If not provided, a unique ID is auto-generated.",
+                  "type": "string",
+                  "nullable": false
+                },
+                "pageType": {
+                  "description": "The type of page (typically \"NOTES_MASTER\" but not enforced as a constant by the FCD schema).",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "revisionId": {
+                  "description": "The revision ID of the page.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "pageElements": {
+                  "description": "The page elements rendered on the notes master, each containing:",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "objectId": {
+                        "description": "The unique identifier of the page element. If not provided, a unique ID is auto-generated.",
+                        "type": "string",
+                        "nullable": false
+                      },
+                      "size": {
+                        "description": "The size of the page element with keys:",
+                        "type": "object",
+                        "properties": {
+                          "width": {
+                            "description": "Element width with keys:",
+                            "type": "object",
+                            "properties": {
+                              "magnitude": {
+                                "description": "The numeric width value.",
+                                "type": "number",
+                                "minimum": 0,
+                                "nullable": false
+                              },
+                              "unit": {
+                                "description": "The unit of measurement (\"EMU\" or \"PT\").",
+                                "type": "string",
+                                "nullable": false
+                              }
+                            },
+                            "required": [
+                              "magnitude",
+                              "unit"
+                            ],
+                            "nullable": true,
+                            "default": null
+                          },
+                          "height": {
+                            "description": "Element height with keys:",
+                            "type": "object",
+                            "properties": {
+                              "magnitude": {
+                                "description": "The numeric height value.",
+                                "type": "number",
+                                "minimum": 0,
+                                "nullable": false
+                              },
+                              "unit": {
+                                "description": "The unit of measurement (\"EMU\" or \"PT\").",
+                                "type": "string",
+                                "nullable": false
+                              }
+                            },
+                            "required": [
+                              "magnitude",
+                              "unit"
+                            ],
+                            "nullable": true,
+                            "default": null
+                          }
+                        },
+                        "required": [],
+                        "nullable": true,
+                        "default": null
+                      },
+                      "transform": {
+                        "description": "The transform of the page element with keys:",
+                        "type": "object",
+                        "properties": {
+                          "scaleX": {
+                            "description": "The X coordinate scaling element (default: 1.0).",
+                            "type": "number",
+                            "nullable": true,
+                            "default": 1.0
+                          },
+                          "scaleY": {
+                            "description": "The Y coordinate scaling element (default: 1.0).",
+                            "type": "number",
+                            "nullable": true,
+                            "default": 1.0
+                          },
+                          "shearX": {
+                            "description": "The X coordinate shearing element (default: 0.0).",
+                            "type": "number",
+                            "nullable": true,
+                            "default": 0.0
+                          },
+                          "shearY": {
+                            "description": "The Y coordinate shearing element (default: 0.0).",
+                            "type": "number",
+                            "nullable": true,
+                            "default": 0.0
+                          },
+                          "translateX": {
+                            "description": "The X coordinate translation element (default: 0.0).",
+                            "type": "number",
+                            "nullable": true,
+                            "default": 0.0
+                          },
+                          "translateY": {
+                            "description": "The Y coordinate translation element (default: 0.0).",
+                            "type": "number",
+                            "nullable": true,
+                            "default": 0.0
+                          },
+                          "unit": {
+                            "description": "The units for translate (default: \"PT\").",
+                            "type": "string",
+                            "nullable": true,
+                            "default": "PT"
+                          }
+                        },
+                        "required": [],
+                        "nullable": true,
+                        "default": null
+                      },
+                      "title": {
+                        "description": "The title of the page element for accessibility.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      },
+                      "description": {
+                        "description": "The description of the page element for accessibility.",
+                        "type": "string",
+                        "nullable": true,
+                        "default": null
+                      }
+                    },
+                    "required": [],
+                    "nullable": false
+                  },
+                  "nullable": true
+                },
+                "pageProperties": {
+                  "description": "Properties common to all page elements. Contains pageBackgroundFill, colorScheme, and backgroundColor (deprecated).",
+                  "type": "object",
+                  "properties": {
+                    "pageBackgroundFill": {
+                      "description": "The background fill of the page. Can contain solidFill, stretchedPictureFill, or propertyState.",
+                      "type": "object",
+                      "properties": {
+                        "solidFill": {
+                          "description": "Solid color fill with color and alpha properties.",
+                          "type": "object",
+                          "properties": {
+                            "color": {
+                              "description": "The color specification.",
+                              "type": "object",
+                              "properties": {
+                                "rgbColor": {
+                                  "description": "RGB color values. Can be either a JSON stringified object (e.g., '{\"red\": 0.5, \"green\": 0.6, \"blue\": 0.7}') or an object with keys:",
+                                  "type": "object",
+                                  "properties": {
+                                    "red": {
+                                      "description": "The red component (0.0-1.0).",
+                                      "type": "number",
+                                      "minimum": 0.0,
+                                      "maximum": 1.0,
+                                      "nullable": false
+                                    },
+                                    "green": {
+                                      "description": "The green component (0.0-1.0).",
+                                      "type": "number",
+                                      "minimum": 0.0,
+                                      "maximum": 1.0,
+                                      "nullable": false
+                                    },
+                                    "blue": {
+                                      "description": "The blue component (0.0-1.0).",
+                                      "type": "number",
+                                      "minimum": 0.0,
+                                      "maximum": 1.0,
+                                      "nullable": false
+                                    }
+                                  },
+                                  "required": [
+                                    "red",
+                                    "green",
+                                    "blue"
+                                  ],
+                                  "nullable": true,
+                                  "default": null
+                                },
+                                "themeColor": {
+                                  "description": "Theme color reference.",
+                                  "type": "string",
+                                  "nullable": true,
+                                  "default": null
+                                }
+                              },
+                              "required": [],
+                              "nullable": false
+                            },
+                            "alpha": {
+                              "description": "Alpha transparency (0.0-1.0).",
+                              "type": "number",
+                              "nullable": true,
+                              "default": null
+                            }
+                          },
+                          "required": [
+                            "color"
+                          ],
+                          "nullable": true,
+                          "default": null
+                        },
+                        "propertyState": {
+                          "description": "Property state (RENDERED, NOT_RENDERED, INHERIT).",
+                          "type": "string",
+                          "nullable": true,
+                          "default": null
+                        }
+                      },
+                      "required": [],
+                      "nullable": true,
+                      "default": null
+                    },
+                    "backgroundColor": {
+                      "description": "The background color of the page (deprecated, use pageBackgroundFill instead). Contains opaqueColor with rgbColor or themeColor.",
+                      "type": "object",
+                      "properties": {
+                        "opaqueColor": {
+                          "description": "An opaque color value.",
+                          "type": "object",
+                          "properties": {
+                            "rgbColor": {
+                              "description": "RGB color values. Can be either a JSON stringified object (e.g., '{\"red\": 0.5, \"green\": 0.6, \"blue\": 0.7}') or an object with keys:",
+                              "type": "object",
+                              "properties": {
+                                "red": {
+                                  "description": "The red component (0.0-1.0).",
+                                  "type": "number",
+                                  "minimum": 0.0,
+                                  "maximum": 1.0,
+                                  "nullable": false
+                                },
+                                "green": {
+                                  "description": "The green component (0.0-1.0).",
+                                  "type": "number",
+                                  "minimum": 0.0,
+                                  "maximum": 1.0,
+                                  "nullable": false
+                                },
+                                "blue": {
+                                  "description": "The blue component (0.0-1.0).",
+                                  "type": "number",
+                                  "minimum": 0.0,
+                                  "maximum": 1.0,
+                                  "nullable": false
+                                }
+                              },
+                              "required": [
+                                "red",
+                                "green",
+                                "blue"
+                              ],
+                              "nullable": true,
+                              "default": null
+                            },
+                            "themeColor": {
+                              "description": "Theme color type.",
+                              "type": "string",
+                              "nullable": true,
+                              "default": null
+                            }
+                          },
+                          "required": [],
+                          "nullable": true,
+                          "default": null
+                        }
+                      },
+                      "required": [],
+                      "nullable": true,
+                      "default": null
+                    }
+                  },
+                  "required": [],
+                  "nullable": true,
+                  "default": null
+                },
+                "slideProperties": {
+                  "description": "Properties specific to slides. REQUIRED when pageType is \"SLIDE\". When pageType is \"SLIDE\", this field MUST be provided and cannot be omitted. Optional when pageType is not specified.",
+                  "type": "object",
+                  "properties": {
+                    "masterObjectId": {
+                      "description": "The object ID of the master slide.",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    },
+                    "layoutObjectId": {
+                      "description": "The object ID of the layout slide.",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    },
+                    "isSkipped": {
+                      "description": "Whether the slide is skipped in presentation mode.",
+                      "type": "boolean",
+                      "nullable": true,
+                      "default": null
+                    }
+                  },
+                  "required": [],
+                  "nullable": true,
+                  "default": null
+                },
+                "layoutProperties": {
+                  "description": "Properties specific to layouts. REQUIRED when pageType is \"LAYOUT\", optional otherwise. When layouts are provided in a create request, each layout must reference a master: either set masterObjectId here, or provide a top-level masters array. Contains keys:",
+                  "type": "object",
+                  "properties": {
+                    "masterObjectId": {
+                      "description": "The object ID of the master that this layout is based on. Required on each layout when layouts are provided and no top-level masters array is supplied; otherwise this is filled from the first master.",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    },
+                    "name": {
+                      "description": "The internal name identifier of the layout.",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    },
+                    "displayName": {
+                      "description": "The human-readable name of the layout.",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    }
+                  },
+                  "required": [],
+                  "nullable": true,
+                  "default": null
+                },
+                "notesProperties": {
+                  "description": "Properties specific to notes. Optional in general, but REQUIRED when pageType is \"NOTES_MASTER\". When notesProperties is provided, speakerNotesObjectId is REQUIRED. Contains keys:",
+                  "type": "object",
+                  "properties": {
+                    "speakerNotesObjectId": {
+                      "description": "The object ID of the speaker notes page. Optional - auto-generated if not provided.",
+                      "type": "string",
+                      "nullable": false
+                    }
+                  },
+                  "required": [
+                    "speakerNotesObjectId"
+                  ],
+                  "nullable": true,
+                  "default": null
+                },
+                "masterProperties": {
+                  "description": "Properties specific to masters. REQUIRED when pageType is \"MASTER\", optional otherwise. Contains keys:",
+                  "type": "object",
+                  "properties": {
+                    "displayName": {
+                      "description": "The human-readable name of the master.",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    }
+                  },
+                  "required": [],
+                  "nullable": true,
+                  "default": null
+                }
+              },
+              "required": [],
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": false
+        }
+      },
+      "required": [
+        "request"
+      ]
+    }
+  },
+  {
+    "name": "get_page",
+    "description": "Gets the latest version of the specified page in a presentation.\n\nThis function retrieves a specific page (slide, layout, master, etc.) from a\nGridwellSlides presentation by its object ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "presentationId": {
+          "description": "The ID of the presentation containing the page.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "pageObjectId": {
+          "description": "The object ID of the specific page to retrieve.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "presentationId",
+        "pageObjectId"
+      ]
+    }
+  },
+  {
+    "name": "get_presentation",
+    "description": "Gets the latest version of the specified GridwellSlides presentation.\n\nThis function retrieves the complete information about a GridwellSlides presentation,\nreturning the full Presentation object as defined by the GridwellSlides API,\nincluding page object IDs for all slides, masters, layouts, and notes pages.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "presentationId": {
+          "description": "The ID of the presentation to retrieve. Must be a non-empty\nstring following the pattern ^[^/]+$ (cannot contain forward slashes).",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "presentationId"
+      ]
+    }
+  },
+  {
+    "name": "summarize_presentation",
+    "description": "Extract text content from all slides in a presentation for summarization purposes.\n\nThis function processes a presentation, identified by `presentationId`, to extract\nall text content from its slides. The primary purpose of this extraction is to\ngather text for summarization. If the `include_notes` parameter is set to true,\nspeaker notes associated with the slides are also included in the extracted content.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "presentationId": {
+          "description": "The ID of the presentation to summarize. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "include_notes": {
+          "description": "Whether to include speaker notes in the summary. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        }
+      },
+      "required": [
+        "presentationId"
+      ]
+    }
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "id": "streamify",
+  "name": "Streamify",
+  "icon": "./icons/streamify.svg",
+  "iconBackground": "linear-gradient(135deg, #DB2777 0%, #44403C 100%)",
+  "description": "Music streaming with playlists and library",
+  "backendService": "streamify",
+  "defaultWindow": {
+    "width": 1100,
+    "height": 700
+  }
+}

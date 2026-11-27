@@ -1,0 +1,586 @@
+[
+  {
+    "name": "ask_for_message_body",
+    "description": "Display recipient and ask user for message body.\n\nThis method displays the recipient in a card shown to the user, with the intent\nto ask the user to provide the message body. It is used when there is a single\nrecipient with a single endpoint.\n\nReturns a response with the validated recipient data in action_card_content_passthrough.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "recipient": {
+          "description": "The recipient to send the\nmessage to. The recipient is auxiliary information that is displayed\nin the card shown to the user. Should contain:",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "contact_id": {
+              "description": "Unique identifier for the contact",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "contact_name": {
+              "description": "The name of the contact (required)",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1
+            },
+            "contact_endpoints": {
+              "description": "List with exactly one endpoint for the contact.",
+              "type": "array",
+              "nullable": false,
+              "minItems": 1,
+              "maxItems": 1,
+              "items": {
+                "description": "Contact endpoint",
+                "type": "object",
+                "properties": {
+                  "endpoint_type": {
+                    "description": "Must be \"PHONE_NUMBER\"",
+                    "type": "string",
+                    "nullable": false,
+                    "enum": [
+                      "PHONE_NUMBER"
+                    ]
+                  },
+                  "endpoint_value": {
+                    "description": "A 5-6 digit SMS short code or 7-15 digit phone number, with optional '+' prefix.",
+                    "type": "string",
+                    "nullable": false,
+                    "minLength": 1
+                  },
+                  "endpoint_label": {
+                    "description": "Label for the endpoint (e.g., 'mobile', 'work')",
+                    "type": "string",
+                    "nullable": true,
+                    "default": null
+                  }
+                },
+                "required": [
+                  "endpoint_type",
+                  "endpoint_value"
+                ]
+              }
+            },
+            "contact_photo_url": {
+              "description": "URL to the contact's profile photo. Must be a valid HTTP/HTTPS URL when provided (e.g., 'https://example.com/photo.jpg').",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [
+            "contact_name",
+            "contact_endpoints"
+          ]
+        }
+      },
+      "required": [
+        "recipient"
+      ]
+    }
+  },
+  {
+    "name": "calculate_message_length",
+    "description": "Calculate SMS segment information for a message body.\n\nAnalyzes the message text to determine the number of SMS segments required,\nthe encoding type (GSM 7-bit or UCS-2 16-bit), and remaining character capacity.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "message_body": {
+          "description": "The message text to analyze for SMS segment calculation.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "message_body"
+      ]
+    }
+  },
+  {
+    "name": "delete_chat_message",
+    "description": "Delete a message by its unique ID.\n\nRemoves the message from the database and its associated history entries.\nLocked messages cannot be deleted.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "message_id": {
+          "description": "Unique message ID to delete (e.g., 'msg_1').",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "message_id"
+      ]
+    }
+  },
+  {
+    "name": "get_message_contact",
+    "description": "Get a specific contact by resource name or phone number.\n\nLooks up the contact in the recipients database and returns messaging-compatible\ncontact data. Searches by resource name (e.g., 'people/c1234') or phone number.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "description": "Resource name (people/...) or phone number (7-15 digits, optional '+' prefix).",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "identifier"
+      ]
+    }
+  },
+  {
+    "name": "get_messages",
+    "description": "Retrieve messages from the message history with optional filtering.\n\nReturns a list of messages matching the provided filters. If no filters are\nprovided, returns all messages. Supports filtering by recipient, date range,\ndelivery status, message type, read status, and conversation thread.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "recipient_id": {
+          "description": "Filter by contact ID.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "recipient_name": {
+          "description": "Filter by recipient name (case-insensitive partial match).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "start_date": {
+          "description": "Filter messages on or after this date (ISO 8601 format).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "end_date": {
+          "description": "Filter messages on or before this date (ISO 8601 format).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "status": {
+          "description": "Filter by delivery status.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "enum": [
+            "sent",
+            "failed",
+            "pending",
+            "delivered"
+          ]
+        },
+        "message_type": {
+          "description": "Filter by message type/direction.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "enum": [
+            "inbox",
+            "sent",
+            "draft"
+          ]
+        },
+        "read": {
+          "description": "Filter by read status ('true' or 'false').",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "enum": [
+            "true",
+            "false"
+          ]
+        },
+        "thread_id": {
+          "description": "Filter by conversation thread ID.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "mark_message_as_read",
+    "description": "Mark a message as read.\n\nUpdates the message's read status to true and records a 'read' action\nin the message history.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "message_id": {
+          "description": "Unique ID of the message to mark as read.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "message_id"
+      ]
+    }
+  },
+  {
+    "name": "prepare_chat_message",
+    "description": "Prepare to send a message to one or more candidate recipients via SMS/MMS.\n\nThis method prepares message cards that show information and can be interacted\nwith to send messages. It validates the message body and recipient list but\ndoes not actually send any messages.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "message_body": {
+          "description": "The text message content to send to the recipients.\nMust be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "recipients": {
+          "description": "List of recipient\nobjects. Each recipient should contain:",
+          "type": "array",
+          "nullable": false,
+          "minItems": 1,
+          "items": {
+            "description": "Recipient object containing contact information",
+            "type": "object",
+            "properties": {
+              "contact_id": {
+                "description": "Unique identifier for the contact",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              },
+              "contact_name": {
+                "description": "The name of the contact",
+                "type": "string",
+                "nullable": false,
+                "minLength": 1
+              },
+              "contact_endpoints": {
+                "description": "List of endpoints for the contact",
+                "type": "array",
+                "nullable": false,
+                "minItems": 1,
+                "items": {
+                  "description": "Contact endpoint",
+                  "type": "object",
+                  "properties": {
+                    "endpoint_type": {
+                      "description": "Type of communication endpoint. Must be \"PHONE_NUMBER\"",
+                      "type": "string",
+                      "nullable": false,
+                      "enum": [
+                        "PHONE_NUMBER"
+                      ]
+                    },
+                    "endpoint_value": {
+                      "description": "A 5-6 digit SMS short code or 7-15 digit phone number, with optional '+' prefix.",
+                      "type": "string",
+                      "nullable": false,
+                      "minLength": 1
+                    },
+                    "endpoint_label": {
+                      "description": "Human-readable label for the endpoint",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "endpoint_type",
+                    "endpoint_value"
+                  ]
+                }
+              },
+              "contact_photo_url": {
+                "description": "URL to the contact's profile photo. Must be a valid HTTP/HTTPS URL when provided (e.g., 'https://example.com/photo.jpg').",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              }
+            },
+            "required": [
+              "contact_name",
+              "contact_endpoints"
+            ]
+          }
+        }
+      },
+      "required": [
+        "message_body",
+        "recipients"
+      ]
+    }
+  },
+  {
+    "name": "search_message_contacts",
+    "description": "Search for message contacts by name or phone number.\n\nSearches the recipients database for contacts matching the query string.\nReturns contacts with messaging-compatible endpoints.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "Search term: name or phone number.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  {
+    "name": "send_chat_message",
+    "description": "Send a message to a recipient with a single phone number.\n\nThis method sends a message to a recipient via SMS/MMS.\nIt makes sure the recipient has exactly one phone number before sending.\nThe message can include text and/or media attachments.\nAt least one of message_body or media_attachments must be provided.\n\nLegacy parameters (recipient_name, recipient_phone_number, recipient_photo_url)\nare accepted for backward compatibility and undergo basic validation.\nHowever, these parameters are not used in message processing — all message routing\nand delivery are performed solely based on the 'recipient' object.\nThese legacy parameters are retained in the FCD for API compatibility purposes.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "recipient": {
+          "description": "The recipient object containing\ncontact information. Must have exactly one endpoint for sending messages.\nExpected structure:",
+          "type": "object",
+          "properties": {
+            "contact_id": {
+              "description": "Unique identifier for the contact",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "contact_name": {
+              "description": "The name of the contact (required)",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1
+            },
+            "contact_endpoints": {
+              "description": "List with exactly one endpoint containing:",
+              "type": "array",
+              "nullable": false,
+              "minItems": 1,
+              "maxItems": 1,
+              "items": {
+                "description": "A single SMS/MMS communication endpoint. Accepts a 5-6 digit SMS short code or a 7-15 digit phone number; either may use an optional '+' prefix.",
+                "type": "object",
+                "properties": {
+                  "endpoint_type": {
+                    "description": "Must be \"PHONE_NUMBER\"",
+                    "type": "string",
+                    "nullable": false,
+                    "enum": [
+                      "PHONE_NUMBER"
+                    ]
+                  },
+                  "endpoint_value": {
+                    "description": "A 5-6 digit SMS short code or 7-15 digit phone number, with optional '+' prefix (e.g., '32522', '+22000', or '+14155552671').",
+                    "type": "string",
+                    "nullable": false,
+                    "minLength": 1
+                  },
+                  "endpoint_label": {
+                    "description": "Label for the endpoint",
+                    "type": "string",
+                    "nullable": true,
+                    "default": null
+                  }
+                },
+                "required": [
+                  "endpoint_type",
+                  "endpoint_value"
+                ]
+              }
+            },
+            "contact_photo_url": {
+              "description": "URL to the contact's profile photo. Must be a valid HTTP/HTTPS URL when provided (e.g., 'https://example.com/photo.jpg').",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [
+            "contact_name",
+            "contact_endpoints"
+          ],
+          "nullable": false
+        },
+        "message_body": {
+          "description": "The text message content to send to the recipient.\nThis field is optional if media_attachments are provided. At least one of\nmessage_body or media_attachments must be non-empty. Should use correct\ngrammar, capitalization, and punctuation. If the message body contains a\nlist of items, format it as a bulleted list with asterisks.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "media_attachments": {
+          "description": "Metadata associated with media payload. Currently only supports images.\nEach attachment should contain:",
+          "type": "array",
+          "nullable": true,
+          "default": null,
+          "items": {
+            "description": "Media attachment metadata object",
+            "type": "object",
+            "properties": {
+              "media_id": {
+                "description": "Unique identifier of the media",
+                "type": "string",
+                "nullable": false,
+                "minLength": 1
+              },
+              "media_type": {
+                "description": "Type of media, must be \"IMAGE\"",
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "IMAGE"
+                ]
+              },
+              "source": {
+                "description": "Source of media",
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "IMAGE_RETRIEVAL",
+                  "IMAGE_GENERATION",
+                  "IMAGE_UPLOAD",
+                  "GRIDWELL_PHOTO"
+                ]
+              }
+            },
+            "required": [
+              "media_id",
+              "media_type",
+              "source"
+            ]
+          }
+        },
+        "recipient_name": {
+          "description": "The recipient's name (legacy parameter).\nThis field is validated for backward compatibility but not used in message processing.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "recipient_phone_number": {
+          "description": "The recipient's phone number (legacy parameter).\nMust be 7-15 digits with an optional '+' prefix (e.g., '+14155552671' or '14155552671').\nThis field is validated for backward compatibility but not used in message routing.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "recipient_photo_url": {
+          "description": "URL to the recipient's profile photo (legacy parameter). \nMust be a valid HTTP/HTTPS URL when provided (e.g., 'https://example.com/photo.jpg').\nThis field is validated for backward compatibility but not used in message processing.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "recipient"
+      ]
+    }
+  },
+  {
+    "name": "show_message_recipient_choices",
+    "description": "Display potential recipients in a card for user selection.\n\nThis method displays a list of one or more recipients that the user can choose\nto send a message to. It is used when there are multiple recipients or when\na single recipient has multiple endpoints, requiring user clarification.\n\nReturns a response with the validated recipient choices and message body in\naction_card_content_passthrough.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "recipients": {
+          "description": "List of possible\nrecipients to send the message to. Each recipient should contain:",
+          "type": "array",
+          "nullable": false,
+          "minItems": 1,
+          "items": {
+            "description": "Recipient object containing contact information",
+            "type": "object",
+            "properties": {
+              "contact_id": {
+                "description": "Unique identifier for the contact",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              },
+              "contact_name": {
+                "description": "The name of the contact",
+                "type": "string",
+                "nullable": false,
+                "minLength": 1
+              },
+              "contact_endpoints": {
+                "description": "List of endpoints for the contact",
+                "type": "array",
+                "nullable": false,
+                "minItems": 1,
+                "items": {
+                  "description": "Contact endpoint",
+                  "type": "object",
+                  "properties": {
+                    "endpoint_type": {
+                      "description": "Type of communication endpoint. Must be \"PHONE_NUMBER\"",
+                      "type": "string",
+                      "nullable": false,
+                      "enum": [
+                        "PHONE_NUMBER"
+                      ]
+                    },
+                    "endpoint_value": {
+                      "description": "A 5-6 digit SMS short code or 7-15 digit phone number, with optional '+' prefix.",
+                      "type": "string",
+                      "nullable": false,
+                      "minLength": 1
+                    },
+                    "endpoint_label": {
+                      "description": "Human-readable label for the endpoint",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "endpoint_type",
+                    "endpoint_value"
+                  ]
+                }
+              },
+              "contact_photo_url": {
+                "description": "URL to the contact's profile photo. Must be a valid HTTP/HTTPS URL when provided (e.g., 'https://example.com/photo.jpg').",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              }
+            },
+            "required": [
+              "contact_name",
+              "contact_endpoints"
+            ]
+          }
+        },
+        "message_body": {
+          "description": "The text message content to send to the\nrecipient. This may be left empty if the user has not specified\nthis already.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "recipients"
+      ]
+    }
+  },
+  {
+    "name": "show_message_recipient_not_found_or_specified",
+    "description": "Inform the user that the message recipient is not found or not specified.\n\nThis method is used to inform the user that the message recipient is not found\nor not specified. It is invoked when there are no contacts returned from contact\nsearch or when the user has not specified a contact name in the query.\n\nThe contact_name and message_body parameters are retained in the FCD for compliance with the OpenAPI spec.\nThese parameters are not used in any processing logic.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "contact_name": {
+          "description": "The recipient name that was searched for.\nMay be None if no name was provided in the search.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "message_body": {
+          "description": "The text message content to send to the\nrecipient. This may be left empty if the user has not specified\nthis already.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  }
+]

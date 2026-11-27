@@ -1,0 +1,3972 @@
+{
+  "schemaVersion": 1,
+  "metric": "Success rate (%): mean of three runs, with the sample standard deviation across runs",
+  "runs": 3,
+  "taskCounts": {
+    "ST": 100,
+    "IF": 97,
+    "MT": 100,
+    "MTIF": 99
+  },
+  "settings": [
+    {
+      "id": "Average",
+      "name": "Average",
+      "description": "Equal-weight mean of the four task settings"
+    },
+    {
+      "id": "ST",
+      "name": "ST",
+      "description": "Single-turn"
+    },
+    {
+      "id": "IF",
+      "name": "IF",
+      "description": "Instruction following"
+    },
+    {
+      "id": "MT",
+      "name": "MT",
+      "description": "Multi-turn"
+    },
+    {
+      "id": "MTIF",
+      "name": "MTIF",
+      "description": "Multi-turn + instruction following"
+    }
+  ],
+  "harnesses": [
+    {
+      "id": "bare",
+      "name": "Bare",
+      "abbr": "B",
+      "kind": "bare"
+    },
+    {
+      "id": "hermes",
+      "name": "Hermes",
+      "abbr": "H",
+      "kind": "end-user"
+    },
+    {
+      "id": "opencode",
+      "name": "OpenCode",
+      "abbr": "OC",
+      "kind": "end-user"
+    },
+    {
+      "id": "openhands",
+      "name": "OpenHands",
+      "abbr": "OH",
+      "kind": "end-user"
+    },
+    {
+      "id": "openclaw",
+      "name": "OpenClaw",
+      "abbr": "OCl",
+      "kind": "end-user"
+    }
+  ],
+  "models": [
+    {
+      "id": "gpt_6_astra",
+      "name": "GPT 6 Astra",
+      "developer": "OpenAI",
+      "access": "closed",
+      "reference": false,
+      "providerId": "gpt-6-astra"
+    },
+    {
+      "id": "claude_fable_5",
+      "name": "Claude Fable 5",
+      "developer": "Anthropic",
+      "access": "closed",
+      "reference": false,
+      "providerId": "claude-fable-5"
+    },
+    {
+      "id": "gemini_3_8_flash_thinking",
+      "name": "Gemini 3.8 Flash",
+      "developer": "Google",
+      "access": "closed",
+      "reference": false,
+      "providerId": "gemini-3.8-flash"
+    },
+    {
+      "id": "gpt_5_6_sol",
+      "name": "GPT 5.6 Sol",
+      "developer": "OpenAI",
+      "access": "closed",
+      "reference": false,
+      "providerId": "gpt-5.6-sol"
+    },
+    {
+      "id": "gpt_5_4",
+      "name": "GPT 5.4",
+      "developer": "OpenAI",
+      "access": "closed",
+      "reference": true,
+      "providerId": "gpt-5.4"
+    },
+    {
+      "id": "gemini_3_5_flash_thinking",
+      "name": "Gemini 3.5 Flash",
+      "developer": "Google",
+      "access": "closed",
+      "reference": false,
+      "providerId": "gemini-3.5-flash"
+    },
+    {
+      "id": "kimi_k3",
+      "name": "Kimi K3",
+      "developer": "Moonshot AI",
+      "access": "open",
+      "reference": false,
+      "providerId": "moonshotai/kimi-k3"
+    },
+    {
+      "id": "claude_sonnet_5",
+      "name": "Claude Sonnet 5",
+      "developer": "Anthropic",
+      "access": "closed",
+      "reference": false,
+      "providerId": "claude-sonnet-5"
+    },
+    {
+      "id": "gemini_3_1_pro_thinking",
+      "name": "Gemini 3.1 Pro",
+      "developer": "Google",
+      "access": "closed",
+      "reference": true,
+      "providerId": "gemini-3.1-pro-preview"
+    },
+    {
+      "id": "claude_opus_4_6",
+      "name": "Claude Opus 4.6",
+      "developer": "Anthropic",
+      "access": "closed",
+      "reference": true,
+      "providerId": "claude-opus-4-6"
+    },
+    {
+      "id": "glm_5_2",
+      "name": "GLM 5.2",
+      "developer": "Z.ai",
+      "access": "open",
+      "reference": false,
+      "providerId": "z-ai/glm-5.2"
+    },
+    {
+      "id": "deepseek_v4_flash",
+      "name": "DeepSeek V4 Flash",
+      "developer": "DeepSeek",
+      "access": "open",
+      "reference": false,
+      "providerId": "deepseek/deepseek-v4-flash"
+    }
+  ],
+  "results": {
+    "Average": {
+      "gpt_6_astra": {
+        "bare": {
+          "mean": 69.983885,
+          "sd": 2.317364,
+          "rank": 1,
+          "meanText": "70.0",
+          "sdText": "2.3",
+          "ci95": [
+            65.984256,
+            73.94853
+          ]
+        },
+        "hermes": {
+          "mean": 68.630879,
+          "sd": 0.631398,
+          "rank": 1,
+          "meanText": "68.6",
+          "sdText": "0.6",
+          "ci95": [
+            64.4045,
+            72.7459
+          ]
+        },
+        "opencode": {
+          "mean": 68.140295,
+          "sd": 0.772204,
+          "rank": 1,
+          "meanText": "68.1",
+          "sdText": "0.8",
+          "ci95": [
+            63.916796,
+            72.305842
+          ]
+        },
+        "openhands": {
+          "mean": 69.988094,
+          "sd": 0.255739,
+          "rank": 1,
+          "meanText": "70.0",
+          "sdText": "0.3",
+          "ci95": [
+            65.912572,
+            73.939755
+          ]
+        },
+        "openclaw": {
+          "mean": 66.152201,
+          "sd": 0.862385,
+          "rank": 1,
+          "meanText": "66.2",
+          "sdText": "0.9",
+          "ci95": [
+            62.114477,
+            70.276632
+          ]
+        }
+      },
+      "claude_fable_5": {
+        "bare": {
+          "mean": 67.052128,
+          "sd": 2.911464,
+          "rank": 3,
+          "meanText": "67.1",
+          "sdText": "2.9",
+          "ci95": [
+            63.036539,
+            70.897535
+          ]
+        },
+        "hermes": {
+          "mean": 62.349795,
+          "sd": 0.638948,
+          "rank": 3,
+          "meanText": "62.3",
+          "sdText": "0.6",
+          "ci95": [
+            58.209031,
+            66.36041
+          ]
+        },
+        "opencode": {
+          "mean": 66.031718,
+          "sd": 1.548419,
+          "rank": 2,
+          "meanText": "66.0",
+          "sdText": "1.5",
+          "ci95": [
+            61.980008,
+            70.002222
+          ]
+        },
+        "openhands": {
+          "mean": 67.438023,
+          "sd": 1.33629,
+          "rank": 2,
+          "meanText": "67.4",
+          "sdText": "1.3",
+          "ci95": [
+            63.513556,
+            71.377167
+          ]
+        },
+        "openclaw": {
+          "mean": 61.945035,
+          "sd": 0.643472,
+          "rank": 2,
+          "meanText": "61.9",
+          "sdText": "0.6",
+          "ci95": [
+            57.877201,
+            65.881453
+          ]
+        }
+      },
+      "gemini_3_8_flash_thinking": {
+        "bare": {
+          "mean": 67.297112,
+          "sd": 1.650948,
+          "rank": 2,
+          "meanText": "67.3",
+          "sdText": "1.7",
+          "ci95": [
+            63.542959,
+            70.893428
+          ]
+        },
+        "hermes": {
+          "mean": 65.023179,
+          "sd": 1.098416,
+          "rank": 2,
+          "meanText": "65.0",
+          "sdText": "1.1",
+          "ci95": [
+            61.304442,
+            68.646945
+          ]
+        },
+        "opencode": {
+          "mean": 65.869346,
+          "sd": 0.652579,
+          "rank": 3,
+          "meanText": "65.9",
+          "sdText": "0.7",
+          "ci95": [
+            62.225597,
+            69.398072
+          ]
+        },
+        "openhands": {
+          "mean": 66.611666,
+          "sd": 2.101236,
+          "rank": 3,
+          "meanText": "66.6",
+          "sdText": "2.1",
+          "ci95": [
+            62.913297,
+            70.284836
+          ]
+        },
+        "openclaw": {
+          "mean": 61.860313,
+          "sd": 1.954221,
+          "rank": 3,
+          "meanText": "61.9",
+          "sdText": "2.0",
+          "ci95": [
+            58.008242,
+            65.685804
+          ]
+        }
+      },
+      "gpt_5_6_sol": {
+        "bare": {
+          "mean": 57.838852,
+          "sd": 1.90713,
+          "rank": 4,
+          "meanText": "57.8",
+          "sdText": "1.9",
+          "ci95": [
+            53.72541,
+            61.97154
+          ]
+        },
+        "hermes": {
+          "mean": 59.632407,
+          "sd": 0.635905,
+          "rank": 4,
+          "meanText": "59.6",
+          "sdText": "0.6",
+          "ci95": [
+            55.682388,
+            63.602952
+          ]
+        },
+        "opencode": {
+          "mean": 57.349422,
+          "sd": 1.021589,
+          "rank": 4,
+          "meanText": "57.3",
+          "sdText": "1.0",
+          "ci95": [
+            53.220046,
+            61.48734
+          ]
+        },
+        "openhands": {
+          "mean": 62.058541,
+          "sd": 0.584796,
+          "rank": 4,
+          "meanText": "62.1",
+          "sdText": "0.6",
+          "ci95": [
+            58.012397,
+            66.013299
+          ]
+        },
+        "openclaw": {
+          "mean": 57.3348,
+          "sd": 1.448979,
+          "rank": 4,
+          "meanText": "57.3",
+          "sdText": "1.4",
+          "ci95": [
+            53.310226,
+            61.312396
+          ]
+        }
+      },
+      "gpt_5_4": {
+        "bare": {
+          "mean": 55.704606,
+          "sd": 0.953027,
+          "rank": 5,
+          "meanText": "55.7",
+          "sdText": "1.0",
+          "ci95": [
+            51.874647,
+            59.481992
+          ]
+        },
+        "hermes": {
+          "mean": 55.921978,
+          "sd": 1.391913,
+          "rank": 5,
+          "meanText": "55.9",
+          "sdText": "1.4",
+          "ci95": [
+            52.110275,
+            59.826465
+          ]
+        },
+        "opencode": {
+          "mean": 53.054922,
+          "sd": 0.387806,
+          "rank": 5,
+          "meanText": "53.1",
+          "sdText": "0.4",
+          "ci95": [
+            49.242416,
+            56.886235
+          ]
+        },
+        "openhands": {
+          "mean": 55.058081,
+          "sd": 1.154244,
+          "rank": 5,
+          "meanText": "55.1",
+          "sdText": "1.2",
+          "ci95": [
+            51.261854,
+            58.927427
+          ]
+        },
+        "openclaw": {
+          "mean": 49.719133,
+          "sd": 2.039385,
+          "rank": 7,
+          "meanText": "49.7",
+          "sdText": "2.0",
+          "ci95": [
+            45.911604,
+            53.607975
+          ]
+        }
+      },
+      "gemini_3_5_flash_thinking": {
+        "bare": {
+          "mean": 53.39341,
+          "sd": 1.539293,
+          "rank": 6,
+          "meanText": "53.4",
+          "sdText": "1.5",
+          "ci95": [
+            49.620151,
+            57.017968
+          ]
+        },
+        "hermes": {
+          "mean": 51.213961,
+          "sd": 1.386696,
+          "rank": 6,
+          "meanText": "51.2",
+          "sdText": "1.4",
+          "ci95": [
+            47.67476,
+            54.762672
+          ]
+        },
+        "opencode": {
+          "mean": 50.276042,
+          "sd": 1.266191,
+          "rank": 7,
+          "meanText": "50.3",
+          "sdText": "1.3",
+          "ci95": [
+            46.621624,
+            53.98519
+          ]
+        },
+        "openhands": {
+          "mean": 50.959856,
+          "sd": 0.926156,
+          "rank": 6,
+          "meanText": "51.0",
+          "sdText": "0.9",
+          "ci95": [
+            47.386689,
+            54.578432
+          ]
+        },
+        "openclaw": {
+          "mean": 51.004322,
+          "sd": 1.394942,
+          "rank": 6,
+          "meanText": "51.0",
+          "sdText": "1.4",
+          "ci95": [
+            47.21399,
+            54.754412
+          ]
+        }
+      },
+      "kimi_k3": {
+        "bare": {
+          "mean": 50.123807,
+          "sd": 0.87589,
+          "rank": 7,
+          "meanText": "50.1",
+          "sdText": "0.9",
+          "ci95": [
+            46.408412,
+            53.89867
+          ]
+        },
+        "hermes": {
+          "mean": 45.514596,
+          "sd": 1.572252,
+          "rank": 8,
+          "meanText": "45.5",
+          "sdText": "1.6",
+          "ci95": [
+            41.857633,
+            49.235329
+          ]
+        },
+        "opencode": {
+          "mean": 47.67006,
+          "sd": 3.88398,
+          "rank": 8,
+          "meanText": "47.7",
+          "sdText": "3.9",
+          "ci95": [
+            43.900699,
+            51.536696
+          ]
+        },
+        "openhands": {
+          "mean": 50.48628,
+          "sd": 1.63253,
+          "rank": 7,
+          "meanText": "50.5",
+          "sdText": "1.6",
+          "ci95": [
+            46.632574,
+            54.383926
+          ]
+        },
+        "openclaw": {
+          "mean": 52.369129,
+          "sd": 2.312965,
+          "rank": 5,
+          "meanText": "52.4",
+          "sdText": "2.3",
+          "ci95": [
+            48.698423,
+            56.135101
+          ]
+        }
+      },
+      "claude_sonnet_5": {
+        "bare": {
+          "mean": 43.943325,
+          "sd": 1.924803,
+          "rank": 8,
+          "meanText": "43.9",
+          "sdText": "1.9",
+          "ci95": [
+            40.068169,
+            47.850358
+          ]
+        },
+        "hermes": {
+          "mean": 47.122618,
+          "sd": 1.939838,
+          "rank": 7,
+          "meanText": "47.1",
+          "sdText": "1.9",
+          "ci95": [
+            43.326616,
+            51.019182
+          ]
+        },
+        "opencode": {
+          "mean": 51.57095,
+          "sd": 2.488299,
+          "rank": 6,
+          "meanText": "51.6",
+          "sdText": "2.5",
+          "ci95": [
+            47.622523,
+            55.601682
+          ]
+        },
+        "openhands": {
+          "mean": 48.633292,
+          "sd": 0.99269,
+          "rank": 8,
+          "meanText": "48.6",
+          "sdText": "1.0",
+          "ci95": [
+            44.669749,
+            52.649427
+          ]
+        },
+        "openclaw": {
+          "mean": 46.773343,
+          "sd": 0.632251,
+          "rank": 8,
+          "meanText": "46.8",
+          "sdText": "0.6",
+          "ci95": [
+            42.82007,
+            50.743012
+          ]
+        }
+      },
+      "gemini_3_1_pro_thinking": {
+        "bare": {
+          "mean": 37.698575,
+          "sd": 0.889431,
+          "rank": 10,
+          "meanText": "37.7",
+          "sdText": "0.9",
+          "ci95": [
+            34.103692,
+            41.31428
+          ]
+        },
+        "hermes": {
+          "mean": 38.254434,
+          "sd": 0.874226,
+          "rank": 9,
+          "meanText": "38.3",
+          "sdText": "0.9",
+          "ci95": [
+            34.672568,
+            41.92603
+          ]
+        },
+        "opencode": {
+          "mean": 39.932408,
+          "sd": 0.380076,
+          "rank": 9,
+          "meanText": "39.9",
+          "sdText": "0.4",
+          "ci95": [
+            36.546031,
+            43.367078
+          ]
+        },
+        "openhands": {
+          "mean": 40.299898,
+          "sd": 1.909822,
+          "rank": 9,
+          "meanText": "40.3",
+          "sdText": "1.9",
+          "ci95": [
+            36.617215,
+            44.011183
+          ]
+        },
+        "openclaw": {
+          "mean": 41.603813,
+          "sd": 0.536993,
+          "rank": 9,
+          "meanText": "41.6",
+          "sdText": "0.5",
+          "ci95": [
+            38.043854,
+            45.231629
+          ]
+        }
+      },
+      "claude_opus_4_6": {
+        "bare": {
+          "mean": 38.276389,
+          "sd": 1.940024,
+          "rank": 9,
+          "meanText": "38.3",
+          "sdText": "1.9",
+          "ci95": [
+            34.239359,
+            42.450259
+          ]
+        },
+        "hermes": {
+          "mean": 37.91802,
+          "sd": 2.626915,
+          "rank": 10,
+          "meanText": "37.9",
+          "sdText": "2.6",
+          "ci95": [
+            33.869969,
+            42.052968
+          ]
+        },
+        "opencode": {
+          "mean": 38.666337,
+          "sd": 2.141615,
+          "rank": 10,
+          "meanText": "38.7",
+          "sdText": "2.1",
+          "ci95": [
+            34.634962,
+            42.805376
+          ]
+        },
+        "openhands": {
+          "mean": 38.008088,
+          "sd": 0.403476,
+          "rank": 10,
+          "meanText": "38.0",
+          "sdText": "0.4",
+          "ci95": [
+            34.132784,
+            41.894743
+          ]
+        },
+        "openclaw": {
+          "mean": 39.399294,
+          "sd": 0.445804,
+          "rank": 10,
+          "meanText": "39.4",
+          "sdText": "0.4",
+          "ci95": [
+            35.354748,
+            43.498697
+          ]
+        }
+      },
+      "glm_5_2": {
+        "bare": {
+          "mean": 31.799932,
+          "sd": 3.507513,
+          "rank": 11,
+          "meanText": "31.8",
+          "sdText": "3.5",
+          "ci95": [
+            28.355021,
+            35.371202
+          ]
+        },
+        "hermes": {
+          "mean": 33.431237,
+          "sd": 1.022692,
+          "rank": 11,
+          "meanText": "33.4",
+          "sdText": "1.0",
+          "ci95": [
+            29.726781,
+            37.150774
+          ]
+        },
+        "opencode": {
+          "mean": 36.241253,
+          "sd": 1.510318,
+          "rank": 11,
+          "meanText": "36.2",
+          "sdText": "1.5",
+          "ci95": [
+            32.693925,
+            39.885407
+          ]
+        },
+        "openhands": {
+          "mean": 35.509363,
+          "sd": 2.135529,
+          "rank": 11,
+          "meanText": "35.5",
+          "sdText": "2.1",
+          "ci95": [
+            31.904603,
+            39.310726
+          ]
+        },
+        "openclaw": {
+          "mean": 34.524142,
+          "sd": 0.319129,
+          "rank": 11,
+          "meanText": "34.5",
+          "sdText": "0.3",
+          "ci95": [
+            30.993242,
+            38.071781
+          ]
+        }
+      },
+      "deepseek_v4_flash": {
+        "bare": {
+          "mean": 18.164011,
+          "sd": 1.078604,
+          "rank": 12,
+          "meanText": "18.2",
+          "sdText": "1.1",
+          "ci95": [
+            15.425984,
+            21.053231
+          ]
+        },
+        "hermes": {
+          "mean": 21.361606,
+          "sd": 3.170294,
+          "rank": 12,
+          "meanText": "21.4",
+          "sdText": "3.2",
+          "ci95": [
+            18.322286,
+            24.50407
+          ]
+        },
+        "opencode": {
+          "mean": 17.695095,
+          "sd": 1.508963,
+          "rank": 12,
+          "meanText": "17.7",
+          "sdText": "1.5",
+          "ci95": [
+            14.948779,
+            20.55672
+          ]
+        },
+        "openhands": {
+          "mean": 20.111606,
+          "sd": 1.912624,
+          "rank": 12,
+          "meanText": "20.1",
+          "sdText": "1.9",
+          "ci95": [
+            17.180504,
+            23.131464
+          ]
+        },
+        "openclaw": {
+          "mean": 16.060372,
+          "sd": 1.926469,
+          "rank": 12,
+          "meanText": "16.1",
+          "sdText": "1.9",
+          "ci95": [
+            13.544889,
+            18.651401
+          ]
+        }
+      }
+    },
+    "ST": {
+      "gpt_6_astra": {
+        "bare": {
+          "mean": 80.333333,
+          "sd": 3.511885,
+          "rank": 1,
+          "meanText": "80.3",
+          "sdText": "3.5",
+          "ci95": [
+            73.0,
+            87.333333
+          ]
+        },
+        "hermes": {
+          "mean": 75.333333,
+          "sd": 1.527525,
+          "rank": 2,
+          "meanText": "75.3",
+          "sdText": "1.5",
+          "ci95": [
+            67.325,
+            83.0
+          ]
+        },
+        "opencode": {
+          "mean": 74.333333,
+          "sd": 0.57735,
+          "rank": 2,
+          "meanText": "74.3",
+          "sdText": "0.6",
+          "ci95": [
+            66.333333,
+            82.0
+          ]
+        },
+        "openhands": {
+          "mean": 76.666667,
+          "sd": 1.527525,
+          "rank": 2,
+          "meanText": "76.7",
+          "sdText": "1.5",
+          "ci95": [
+            68.666667,
+            84.333333
+          ]
+        },
+        "openclaw": {
+          "mean": 76.666667,
+          "sd": 4.041452,
+          "rank": 2,
+          "meanText": "76.7",
+          "sdText": "4.0",
+          "ci95": [
+            69.666667,
+            83.333333
+          ]
+        }
+      },
+      "claude_fable_5": {
+        "bare": {
+          "mean": 68.666667,
+          "sd": 1.154701,
+          "rank": 4,
+          "meanText": "68.7",
+          "sdText": "1.2",
+          "ci95": [
+            61.0,
+            76.0
+          ]
+        },
+        "hermes": {
+          "mean": 68.0,
+          "sd": 1.732051,
+          "rank": 3,
+          "meanText": "68.0",
+          "sdText": "1.7",
+          "ci95": [
+            59.666667,
+            75.666667
+          ]
+        },
+        "opencode": {
+          "mean": 70.333333,
+          "sd": 2.081666,
+          "rank": 3,
+          "meanText": "70.3",
+          "sdText": "2.1",
+          "ci95": [
+            62.333333,
+            78.0
+          ]
+        },
+        "openhands": {
+          "mean": 73.0,
+          "sd": 3.0,
+          "rank": 3,
+          "meanText": "73.0",
+          "sdText": "3.0",
+          "ci95": [
+            65.333333,
+            80.333333
+          ]
+        },
+        "openclaw": {
+          "mean": 73.666667,
+          "sd": 1.527525,
+          "rank": 3,
+          "meanText": "73.7",
+          "sdText": "1.5",
+          "ci95": [
+            66.333333,
+            80.333333
+          ]
+        }
+      },
+      "gemini_3_8_flash_thinking": {
+        "bare": {
+          "mean": 79.666667,
+          "sd": 4.163332,
+          "rank": 2,
+          "meanText": "79.7",
+          "sdText": "4.2",
+          "ci95": [
+            73.0,
+            86.0
+          ]
+        },
+        "hermes": {
+          "mean": 78.0,
+          "sd": 2.0,
+          "rank": 1,
+          "meanText": "78.0",
+          "sdText": "2.0",
+          "ci95": [
+            71.0,
+            84.341667
+          ]
+        },
+        "opencode": {
+          "mean": 78.0,
+          "sd": 2.0,
+          "rank": 1,
+          "meanText": "78.0",
+          "sdText": "2.0",
+          "ci95": [
+            71.0,
+            84.666667
+          ]
+        },
+        "openhands": {
+          "mean": 81.0,
+          "sd": 4.582576,
+          "rank": 1,
+          "meanText": "81.0",
+          "sdText": "4.6",
+          "ci95": [
+            74.333333,
+            87.666667
+          ]
+        },
+        "openclaw": {
+          "mean": 80.0,
+          "sd": 5.567764,
+          "rank": 1,
+          "meanText": "80.0",
+          "sdText": "5.6",
+          "ci95": [
+            73.333333,
+            86.0
+          ]
+        }
+      },
+      "gpt_5_6_sol": {
+        "bare": {
+          "mean": 62.0,
+          "sd": 2.645751,
+          "rank": 5,
+          "meanText": "62.0",
+          "sdText": "2.6",
+          "ci95": [
+            53.666667,
+            70.0
+          ]
+        },
+        "hermes": {
+          "mean": 62.666667,
+          "sd": 2.081666,
+          "rank": 5,
+          "meanText": "62.7",
+          "sdText": "2.1",
+          "ci95": [
+            54.333333,
+            70.666667
+          ]
+        },
+        "opencode": {
+          "mean": 61.333333,
+          "sd": 3.05505,
+          "rank": 5,
+          "meanText": "61.3",
+          "sdText": "3.1",
+          "ci95": [
+            53.0,
+            69.666667
+          ]
+        },
+        "openhands": {
+          "mean": 65.666667,
+          "sd": 0.57735,
+          "rank": 5,
+          "meanText": "65.7",
+          "sdText": "0.6",
+          "ci95": [
+            57.333333,
+            73.666667
+          ]
+        },
+        "openclaw": {
+          "mean": 63.0,
+          "sd": 4.358899,
+          "rank": 6,
+          "meanText": "63.0",
+          "sdText": "4.4",
+          "ci95": [
+            55.333333,
+            70.666667
+          ]
+        }
+      },
+      "gpt_5_4": {
+        "bare": {
+          "mean": 55.0,
+          "sd": 2.645751,
+          "rank": 7,
+          "meanText": "55.0",
+          "sdText": "2.6",
+          "ci95": [
+            47.333333,
+            62.666667
+          ]
+        },
+        "hermes": {
+          "mean": 55.333333,
+          "sd": 1.527525,
+          "rank": 6,
+          "meanText": "55.3",
+          "sdText": "1.5",
+          "ci95": [
+            47.666667,
+            63.0
+          ]
+        },
+        "opencode": {
+          "mean": 52.666667,
+          "sd": 2.886751,
+          "rank": 6,
+          "meanText": "52.7",
+          "sdText": "2.9",
+          "ci95": [
+            45.0,
+            60.333333
+          ]
+        },
+        "openhands": {
+          "mean": 57.0,
+          "sd": 1.0,
+          "rank": 6,
+          "meanText": "57.0",
+          "sdText": "1.0",
+          "ci95": [
+            49.333333,
+            64.666667
+          ]
+        },
+        "openclaw": {
+          "mean": 57.333333,
+          "sd": 2.309401,
+          "rank": 7,
+          "meanText": "57.3",
+          "sdText": "2.3",
+          "ci95": [
+            50.0,
+            64.666667
+          ]
+        }
+      },
+      "gemini_3_5_flash_thinking": {
+        "bare": {
+          "mean": 71.333333,
+          "sd": 8.621678,
+          "rank": 3,
+          "meanText": "71.3",
+          "sdText": "8.6",
+          "ci95": [
+            63.666667,
+            78.666667
+          ]
+        },
+        "hermes": {
+          "mean": 68.0,
+          "sd": 1.0,
+          "rank": 3,
+          "meanText": "68.0",
+          "sdText": "1.0",
+          "ci95": [
+            61.0,
+            75.0
+          ]
+        },
+        "opencode": {
+          "mean": 68.0,
+          "sd": 2.0,
+          "rank": 4,
+          "meanText": "68.0",
+          "sdText": "2.0",
+          "ci95": [
+            60.666667,
+            75.333333
+          ]
+        },
+        "openhands": {
+          "mean": 69.0,
+          "sd": 2.0,
+          "rank": 4,
+          "meanText": "69.0",
+          "sdText": "2.0",
+          "ci95": [
+            62.0,
+            75.666667
+          ]
+        },
+        "openclaw": {
+          "mean": 71.666667,
+          "sd": 4.163332,
+          "rank": 4,
+          "meanText": "71.7",
+          "sdText": "4.2",
+          "ci95": [
+            64.333333,
+            78.666667
+          ]
+        }
+      },
+      "kimi_k3": {
+        "bare": {
+          "mean": 55.666667,
+          "sd": 5.859465,
+          "rank": 6,
+          "meanText": "55.7",
+          "sdText": "5.9",
+          "ci95": [
+            48.0,
+            63.0
+          ]
+        },
+        "hermes": {
+          "mean": 46.666667,
+          "sd": 2.309401,
+          "rank": 7,
+          "meanText": "46.7",
+          "sdText": "2.3",
+          "ci95": [
+            38.991667,
+            54.666667
+          ]
+        },
+        "opencode": {
+          "mean": 49.666667,
+          "sd": 5.686241,
+          "rank": 8,
+          "meanText": "49.7",
+          "sdText": "5.7",
+          "ci95": [
+            42.333333,
+            57.0
+          ]
+        },
+        "openhands": {
+          "mean": 54.0,
+          "sd": 3.605551,
+          "rank": 8,
+          "meanText": "54.0",
+          "sdText": "3.6",
+          "ci95": [
+            46.333333,
+            61.666667
+          ]
+        },
+        "openclaw": {
+          "mean": 63.333333,
+          "sd": 4.163332,
+          "rank": 5,
+          "meanText": "63.3",
+          "sdText": "4.2",
+          "ci95": [
+            56.0,
+            70.666667
+          ]
+        }
+      },
+      "claude_sonnet_5": {
+        "bare": {
+          "mean": 41.333333,
+          "sd": 1.154701,
+          "rank": 9,
+          "meanText": "41.3",
+          "sdText": "1.2",
+          "ci95": [
+            33.333333,
+            49.666667
+          ]
+        },
+        "hermes": {
+          "mean": 43.666667,
+          "sd": 3.511885,
+          "rank": 9,
+          "meanText": "43.7",
+          "sdText": "3.5",
+          "ci95": [
+            36.333333,
+            51.0
+          ]
+        },
+        "opencode": {
+          "mean": 50.333333,
+          "sd": 1.527525,
+          "rank": 7,
+          "meanText": "50.3",
+          "sdText": "1.5",
+          "ci95": [
+            42.333333,
+            58.333333
+          ]
+        },
+        "openhands": {
+          "mean": 48.0,
+          "sd": 4.582576,
+          "rank": 9,
+          "meanText": "48.0",
+          "sdText": "4.6",
+          "ci95": [
+            40.0,
+            56.0
+          ]
+        },
+        "openclaw": {
+          "mean": 55.0,
+          "sd": 3.605551,
+          "rank": 8,
+          "meanText": "55.0",
+          "sdText": "3.6",
+          "ci95": [
+            47.0,
+            63.0
+          ]
+        }
+      },
+      "gemini_3_1_pro_thinking": {
+        "bare": {
+          "mean": 48.333333,
+          "sd": 3.511885,
+          "rank": 8,
+          "meanText": "48.3",
+          "sdText": "3.5",
+          "ci95": [
+            41.0,
+            55.666667
+          ]
+        },
+        "hermes": {
+          "mean": 44.333333,
+          "sd": 2.309401,
+          "rank": 8,
+          "meanText": "44.3",
+          "sdText": "2.3",
+          "ci95": [
+            36.666667,
+            52.333333
+          ]
+        },
+        "opencode": {
+          "mean": 49.666667,
+          "sd": 3.05505,
+          "rank": 8,
+          "meanText": "49.7",
+          "sdText": "3.1",
+          "ci95": [
+            42.333333,
+            57.0
+          ]
+        },
+        "openhands": {
+          "mean": 55.0,
+          "sd": 3.605551,
+          "rank": 7,
+          "meanText": "55.0",
+          "sdText": "3.6",
+          "ci95": [
+            47.0,
+            63.0
+          ]
+        },
+        "openclaw": {
+          "mean": 47.666667,
+          "sd": 4.932883,
+          "rank": 9,
+          "meanText": "47.7",
+          "sdText": "4.9",
+          "ci95": [
+            40.666667,
+            54.666667
+          ]
+        }
+      },
+      "claude_opus_4_6": {
+        "bare": {
+          "mean": 33.333333,
+          "sd": 2.081666,
+          "rank": 10,
+          "meanText": "33.3",
+          "sdText": "2.1",
+          "ci95": [
+            25.666667,
+            41.333333
+          ]
+        },
+        "hermes": {
+          "mean": 38.333333,
+          "sd": 4.041452,
+          "rank": 10,
+          "meanText": "38.3",
+          "sdText": "4.0",
+          "ci95": [
+            30.333333,
+            46.666667
+          ]
+        },
+        "opencode": {
+          "mean": 40.666667,
+          "sd": 2.886751,
+          "rank": 10,
+          "meanText": "40.7",
+          "sdText": "2.9",
+          "ci95": [
+            32.333333,
+            49.0
+          ]
+        },
+        "openhands": {
+          "mean": 42.0,
+          "sd": 1.732051,
+          "rank": 10,
+          "meanText": "42.0",
+          "sdText": "1.7",
+          "ci95": [
+            33.666667,
+            50.333333
+          ]
+        },
+        "openclaw": {
+          "mean": 46.666667,
+          "sd": 0.57735,
+          "rank": 10,
+          "meanText": "46.7",
+          "sdText": "0.6",
+          "ci95": [
+            38.666667,
+            55.0
+          ]
+        }
+      },
+      "glm_5_2": {
+        "bare": {
+          "mean": 32.0,
+          "sd": 2.645751,
+          "rank": 11,
+          "meanText": "32.0",
+          "sdText": "2.6",
+          "ci95": [
+            25.333333,
+            39.0
+          ]
+        },
+        "hermes": {
+          "mean": 34.0,
+          "sd": 3.0,
+          "rank": 11,
+          "meanText": "34.0",
+          "sdText": "3.0",
+          "ci95": [
+            27.0,
+            41.0
+          ]
+        },
+        "opencode": {
+          "mean": 36.0,
+          "sd": 1.732051,
+          "rank": 11,
+          "meanText": "36.0",
+          "sdText": "1.7",
+          "ci95": [
+            29.0,
+            43.0
+          ]
+        },
+        "openhands": {
+          "mean": 38.333333,
+          "sd": 2.516611,
+          "rank": 11,
+          "meanText": "38.3",
+          "sdText": "2.5",
+          "ci95": [
+            31.333333,
+            45.666667
+          ]
+        },
+        "openclaw": {
+          "mean": 37.0,
+          "sd": 1.732051,
+          "rank": 11,
+          "meanText": "37.0",
+          "sdText": "1.7",
+          "ci95": [
+            30.0,
+            44.0
+          ]
+        }
+      },
+      "deepseek_v4_flash": {
+        "bare": {
+          "mean": 18.333333,
+          "sd": 0.57735,
+          "rank": 12,
+          "meanText": "18.3",
+          "sdText": "0.6",
+          "ci95": [
+            12.666667,
+            24.333333
+          ]
+        },
+        "hermes": {
+          "mean": 22.666667,
+          "sd": 3.511885,
+          "rank": 12,
+          "meanText": "22.7",
+          "sdText": "3.5",
+          "ci95": [
+            17.0,
+            28.666667
+          ]
+        },
+        "opencode": {
+          "mean": 16.0,
+          "sd": 6.082763,
+          "rank": 12,
+          "meanText": "16.0",
+          "sdText": "6.1",
+          "ci95": [
+            11.0,
+            21.333333
+          ]
+        },
+        "openhands": {
+          "mean": 20.666667,
+          "sd": 3.05505,
+          "rank": 12,
+          "meanText": "20.7",
+          "sdText": "3.1",
+          "ci95": [
+            14.666667,
+            27.333333
+          ]
+        },
+        "openclaw": {
+          "mean": 14.0,
+          "sd": 5.291503,
+          "rank": 12,
+          "meanText": "14.0",
+          "sdText": "5.3",
+          "ci95": [
+            9.333333,
+            19.0
+          ]
+        }
+      }
+    },
+    "IF": {
+      "gpt_6_astra": {
+        "bare": {
+          "mean": 76.975945,
+          "sd": 3.313969,
+          "rank": 2,
+          "meanText": "77.0",
+          "sdText": "3.3",
+          "ci95": [
+            69.75945,
+            83.848797
+          ]
+        },
+        "hermes": {
+          "mean": 74.914089,
+          "sd": 1.190413,
+          "rank": 2,
+          "meanText": "74.9",
+          "sdText": "1.2",
+          "ci95": [
+            67.353952,
+            82.130584
+          ]
+        },
+        "opencode": {
+          "mean": 75.945017,
+          "sd": 1.190413,
+          "rank": 2,
+          "meanText": "75.9",
+          "sdText": "1.2",
+          "ci95": [
+            67.697595,
+            83.505155
+          ]
+        },
+        "openhands": {
+          "mean": 76.975945,
+          "sd": 3.149537,
+          "rank": 2,
+          "meanText": "77.0",
+          "sdText": "3.1",
+          "ci95": [
+            69.415808,
+            83.848797
+          ]
+        },
+        "openclaw": {
+          "mean": 65.635739,
+          "sd": 2.594445,
+          "rank": 3,
+          "meanText": "65.6",
+          "sdText": "2.6",
+          "ci95": [
+            57.388316,
+            73.883162
+          ]
+        }
+      },
+      "claude_fable_5": {
+        "bare": {
+          "mean": 71.821306,
+          "sd": 4.166445,
+          "rank": 3,
+          "meanText": "71.8",
+          "sdText": "4.2",
+          "ci95": [
+            64.261168,
+            79.381443
+          ]
+        },
+        "hermes": {
+          "mean": 69.75945,
+          "sd": 0.595206,
+          "rank": 4,
+          "meanText": "69.8",
+          "sdText": "0.6",
+          "ci95": [
+            61.512027,
+            77.66323
+          ]
+        },
+        "opencode": {
+          "mean": 70.446735,
+          "sd": 3.313969,
+          "rank": 4,
+          "meanText": "70.4",
+          "sdText": "3.3",
+          "ci95": [
+            62.199313,
+            78.350515
+          ]
+        },
+        "openhands": {
+          "mean": 68.728522,
+          "sd": 0.595206,
+          "rank": 4,
+          "meanText": "68.7",
+          "sdText": "0.6",
+          "ci95": [
+            60.4811,
+            76.975945
+          ]
+        },
+        "openclaw": {
+          "mean": 59.450172,
+          "sd": 3.6205,
+          "rank": 5,
+          "meanText": "59.5",
+          "sdText": "3.6",
+          "ci95": [
+            51.202749,
+            67.697595
+          ]
+        }
+      },
+      "gemini_3_8_flash_thinking": {
+        "bare": {
+          "mean": 83.161512,
+          "sd": 2.594445,
+          "rank": 1,
+          "meanText": "83.2",
+          "sdText": "2.6",
+          "ci95": [
+            76.975945,
+            89.003436
+          ]
+        },
+        "hermes": {
+          "mean": 80.756014,
+          "sd": 2.594445,
+          "rank": 1,
+          "meanText": "80.8",
+          "sdText": "2.6",
+          "ci95": [
+            73.883162,
+            87.285223
+          ]
+        },
+        "opencode": {
+          "mean": 82.130584,
+          "sd": 2.976032,
+          "rank": 1,
+          "meanText": "82.1",
+          "sdText": "3.0",
+          "ci95": [
+            75.257732,
+            88.659794
+          ]
+        },
+        "openhands": {
+          "mean": 81.443299,
+          "sd": 3.717063,
+          "rank": 1,
+          "meanText": "81.4",
+          "sdText": "3.7",
+          "ci95": [
+            75.257732,
+            87.628866
+          ]
+        },
+        "openclaw": {
+          "mean": 72.508591,
+          "sd": 2.380826,
+          "rank": 1,
+          "meanText": "72.5",
+          "sdText": "2.4",
+          "ci95": [
+            64.604811,
+            80.068729
+          ]
+        }
+      },
+      "gpt_5_6_sol": {
+        "bare": {
+          "mean": 69.75945,
+          "sd": 4.166445,
+          "rank": 4,
+          "meanText": "69.8",
+          "sdText": "4.2",
+          "ci95": [
+            61.85567,
+            77.66323
+          ]
+        },
+        "hermes": {
+          "mean": 73.883162,
+          "sd": 3.90303,
+          "rank": 3,
+          "meanText": "73.9",
+          "sdText": "3.9",
+          "ci95": [
+            66.323024,
+            81.099656
+          ]
+        },
+        "opencode": {
+          "mean": 72.852234,
+          "sd": 2.146047,
+          "rank": 3,
+          "meanText": "72.9",
+          "sdText": "2.1",
+          "ci95": [
+            65.292096,
+            80.068729
+          ]
+        },
+        "openhands": {
+          "mean": 75.257732,
+          "sd": 1.030928,
+          "rank": 3,
+          "meanText": "75.3",
+          "sdText": "1.0",
+          "ci95": [
+            67.697595,
+            82.474227
+          ]
+        },
+        "openclaw": {
+          "mean": 70.790378,
+          "sd": 3.149537,
+          "rank": 2,
+          "meanText": "70.8",
+          "sdText": "3.1",
+          "ci95": [
+            63.230241,
+            78.006873
+          ]
+        }
+      },
+      "gpt_5_4": {
+        "bare": {
+          "mean": 61.512027,
+          "sd": 0.595206,
+          "rank": 6,
+          "meanText": "61.5",
+          "sdText": "0.6",
+          "ci95": [
+            53.95189,
+            69.072165
+          ]
+        },
+        "hermes": {
+          "mean": 68.38488,
+          "sd": 1.190413,
+          "rank": 5,
+          "meanText": "68.4",
+          "sdText": "1.2",
+          "ci95": [
+            60.824742,
+            75.945017
+          ]
+        },
+        "opencode": {
+          "mean": 68.041237,
+          "sd": 2.727579,
+          "rank": 5,
+          "meanText": "68.0",
+          "sdText": "2.7",
+          "ci95": [
+            60.4811,
+            75.257732
+          ]
+        },
+        "openhands": {
+          "mean": 66.666667,
+          "sd": 4.292095,
+          "rank": 6,
+          "meanText": "66.7",
+          "sdText": "4.3",
+          "ci95": [
+            59.450172,
+            73.883162
+          ]
+        },
+        "openclaw": {
+          "mean": 57.388316,
+          "sd": 3.149537,
+          "rank": 6,
+          "meanText": "57.4",
+          "sdText": "3.1",
+          "ci95": [
+            49.484536,
+            65.292096
+          ]
+        }
+      },
+      "gemini_3_5_flash_thinking": {
+        "bare": {
+          "mean": 68.728522,
+          "sd": 2.146047,
+          "rank": 5,
+          "meanText": "68.7",
+          "sdText": "2.1",
+          "ci95": [
+            61.512027,
+            75.945017
+          ]
+        },
+        "hermes": {
+          "mean": 67.697595,
+          "sd": 0.595206,
+          "rank": 6,
+          "meanText": "67.7",
+          "sdText": "0.6",
+          "ci95": [
+            60.137457,
+            75.257732
+          ]
+        },
+        "opencode": {
+          "mean": 66.323024,
+          "sd": 4.166445,
+          "rank": 6,
+          "meanText": "66.3",
+          "sdText": "4.2",
+          "ci95": [
+            58.075601,
+            73.883162
+          ]
+        },
+        "openhands": {
+          "mean": 68.38488,
+          "sd": 7.457916,
+          "rank": 5,
+          "meanText": "68.4",
+          "sdText": "7.5",
+          "ci95": [
+            60.824742,
+            75.601375
+          ]
+        },
+        "openclaw": {
+          "mean": 61.85567,
+          "sd": 2.727579,
+          "rank": 4,
+          "meanText": "61.9",
+          "sdText": "2.7",
+          "ci95": [
+            53.608247,
+            70.103093
+          ]
+        }
+      },
+      "kimi_k3": {
+        "bare": {
+          "mean": 56.013746,
+          "sd": 1.574768,
+          "rank": 7,
+          "meanText": "56.0",
+          "sdText": "1.6",
+          "ci95": [
+            48.109966,
+            63.573883
+          ]
+        },
+        "hermes": {
+          "mean": 51.890034,
+          "sd": 5.952065,
+          "rank": 8,
+          "meanText": "51.9",
+          "sdText": "6.0",
+          "ci95": [
+            45.017182,
+            58.762887
+          ]
+        },
+        "opencode": {
+          "mean": 50.171821,
+          "sd": 5.290311,
+          "rank": 8,
+          "meanText": "50.2",
+          "sdText": "5.3",
+          "ci95": [
+            42.955326,
+            57.388316
+          ]
+        },
+        "openhands": {
+          "mean": 59.450172,
+          "sd": 2.146047,
+          "rank": 7,
+          "meanText": "59.5",
+          "sdText": "2.1",
+          "ci95": [
+            51.890034,
+            67.010309
+          ]
+        },
+        "openclaw": {
+          "mean": 52.920962,
+          "sd": 6.040686,
+          "rank": 8,
+          "meanText": "52.9",
+          "sdText": "6.0",
+          "ci95": [
+            45.704467,
+            60.137457
+          ]
+        }
+      },
+      "claude_sonnet_5": {
+        "bare": {
+          "mean": 42.611684,
+          "sd": 4.871975,
+          "rank": 10,
+          "meanText": "42.6",
+          "sdText": "4.9",
+          "ci95": [
+            35.051546,
+            50.515464
+          ]
+        },
+        "hermes": {
+          "mean": 42.611684,
+          "sd": 1.574768,
+          "rank": 9,
+          "meanText": "42.6",
+          "sdText": "1.6",
+          "ci95": [
+            34.707904,
+            50.859107
+          ]
+        },
+        "opencode": {
+          "mean": 46.04811,
+          "sd": 2.146047,
+          "rank": 9,
+          "meanText": "46.0",
+          "sdText": "2.1",
+          "ci95": [
+            38.14433,
+            54.295533
+          ]
+        },
+        "openhands": {
+          "mean": 46.391753,
+          "sd": 7.216495,
+          "rank": 9,
+          "meanText": "46.4",
+          "sdText": "7.2",
+          "ci95": [
+            38.487973,
+            53.95189
+          ]
+        },
+        "openclaw": {
+          "mean": 42.955326,
+          "sd": 3.313969,
+          "rank": 9,
+          "meanText": "43.0",
+          "sdText": "3.3",
+          "ci95": [
+            34.707904,
+            51.546392
+          ]
+        }
+      },
+      "gemini_3_1_pro_thinking": {
+        "bare": {
+          "mean": 49.484536,
+          "sd": 4.123711,
+          "rank": 8,
+          "meanText": "49.5",
+          "sdText": "4.1",
+          "ci95": [
+            41.924399,
+            57.044674
+          ]
+        },
+        "hermes": {
+          "mean": 57.044674,
+          "sd": 6.707636,
+          "rank": 7,
+          "meanText": "57.0",
+          "sdText": "6.7",
+          "ci95": [
+            49.140893,
+            64.948454
+          ]
+        },
+        "opencode": {
+          "mean": 59.450172,
+          "sd": 2.146047,
+          "rank": 7,
+          "meanText": "59.5",
+          "sdText": "2.1",
+          "ci95": [
+            52.233677,
+            66.666667
+          ]
+        },
+        "openhands": {
+          "mean": 51.546392,
+          "sd": 2.727579,
+          "rank": 8,
+          "meanText": "51.5",
+          "sdText": "2.7",
+          "ci95": [
+            43.642612,
+            59.450172
+          ]
+        },
+        "openclaw": {
+          "mean": 57.388316,
+          "sd": 4.292095,
+          "rank": 6,
+          "meanText": "57.4",
+          "sdText": "4.3",
+          "ci95": [
+            49.140893,
+            65.635739
+          ]
+        }
+      },
+      "claude_opus_4_6": {
+        "bare": {
+          "mean": 46.391753,
+          "sd": 2.061856,
+          "rank": 9,
+          "meanText": "46.4",
+          "sdText": "2.1",
+          "ci95": [
+            37.800687,
+            55.32646
+          ]
+        },
+        "hermes": {
+          "mean": 42.268041,
+          "sd": 2.727579,
+          "rank": 10,
+          "meanText": "42.3",
+          "sdText": "2.7",
+          "ci95": [
+            33.676976,
+            50.859107
+          ]
+        },
+        "opencode": {
+          "mean": 42.268041,
+          "sd": 2.061856,
+          "rank": 10,
+          "meanText": "42.3",
+          "sdText": "2.1",
+          "ci95": [
+            34.020619,
+            50.515464
+          ]
+        },
+        "openhands": {
+          "mean": 42.268041,
+          "sd": 3.717063,
+          "rank": 10,
+          "meanText": "42.3",
+          "sdText": "3.7",
+          "ci95": [
+            34.364261,
+            50.171821
+          ]
+        },
+        "openclaw": {
+          "mean": 40.893471,
+          "sd": 1.190413,
+          "rank": 10,
+          "meanText": "40.9",
+          "sdText": "1.2",
+          "ci95": [
+            31.958763,
+            49.828179
+          ]
+        }
+      },
+      "glm_5_2": {
+        "bare": {
+          "mean": 29.553265,
+          "sd": 3.6205,
+          "rank": 11,
+          "meanText": "29.6",
+          "sdText": "3.6",
+          "ci95": [
+            23.024055,
+            36.769759
+          ]
+        },
+        "hermes": {
+          "mean": 35.051546,
+          "sd": 4.49371,
+          "rank": 11,
+          "meanText": "35.1",
+          "sdText": "4.5",
+          "ci95": [
+            27.491409,
+            42.955326
+          ]
+        },
+        "opencode": {
+          "mean": 42.268041,
+          "sd": 2.727579,
+          "rank": 10,
+          "meanText": "42.3",
+          "sdText": "2.7",
+          "ci95": [
+            34.364261,
+            50.171821
+          ]
+        },
+        "openhands": {
+          "mean": 34.020619,
+          "sd": 3.092784,
+          "rank": 11,
+          "meanText": "34.0",
+          "sdText": "3.1",
+          "ci95": [
+            26.804124,
+            41.237113
+          ]
+        },
+        "openclaw": {
+          "mean": 37.113402,
+          "sd": 3.717063,
+          "rank": 11,
+          "meanText": "37.1",
+          "sdText": "3.7",
+          "ci95": [
+            30.24055,
+            44.329897
+          ]
+        }
+      },
+      "deepseek_v4_flash": {
+        "bare": {
+          "mean": 15.80756,
+          "sd": 2.594445,
+          "rank": 12,
+          "meanText": "15.8",
+          "sdText": "2.6",
+          "ci95": [
+            10.309278,
+            21.649485
+          ]
+        },
+        "hermes": {
+          "mean": 19.931271,
+          "sd": 3.90303,
+          "rank": 12,
+          "meanText": "19.9",
+          "sdText": "3.9",
+          "ci95": [
+            13.745704,
+            26.460481
+          ]
+        },
+        "opencode": {
+          "mean": 20.962199,
+          "sd": 2.146047,
+          "rank": 12,
+          "meanText": "21.0",
+          "sdText": "2.1",
+          "ci95": [
+            15.463918,
+            27.147766
+          ]
+        },
+        "openhands": {
+          "mean": 19.931271,
+          "sd": 1.574768,
+          "rank": 12,
+          "meanText": "19.9",
+          "sdText": "1.6",
+          "ci95": [
+            14.43299,
+            25.773196
+          ]
+        },
+        "openclaw": {
+          "mean": 15.120275,
+          "sd": 3.149537,
+          "rank": 12,
+          "meanText": "15.1",
+          "sdText": "3.1",
+          "ci95": [
+            9.965636,
+            20.618557
+          ]
+        }
+      }
+    },
+    "MT": {
+      "gpt_6_astra": {
+        "bare": {
+          "mean": 60.0,
+          "sd": 2.0,
+          "rank": 1,
+          "meanText": "60.0",
+          "sdText": "2.0",
+          "ci95": [
+            51.0,
+            68.666667
+          ]
+        },
+        "hermes": {
+          "mean": 63.333333,
+          "sd": 1.154701,
+          "rank": 1,
+          "meanText": "63.3",
+          "sdText": "1.2",
+          "ci95": [
+            54.333333,
+            71.666667
+          ]
+        },
+        "opencode": {
+          "mean": 60.666667,
+          "sd": 2.081666,
+          "rank": 1,
+          "meanText": "60.7",
+          "sdText": "2.1",
+          "ci95": [
+            51.333333,
+            69.666667
+          ]
+        },
+        "openhands": {
+          "mean": 62.0,
+          "sd": 1.0,
+          "rank": 1,
+          "meanText": "62.0",
+          "sdText": "1.0",
+          "ci95": [
+            53.333333,
+            70.333333
+          ]
+        },
+        "openclaw": {
+          "mean": 58.333333,
+          "sd": 1.527525,
+          "rank": 1,
+          "meanText": "58.3",
+          "sdText": "1.5",
+          "ci95": [
+            49.666667,
+            67.0
+          ]
+        }
+      },
+      "claude_fable_5": {
+        "bare": {
+          "mean": 55.666667,
+          "sd": 5.686241,
+          "rank": 2,
+          "meanText": "55.7",
+          "sdText": "5.7",
+          "ci95": [
+            47.333333,
+            64.0
+          ]
+        },
+        "hermes": {
+          "mean": 47.666667,
+          "sd": 1.527525,
+          "rank": 2,
+          "meanText": "47.7",
+          "sdText": "1.5",
+          "ci95": [
+            39.333333,
+            56.0
+          ]
+        },
+        "opencode": {
+          "mean": 55.333333,
+          "sd": 3.21455,
+          "rank": 2,
+          "meanText": "55.3",
+          "sdText": "3.2",
+          "ci95": [
+            47.0,
+            63.666667
+          ]
+        },
+        "openhands": {
+          "mean": 59.0,
+          "sd": 2.645751,
+          "rank": 2,
+          "meanText": "59.0",
+          "sdText": "2.6",
+          "ci95": [
+            50.666667,
+            67.0
+          ]
+        },
+        "openclaw": {
+          "mean": 48.333333,
+          "sd": 1.527525,
+          "rank": 2,
+          "meanText": "48.3",
+          "sdText": "1.5",
+          "ci95": [
+            39.991667,
+            56.666667
+          ]
+        }
+      },
+      "gemini_3_8_flash_thinking": {
+        "bare": {
+          "mean": 37.0,
+          "sd": 2.645751,
+          "rank": 7,
+          "meanText": "37.0",
+          "sdText": "2.6",
+          "ci95": [
+            28.666667,
+            45.333333
+          ]
+        },
+        "hermes": {
+          "mean": 34.333333,
+          "sd": 2.516611,
+          "rank": 6,
+          "meanText": "34.3",
+          "sdText": "2.5",
+          "ci95": [
+            26.333333,
+            42.333333
+          ]
+        },
+        "opencode": {
+          "mean": 35.333333,
+          "sd": 4.50925,
+          "rank": 7,
+          "meanText": "35.3",
+          "sdText": "4.5",
+          "ci95": [
+            27.666667,
+            43.666667
+          ]
+        },
+        "openhands": {
+          "mean": 37.0,
+          "sd": 2.645751,
+          "rank": 7,
+          "meanText": "37.0",
+          "sdText": "2.6",
+          "ci95": [
+            28.666667,
+            45.666667
+          ]
+        },
+        "openclaw": {
+          "mean": 35.0,
+          "sd": 1.0,
+          "rank": 7,
+          "meanText": "35.0",
+          "sdText": "1.0",
+          "ci95": [
+            27.0,
+            43.0
+          ]
+        }
+      },
+      "gpt_5_6_sol": {
+        "bare": {
+          "mean": 40.0,
+          "sd": 3.0,
+          "rank": 6,
+          "meanText": "40.0",
+          "sdText": "3.0",
+          "ci95": [
+            31.666667,
+            48.333333
+          ]
+        },
+        "hermes": {
+          "mean": 37.333333,
+          "sd": 4.50925,
+          "rank": 4,
+          "meanText": "37.3",
+          "sdText": "4.5",
+          "ci95": [
+            29.333333,
+            45.333333
+          ]
+        },
+        "opencode": {
+          "mean": 40.666667,
+          "sd": 0.57735,
+          "rank": 4,
+          "meanText": "40.7",
+          "sdText": "0.6",
+          "ci95": [
+            32.333333,
+            49.333333
+          ]
+        },
+        "openhands": {
+          "mean": 43.0,
+          "sd": 2.645751,
+          "rank": 4,
+          "meanText": "43.0",
+          "sdText": "2.6",
+          "ci95": [
+            35.0,
+            51.008333
+          ]
+        },
+        "openclaw": {
+          "mean": 40.666667,
+          "sd": 3.785939,
+          "rank": 4,
+          "meanText": "40.7",
+          "sdText": "3.8",
+          "ci95": [
+            32.333333,
+            49.0
+          ]
+        }
+      },
+      "gpt_5_4": {
+        "bare": {
+          "mean": 42.333333,
+          "sd": 1.527525,
+          "rank": 3,
+          "meanText": "42.3",
+          "sdText": "1.5",
+          "ci95": [
+            34.666667,
+            50.008333
+          ]
+        },
+        "hermes": {
+          "mean": 36.333333,
+          "sd": 4.163332,
+          "rank": 5,
+          "meanText": "36.3",
+          "sdText": "4.2",
+          "ci95": [
+            28.333333,
+            44.333333
+          ]
+        },
+        "opencode": {
+          "mean": 40.333333,
+          "sd": 3.05505,
+          "rank": 5,
+          "meanText": "40.3",
+          "sdText": "3.1",
+          "ci95": [
+            32.666667,
+            48.008333
+          ]
+        },
+        "openhands": {
+          "mean": 40.0,
+          "sd": 1.0,
+          "rank": 5,
+          "meanText": "40.0",
+          "sdText": "1.0",
+          "ci95": [
+            32.333333,
+            47.666667
+          ]
+        },
+        "openclaw": {
+          "mean": 35.333333,
+          "sd": 2.309401,
+          "rank": 6,
+          "meanText": "35.3",
+          "sdText": "2.3",
+          "ci95": [
+            28.333333,
+            42.666667
+          ]
+        }
+      },
+      "gemini_3_5_flash_thinking": {
+        "bare": {
+          "mean": 22.333333,
+          "sd": 2.081666,
+          "rank": 10,
+          "meanText": "22.3",
+          "sdText": "2.1",
+          "ci95": [
+            16.0,
+            29.0
+          ]
+        },
+        "hermes": {
+          "mean": 20.0,
+          "sd": 3.464102,
+          "rank": 12,
+          "meanText": "20.0",
+          "sdText": "3.5",
+          "ci95": [
+            14.0,
+            26.333333
+          ]
+        },
+        "opencode": {
+          "mean": 22.0,
+          "sd": 1.0,
+          "rank": 11,
+          "meanText": "22.0",
+          "sdText": "1.0",
+          "ci95": [
+            16.0,
+            28.666667
+          ]
+        },
+        "openhands": {
+          "mean": 21.0,
+          "sd": 3.0,
+          "rank": 12,
+          "meanText": "21.0",
+          "sdText": "3.0",
+          "ci95": [
+            15.0,
+            27.333333
+          ]
+        },
+        "openclaw": {
+          "mean": 21.0,
+          "sd": 1.732051,
+          "rank": 12,
+          "meanText": "21.0",
+          "sdText": "1.7",
+          "ci95": [
+            14.666667,
+            28.0
+          ]
+        }
+      },
+      "kimi_k3": {
+        "bare": {
+          "mean": 40.666667,
+          "sd": 4.041452,
+          "rank": 5,
+          "meanText": "40.7",
+          "sdText": "4.0",
+          "ci95": [
+            33.333333,
+            48.0
+          ]
+        },
+        "hermes": {
+          "mean": 33.333333,
+          "sd": 1.527525,
+          "rank": 7,
+          "meanText": "33.3",
+          "sdText": "1.5",
+          "ci95": [
+            26.333333,
+            40.333333
+          ]
+        },
+        "opencode": {
+          "mean": 40.0,
+          "sd": 7.211103,
+          "rank": 6,
+          "meanText": "40.0",
+          "sdText": "7.2",
+          "ci95": [
+            32.666667,
+            47.666667
+          ]
+        },
+        "openhands": {
+          "mean": 39.0,
+          "sd": 4.582576,
+          "rank": 6,
+          "meanText": "39.0",
+          "sdText": "4.6",
+          "ci95": [
+            31.666667,
+            46.666667
+          ]
+        },
+        "openclaw": {
+          "mean": 37.666667,
+          "sd": 3.21455,
+          "rank": 5,
+          "meanText": "37.7",
+          "sdText": "3.2",
+          "ci95": [
+            30.333333,
+            45.0
+          ]
+        }
+      },
+      "claude_sonnet_5": {
+        "bare": {
+          "mean": 42.333333,
+          "sd": 1.527525,
+          "rank": 3,
+          "meanText": "42.3",
+          "sdText": "1.5",
+          "ci95": [
+            35.0,
+            49.666667
+          ]
+        },
+        "hermes": {
+          "mean": 47.666667,
+          "sd": 3.05505,
+          "rank": 2,
+          "meanText": "47.7",
+          "sdText": "3.1",
+          "ci95": [
+            40.0,
+            55.333333
+          ]
+        },
+        "opencode": {
+          "mean": 53.0,
+          "sd": 4.358899,
+          "rank": 3,
+          "meanText": "53.0",
+          "sdText": "4.4",
+          "ci95": [
+            45.333333,
+            60.666667
+          ]
+        },
+        "openhands": {
+          "mean": 52.666667,
+          "sd": 2.516611,
+          "rank": 3,
+          "meanText": "52.7",
+          "sdText": "2.5",
+          "ci95": [
+            45.0,
+            60.333333
+          ]
+        },
+        "openclaw": {
+          "mean": 42.0,
+          "sd": 1.0,
+          "rank": 3,
+          "meanText": "42.0",
+          "sdText": "1.0",
+          "ci95": [
+            34.666667,
+            49.333333
+          ]
+        }
+      },
+      "gemini_3_1_pro_thinking": {
+        "bare": {
+          "mean": 22.0,
+          "sd": 2.0,
+          "rank": 11,
+          "meanText": "22.0",
+          "sdText": "2.0",
+          "ci95": [
+            15.991667,
+            28.333333
+          ]
+        },
+        "hermes": {
+          "mean": 21.0,
+          "sd": 0.0,
+          "rank": 11,
+          "meanText": "21.0",
+          "sdText": "0.0",
+          "ci95": [
+            15.666667,
+            26.666667
+          ]
+        },
+        "opencode": {
+          "mean": 22.666667,
+          "sd": 1.527525,
+          "rank": 10,
+          "meanText": "22.7",
+          "sdText": "1.5",
+          "ci95": [
+            16.666667,
+            29.333333
+          ]
+        },
+        "openhands": {
+          "mean": 22.666667,
+          "sd": 3.511885,
+          "rank": 10,
+          "meanText": "22.7",
+          "sdText": "3.5",
+          "ci95": [
+            16.666667,
+            29.0
+          ]
+        },
+        "openclaw": {
+          "mean": 25.333333,
+          "sd": 2.081666,
+          "rank": 10,
+          "meanText": "25.3",
+          "sdText": "2.1",
+          "ci95": [
+            19.0,
+            32.0
+          ]
+        }
+      },
+      "claude_opus_4_6": {
+        "bare": {
+          "mean": 35.333333,
+          "sd": 1.527525,
+          "rank": 8,
+          "meanText": "35.3",
+          "sdText": "1.5",
+          "ci95": [
+            27.333333,
+            43.333333
+          ]
+        },
+        "hermes": {
+          "mean": 30.666667,
+          "sd": 2.516611,
+          "rank": 8,
+          "meanText": "30.7",
+          "sdText": "2.5",
+          "ci95": [
+            23.0,
+            38.333333
+          ]
+        },
+        "opencode": {
+          "mean": 32.0,
+          "sd": 5.567764,
+          "rank": 8,
+          "meanText": "32.0",
+          "sdText": "5.6",
+          "ci95": [
+            24.333333,
+            40.0
+          ]
+        },
+        "openhands": {
+          "mean": 24.666667,
+          "sd": 2.081666,
+          "rank": 9,
+          "meanText": "24.7",
+          "sdText": "2.1",
+          "ci95": [
+            18.0,
+            31.666667
+          ]
+        },
+        "openclaw": {
+          "mean": 33.0,
+          "sd": 5.291503,
+          "rank": 8,
+          "meanText": "33.0",
+          "sdText": "5.3",
+          "ci95": [
+            25.333333,
+            41.0
+          ]
+        }
+      },
+      "glm_5_2": {
+        "bare": {
+          "mean": 34.333333,
+          "sd": 4.50925,
+          "rank": 9,
+          "meanText": "34.3",
+          "sdText": "4.5",
+          "ci95": [
+            27.666667,
+            41.333333
+          ]
+        },
+        "hermes": {
+          "mean": 30.666667,
+          "sd": 2.886751,
+          "rank": 8,
+          "meanText": "30.7",
+          "sdText": "2.9",
+          "ci95": [
+            23.333333,
+            38.0
+          ]
+        },
+        "opencode": {
+          "mean": 30.333333,
+          "sd": 5.131601,
+          "rank": 9,
+          "meanText": "30.3",
+          "sdText": "5.1",
+          "ci95": [
+            23.666667,
+            37.333333
+          ]
+        },
+        "openhands": {
+          "mean": 34.666667,
+          "sd": 5.859465,
+          "rank": 8,
+          "meanText": "34.7",
+          "sdText": "5.9",
+          "ci95": [
+            27.333333,
+            42.333333
+          ]
+        },
+        "openclaw": {
+          "mean": 32.333333,
+          "sd": 3.05505,
+          "rank": 9,
+          "meanText": "32.3",
+          "sdText": "3.1",
+          "ci95": [
+            25.666667,
+            39.333333
+          ]
+        }
+      },
+      "deepseek_v4_flash": {
+        "bare": {
+          "mean": 20.333333,
+          "sd": 7.023769,
+          "rank": 12,
+          "meanText": "20.3",
+          "sdText": "7.0",
+          "ci95": [
+            15.333333,
+            25.675
+          ]
+        },
+        "hermes": {
+          "mean": 24.666667,
+          "sd": 5.033223,
+          "rank": 10,
+          "meanText": "24.7",
+          "sdText": "5.0",
+          "ci95": [
+            18.333333,
+            31.333333
+          ]
+        },
+        "opencode": {
+          "mean": 18.666667,
+          "sd": 2.516611,
+          "rank": 12,
+          "meanText": "18.7",
+          "sdText": "2.5",
+          "ci95": [
+            13.333333,
+            24.333333
+          ]
+        },
+        "openhands": {
+          "mean": 21.666667,
+          "sd": 4.163332,
+          "rank": 11,
+          "meanText": "21.7",
+          "sdText": "4.2",
+          "ci95": [
+            16.0,
+            27.666667
+          ]
+        },
+        "openclaw": {
+          "mean": 23.0,
+          "sd": 4.0,
+          "rank": 11,
+          "meanText": "23.0",
+          "sdText": "4.0",
+          "ci95": [
+            17.333333,
+            29.0
+          ]
+        }
+      }
+    },
+    "MTIF": {
+      "gpt_6_astra": {
+        "bare": {
+          "mean": 62.626263,
+          "sd": 2.672476,
+          "rank": 4,
+          "meanText": "62.6",
+          "sdText": "2.7",
+          "ci95": [
+            54.200337,
+            71.043771
+          ]
+        },
+        "hermes": {
+          "mean": 60.942761,
+          "sd": 0.583182,
+          "rank": 5,
+          "meanText": "60.9",
+          "sdText": "0.6",
+          "ci95": [
+            52.188552,
+            69.360269
+          ]
+        },
+        "opencode": {
+          "mean": 61.616162,
+          "sd": 0.0,
+          "rank": 3,
+          "meanText": "61.6",
+          "sdText": "0.0",
+          "ci95": [
+            52.861953,
+            70.37037
+          ]
+        },
+        "openhands": {
+          "mean": 64.309764,
+          "sd": 2.542032,
+          "rank": 3,
+          "meanText": "64.3",
+          "sdText": "2.5",
+          "ci95": [
+            55.555556,
+            72.727273
+          ]
+        },
+        "openclaw": {
+          "mean": 63.973064,
+          "sd": 4.082275,
+          "rank": 2,
+          "meanText": "64.0",
+          "sdText": "4.1",
+          "ci95": [
+            55.555556,
+            72.390572
+          ]
+        }
+      },
+      "claude_fable_5": {
+        "bare": {
+          "mean": 72.053872,
+          "sd": 3.547358,
+          "rank": 1,
+          "meanText": "72.1",
+          "sdText": "3.5",
+          "ci95": [
+            64.309764,
+            79.79798
+          ]
+        },
+        "hermes": {
+          "mean": 63.973064,
+          "sd": 3.24702,
+          "rank": 3,
+          "meanText": "64.0",
+          "sdText": "3.2",
+          "ci95": [
+            55.892256,
+            72.053872
+          ]
+        },
+        "opencode": {
+          "mean": 68.013468,
+          "sd": 1.542955,
+          "rank": 1,
+          "meanText": "68.0",
+          "sdText": "1.5",
+          "ci95": [
+            59.93266,
+            75.757576
+          ]
+        },
+        "openhands": {
+          "mean": 69.023569,
+          "sd": 4.98271,
+          "rank": 1,
+          "meanText": "69.0",
+          "sdText": "5.0",
+          "ci95": [
+            61.279461,
+            76.430976
+          ]
+        },
+        "openclaw": {
+          "mean": 66.329966,
+          "sd": 1.166364,
+          "rank": 1,
+          "meanText": "66.3",
+          "sdText": "1.2",
+          "ci95": [
+            58.585859,
+            73.737374
+          ]
+        }
+      },
+      "gemini_3_8_flash_thinking": {
+        "bare": {
+          "mean": 69.360269,
+          "sd": 3.08591,
+          "rank": 2,
+          "meanText": "69.4",
+          "sdText": "3.1",
+          "ci95": [
+            60.942761,
+            77.104377
+          ]
+        },
+        "hermes": {
+          "mean": 67.003367,
+          "sd": 5.563203,
+          "rank": 1,
+          "meanText": "67.0",
+          "sdText": "5.6",
+          "ci95": [
+            58.585859,
+            74.747475
+          ]
+        },
+        "opencode": {
+          "mean": 68.013468,
+          "sd": 1.542955,
+          "rank": 1,
+          "meanText": "68.0",
+          "sdText": "1.5",
+          "ci95": [
+            60.606061,
+            75.420875
+          ]
+        },
+        "openhands": {
+          "mean": 67.003367,
+          "sd": 3.08591,
+          "rank": 2,
+          "meanText": "67.0",
+          "sdText": "3.1",
+          "ci95": [
+            58.922559,
+            74.747475
+          ]
+        },
+        "openclaw": {
+          "mean": 59.93266,
+          "sd": 1.542955,
+          "rank": 3,
+          "meanText": "59.9",
+          "sdText": "1.5",
+          "ci95": [
+            51.515152,
+            68.021886
+          ]
+        }
+      },
+      "gpt_5_6_sol": {
+        "bare": {
+          "mean": 59.59596,
+          "sd": 0.0,
+          "rank": 5,
+          "meanText": "59.6",
+          "sdText": "0.0",
+          "ci95": [
+            51.178451,
+            67.685185
+          ]
+        },
+        "hermes": {
+          "mean": 64.646465,
+          "sd": 2.672476,
+          "rank": 2,
+          "meanText": "64.6",
+          "sdText": "2.7",
+          "ci95": [
+            56.565657,
+            72.390572
+          ]
+        },
+        "opencode": {
+          "mean": 54.545455,
+          "sd": 0.0,
+          "rank": 5,
+          "meanText": "54.5",
+          "sdText": "0.0",
+          "ci95": [
+            45.791246,
+            63.636364
+          ]
+        },
+        "openhands": {
+          "mean": 64.309764,
+          "sd": 3.547358,
+          "rank": 3,
+          "meanText": "64.3",
+          "sdText": "3.5",
+          "ci95": [
+            56.565657,
+            71.717172
+          ]
+        },
+        "openclaw": {
+          "mean": 54.882155,
+          "sd": 1.542955,
+          "rank": 5,
+          "meanText": "54.9",
+          "sdText": "1.5",
+          "ci95": [
+            46.792929,
+            63.299663
+          ]
+        }
+      },
+      "gpt_5_4": {
+        "bare": {
+          "mean": 63.973064,
+          "sd": 5.183436,
+          "rank": 3,
+          "meanText": "64.0",
+          "sdText": "5.2",
+          "ci95": [
+            56.565657,
+            71.380471
+          ]
+        },
+        "hermes": {
+          "mean": 63.636364,
+          "sd": 3.499093,
+          "rank": 4,
+          "meanText": "63.6",
+          "sdText": "3.5",
+          "ci95": [
+            55.892256,
+            71.380471
+          ]
+        },
+        "opencode": {
+          "mean": 51.178451,
+          "sd": 5.743677,
+          "rank": 6,
+          "meanText": "51.2",
+          "sdText": "5.7",
+          "ci95": [
+            44.099327,
+            58.585859
+          ]
+        },
+        "openhands": {
+          "mean": 56.565657,
+          "sd": 2.020202,
+          "rank": 5,
+          "meanText": "56.6",
+          "sdText": "2.0",
+          "ci95": [
+            48.821549,
+            64.309764
+          ]
+        },
+        "openclaw": {
+          "mean": 48.821549,
+          "sd": 3.08591,
+          "rank": 7,
+          "meanText": "48.8",
+          "sdText": "3.1",
+          "ci95": [
+            40.740741,
+            56.902357
+          ]
+        }
+      },
+      "gemini_3_5_flash_thinking": {
+        "bare": {
+          "mean": 51.178451,
+          "sd": 2.542032,
+          "rank": 6,
+          "meanText": "51.2",
+          "sdText": "2.5",
+          "ci95": [
+            43.097643,
+            58.922559
+          ]
+        },
+        "hermes": {
+          "mean": 49.158249,
+          "sd": 3.24702,
+          "rank": 8,
+          "meanText": "49.2",
+          "sdText": "3.2",
+          "ci95": [
+            41.077441,
+            56.902357
+          ]
+        },
+        "opencode": {
+          "mean": 44.781145,
+          "sd": 2.102693,
+          "rank": 8,
+          "meanText": "44.8",
+          "sdText": "2.1",
+          "ci95": [
+            37.037037,
+            52.861953
+          ]
+        },
+        "openhands": {
+          "mean": 45.454545,
+          "sd": 6.623675,
+          "rank": 8,
+          "meanText": "45.5",
+          "sdText": "6.6",
+          "ci95": [
+            37.373737,
+            53.535354
+          ]
+        },
+        "openclaw": {
+          "mean": 49.494949,
+          "sd": 2.672476,
+          "rank": 6,
+          "meanText": "49.5",
+          "sdText": "2.7",
+          "ci95": [
+            41.414141,
+            57.239057
+          ]
+        }
+      },
+      "kimi_k3": {
+        "bare": {
+          "mean": 48.148148,
+          "sd": 1.166364,
+          "rank": 8,
+          "meanText": "48.1",
+          "sdText": "1.2",
+          "ci95": [
+            40.732323,
+            55.892256
+          ]
+        },
+        "hermes": {
+          "mean": 50.16835,
+          "sd": 3.08591,
+          "rank": 7,
+          "meanText": "50.2",
+          "sdText": "3.1",
+          "ci95": [
+            42.424242,
+            57.912458
+          ]
+        },
+        "opencode": {
+          "mean": 50.841751,
+          "sd": 4.98271,
+          "rank": 7,
+          "meanText": "50.8",
+          "sdText": "5.0",
+          "ci95": [
+            43.097643,
+            58.585859
+          ]
+        },
+        "openhands": {
+          "mean": 49.494949,
+          "sd": 2.672476,
+          "rank": 6,
+          "meanText": "49.5",
+          "sdText": "2.7",
+          "ci95": [
+            42.087542,
+            56.902357
+          ]
+        },
+        "openclaw": {
+          "mean": 55.555556,
+          "sd": 4.628864,
+          "rank": 4,
+          "meanText": "55.6",
+          "sdText": "4.6",
+          "ci95": [
+            47.811448,
+            63.299663
+          ]
+        }
+      },
+      "claude_sonnet_5": {
+        "bare": {
+          "mean": 49.494949,
+          "sd": 1.749546,
+          "rank": 7,
+          "meanText": "49.5",
+          "sdText": "1.7",
+          "ci95": [
+            42.087542,
+            56.902357
+          ]
+        },
+        "hermes": {
+          "mean": 54.545455,
+          "sd": 4.040404,
+          "rank": 6,
+          "meanText": "54.5",
+          "sdText": "4.0",
+          "ci95": [
+            46.801347,
+            62.289562
+          ]
+        },
+        "opencode": {
+          "mean": 56.902357,
+          "sd": 3.824181,
+          "rank": 4,
+          "meanText": "56.9",
+          "sdText": "3.8",
+          "ci95": [
+            48.821549,
+            64.983165
+          ]
+        },
+        "openhands": {
+          "mean": 47.474747,
+          "sd": 2.672476,
+          "rank": 7,
+          "meanText": "47.5",
+          "sdText": "2.7",
+          "ci95": [
+            39.393939,
+            55.555556
+          ]
+        },
+        "openclaw": {
+          "mean": 47.138047,
+          "sd": 1.542955,
+          "rank": 8,
+          "meanText": "47.1",
+          "sdText": "1.5",
+          "ci95": [
+            39.393939,
+            55.218855
+          ]
+        }
+      },
+      "gemini_3_1_pro_thinking": {
+        "bare": {
+          "mean": 30.976431,
+          "sd": 2.91591,
+          "rank": 11,
+          "meanText": "31.0",
+          "sdText": "2.9",
+          "ci95": [
+            23.905724,
+            38.047138
+          ]
+        },
+        "hermes": {
+          "mean": 30.639731,
+          "sd": 4.98271,
+          "rank": 11,
+          "meanText": "30.6",
+          "sdText": "5.0",
+          "ci95": [
+            23.905724,
+            37.710438
+          ]
+        },
+        "opencode": {
+          "mean": 27.946128,
+          "sd": 2.332728,
+          "rank": 11,
+          "meanText": "27.9",
+          "sdText": "2.3",
+          "ci95": [
+            21.212121,
+            35.016835
+          ]
+        },
+        "openhands": {
+          "mean": 31.986532,
+          "sd": 3.08591,
+          "rank": 11,
+          "meanText": "32.0",
+          "sdText": "3.1",
+          "ci95": [
+            24.915825,
+            39.057239
+          ]
+        },
+        "openclaw": {
+          "mean": 36.026936,
+          "sd": 6.0886,
+          "rank": 10,
+          "meanText": "36.0",
+          "sdText": "6.1",
+          "ci95": [
+            29.292929,
+            43.097643
+          ]
+        }
+      },
+      "claude_opus_4_6": {
+        "bare": {
+          "mean": 38.047138,
+          "sd": 6.171819,
+          "rank": 9,
+          "meanText": "38.0",
+          "sdText": "6.2",
+          "ci95": [
+            30.30303,
+            46.127946
+          ]
+        },
+        "hermes": {
+          "mean": 40.40404,
+          "sd": 4.628864,
+          "rank": 9,
+          "meanText": "40.4",
+          "sdText": "4.6",
+          "ci95": [
+            32.323232,
+            48.493266
+          ]
+        },
+        "opencode": {
+          "mean": 39.73064,
+          "sd": 2.102693,
+          "rank": 9,
+          "meanText": "39.7",
+          "sdText": "2.1",
+          "ci95": [
+            31.986532,
+            47.811448
+          ]
+        },
+        "openhands": {
+          "mean": 43.097643,
+          "sd": 3.824181,
+          "rank": 9,
+          "meanText": "43.1",
+          "sdText": "3.8",
+          "ci95": [
+            35.353535,
+            51.178451
+          ]
+        },
+        "openclaw": {
+          "mean": 37.037037,
+          "sd": 4.773551,
+          "rank": 9,
+          "meanText": "37.0",
+          "sdText": "4.8",
+          "ci95": [
+            29.62963,
+            45.117845
+          ]
+        }
+      },
+      "glm_5_2": {
+        "bare": {
+          "mean": 31.313131,
+          "sd": 4.402928,
+          "rank": 10,
+          "meanText": "31.3",
+          "sdText": "4.4",
+          "ci95": [
+            24.242424,
+            38.720539
+          ]
+        },
+        "hermes": {
+          "mean": 34.006734,
+          "sd": 1.166364,
+          "rank": 10,
+          "meanText": "34.0",
+          "sdText": "1.2",
+          "ci95": [
+            26.599327,
+            41.750842
+          ]
+        },
+        "opencode": {
+          "mean": 36.363636,
+          "sd": 1.010101,
+          "rank": 10,
+          "meanText": "36.4",
+          "sdText": "1.0",
+          "ci95": [
+            28.956229,
+            43.771044
+          ]
+        },
+        "openhands": {
+          "mean": 35.016835,
+          "sd": 5.563203,
+          "rank": 10,
+          "meanText": "35.0",
+          "sdText": "5.6",
+          "ci95": [
+            27.609428,
+            42.760943
+          ]
+        },
+        "openclaw": {
+          "mean": 31.649832,
+          "sd": 2.102693,
+          "rank": 11,
+          "meanText": "31.6",
+          "sdText": "2.1",
+          "ci95": [
+            24.579125,
+            39.057239
+          ]
+        }
+      },
+      "deepseek_v4_flash": {
+        "bare": {
+          "mean": 18.181818,
+          "sd": 2.672476,
+          "rank": 12,
+          "meanText": "18.2",
+          "sdText": "2.7",
+          "ci95": [
+            12.457912,
+            24.579125
+          ]
+        },
+        "hermes": {
+          "mean": 18.181818,
+          "sd": 3.641971,
+          "rank": 12,
+          "meanText": "18.2",
+          "sdText": "3.6",
+          "ci95": [
+            12.457912,
+            24.579125
+          ]
+        },
+        "opencode": {
+          "mean": 15.151515,
+          "sd": 2.020202,
+          "rank": 12,
+          "meanText": "15.2",
+          "sdText": "2.0",
+          "ci95": [
+            9.76431,
+            21.212121
+          ]
+        },
+        "openhands": {
+          "mean": 18.181818,
+          "sd": 3.641971,
+          "rank": 12,
+          "meanText": "18.2",
+          "sdText": "3.6",
+          "ci95": [
+            12.457912,
+            24.242424
+          ]
+        },
+        "openclaw": {
+          "mean": 12.121212,
+          "sd": 6.308079,
+          "rank": 12,
+          "meanText": "12.1",
+          "sdText": "6.3",
+          "ci95": [
+            7.744108,
+            16.835017
+          ]
+        }
+      }
+    }
+  },
+  "harnessAverage": {
+    "Average": {
+      "gpt_6_astra": {
+        "mean": 68.579071,
+        "sd": 0.55977,
+        "meanText": "68.6",
+        "sdText": "0.6"
+      },
+      "claude_fable_5": {
+        "mean": 64.96334,
+        "sd": 0.631756,
+        "meanText": "65.0",
+        "sdText": "0.6"
+      },
+      "gemini_3_8_flash_thinking": {
+        "mean": 65.332323,
+        "sd": 0.586278,
+        "meanText": "65.3",
+        "sdText": "0.6"
+      },
+      "gpt_5_6_sol": {
+        "mean": 58.842804,
+        "sd": 1.064655,
+        "meanText": "58.8",
+        "sdText": "1.1"
+      },
+      "gpt_5_4": {
+        "mean": 53.891744,
+        "sd": 0.552702,
+        "meanText": "53.9",
+        "sdText": "0.6"
+      },
+      "gemini_3_5_flash_thinking": {
+        "mean": 51.369518,
+        "sd": 0.702674,
+        "meanText": "51.4",
+        "sdText": "0.7"
+      },
+      "kimi_k3": {
+        "mean": 49.232774,
+        "sd": 0.505427,
+        "meanText": "49.2",
+        "sdText": "0.5"
+      },
+      "claude_sonnet_5": {
+        "mean": 47.608706,
+        "sd": 0.65368,
+        "meanText": "47.6",
+        "sdText": "0.7"
+      },
+      "gemini_3_1_pro_thinking": {
+        "mean": 39.557826,
+        "sd": 0.503855,
+        "meanText": "39.6",
+        "sdText": "0.5"
+      },
+      "claude_opus_4_6": {
+        "mean": 38.453626,
+        "sd": 0.243294,
+        "meanText": "38.5",
+        "sdText": "0.2"
+      },
+      "glm_5_2": {
+        "mean": 34.301185,
+        "sd": 1.059164,
+        "meanText": "34.3",
+        "sdText": "1.1"
+      },
+      "deepseek_v4_flash": {
+        "mean": 18.678538,
+        "sd": 1.242604,
+        "meanText": "18.7",
+        "sdText": "1.2"
+      }
+    },
+    "ST": {
+      "gpt_6_astra": {
+        "mean": 76.666667,
+        "sd": 0.61101,
+        "meanText": "76.7",
+        "sdText": "0.6"
+      },
+      "claude_fable_5": {
+        "mean": 70.733333,
+        "sd": 0.945163,
+        "meanText": "70.7",
+        "sdText": "0.9"
+      },
+      "gemini_3_8_flash_thinking": {
+        "mean": 79.333333,
+        "sd": 1.101514,
+        "meanText": "79.3",
+        "sdText": "1.1"
+      },
+      "gpt_5_6_sol": {
+        "mean": 62.933333,
+        "sd": 1.501111,
+        "meanText": "62.9",
+        "sdText": "1.5"
+      },
+      "gpt_5_4": {
+        "mean": 55.466667,
+        "sd": 0.46188,
+        "meanText": "55.5",
+        "sdText": "0.5"
+      },
+      "gemini_3_5_flash_thinking": {
+        "mean": 69.6,
+        "sd": 2.4,
+        "meanText": "69.6",
+        "sdText": "2.4"
+      },
+      "kimi_k3": {
+        "mean": 53.866667,
+        "sd": 1.02632,
+        "meanText": "53.9",
+        "sdText": "1.0"
+      },
+      "claude_sonnet_5": {
+        "mean": 47.666667,
+        "sd": 0.80829,
+        "meanText": "47.7",
+        "sdText": "0.8"
+      },
+      "gemini_3_1_pro_thinking": {
+        "mean": 49.0,
+        "sd": 0.6,
+        "meanText": "49.0",
+        "sdText": "0.6"
+      },
+      "claude_opus_4_6": {
+        "mean": 40.2,
+        "sd": 1.113553,
+        "meanText": "40.2",
+        "sdText": "1.1"
+      },
+      "glm_5_2": {
+        "mean": 35.466667,
+        "sd": 1.137248,
+        "meanText": "35.5",
+        "sdText": "1.1"
+      },
+      "deepseek_v4_flash": {
+        "mean": 18.333333,
+        "sd": 2.532456,
+        "meanText": "18.3",
+        "sdText": "2.5"
+      }
+    },
+    "IF": {
+      "gpt_6_astra": {
+        "mean": 74.089347,
+        "sd": 0.238083,
+        "meanText": "74.1",
+        "sdText": "0.2"
+      },
+      "claude_fable_5": {
+        "mean": 68.041237,
+        "sd": 1.254178,
+        "meanText": "68.0",
+        "sdText": "1.3"
+      },
+      "gemini_3_8_flash_thinking": {
+        "mean": 80.0,
+        "sd": 1.091031,
+        "meanText": "80.0",
+        "sdText": "1.1"
+      },
+      "gpt_5_6_sol": {
+        "mean": 72.508591,
+        "sd": 1.729175,
+        "meanText": "72.5",
+        "sdText": "1.7"
+      },
+      "gpt_5_4": {
+        "mean": 64.398625,
+        "sd": 0.314954,
+        "meanText": "64.4",
+        "sdText": "0.3"
+      },
+      "gemini_3_5_flash_thinking": {
+        "mean": 66.597938,
+        "sd": 2.142743,
+        "meanText": "66.6",
+        "sdText": "2.1"
+      },
+      "kimi_k3": {
+        "mean": 54.089347,
+        "sd": 1.037778,
+        "meanText": "54.1",
+        "sdText": "1.0"
+      },
+      "claude_sonnet_5": {
+        "mean": 44.123711,
+        "sd": 0.743413,
+        "meanText": "44.1",
+        "sdText": "0.7"
+      },
+      "gemini_3_1_pro_thinking": {
+        "mean": 54.982818,
+        "sd": 2.561463,
+        "meanText": "55.0",
+        "sdText": "2.6"
+      },
+      "claude_opus_4_6": {
+        "mean": 42.817869,
+        "sd": 1.259815,
+        "meanText": "42.8",
+        "sdText": "1.3"
+      },
+      "glm_5_2": {
+        "mean": 35.601375,
+        "sd": 1.848018,
+        "meanText": "35.6",
+        "sdText": "1.8"
+      },
+      "deepseek_v4_flash": {
+        "mean": 18.350515,
+        "sd": 1.966885,
+        "meanText": "18.4",
+        "sdText": "2.0"
+      }
+    },
+    "MT": {
+      "gpt_6_astra": {
+        "mean": 60.866667,
+        "sd": 0.503322,
+        "meanText": "60.9",
+        "sdText": "0.5"
+      },
+      "claude_fable_5": {
+        "mean": 53.2,
+        "sd": 1.385641,
+        "meanText": "53.2",
+        "sdText": "1.4"
+      },
+      "gemini_3_8_flash_thinking": {
+        "mean": 35.733333,
+        "sd": 0.986577,
+        "meanText": "35.7",
+        "sdText": "1.0"
+      },
+      "gpt_5_6_sol": {
+        "mean": 40.333333,
+        "sd": 0.80829,
+        "meanText": "40.3",
+        "sdText": "0.8"
+      },
+      "gpt_5_4": {
+        "mean": 38.866667,
+        "sd": 0.64291,
+        "meanText": "38.9",
+        "sdText": "0.6"
+      },
+      "gemini_3_5_flash_thinking": {
+        "mean": 21.266667,
+        "sd": 1.154701,
+        "meanText": "21.3",
+        "sdText": "1.2"
+      },
+      "kimi_k3": {
+        "mean": 38.133333,
+        "sd": 2.119748,
+        "meanText": "38.1",
+        "sdText": "2.1"
+      },
+      "claude_sonnet_5": {
+        "mean": 47.533333,
+        "sd": 1.331666,
+        "meanText": "47.5",
+        "sdText": "1.3"
+      },
+      "gemini_3_1_pro_thinking": {
+        "mean": 22.733333,
+        "sd": 0.46188,
+        "meanText": "22.7",
+        "sdText": "0.5"
+      },
+      "claude_opus_4_6": {
+        "mean": 31.133333,
+        "sd": 1.101514,
+        "meanText": "31.1",
+        "sdText": "1.1"
+      },
+      "glm_5_2": {
+        "mean": 32.466667,
+        "sd": 1.70098,
+        "meanText": "32.5",
+        "sdText": "1.7"
+      },
+      "deepseek_v4_flash": {
+        "mean": 21.666667,
+        "sd": 2.369247,
+        "meanText": "21.7",
+        "sdText": "2.4"
+      }
+    },
+    "MTIF": {
+      "gpt_6_astra": {
+        "mean": 62.693603,
+        "sd": 1.63291,
+        "meanText": "62.7",
+        "sdText": "1.6"
+      },
+      "claude_fable_5": {
+        "mean": 67.878788,
+        "sd": 0.728394,
+        "meanText": "67.9",
+        "sdText": "0.7"
+      },
+      "gemini_3_8_flash_thinking": {
+        "mean": 66.262626,
+        "sd": 1.456788,
+        "meanText": "66.3",
+        "sdText": "1.5"
+      },
+      "gpt_5_6_sol": {
+        "mean": 59.59596,
+        "sd": 1.399637,
+        "meanText": "59.6",
+        "sdText": "1.4"
+      },
+      "gpt_5_4": {
+        "mean": 56.835017,
+        "sd": 2.033625,
+        "meanText": "56.8",
+        "sdText": "2.0"
+      },
+      "gemini_3_5_flash_thinking": {
+        "mean": 48.013468,
+        "sd": 2.234432,
+        "meanText": "48.0",
+        "sdText": "2.2"
+      },
+      "kimi_k3": {
+        "mean": 50.841751,
+        "sd": 0.420539,
+        "meanText": "50.8",
+        "sdText": "0.4"
+      },
+      "claude_sonnet_5": {
+        "mean": 51.111111,
+        "sd": 1.261616,
+        "meanText": "51.1",
+        "sdText": "1.3"
+      },
+      "gemini_3_1_pro_thinking": {
+        "mean": 31.515152,
+        "sd": 2.828283,
+        "meanText": "31.5",
+        "sdText": "2.8"
+      },
+      "claude_opus_4_6": {
+        "mean": 39.6633,
+        "sd": 3.032547,
+        "meanText": "39.7",
+        "sdText": "3.0"
+      },
+      "glm_5_2": {
+        "mean": 33.670034,
+        "sd": 1.18373,
+        "meanText": "33.7",
+        "sdText": "1.2"
+      },
+      "deepseek_v4_flash": {
+        "mean": 16.363636,
+        "sd": 2.137981,
+        "meanText": "16.4",
+        "sdText": "2.1"
+      }
+    }
+  }
+}

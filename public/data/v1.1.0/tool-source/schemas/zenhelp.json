@@ -1,0 +1,1802 @@
+[
+  {
+    "name": "create_attachment",
+    "description": "File upload that generates attachment tokens and metadata.\n\nThis function uploads a file to Zenhelp and returns the upload token\nand attachment metadata. The token can be used to associate the file with tickets\nor comments. Multiple files can be associated with the same token.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "filename": {
+          "description": "Target filename for the attachment.",
+          "type": "string",
+          "minLength": 1
+        },
+        "token": {
+          "description": "Upload token for associating multiple files. If not provided,\na new token will be generated.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "content_type": {
+          "description": "MIME type of the file. If not provided, will be\nauto-detected from the filename.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "file_size": {
+          "description": "File size in bytes. Defaults to 1024.",
+          "type": "integer",
+          "minimum": 0,
+          "default": 1024
+        }
+      },
+      "required": [
+        "filename"
+      ]
+    }
+  },
+  {
+    "name": "create_organization",
+    "description": "Creates a new organization.\n\nAdds a new organization to the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the organization.",
+          "type": "string"
+        },
+        "industry": {
+          "description": "The industry of the organization. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "location": {
+          "description": "The location of the organization. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "domain_names": {
+          "description": "A list of domain names associated with the organization.\nDefaults to None.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": null,
+          "nullable": true
+        },
+        "external_id": {
+          "description": "A unique external identifier for the organization. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "group_id": {
+          "description": "The ID of the group that the organization belongs to. Defaults to None.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "notes": {
+          "description": "Notes about the organization. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "details": {
+          "description": "Any details about the organization, such as the address. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "shared_tickets": {
+          "description": "Whether tickets from this organization are shared with other organizations. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "shared_comments": {
+          "description": "Whether end users in this organization can comment on each other's tickets. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "tags": {
+          "description": "A list of tags associated with the organization. Defaults to None.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true,
+          "default": null
+        },
+        "organization_fields": {
+          "description": "A dictionary of user-defined attributes for the organization.\nKeys represent the unique identifier of the custom field, and values contain the data for that field. Defaults to None.",
+          "type": "object",
+          "properties": {},
+          "additionalProperties": {
+            "description": "Custom field value. Can be a string, integer, number, boolean, or array of strings depending on the field type.",
+            "anyOf": [
+              {
+                "description": "String field value.",
+                "type": "string"
+              },
+              {
+                "description": "Integer field value.",
+                "type": "integer"
+              },
+              {
+                "description": "Numeric field value.",
+                "type": "number"
+              },
+              {
+                "description": "Boolean field value.",
+                "type": "boolean"
+              },
+              {
+                "description": "Array of string values.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "create_ticket",
+    "description": "Creates a new ticket.\n\nThis function creates a new ticket. The request body must contain a 'ticket'\nobject. Within the 'ticket' object, 'requester_id' and a 'comment' object\n(which must include a 'body') are typically required fields for successful ticket creation.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "ticket": {
+          "description": "The ticket object to create. This dictionary must\ncontain 'requester_id' and 'comment' keys. Its structure is as follows:",
+          "type": "object",
+          "properties": {
+            "assignee_email": {
+              "description": "Write only. The email address of the\nagent to assign the ticket to.",
+              "type": "string",
+              "nullable": true
+            },
+            "assignee_id": {
+              "description": "The agent currently assigned to the ticket.",
+              "type": "integer",
+              "nullable": true,
+              "minimum": 1
+            },
+            "brand_id": {
+              "description": "The id of the brand this ticket is\nassociated with.",
+              "type": "integer",
+              "nullable": true,
+              "minimum": 1
+            },
+            "collaborator_ids": {
+              "description": "The ids of users currently\nCC'ed on the ticket.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "integer"
+              }
+            },
+            "collaborators": {
+              "description": "POST requests only.\n Users to add as cc's when creating a ticket. Each item is a\ndictionary with the following keys:",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "description": "ID of an existing user.",
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "name": {
+                    "description": "Name of a new or existing user.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "email": {
+                    "description": "Email of a new or existing user.",
+                    "type": "string",
+                    "format": "email",
+                    "nullable": true
+                  }
+                },
+                "required": []
+              }
+            },
+            "comment": {
+              "description": "Write only. An object that adds a comment\nto the ticket. This dictionary must contain a 'body' key.",
+              "type": "object",
+              "properties": {
+                "body": {
+                  "description": "The plain text body of the comment. Mandatory for new\ntickets.",
+                  "type": "string"
+                },
+                "html_body": {
+                  "description": "The HTML body of the comment. If both\nbody and html_body are present, html_body is ignored.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "public": {
+                  "description": "Whether the comment is public (true) or\ninternal (false). Defaults to True.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": true
+                },
+                "uploads": {
+                  "description": "An array of attachment tokens\nreceived from the Uploads API.",
+                  "type": "array",
+                  "nullable": true,
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "author_id": {
+                  "description": "ID of the agent or end user who is the\nauthor of the comment.",
+                  "type": "integer",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "body"
+              ]
+            },
+            "custom_fields": {
+              "description": "Custom fields for the\n ticket. Each object in the list must have an 'id' and 'value'.\nDefaults to an empty array [] if not provided.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "description": "The ID of the custom field.",
+                    "type": "integer"
+                  },
+                  "value": {
+                    "description": "The value for the custom\n field. For multi-select custom fields, this is a list of\nstrings. For numeric fields, this can be an integer. For text fields, this is a string.",
+                    "anyOf": [
+                      {
+                        "description": "Text value, date string (ISO 8601), or drop-down option tag.",
+                        "type": "string"
+                      },
+                      {
+                        "description": "Integer value for numeric custom fields.",
+                        "type": "integer"
+                      },
+                      {
+                        "description": "Array of strings for multi-select custom fields.",
+                        "type": "array",
+                        "items": {
+                          "description": "Selected option tag.",
+                          "type": "string"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "value"
+                ]
+              }
+            },
+            "due_at": {
+              "description": "If this is a ticket of type 'task' it has a\ndue date. Due date format uses ISO 8601 format.",
+              "type": "string",
+              "nullable": true
+            },
+            "email_cc_ids": {
+              "description": "The ids of agents or end users\n currently CC'ed on the ticket. Ignored when CCs and followers\nis not enabled.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "integer"
+              }
+            },
+            "email_ccs": {
+              "description": "Write only. An array of\nobjects that represents agent or end users email CCs to add or\ndelete from the ticket. Each item is a dictionary with keys:",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "description": "ID of the user.",
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "user_email": {
+                    "description": "Email of the user.",
+                    "type": "string",
+                    "format": "email",
+                    "nullable": true
+                  },
+                  "action": {
+                    "description": "Action to perform. Possible values: \"put\", \"delete\".",
+                    "type": "string",
+                    "nullable": true,
+                    "enum": [
+                      "put",
+                      "delete"
+                    ]
+                  }
+                },
+                "required": []
+              }
+            },
+            "external_id": {
+              "description": "An id you can use to link Zenhelp Support\ntickets to local records.",
+              "type": "string",
+              "nullable": true,
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "follower_ids": {
+              "description": "The ids of agents currently\n following the ticket. Ignored when CCs and followers is not\nenabled.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "integer"
+              }
+            },
+            "followers": {
+              "description": "Write only. An array of\nobjects that represents agent followers to add or delete from\nthe ticket. Each item is a dictionary with keys:",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "description": "ID of the user.",
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "user_email": {
+                    "description": "Email of the user.",
+                    "type": "string",
+                    "format": "email",
+                    "nullable": true
+                  },
+                  "action": {
+                    "description": "Action to perform. Possible values: \"put\", \"delete\".",
+                    "type": "string",
+                    "nullable": true,
+                    "enum": [
+                      "put",
+                      "delete"
+                    ]
+                  }
+                },
+                "required": []
+              }
+            },
+            "group_id": {
+              "description": "The group this ticket is assigned to.",
+              "type": "integer",
+              "nullable": true
+            },
+            "macro_id": {
+              "description": "Write only. A macro ID to be recorded in\nthe ticket audit.",
+              "type": "integer",
+              "nullable": true
+            },
+            "macro_ids": {
+              "description": "POST requests only. List of macro IDs\nto be recorded in the ticket audit.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "integer"
+              }
+            },
+            "metadata": {
+              "description": "Write only. Metadata for the audit.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "system": {
+                  "description": "System-related metadata. Can\ncontain information like the client, IP address, or location.",
+                  "type": "object",
+                  "nullable": true,
+                  "properties": {
+                    "client": {
+                      "description": "The client application that created the ticket.",
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "ip_address": {
+                      "description": "The IP address of the client.",
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "location": {
+                      "description": "The location of the client.",
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "applied_macro_ids": {
+                      "description": "List of macro IDs that were applied during ticket creation.",
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "latitude": {
+                      "description": "Latitude coordinate for the ticket action location.",
+                      "type": "number",
+                      "nullable": true
+                    },
+                    "longitude": {
+                      "description": "Longitude coordinate for the ticket action location.",
+                      "type": "number",
+                      "nullable": true
+                    }
+                  },
+                  "required": []
+                },
+                "custom": {
+                  "description": "Custom metadata for any extra information. Can\ncontain information like the conversation ID or source channel.",
+                  "type": "object",
+                  "nullable": true,
+                  "properties": {
+                    "conversation_id": {
+                      "description": "An external conversation identifier.",
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "source_channel": {
+                      "description": "The specific channel the ticket came from.",
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": []
+                }
+              },
+              "required": []
+            },
+            "organization_id": {
+              "description": "The organization of the requester.",
+              "type": "integer",
+              "nullable": true
+            },
+            "priority": {
+              "description": "The urgency with which the ticket should be\n addressed. Possible values: \"urgent\", \"high\", \"normal\", \"low\".\nDefaults to \"normal\" if not provided.",
+              "type": "string",
+              "nullable": true,
+              "default": "normal",
+              "enum": [
+                "urgent",
+                "high",
+                "normal",
+                "low"
+              ]
+            },
+            "problem_id": {
+              "description": "For tickets of type 'incident', the ID of\nthe problem the incident is linked to.",
+              "type": "integer",
+              "nullable": true,
+              "minimum": 1
+            },
+            "raw_subject": {
+              "description": "The dynamic content placeholder, if\npresent, or the 'subject' value, if not. Defaults to the 'subject' value.",
+              "type": "string",
+              "nullable": true
+            },
+            "recipient": {
+              "description": "The original recipient e-mail address of\nthe ticket.",
+              "type": "string",
+              "nullable": true
+            },
+            "requester_id": {
+              "description": "The user who requested this ticket. Mandatory.",
+              "type": "integer"
+            },
+            "sharing_agreement_ids": {
+              "description": "The ids of the sharing\nagreements used for this ticket. Defaults to an empty array [] if not provided.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "integer"
+              }
+            },
+            "status": {
+              "description": "The state of the ticket. Possible values: \"new\",\n\"open\", \"pending\", \"hold\", \"solved\", \"closed\". Defaults to \"new\" if not provided.",
+              "type": "string",
+              "nullable": true,
+              "default": "new",
+              "enum": [
+                "new",
+                "open",
+                "pending",
+                "hold",
+                "solved",
+                "closed"
+              ]
+            },
+            "subject": {
+              "description": "The value of the subject field for this ticket.",
+              "type": "string",
+              "nullable": true,
+              "minLength": 1
+            },
+            "submitter_id": {
+              "description": "The user who submitted the ticket.\nDefaults to requester_id.",
+              "type": "integer",
+              "nullable": true
+            },
+            "tags": {
+              "description": "The array of tags applied to this ticket.\nDefaults to an empty array [] if not provided.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string"
+              }
+            },
+            "type": {
+              "description": "The type of this ticket. Possible values:\n\"problem\", \"incident\", \"question\", \"task\". Defaults to \"question\" if not provided.",
+              "type": "string",
+              "nullable": true,
+              "enum": [
+                "problem",
+                "incident",
+                "question",
+                "task"
+              ],
+              "default": "question"
+            },
+            "via": {
+              "description": "Describes how the ticket was created.\nDefaults to {\"channel\": \"api\", \"source\": {\"rel\": \"api_client\"}}.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "channel": {
+                  "description": "The channel through which the ticket was\ncreated.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "source": {
+                  "description": "Source details.",
+                  "type": "object",
+                  "nullable": true,
+                  "properties": {
+                    "rel": {
+                      "description": "Relation type.",
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": []
+                }
+              },
+              "required": []
+            },
+            "attribute_value_ids": {
+              "description": "List of attribute value IDs for the ticket.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "integer"
+              }
+            },
+            "custom_status_id": {
+              "description": "ID of the custom status for the ticket.",
+              "type": "integer",
+              "nullable": true,
+              "minimum": 1
+            },
+            "requester": {
+              "description": "Email or name of the requester.",
+              "type": "string",
+              "nullable": true
+            },
+            "safe_update": {
+              "description": "Whether to perform a safe update.",
+              "type": "boolean",
+              "nullable": true
+            },
+            "ticket_form_id": {
+              "description": "ID of the ticket form.",
+              "type": "integer",
+              "nullable": true
+            },
+            "updated_stamp": {
+              "description": "Timestamp for when the ticket was last updated.",
+              "type": "string",
+              "nullable": true
+            },
+            "via_followup_source_id": {
+              "description": "ID of the via followup source.",
+              "type": "integer",
+              "nullable": true
+            },
+            "via_id": {
+              "description": "ID of the via channel.",
+              "type": "integer",
+              "nullable": true,
+              "minimum": 1
+            },
+            "voice_comment": {
+              "description": "Voice comment data for the ticket.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "from": {
+                  "description": "The phone number of the caller.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "to": {
+                  "description": "The phone number that was called.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "recording_url": {
+                  "description": "The URL of the call recording.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "started_at": {
+                  "description": "The time the call started.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "ended_at": {
+                  "description": "The time the call ended.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "call_duration": {
+                  "description": "The duration of the call in seconds.",
+                  "type": "integer",
+                  "nullable": true,
+                  "minimum": 0
+                },
+                "answered_by_id": {
+                  "description": "ID of the user who answered the call.",
+                  "type": "integer",
+                  "nullable": true,
+                  "minimum": 1
+                },
+                "location": {
+                  "description": "Geographical location associated with the voice comment.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "transcription_text": {
+                  "description": "Transcription text of the voice comment.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            }
+          },
+          "required": [
+            "comment",
+            "requester_id"
+          ]
+        }
+      },
+      "required": [
+        "ticket"
+      ]
+    }
+  },
+  {
+    "name": "create_user",
+    "description": "Creates a new user with comprehensive Zenhelp API support.\n\nGenerates a unique ID for the new user internally and adds it to the database.\nChecks for existing users based on email and external_id to prevent duplicates.\nSupports all standard Zenhelp API parameters with robust validation.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the user (mandatory).",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "email": {
+          "description": "The user's primary email address. Defaults to None.",
+          "type": "string",
+          "format": "email",
+          "nullable": true,
+          "default": null
+        },
+        "role": {
+          "description": "The user's role. Possible values: \"end-user\", \"agent\", \"admin\". Defaults to \"end-user\".",
+          "type": "string",
+          "enum": [
+            "end-user",
+            "agent",
+            "admin"
+          ],
+          "default": "end-user"
+        },
+        "organization_id": {
+          "description": "The id of the user's organization. Must be greater than 0 if provided. Defaults to None.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "tags": {
+          "description": "The user's tags. Defaults to an empty list []. Maximum 50 tags allowed.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 50
+        },
+        "photo": {
+          "description": "The user's profile picture as Attachment object. Defaults to None.\nPossible keys:",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "Unique identifier for the photo. Defaults to None.",
+              "type": "integer",
+              "minimum": 1,
+              "nullable": true,
+              "default": null
+            },
+            "filename": {
+              "description": "Original filename of the uploaded photo. Defaults to None.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "content_type": {
+              "description": "MIME type of the image (e.g., 'image/jpeg', 'image/png'). Defaults to None.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "content_url": {
+              "description": "URL to access the photo content. Defaults to None.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "size": {
+              "description": "File size of the photo in bytes. Defaults to None.",
+              "type": "integer",
+              "minimum": 0,
+              "nullable": true,
+              "default": null
+            },
+            "url": {
+              "description": "API URL to access the photo resource. Defaults to None.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        },
+        "details": {
+          "description": "Any details about the user. Defaults to None.",
+          "type": "string",
+          "maxLength": 1000,
+          "nullable": true,
+          "default": null
+        },
+        "default_group_id": {
+          "description": "The id of the user's default group. Must be greater than 0 if provided. Defaults to None.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "alias": {
+          "description": "An alias displayed to end users. Must have at least 1 character if provided (cannot be empty string). Defaults to None.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "nullable": true,
+          "default": null
+        },
+        "custom_role_id": {
+          "description": "A custom role if user is an agent on Enterprise plan. Must be greater than 0 if provided. Defaults to None.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "external_id": {
+          "description": "A unique identifier from another system. Must have at least 1 character if provided (cannot be empty string). Defaults to None.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "nullable": true,
+          "default": null
+        },
+        "locale": {
+          "description": "The user's locale (BCP-47 compliant). Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "locale_id": {
+          "description": "The user's language identifier. Must be greater than 0 if provided. Defaults to None.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "moderator": {
+          "description": "Whether user has forum moderation capabilities. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "notes": {
+          "description": "Any notes about the user. Defaults to None.",
+          "type": "string",
+          "maxLength": 1000,
+          "nullable": true,
+          "default": null
+        },
+        "only_private_comments": {
+          "description": "Whether user can only create private comments. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "phone": {
+          "description": "The user's primary phone number. This value is validated and stored in E.164 format(cannot be empty string). Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "remote_photo_url": {
+          "description": "URL pointing to user's profile picture. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "restricted_agent": {
+          "description": "If agent has restrictions. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "shared_phone_number": {
+          "description": "Whether phone number is shared. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "signature": {
+          "description": "The user's signature (agents/admins only). Defaults to None.",
+          "type": "string",
+          "maxLength": 1000,
+          "nullable": true,
+          "default": null
+        },
+        "suspended": {
+          "description": "If agent is suspended. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "ticket_restriction": {
+          "description": "Which tickets user has access to. Must be one of: \"organization\", \"groups\", \"assigned\", \"requested\". Defaults to None.",
+          "type": "string",
+          "enum": [
+            "organization",
+            "groups",
+            "assigned",
+            "requested"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "time_zone": {
+          "description": "The user's time zone. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "verified": {
+          "description": "Whether any user identity is verified. Defaults to None.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "user_fields": {
+          "description": "Values of custom fields in user's profile. Defaults to None.\nPossible keys:",
+          "type": "object",
+          "properties": {
+            "department": {
+              "description": "User's department. Defaults to None.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "employee_id": {
+              "description": "Employee ID. Defaults to None.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "hire_date": {
+              "description": "Date of hire (YYYY-MM-DD). Defaults to None.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "manager": {
+              "description": "User's manager. Defaults to None.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "location": {
+              "description": "User's location. Defaults to None.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "delete_attachment",
+    "description": "Deletes an uploaded file using its token.\n\nThis function removes an uploaded file from the system using the token\nthat was returned when the file was originally uploaded. The token is\nvalid for 60 minutes after upload.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "description": "The upload token of the attachment to delete. This token\nwas returned when the file was originally uploaded via the uploads endpoint.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "token"
+      ]
+    }
+  },
+  {
+    "name": "delete_organization",
+    "description": "Deletes an existing organization.\n\nDeletes an organization based on its unique identifier. Also nullifies the organization_id in all associated user and ticket records, setting it to None for any users or tickets that were linked to this organization. Additionally removes the organization from the search index if it exists.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "organization_id": {
+          "description": "The unique identifier for the organization.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "organization_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_ticket",
+    "description": "Deletes an existing ticket.\n\nDeletes a ticket based on its unique identifier.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "ticket_id": {
+          "description": "The unique identifier for the ticket.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ticket_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_user",
+    "description": "Deletes an existing user.\n\nDeletes a user based on their unique identifier and returns the complete user data\nthat was deleted. This operation is irreversible and has significant side effects:\nit automatically nullifies user references (requester_id, assignee_id, author_id, etc.)\nin tickets, comments, and ticket audits. Tickets that cannot have a valid submitter_id\nafter user deletion are automatically deleted, along with their associated comments,\naudits, and attachments.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "The unique identifier for the user. Must be a positive integer.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "user_id"
+      ]
+    }
+  },
+  {
+    "name": "get_organization_details",
+    "description": "Shows details of a specific organization.\n\nReturns the details of an organization based on its unique identifier.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "organization_id": {
+          "description": "The unique identifier for the organization.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "organization_id"
+      ]
+    }
+  },
+  {
+    "name": "get_ticket_details",
+    "description": "Shows details of a specific ticket.\n\nReturns the details of a ticket based on its unique identifier.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "ticket_id": {
+          "description": "The unique identifier for the ticket. Must be a positive integer greater than 0.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ticket_id"
+      ]
+    }
+  },
+  {
+    "name": "get_user_details",
+    "description": "Shows details of a specific user.\n\nReturns the details of a user based on their unique identifier.\nReturns comprehensive user information including all Zenhelp API fields.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "The unique identifier for the user.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "user_id"
+      ]
+    }
+  },
+  {
+    "name": "list_audits_for_ticket",
+    "description": "List all audits for a given ticket. Audits are returned sorted by created_at in ascending order (oldest first).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "ticket_id": {
+          "description": "The ID of the ticket to list audits for.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ticket_id"
+      ]
+    }
+  },
+  {
+    "name": "list_organizations",
+    "description": "Lists all organizations in the database.\n\nReturns a list of all organizations in the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "list_ticket_comments",
+    "description": "List all comments for a ticket.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "ticket_id": {
+          "description": "The ID of the ticket to list comments for.",
+          "type": "integer"
+        },
+        "include": {
+          "description": "Accepts \"users\". Use this parameter to list email CCs by side-loading users.\nNote: If the comment source is email, a deleted user will be represented as the CCd email address.\nIf the comment source is anything else, a deleted user will be represented as the user name.\nExample: ?include=users. Its in the documentation but not implemented.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "include_inline_images": {
+          "description": "When true, inline images are also listed as attachments in the response.",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "ticket_id"
+      ]
+    }
+  },
+  {
+    "name": "list_tickets",
+    "description": "Lists all tickets in the database.\n\nReturns a list of all tickets in the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "list_users",
+    "description": "Lists the users visible to the authenticated caller.\n\nReturns the users the authenticated caller is permitted to view, with comprehensive user details.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "search",
+    "description": "Search for tickets, users, groups, and organizations using Zenhelp's query syntax.\n\nThis function implements the Zenhelp Support API /api/v2/search endpoint which allows\nsearching across tickets, users, groups, and organizations using property keywords and operators.\n\nNote: The special keyword \"me\" for assignee/requester\nfields returns tickets with assignee_id=1 or requester_id=1 respectively, as there is\nno authentication/session management system.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "The search query string using Zenhelp's query syntax.\nSearch Rules:\n- Searches across tickets, users, groups and organizations by default\n- Use \"type:ticket\", \"type:user\", \"type:group\", or \"type:organization\" to limit scope\n- Multiple terms are combined with AND logic\n- Repeat the same field for OR: e.g. \"tags:silver tags:bronze\" returns silver OR bronze\n- Use double quotes for AND within a value: e.g. status:\"open pending\" returns results containing both terms\n- Use quotes for exact phrase matching: \"exact phrase\"\n- Use wildcards (*) for pattern matching like \"email*\"\n- Use minus (-) for negation like \"-status:closed\"\n- Combine filters and text like \"priority:urgent server down\"\n\nSupported Filter Fields:\n\nFree-Text Search:\nWhen you provide text terms without field prefixes (e.g., \"server down\"), the search\nautomatically searches across multiple fields:\n- For Tickets: searches in subject, description, status, priority, and tags\n- For Users: searches in name, email, role, notes, details, and tags\n- For Organizations: searches in name, details, notes, and tags\n- For Groups: searches in name and description\n\nField-Specific Filters:\n\nFor Tickets:\n- status: new, open, pending, hold, solved, closed\n- priority: low, normal, high, urgent (supports >, <, >=, <= operators)\n- ticket_type: problem, incident, question, task\n- assignee: user_id, \"me\"(returns tickets with assignee_id=1), \"none\"\n- requester: user_id\n- organization: organization_id, \"none\"\n- group: group_id, \"none\"\n- tags: tag_name, \"none\"\n- subject: text search in ticket subject\n- description: text search in ticket description\n- created: date or relative time (>2hours, >1day, >1week)\n- updated: date or relative time\n\nFor Users:\n- role: end-user, agent, admin\n- email: email pattern or domain (@example.com)\n- name: text search in user name\n- organization: organization_id, \"none\"\n- tags: tag_name, \"none\"\n- verified: true, false\n- active: true, false\n- created: date or relative time\n- updated: date or relative time\n\nFor Organizations:\n- name: text search in organization name\n- tags: tag_name, \"none\"\n- created: date or relative time\n- updated: date or relative time\n\nFor Groups:\n- name: text search in group name\n- description: text search in group description\n- created: date or relative time\n- updated: date or relative time\n\nRelative Time Format:\n- Supports: hours/h, minutes/min, days/d, weeks/w, months, years/y",
+          "type": "string"
+        },
+        "sort_by": {
+          "description": "Field to sort results by. Value can be created_at, updated_at, priority, status, ticket_type",
+          "type": "string",
+          "nullable": true,
+          "enum": [
+            "created_at",
+            "updated_at",
+            "priority",
+            "status",
+            "ticket_type"
+          ],
+          "default": null
+        },
+        "sort_order": {
+          "description": "Sort order. Value can be asc, desc. Defaults to desc.",
+          "type": "string",
+          "nullable": true,
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        },
+        "page": {
+          "description": "Page number for pagination. Defaults to 1.",
+          "type": "integer",
+          "default": 1
+        },
+        "per_page": {
+          "description": "Number of results per page (1-100). Defaults to 100.",
+          "type": "integer",
+          "default": 100
+        },
+        "include": {
+          "description": "Side-load related data. Comma-separated list like \"users\", or \"users,organizations\", \"users,groups\", \"users,organizations,groups\".",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  {
+    "name": "show_attachment",
+    "description": "Retrieves metadata about a specific attachment.\n\nThis function returns detailed information about an attachment including\nits content type, file name, size, URLs, and other metadata. The attachment\nmust exist in the system and not be marked as deleted.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "attachment_id": {
+          "description": "The ID of the attachment to retrieve.",
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "attachment_id"
+      ]
+    }
+  },
+  {
+    "name": "show_audit",
+    "description": "Show an audit by its ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "ticket_id": {
+          "description": "The ID of the ticket that the audit belongs to.",
+          "type": "integer"
+        },
+        "audit_id": {
+          "description": "The ID of the audit to show.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ticket_id",
+        "audit_id"
+      ]
+    }
+  },
+  {
+    "name": "update_organization",
+    "description": "Updates an existing organization.\n\nUpdates the details of an organization based on its unique identifier.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "organization_id": {
+          "description": "The unique identifier for the organization.",
+          "type": "integer"
+        },
+        "name": {
+          "description": "The new name of the organization. Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "industry": {
+          "description": "The industry of the organization. Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "location": {
+          "description": "The location of the organization. Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "domain_names": {
+          "description": "A list of domain names associated with the organization. Defaults to None.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true
+        },
+        "external_id": {
+          "description": "A unique external identifier for the organization. Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "group_id": {
+          "description": "The ID of the group that the organization belongs to. Defaults to None.",
+          "type": "integer",
+          "nullable": true
+        },
+        "notes": {
+          "description": "Notes about the organization. Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "details": {
+          "description": "Any details about the organization, such as the address. Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "shared_tickets": {
+          "description": "Whether tickets from this organization are shared with other organizations. Defaults to None.",
+          "type": "boolean",
+          "nullable": true
+        },
+        "shared_comments": {
+          "description": "Whether end users in this organization can comment on each other's tickets. Defaults to None.",
+          "type": "boolean",
+          "nullable": true
+        },
+        "tags": {
+          "description": "A list of tags associated with the organization. Defaults to None.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true
+        },
+        "organization_fields": {
+          "description": "Custom fields for this organization. Defaults to None.",
+          "type": "object",
+          "nullable": true,
+          "properties": {},
+          "additionalProperties": {
+            "description": "Custom field value. Can be a string, integer, number, boolean, or array of strings depending on the field type.",
+            "anyOf": [
+              {
+                "description": "String field value.",
+                "type": "string"
+              },
+              {
+                "description": "Integer field value.",
+                "type": "integer"
+              },
+              {
+                "description": "Numeric field value.",
+                "type": "number"
+              },
+              {
+                "description": "Boolean field value.",
+                "type": "boolean"
+              },
+              {
+                "description": "Array of string values.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "organization_id"
+      ]
+    }
+  },
+  {
+    "name": "update_ticket",
+    "description": "Updates an existing ticket.\n\nUpdates the details of a ticket based on its unique identifier.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "ticket_id": {
+          "description": "The unique identifier for the ticket.",
+          "type": "integer"
+        },
+        "ticket_updates": {
+          "description": "A dictionary representing the ticket attributes to be modified.",
+          "type": "object",
+          "properties": {
+            "assignee_id": {
+              "description": "ID of the agent assigned to the ticket.",
+              "type": "integer",
+              "nullable": true,
+              "minimum": 1
+            },
+            "assignee_email": {
+              "description": "Email of the agent assigned to the ticket.",
+              "type": "string",
+              "format": "email",
+              "nullable": true
+            },
+            "subject": {
+              "description": "The new subject of the ticket.",
+              "type": "string",
+              "nullable": true,
+              "minLength": 1
+            },
+            "comment_body": {
+              "description": "The new body of the comment.",
+              "type": "string",
+              "nullable": true,
+              "minLength": 1
+            },
+            "priority": {
+              "description": "The new priority (urgent/high/normal/low).",
+              "type": "string",
+              "nullable": true,
+              "enum": [
+                "urgent",
+                "high",
+                "normal",
+                "low"
+              ]
+            },
+            "ticket_type": {
+              "description": "The new type (problem/incident/question/task).",
+              "type": "string",
+              "nullable": true,
+              "enum": [
+                "problem",
+                "incident",
+                "question",
+                "task"
+              ]
+            },
+            "status": {
+              "description": "The new status (new/open/pending/hold/solved/closed).",
+              "type": "string",
+              "nullable": true,
+              "enum": [
+                "new",
+                "open",
+                "pending",
+                "hold",
+                "solved",
+                "closed"
+              ]
+            },
+            "attribute_value_ids": {
+              "description": "List of attribute value IDs for the ticket.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "description": "Attribute value ID.",
+                "type": "integer"
+              }
+            },
+            "custom_status_id": {
+              "description": "ID of the custom status for the ticket.",
+              "type": "integer",
+              "nullable": true,
+              "minimum": 1
+            },
+            "requester": {
+              "description": "Email or name of the requester.",
+              "type": "string",
+              "nullable": true
+            },
+            "safe_update": {
+              "description": "Whether to perform a safe update.",
+              "type": "boolean",
+              "nullable": true
+            },
+            "ticket_form_id": {
+              "description": "ID of the ticket form (>= 0).",
+              "type": "integer",
+              "nullable": true,
+              "minimum": 0
+            },
+            "updated_stamp": {
+              "description": "Timestamp for when the ticket was last updated.",
+              "type": "string",
+              "nullable": true
+            },
+            "via_followup_source_id": {
+              "description": "ID of the via followup source (>= 0).",
+              "type": "integer",
+              "nullable": true,
+              "minimum": 0
+            },
+            "via_id": {
+              "description": "ID of the via channel.",
+              "type": "integer",
+              "nullable": true,
+              "minimum": 1
+            },
+            "voice_comment": {
+              "description": "Voice comment data for the ticket.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "from": {
+                  "description": "The phone number of the caller.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "to": {
+                  "description": "The phone number that was called.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "recording_url": {
+                  "description": "The URL of the call recording.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "started_at": {
+                  "description": "The time the call started.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "ended_at": {
+                  "description": "The time the call ended.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "call_duration": {
+                  "description": "The duration of the call in seconds (>= 0).",
+                  "type": "integer",
+                  "nullable": true,
+                  "minimum": 0
+                },
+                "answered_by_id": {
+                  "description": "ID of the agent who answered the call.",
+                  "type": "integer",
+                  "nullable": true,
+                  "minimum": 1
+                },
+                "location": {
+                  "description": "Location of the caller.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "transcription_text": {
+                  "description": "Transcription of the voice call.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": []
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "ticket_id",
+        "ticket_updates"
+      ]
+    }
+  },
+  {
+    "name": "update_user",
+    "description": "Updates an existing user with comprehensive Zenhelp API support.\n\nThis function allows you to update any combination of user fields for an existing user.\nOnly the fields you specify will be updated; all other fields remain unchanged.\nThe function automatically updates the `updated_at` timestamp when any field is modified.\n\nKey Features:\n- Partial updates: Only specified fields are updated\n- Comprehensive validation: All fields are validated according to Zenhelp API standards\n- Automatic timestamp updates: `updated_at` is automatically set to current time\n- Flexible field combinations: Update any combination of fields in a single call\n\nValidation Rules:\n- String fields have length limits (e.g., name cannot be empty, details max 1000 chars)\n- Enum fields are validated against allowed values (e.g., role must be \"end-user\", \"agent\", or \"admin\")\n- Numeric IDs must be positive integers\n- Boolean fields must be actual boolean values\n- Tags are limited to 50 items, each maximum 50 characters long",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "The unique identifier for the user to update. Must be a positive integer.",
+          "type": "integer"
+        },
+        "name": {
+          "description": "The new name of the user. Must be a non-empty string.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "nullable": true,
+          "default": null
+        },
+        "email": {
+          "description": "The new email address of the user. Must be a valid email format.",
+          "type": "string",
+          "format": "email",
+          "nullable": true,
+          "default": null
+        },
+        "role": {
+          "description": "The new role of the user. Must be one of: \"end-user\", \"agent\", \"admin\".\n- \"end-user\": Regular user with limited permissions\n- \"agent\": Support agent with ticket management capabilities\n- \"admin\": Administrator with full system access",
+          "type": "string",
+          "enum": [
+            "end-user",
+            "agent",
+            "admin"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "organization_id": {
+          "description": "The new ID of the user's organization. Must be a positive integer.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "tags": {
+          "description": "The new list of tags for categorizing the user.\nMaximum 50 tags, each maximum 50 characters long.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 50,
+          "nullable": true,
+          "default": null
+        },
+        "photo": {
+          "description": "The new user's profile picture as an Attachment object. Possible keys:",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "Unique identifier for the photo.",
+              "type": "integer",
+              "minimum": 1,
+              "nullable": true,
+              "default": null
+            },
+            "filename": {
+              "description": "Original filename of the uploaded photo.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "content_type": {
+              "description": "MIME type of the image (e.g., 'image/jpeg', 'image/png').",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "content_url": {
+              "description": "URL to access the photo content.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "size": {
+              "description": "File size of the photo in bytes.",
+              "type": "integer",
+              "minimum": 0,
+              "nullable": true,
+              "default": null
+            },
+            "url": {
+              "description": "API URL to access the photo resource.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        },
+        "details": {
+          "description": "Any new details about the user. Maximum 1000 characters.",
+          "type": "string",
+          "maxLength": 1000,
+          "nullable": true,
+          "default": null
+        },
+        "default_group_id": {
+          "description": "The new ID of the user's default group. Must be a positive integer.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "alias": {
+          "description": "A new alias displayed to end users. Maximum 100 characters.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "nullable": true,
+          "default": null
+        },
+        "custom_role_id": {
+          "description": "A new custom role ID for Enterprise plan agents. Must be a positive integer.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "external_id": {
+          "description": "A new unique identifier from another system. Maximum 255 characters.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "nullable": true,
+          "default": null
+        },
+        "locale": {
+          "description": "The new user's locale in BCP-47 format.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "locale_id": {
+          "description": "The new user's language identifier. Must be a positive integer.",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        },
+        "moderator": {
+          "description": "Whether the user has forum moderation capabilities.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "notes": {
+          "description": "Any new internal notes about the user. Maximum 1000 characters.",
+          "type": "string",
+          "maxLength": 1000,
+          "nullable": true,
+          "default": null
+        },
+        "only_private_comments": {
+          "description": "Whether the user can only create private comments.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "phone": {
+          "description": "The new user's primary phone number. This value is validated and stored in E.164 format.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "remote_photo_url": {
+          "description": "New URL pointing to the user's profile picture.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "restricted_agent": {
+          "description": "Whether the agent has access restrictions.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "shared_phone_number": {
+          "description": "Whether the phone number is shared.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "signature": {
+          "description": "The new user's email signature (agents/admins only). Maximum 1000 characters.",
+          "type": "string",
+          "maxLength": 1000,
+          "nullable": true,
+          "default": null
+        },
+        "suspended": {
+          "description": "Whether the user account is suspended.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "ticket_restriction": {
+          "description": "Which tickets the user can access. Must be one of:\n- \"organization\": Access to tickets in user's organization\n- \"groups\": Access to tickets in user's groups\n- \"assigned\": Access only to assigned tickets\n- \"requested\": Access only to requested tickets",
+          "type": "string",
+          "enum": [
+            "organization",
+            "groups",
+            "assigned",
+            "requested"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "time_zone": {
+          "description": "The new user's time zone.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "verified": {
+          "description": "Whether any user identity is verified.",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "user_fields": {
+          "description": "New values of custom fields in the user's profile. Possible keys:",
+          "type": "object",
+          "properties": {
+            "department": {
+              "description": "User's department.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "employee_id": {
+              "description": "Employee ID.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "hire_date": {
+              "description": "Date of hire (YYYY-MM-DD).",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "manager": {
+              "description": "User's manager.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "location": {
+              "description": "User's location.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "user_id"
+      ]
+    }
+  }
+]

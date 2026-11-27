@@ -1,0 +1,139 @@
+/*
+ * The title block that opens the main page, as on a paper's first page (title,
+ * authors, links to the paper, the codebase, and the dataset), and the BibTeX
+ * entry of the Citation section at the end of the page.
+ */
+.paper-info {
+  position: relative;
+  padding-top: 78px;
+  padding-bottom: 26px;
+  text-align: center;
+  /* The title's size and the space under the title: the space above the buttons is worked out from both. */
+  --paper-title-size: clamp(30px, 3.7vw, 46px);
+  --paper-byline-gap: 30px;
+}
+
+/* Second anchor of the block, for the Codebase tab: same place as #paper. */
+.paper-anchor { position: absolute; top: 0; left: 0; width: 1px; height: 1px; }
+
+/* Arriving through a tab marks the button that tab is about. */
+@keyframes paper-button-mark {
+  0%, 60% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--mv-purple) 35%, transparent); }
+  100% { box-shadow: 0 0 0 4px transparent; }
+}
+.paper-info:target .paper-button--paper,
+.paper-anchor:target ~ .paper-links .paper-button--code {
+  animation: paper-button-mark 2.4s ease-out 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .paper-info:target .paper-button--paper,
+  .paper-anchor:target ~ .paper-links .paper-button--code { animation: none; }
+}
+
+.paper-title {
+  max-width: 960px;
+  margin: 0 auto;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: var(--paper-title-size);
+  font-weight: 450;
+  letter-spacing: -0.03em;
+  line-height: 1.16;
+  text-wrap: balance;
+}
+.paper-authors { max-width: 900px; margin: var(--paper-byline-gap) auto 0; color: var(--mv-ink); font-size: 15px; line-height: 1.95; }
+.paper-author { white-space: nowrap; }
+.paper-byline-emphasis { font-weight: 550; }
+.paper-info sup { margin-left: 1px; color: var(--mv-ink-3); font-size: 9px; line-height: 0; }
+.paper-affiliations,
+.paper-marks { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 14px; margin: 14px 0 0; color: var(--mv-ink-3); font-size: 13px; line-height: 1.7; }
+.paper-marks { margin-top: 4px; }
+.paper-affiliations sup,
+.paper-marks sup { margin: 0 2px 0 0; }
+/* The contact address, under the notes on the marks and in their small print. */
+.paper-contact { margin: 4px 0 0; font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+/*
+ * The buttons are as far below the letters of the e-mail address as the authors' names are below
+ * the letters of the title. The title's line box ends about 0.255 of its font size under its
+ * letters, which the space under the title does not count, so the same amount is added here; the
+ * last pixel is the difference between the room above the names and the room under the address
+ * inside their own lines.
+ */
+.paper-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: calc(var(--paper-byline-gap) + 0.255 * var(--paper-title-size) + 1px); }
+/*
+ * Two groups of buttons: what is published elsewhere (paper, codebase, dataset) and what is on
+ * this site (results, task explorer, result explorer for the latest release, citation). The row
+ * breaks between the groups before it breaks inside one, so the buttons sit in one row where they
+ * fit and in one row per group where they do not.
+ */
+.paper-links-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+/* The licenses of the release, in the same small print as the affiliations. */
+.paper-licenses { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2px 16px; margin: 14px 0 0; color: var(--mv-ink-3); font-size: 13px; line-height: 1.7; }
+.paper-licenses strong { color: var(--mv-ink-2); font-weight: 650; }
+.paper-licenses-label { display: inline-flex; align-items: center; gap: 5px; font-weight: 650; }
+/* Which release the site shows, under the licenses. */
+.paper-release { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 2px 12px; margin: 6px 0 0; color: var(--mv-ink-3); font-size: 13px; line-height: 1.7; }
+.paper-release strong { color: var(--mv-ink-2); font-weight: 650; }
+.paper-links .paper-button { justify-content: space-between; gap: 16px; }
+/* The citation link is the quieter one. */
+.paper-links .paper-button--cite {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--mv-line-strong);
+  color: var(--mv-ink);
+}
+.paper-links .paper-button--cite:hover { background: var(--mv-tint); }
+.paper-link-label { display: inline-flex; align-items: center; gap: 8px; }
+/* "coming soon" on a button: a tint of the button's own text colour. */
+.paper-soon {
+  margin-left: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 15%, transparent);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+/* ---- citation ---------------------------------------------------------------- */
+
+.citation-section .section-heading { margin-bottom: 18px; }
+.paper-bibtex {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 880px;
+  border: 1px solid var(--mv-line);
+  border-radius: var(--mv-radius-sm);
+  background: var(--mv-card);
+}
+.paper-bibtex-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--mv-line);
+}
+.paper-bibtex pre {
+  flex: 1;
+  margin: 0;
+  padding: 14px;
+  overflow: auto;
+  color: var(--mv-ink-2);
+  font-family: var(--mv-mono);
+  font-size: 11.5px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.paper-bibtex pre:focus-visible { outline: 3px solid var(--mv-focus); outline-offset: -3px; }
+
+@media (max-width: 600px) {
+  .paper-info { padding-top: 44px; text-align: left; --paper-title-size: 27px; --paper-byline-gap: 22px; }
+  .paper-authors { font-size: 14px; }
+  .paper-affiliations,
+  .paper-marks,
+  .paper-licenses,
+  .paper-release,
+  .paper-links,
+  .paper-links-group { justify-content: flex-start; }
+}

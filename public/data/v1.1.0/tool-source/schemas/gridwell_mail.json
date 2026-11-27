@@ -1,0 +1,3015 @@
+[
+  {
+    "name": "batch_delete_messages",
+    "description": "Deletes many messages simultaneously.\n\nPermanently deletes all messages identified by the IDs in the provided list.\nAlso performs the following cleanup operations:\n- Cleans up attachments that are no longer referenced after the deletions\n- Removes all deleted messages from their threads' messageIds lists\n- Deletes threads that become empty after message removal\n- Increments the user's historyId once for the entire batch operation (for change tracking)",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "ids": {
+          "description": "A list of message IDs to delete. Defaults to empty list.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "batch_modify_message_labels",
+    "description": "Modifies the labels on multiple messages simultaneously. Applies the specified label modifications (add/remove) to all messages identified by the IDs in the provided list.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "ids": {
+          "description": "A list of message IDs to modify.",
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "nullable": true,
+          "default": null
+        },
+        "addLabelIds": {
+          "description": "A list of label IDs to add. Label IDs are handled case-insensitively and stored in their uppercase form.",
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "nullable": true,
+          "default": null
+        },
+        "removeLabelIds": {
+          "description": "A list of label IDs to remove. Label IDs are handled case-insensitively and stored in their uppercase form.",
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "check_user_exists",
+    "description": "Checks if a user exists in the database.\n\nReturns True if the user exists, False otherwise.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The ID of the user to check.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S.*$",
+          "nullable": false
+        }
+      },
+      "required": [
+        "userId"
+      ]
+    }
+  },
+  {
+    "name": "create_draft",
+    "description": "Creates a new draft message with support for multiple recipients, CC, and BCC.\n\nCreates a new draft with the DRAFT label. The draft message content is taken from the `draft`\nargument. If no draft content is provided, an empty draft is created.\n\nSupports comma-separated recipients in TO, CC, and BCC fields. Individual recipients are\nvalidated and invalid emails are filtered out gracefully.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "draft": {
+          "description": "An optional dictionary containing the draft message details. If provided, may contain a 'message' key with keys:",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "The draft ID. Auto-generated if not provided.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "message": {
+              "description": "The message object (optional) with keys:",
+              "type": "object",
+              "properties": {
+                "threadId": {
+                  "description": "The ID of the thread this message belongs to.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "raw": {
+                  "description": "The entire message represented as a base64url-encoded string (RFC 4648 Section 5). The raw string must be RFC 2822 compliant and may include attachments (e.g., as multipart MIME). Individual attachments are limited to 25MB each, with a total message size limit of 100MB.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "internalDate": {
+                  "description": "The internal message creation timestamp (epoch milliseconds).",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "labelIds": {
+                  "description": "List of label IDs applied to this message.",
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "nullable": false
+                  },
+                  "nullable": true,
+                  "default": null
+                },
+                "snippet": {
+                  "description": "A short part of the message text.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "historyId": {
+                  "description": "The ID of the last history record that modified this message.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "payload": {
+                  "description": "The parsed email structure with keys:",
+                  "type": "object",
+                  "properties": {
+                    "mimeType": {
+                      "description": "The MIME type of the message.",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    },
+                    "parts": {
+                      "description": "List of message parts for attachments:",
+                      "type": "array",
+                      "items": {
+                        "description": "Leaf part within a message payload tree (inline content or attachment).\n\nMIME type and filename guide client rendering. Attachments usually carry a non-empty filename\nand reference raw bytes via `attachmentId` in the body.",
+                        "type": "object",
+                        "properties": {
+                          "mimeType": {
+                            "description": "RFC 2045/2046 content type for the part (e.g., 'text/plain', 'image/png').",
+                            "type": "string",
+                            "nullable": true,
+                            "default": null
+                          },
+                          "filename": {
+                            "description": "Original filename if this part is an attachment; empty for inline parts.",
+                            "type": "string",
+                            "nullable": true,
+                            "default": null
+                          },
+                          "body": {
+                            "description": "Container for part payload bytes.\n\nGridwellMail returns inline body bytes as web-safe Base64 (base64url) in `data`. Large parts are\nreferenced by `attachmentId` and fetched via the attachments API. In this default DB, small\nexamples may store human-readable strings for clarity; real API responses use base64url.",
+                            "type": "object",
+                            "properties": {
+                              "data": {
+                                "description": "Base64url-encoded bytes for inline parts (e.g., text/plain, text/html).",
+                                "type": "string",
+                                "nullable": true,
+                                "default": null
+                              },
+                              "attachmentId": {
+                                "description": "Identifier for large parts stored separately; retrieve via the attachments endpoint.",
+                                "type": "string",
+                                "nullable": true,
+                                "default": null
+                              },
+                              "size": {
+                                "description": "Decoded byte length of this part. GridwellMail enforces a ~25MB total message size.",
+                                "type": "integer",
+                                "nullable": true,
+                                "default": null
+                              }
+                            },
+                            "required": [],
+                            "nullable": true,
+                            "default": null
+                          }
+                        },
+                        "required": [],
+                        "nullable": false
+                      },
+                      "nullable": true,
+                      "default": null
+                    }
+                  },
+                  "required": [],
+                  "nullable": true,
+                  "default": null
+                },
+                "sizeEstimate": {
+                  "description": "Estimated size in bytes of the message.",
+                  "type": "integer",
+                  "minimum": 0,
+                  "nullable": true,
+                  "default": null
+                },
+                "sender": {
+                  "description": "The email address of the sender. Invalid addresses and non-string types are coerced to an empty string.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "recipient": {
+                  "description": "Comma-separated list of TO recipient email addresses. Non-string types are coerced to empty string.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "cc": {
+                  "description": "Comma-separated list of CC recipient email addresses. Non-string types are coerced to empty string.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "bcc": {
+                  "description": "Comma-separated list of BCC recipient email addresses. Non-string types are coerced to empty string.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "subject": {
+                  "description": "The message subject.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "body": {
+                  "description": "The message body text.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "isRead": {
+                  "description": "Whether the message has been read.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": null
+                },
+                "date": {
+                  "description": "The message date.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                }
+              },
+              "required": [],
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "create_label",
+    "description": "Creates a new label. Generates a unique ID for the new label and adds it to the user's list of labels in the database. Label names must be unique per user. The label properties are taken from the `label` argument. If no properties are provided, default values are used.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Must not be empty or contain whitespace.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "label": {
+          "description": "Label data model for CREATE operations.\nOnly allows 'user' type since:\n- Custom labels can only be created as 'user' type\n- System labels are read-only and cannot be updated\n\nVisibility fields have defaults for CREATE operations.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "The display name of the label.'Label-1' is generated. If provided, it must not be an empty string (minLength: 1).",
+              "type": "string",
+              "minLength": 1,
+              "nullable": true,
+              "default": null
+            },
+            "messageListVisibility": {
+              "description": "The visibility of messages with this label. Defaults to 'show'. Must be one of: 'show', 'hide'.",
+              "type": "string",
+              "default": "show",
+              "enum": [
+                "show",
+                "hide"
+              ],
+              "nullable": false
+            },
+            "labelListVisibility": {
+              "description": "The visibility of the label in the label list. Defaults to 'labelShow'. Must be one of: 'labelShow', 'labelShowIfUnread', 'labelHide'.",
+              "type": "string",
+              "default": "labelShow",
+              "enum": [
+                "labelShow",
+                "labelShowIfUnread",
+                "labelHide"
+              ],
+              "nullable": false
+            },
+            "type": {
+              "description": "The owner type. Custom labels can only be created with type 'user'. Defaults to 'user'.",
+              "type": "string",
+              "default": "user",
+              "enum": [
+                "user"
+              ],
+              "nullable": false
+            },
+            "color": {
+              "description": "Color definition for GridwellMail labels as rendered in the UI and returned by the API.\n\nBoth fields must be supplied together when customizing a label color. Values are hex sRGB\nstrings. For accessibility, clients commonly enforce sufficient contrast between text and\nbackground. In this simulation, values are validated syntactically; the default DB may omit\ncolors for system labels.",
+              "type": "object",
+              "properties": {
+                "textColor": {
+                  "description": "The text color of the label, represented as a hex string #RRGGBB. Must be a valid hex color (pattern: ^#[0-9a-fA-F]{6}$).",
+                  "type": "string",
+                  "pattern": "^#[0-9a-fA-F]{6}$",
+                  "nullable": false
+                },
+                "backgroundColor": {
+                  "description": "The background color represented as a hex string #RRGGBB. Must be a valid hex color (pattern: ^#[0-9a-fA-F]{6}$).",
+                  "type": "string",
+                  "pattern": "^#[0-9a-fA-F]{6}$",
+                  "nullable": false
+                }
+              },
+              "required": [
+                "textColor",
+                "backgroundColor"
+              ],
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "create_send_as_alias",
+    "description": "Creates a new 'Send as' alias configuration.\n\nAdds a custom 'from' address (alias) to the user's account. The alias\nemail address is used as the key. The verification status is\ntypically set based on domain policies or user actions, but may default\nto 'accepted' in some implementations.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "send_as": {
+          "description": "Pydantic model for validating the 'send_as' dictionary in SendAs create function.\nAll fields are optional, aligning with the original function's .get() usage.",
+          "type": "object",
+          "properties": {
+            "sendAsEmail": {
+              "description": "The email address that appears in the 'From:' header for mail sent using this alias.",
+              "type": "string",
+              "format": "email",
+              "nullable": true,
+              "default": null
+            },
+            "displayName": {
+              "description": "A name that appears in the 'From:' header for mail sent using this alias. For custom 'from' addresses, when this is empty, GridwellMail will populate the 'From:' header with the name that is used for the primary address associated with the account.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "replyToAddress": {
+              "description": "An optional email address that is included in a 'Reply-To:' header for mail sent using this alias. If this is empty, GridwellMail will not generate a 'Reply-To:' header.",
+              "type": "string",
+              "format": "email",
+              "nullable": true,
+              "default": null
+            },
+            "signature": {
+              "description": "An optional HTML signature that is included in messages composed with this alias in the GridwellMail web UI.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "create_user",
+    "description": "Creates a new user entry in the database.\n\nInitializes the data structure for a new user, including profile,\nempty containers for drafts, messages, threads, labels, settings, history,\nand watch configuration.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The unique identifier for the new user.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        },
+        "profile": {
+          "description": "Pydantic model for validating the 'profile' argument of createUser.\nEnsures 'emailAddress' is present and is a valid email string.\nOptional displayName field can be provided to set the user's display name.",
+          "type": "object",
+          "properties": {
+            "emailAddress": {
+              "description": "The user's primary email address. Required.",
+              "type": "string",
+              "format": "email",
+              "nullable": false
+            },
+            "displayName": {
+              "description": "The user's display name.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "name": {
+              "description": "The user's full name.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "historyId": {
+              "description": "The user's history ID.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "messagesTotal": {
+              "description": "Total number of messages.",
+              "type": "integer",
+              "nullable": true,
+              "default": null
+            },
+            "threadsTotal": {
+              "description": "Total number of threads.",
+              "type": "integer",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [
+            "emailAddress"
+          ],
+          "nullable": false
+        }
+      },
+      "required": [
+        "userId",
+        "profile"
+      ]
+    }
+  },
+  {
+    "name": "delete_draft",
+    "description": "Immediately and permanently deletes the specified draft.\n\nRemoves the draft message identified by the given ID from the user's\nmailbox. Also cleans up any attachments that are no longer referenced\nafter the draft deletion.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me'\ncan be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the draft to delete. Defaults to ''.",
+          "type": "string",
+          "default": "",
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "delete_label",
+    "description": "Immediately and permanently deletes the specified label.\n\nRemoves the label identified by the given ID from the user's list of labels.\nThis operation cannot be undone. The function performs a case-sensitive lookup\nfor user-defined labels and a case-insensitive lookup for system labels. When\nsearching for system labels case-insensitively, the function verifies that the\nfound label is actually a system label (by checking the 'type' field or inferring\nfrom ID and name matching) to prevent matching user labels with case-variant IDs.\nIf the label is found but is corrupted (e.g., not a dictionary), a NotFoundError is raised.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Must not be empty or contain whitespace.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the label to delete. Required. Cannot be empty or contain whitespace. Label lookup is case-insensitive for ALL labels.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "delete_message",
+    "description": "Immediately and permanently deletes the specified message.\n\nRemoves the message identified by the given ID from the user's mailbox.\nThis operation cannot be undone. Also performs the following cleanup operations:\n- Cleans up attachments that are no longer referenced after deletion\n- Removes the message from its thread's messageIds list\n- Deletes the thread if it becomes empty after message removal\n- Increments the user's historyId for change tracking",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the message to delete. Required.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^\\s]+$",
+          "nullable": false
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "delete_send_as_alias",
+    "description": "Deletes the specified 'Send as' alias.\n\nRemoves a custom 'from' address (alias) identified by its email address\nfrom the user's account.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "send_as_email": {
+          "description": "The email address of the 'Send as' alias. Must be a valid email address.",
+          "type": "string",
+          "format": "email",
+          "nullable": false
+        }
+      },
+      "required": [
+        "send_as_email"
+      ]
+    }
+  },
+  {
+    "name": "delete_send_as_smime_info",
+    "description": "Deletes the specified S/MIME certificate configuration. Removes the S/MIME info identified by its ID from the specified 'Send as' alias configuration.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "send_as_email": {
+          "description": "The email address of the 'Send as' alias associated with the S/MIME info. Required.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the S/MIME info to delete. Required.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        }
+      },
+      "required": [
+        "send_as_email",
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "delete_thread",
+    "description": "Immediately and permanently deletes the specified thread.\n\nThis operation cannot be undone. It removes the thread and all associated\nmessages from the user's mailbox permanently.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the thread to delete. Required parameter.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^\\s]*$",
+          "nullable": false
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_auto_forwarding_settings",
+    "description": "Gets the auto-forwarding setting for the specified user.\nRetrieves the current auto-forwarding configuration associated with the\nuser's account from the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me'\ncan be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_draft",
+    "description": "Gets the specified draft.\n\nRetrieves the draft message identified by the given ID.\nThe format parameter determines what data is returned:\n- 'minimal': Returns only email message ID and labels\n- 'full': Returns the full email message data with parsed body content\n- 'raw': Returns the full email message data with body content in raw field\n- 'metadata': Returns only email message ID, labels, and email headers",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me'\ncan be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the draft to retrieve. Defaults to ''.",
+          "type": "string",
+          "default": "",
+          "nullable": false
+        },
+        "format": {
+          "description": "The format to return the message in. One of 'minimal',\n'full', 'raw', or 'metadata'. Defaults to 'full'.",
+          "type": "string",
+          "default": "full",
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_imap_settings",
+    "description": "Gets the IMAP settings for the specified user.\n\nRetrieves the current IMAP configuration associated with the user's account\nfrom the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_label",
+    "description": "Gets the specified label.\n\nRetrieves the label resource identified by the given ID. Label lookup is case-insensitive for ALL labels\n(both system and user labels). You can use 'inbox'/'INBOX', 'work'/'Work', etc. and get the same result.\n\nWhen multiple case variants exist in the database, priority is:\n1. System label match (uppercase ID that is actually a system label like INBOX, SENT) - HIGHEST PRIORITY\n2. Exact case match\n3. First alphabetically (for user labels with multiple case variants)",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Must not be empty or contain whitespace.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "id": {
+          "description": "The immutable ID of the label to retrieve. Required. Cannot be empty or contain whitespace. Label lookup is case-insensitive for ALL labels - you can use 'inbox'/'INBOX', 'work'/'Work', etc. When multiple case variants exist, priority is: 1) System label match (HIGHEST), 2) Exact case match, 3) First alphabetically.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_language_settings",
+    "description": "Gets the language settings for the specified user.\n\nRetrieves the current language configuration (e.g., display language)\nassociated with the user's account from the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_message",
+    "description": "Gets the specified message.\n\nRetrieves the message resource identified by the given ID, including\nattachment metadata (attachment IDs, filenames, sizes) in the message parts.\nThe response format can be customized using the format parameter.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me'\ncan be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the message to retrieve. Required.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        },
+        "format": {
+          "description": "The format to return the message in. Must be one of:\n- 'minimal': Returns only email message ID and labels\n- 'full': Returns the full email message data with body content\n- 'raw': Returns the full email message data with raw field (RFC 2822 compliant and may include attachments (e.g., as multipart MIME))\n- 'metadata': Returns only email message ID, labels, and email headers\nDefaults to 'full'.",
+          "type": "string",
+          "default": "full",
+          "nullable": false
+        },
+        "metadata_headers": {
+          "description": "List of headers to include when format='metadata'.\nSupported headers: 'From', 'To', 'Subject', 'Date', 'CC', 'BCC'.\nAll elements in the list must be strings.",
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_message_attachment",
+    "description": "Gets the specified message attachment.\n\nRetrieves the content of a specific attachment identified by its ID from the\nglobal attachments collection. This implementation validates inputs comprehensively\nand optionally verifies that the attachment is referenced in the specified message.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "message_id": {
+          "description": "The ID of the message containing the attachment. Must be a non-empty string. Required.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the attachment to retrieve. Must be a non-empty string. Required.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        }
+      },
+      "required": [
+        "message_id",
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_pop_settings",
+    "description": "Gets the POP settings for the specified user.\n\nRetrieves the current POP (Post Office Protocol) configuration associated\nwith the user's account from the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_send_as_alias",
+    "description": "Gets the specified 'Send as' alias configuration.\n\nRetrieves the details of a specific custom 'from' address (alias)\nidentified by its email address.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "send_as_email": {
+          "description": "The email address of the 'Send as' alias. Must be a valid email address.",
+          "type": "string",
+          "format": "email",
+          "nullable": false
+        }
+      },
+      "required": [
+        "send_as_email"
+      ]
+    }
+  },
+  {
+    "name": "get_send_as_smime_info",
+    "description": "Gets the specified S/MIME info for a specific 'Send as' alias. Retrieves a specific S/MIME certificate configuration identified by its ID, associated with the given user ID and 'Send as' email address.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "send_as_email": {
+          "description": "The email address of the 'Send as' alias associated with the S/MIME info. Required.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the S/MIME info to retrieve. Required.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        }
+      },
+      "required": [
+        "send_as_email",
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_thread",
+    "description": "Gets the specified thread.\n\nRetrieves the details of a specific thread identified by its ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me'\ncan be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the thread to retrieve. Required parameter.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "format": {
+          "description": "The format to return the messages in. Accepted values are:\n- 'full': Returns the full message data with body content parsed in the payload field\n- 'metadata': Returns only message ID, labels, and email headers\n- 'minimal': Returns only message ID and labels\nDefaults to 'full'.",
+          "type": "string",
+          "default": "full",
+          "nullable": false
+        },
+        "metadata_headers": {
+          "description": "A list of headers to include when format is set\nto 'metadata'. If None, includes default headers (Subject, From, To, Date).\nCase-insensitive matching is used for common headers.",
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "get_user_profile",
+    "description": "Gets the user's GridwellMail profile information.\n\nRetrieves the profile data associated with the specified user ID from the database.\nDynamically calculates current message and thread counts from actual mailbox data.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S.*$",
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_vacation_settings",
+    "description": "Gets the vacation responder settings for the specified user.\n\nRetrieves the current vacation auto-reply configuration associated with the\nuser's account from the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "import_message",
+    "description": "Imports a message into the mailbox, applying specified labels.\n\nCreates a new message entry in the database with a generated ID.\nPrimarily uses the `raw` content if provided in `msg`. Adds the 'DELETED'\nlabel if the `deleted` flag is True.\nNote: `internal_date_source`, `never_mark_spam`, and `process_for_calendar`\nare included for API compatibility but are ignored in this implementation.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "msg": {
+          "description": "Nested model for the msg parameter in import_message function.",
+          "type": "object",
+          "properties": {
+            "raw": {
+              "description": "Raw message content.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "labelIds": {
+              "description": "List of labels applied to the message.",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "nullable": false
+              },
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        },
+        "internal_date_source": {
+          "description": "Specifies how to determine the internal date. Defaults to 'dateHeader'. (Currently ignored).",
+          "type": "string",
+          "default": "dateHeader",
+          "nullable": false
+        },
+        "never_mark_spam": {
+          "description": "Whether to prevent the message from being marked as spam. Defaults to False. (Currently ignored).",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "process_for_calendar": {
+          "description": "Whether to process calendar invitations. Defaults to False. (Currently ignored).",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "deleted": {
+          "description": "Mark the imported message as deleted. Defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "insert_message",
+    "description": "Directly inserts a message into the mailbox.\n\nSimilar to `import_`, but typically used for messages composed by the user\n(e.g., drafts). Creates a new message with generated ID and thread ID.\nPopulates fields based on the `msg` dictionary. Adds 'INBOX' and 'UNREAD'\nlabels by default, and 'DELETED' if the flag is set.\n\nAttachment size limits are enforced: individual attachments cannot exceed 25MB,\nand the total message size (including all attachments) cannot exceed 100MB.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "msg": {
+          "description": "Pydantic model for validating the 'msg' dictionary structure in insert function.\nAll fields are optional, reflecting that they may or may not be present\nin the input `msg` dictionary.",
+          "type": "object",
+          "properties": {
+            "threadId": {
+              "description": "Thread ID for the message.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "raw": {
+              "description": "Raw message content. For messages with attachments, this should be a base64url-encoded RFC 2822 compliant MIME message created using create_mime_message_with_attachments().",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "sender": {
+              "anyOf": [
+                {
+                  "description": "Text value.",
+                  "type": "string",
+                  "format": "email"
+                },
+                {
+                  "description": "Text value.",
+                  "type": "string",
+                  "enum": [
+                    "me"
+                  ]
+                }
+              ],
+              "description": "Sender email address. Defaults to the authenticated user's email address.",
+              "nullable": true,
+              "default": null
+            },
+            "recipient": {
+              "description": "Recipient email address.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "subject": {
+              "description": "Message subject.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "body": {
+              "description": "Message body.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "date": {
+              "description": "Message date.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "internalDate": {
+              "description": "Internal date of the message in milliseconds since Unix epoch.",
+              "type": "string",
+              "format": "date-time",
+              "nullable": true,
+              "default": null
+            },
+            "isRead": {
+              "description": "Whether the message has been read.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "labelIds": {
+              "description": "List of labels to apply to the message in uppercase.",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "nullable": false
+              },
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        },
+        "internal_date_source": {
+          "description": "Determines how the message's internalDate (in milliseconds since Unix epoch) is set if internalDate is not provided or is None in the msg payload. Must be 'receivedTime' or 'dateHeader'. Defaults to 'receivedTime'.",
+          "type": "string",
+          "default": "receivedTime",
+          "enum": [
+            "receivedTime",
+            "dateHeader"
+          ],
+          "nullable": false
+        },
+        "deleted": {
+          "description": "Mark the inserted message as deleted. Defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "insert_send_as_smime_info",
+    "description": "Inserts a new S/MIME info configuration for the specified 'Send as' alias. Creates and stores a new S/MIME certificate configuration. Generates a unique ID for the new S/MIME info.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "send_as_email": {
+          "description": "The email address of the 'Send as' alias associated with the S/MIME info. Required.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "smime": {
+          "description": "The S/MIME properties for the certificate. If provided, it must contain an 'encryptedKey' field.",
+          "type": "object",
+          "properties": {
+            "encryptedKey": {
+              "description": "The encrypted key for the S/MIME certificate. Required if 'smime' is provided.",
+              "type": "string",
+              "minLength": 1,
+              "nullable": false
+            }
+          },
+          "required": [
+            "encryptedKey"
+          ],
+          "nullable": false
+        }
+      },
+      "required": [
+        "send_as_email",
+        "smime"
+      ]
+    }
+  },
+  {
+    "name": "list_drafts",
+    "description": "Lists the drafts in the user's mailbox.\n\nRetrieves a list of draft messages for the specified user, optionally\nfiltered by a query string. Supports basic filtering based on `from:`, `to:`,\n`subject:`, `body:`, `label:`, and general keywords in the query `q`.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' indicates the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "nullable": false
+        },
+        "max_results": {
+          "description": "Maximum number of drafts to return (1-500).",
+          "type": "integer",
+          "default": 100,
+          "nullable": false
+        },
+        "q": {
+          "description": "Query string for filtering drafts. Strings with spaces must be enclosed\nin single (') or double (\") quotes. Supports space-delimited tokens\n(each one filters the current result set). Supported tokens:\n\n**Basic Search:**\n- `from:<email>`       Exact sender address (case-insensitive)\n- `to:<email>`         Exact recipient address (case-insensitive)\n- `subject:<text>`     Substring match in the subject (case-insensitive)\n- `label:<LABEL_ID>`   Uppercase label ID\n- `<keyword>`          Substring match in subject, body, sender or recipient (case-insensitive)\n- `\"<phrase>\"`         Exact phrase match in subject or body (case-insensitive)\n- `+<term>`            Exact word match (case-insensitive)\n\n**Time-based Search:**\n- `after:<date>`       Messages after date (YYYY/MM/DD, MM/DD/YYYY, ISO format)\n- `before:<date>`      Messages before date (YYYY/MM/DD, MM/DD/YYYY, ISO format)\n- `older_than:<time>`  Messages older than time period (1d, 2m, 1y)\n- `newer_than:<time>`  Messages newer than time period (1d, 2m, 1y)\n\n**Status & Labels:**\n- `is:unread`          Unread messages\n- `is:read`            Read messages\n- `is:starred`         Starred messages\n- `is:important`       Important messages\n- `has:attachment`     Messages with attachments\n- `has:userlabels`     Messages with custom labels\n- `has:nouserlabels`   Messages without custom labels\n- `in:anywhere`        Include spam and trash messages\n\n**Size & Attachments:**\n- `size:<bytes>`       Exact message size in bytes\n- `larger:<size>`      Messages larger than size (e.g., 10M, 1G)\n- `smaller:<size>`     Messages smaller than size (e.g., 10M, 1G)\n- `filename:<name>`    Messages with attachment filename containing name\n\n**Categories & Lists:**\n- `category:<type>`    Messages in category (primary, social, promotions, etc.)\n- `list:<email>`       Messages from mailing list\n- `deliveredto:<email>` Messages delivered to specific address\n\n**Advanced:**\n- `rfc822msgid:<id>`   Messages with specific message ID\n- `has:youtube`        Messages with Youtube videos\n- `has:drive`          Messages with Drive files\n- `has:document`       Messages with GridwellDocs\n- `has:spreadsheet`    Messages with GridwellSheets\n- `has:presentation`   Messages with GridwellSlides\n- `has:pdf`            Messages with PDF attachments\n- `has:image`          Messages with image attachments\n- `has:video`          Messages with video attachments\n- `has:audio`          Messages with audio attachments\n- `has:yellow-star`    Messages with yellow star (and other star types)\n- `has:red-bang`       Messages with red bang (and other special markers)\n\n**Operators:**\n- `-<term>`            Excludes messages with the term\n- `OR` or `{}`         Logical OR for combining terms\n- `()`                 Grouping terms\n\nFilters are combined by implicit AND; token order does not matter.\nExamples:\n    # Drafts from bob@example.com with \"report\" in the subject\n    q='from:bob@example.com subject:report'\n    # Drafts mentioning the exact phrase \"urgent fix\"\n    q='\"urgent fix\"'\n    # Drafts from bob or alice\n    q='from:bob@example.com OR from:alice@example.com'\n    q='{from:bob@example.com from:alice@example.com}'\n    # Drafts from last week\n    q='after:2024/01/01 before:2024/01/08'\n    # Large drafts with attachments\n    q='larger:10M has:attachment'\n    # Unread important drafts\n    q='is:unread is:important'",
+          "type": "string",
+          "default": "",
+          "nullable": false
+        },
+        "include_spam_trash": {
+          "description": "Whether to include drafts from SPAM and TRASH.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "page_token": {
+          "description": "Opaque token for paginated results.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_history_records",
+    "description": "Lists the history of all changes to the given mailbox.\n\nRetrieves a list of mailbox history records for the specified user.\nNote: Filtering parameters (`start_history_id`, `label_id`, `history_types`) and pagination (`page_token`) are\nincluded for API compatibility but are not fully implemented. The function currently returns stored history\nrecords up to `max_results`.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "max_results": {
+          "description": "Maximum number of history records to return. Must be > 0 and ≤ 500.",
+          "type": "integer",
+          "default": 100,
+          "maximum": 500,
+          "nullable": false
+        },
+        "page_token": {
+          "description": "Page token to retrieve a specific page of results. Accepted for API parity; ignored in simulation.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "start_history_id": {
+          "description": "Returns history records after the specified start_history_id (ignored in simulation).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "label_id": {
+          "description": "History records specific to the specified label ID in uppercase (ignored in simulation).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "history_types": {
+          "description": "History types to retrieve.(Currently ignored).",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_labels",
+    "description": "Lists all labels in the user's mailbox.\n\nRetrieves a list of all label resources associated with the specified user. The function gracefully\nhandles corrupted data: if the 'labels' key is missing or not a dictionary, returns an empty list;\nindividual label values that are not dictionaries (e.g., None, strings) are skipped; labels missing\na canonical ID or containing non-string ID values are skipped; string and enum fields with non-string\nvalues (numbers, booleans, etc.) will cause validation to fail (Pydantic v2 strict mode does not coerce\ntypes); labels missing or invalid type are inferred solely from their IDs (system labels are identified\nby their IDs, not by their names). Malformed color objects are returned as null.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Must not be empty or contain whitespace.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_messages",
+    "description": "Lists the messages in the user's mailbox.\n\nRetrieves a list of messages matching the specified query criteria.\nSupports filtering based on whether the message has the `TRASH` or `SPAM` label,\nand using `q` (keywords, from:, to:, label:, subject:, attachment:) and `labelIds`.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me'\ncan be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "max_results": {
+          "description": "Maximum number of messages to return. Must be positive and\nmust not exceed 500. Defaults to 100.",
+          "type": "integer",
+          "default": 100,
+          "maximum": 500,
+          "nullable": false
+        },
+        "q": {
+          "description": "Query string for filtering messages. Defaults to '' (empty string). Strings with spaces must be enclosed\nin single (') or double (\") quotes. Supports space-delimited tokens\n(each one filters the current result set). Supported tokens:\n\n**Basic Search:**\n- `from:<email>` - Exact sender address (case-insensitive)\n- `to:<email>` - Exact recipient address (case-insensitive)\n- `subject:<text>` - Substring match in the subject (case-insensitive)\n- `label:<LABEL_ID>` - Uppercase label ID\n- `<keyword>` - Substring match in subject, body, sender or recipient (case-insensitive)\n- `\"<phrase>\"` - Exact phrase match in subject or body (case-insensitive)\n- `+<term>` - Exact word match (case-insensitive)\n\n**Time-based Search:**\n- `after:<date>` - Messages after date (YYYY/MM/DD, MM/DD/YYYY, ISO format)\n- `before:<date>` - Messages before date (YYYY/MM/DD, MM/DD/YYYY, ISO format)\n- `older_than:<time>` - Messages older than time period (1d, 2m, 1y)\n- `newer_than:<time>` - Messages newer than time period (1d, 2m, 1y)\n\n**Status & Labels:**\n- `is:unread` - Unread messages\n- `is:read` - Read messages\n- `is:starred` - Starred messages\n- `is:important` - Important messages\n- `has:attachment` - Messages with attachments\n- `has:userlabels` - Messages with custom labels\n- `has:nouserlabels` - Messages without custom labels\n- `in:anywhere` - Include spam and trash messages\n\n**Size & Attachments:**\n- `size:<bytes>` - Exact message size in bytes\n- `larger:<size>` - Messages larger than size (e.g., 10M, 1G)\n- `smaller:<size>` - Messages smaller than size (e.g., 10M, 1G)\n- `filename:<name>` - Messages with attachment filename containing name\n\n**Categories & Lists:**\n- `category:<type>` - Messages in category (primary, social, promotions, etc.)\n- `list:<email>` - Messages from mailing list\n- `deliveredto:<email>` - Messages delivered to specific address\n\n**Advanced:**\n- `rfc822msgid:<id>` - Messages with specific message ID\n- `has:youtube` - Messages with Youtube videos\n- `has:drive` - Messages with Drive files\n- `has:document` - Messages with GridwellDocs\n- `has:spreadsheet` - Messages with GridwellSheets\n- `has:presentation` - Messages with GridwellSlides\n- `has:pdf` - Messages with PDF attachments\n- `has:image` - Messages with image attachments\n- `has:video` - Messages with video attachments\n- `has:audio` - Messages with audio attachments\n- `has:yellow-star` - Messages with yellow star (and other star types)\n- `has:red-bang` - Messages with red bang (and other special markers)\n\n**Operators:**\n- `-<term>` - Excludes messages with the term\n- `OR` or `{}` - Logical OR for combining terms\n- `()` - Grouping terms\n\nFilters are combined by implicit AND; token order does not matter.\nExamples:\n    # Messages from bob@example.com with \"report\" in the subject\n    q='from:bob@example.com subject:report'\n    # Messages mentioning the exact phrase \"urgent fix\"\n    q='\"urgent fix\"'\n    # Messages from bob or alice\n    q='from:bob@example.com OR from:alice@example.com'\n    q='{from:bob@example.com from:alice@example.com}'\n    # Messages from last week\n    q='after:2024/01/01 before:2024/01/08'\n    # Large messages with attachments\n    q='larger:10M has:attachment'\n    # Unread important messages\n    q='is:unread is:important'",
+          "type": "string",
+          "nullable": true,
+          "default": ""
+        },
+        "labelIds": {
+          "description": "List of label IDs required on messages.",
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "nullable": true,
+          "default": null
+        },
+        "include_spam_trash": {
+          "description": "Include messages from SPAM and TRASH. Defaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        },
+        "page_token": {
+          "description": "Page token to retrieve a specific page of results. Accepted for API\nparity; pagination is not simulated and nextPageToken will be None.",
+          "type": "string",
+          "minLength": 0,
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_send_as_aliases",
+    "description": "Lists the 'Send as' aliases for the specified user.\n\nRetrieves all custom 'from' addresses (aliases) associated with the user's\naccount from the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_send_as_smime_info",
+    "description": "Lists the S/MIME info for a specific 'Send as' alias. Retrieves all S/MIME certificate configurations associated with the given user ID and 'Send as' email address from the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "send_as_email": {
+          "description": "The email address of the 'Send as' alias associated with the S/MIME info. Required.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        }
+      },
+      "required": [
+        "send_as_email"
+      ]
+    }
+  },
+  {
+    "name": "list_threads",
+    "description": "Lists the threads in the user's mailbox.\n\nRetrieves a list of threads matching the specified query criteria.\nSupports filtering based on query string (`q`), label IDs, and spam/trash inclusion.\nNote: `page_token` is included for API compatibility but is not implemented.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me'\ncan be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "max_results": {
+          "description": "Maximum number of threads to return. Defaults to 100.\nActual results might be fewer if less threads exist. The maximum allowed value is 500.",
+          "type": "integer",
+          "default": 100,
+          "minimum": 1,
+          "maximum": 500,
+          "nullable": false
+        },
+        "page_token": {
+          "description": "Page token to retrieve a specific page of results.\nDefaults to ''. (Currently ignored).",
+          "type": "string",
+          "default": "",
+          "nullable": false
+        },
+        "q": {
+          "description": "Query string for filtering threads based on their messages. Strings with spaces must be enclosed\nin single (') or double (\") quotes. Supports space-delimited tokens\n(each one filters the current result set). Supported tokens:\n\n**Basic Search:**\n- `from:<email>`       Exact sender address (case-insensitive)\n- `to:<email>`         Exact recipient address (case-insensitive)\n- `subject:<text>`     Substring match in the subject (case-insensitive)\n- `label:<LABEL_ID>`   Uppercase label ID\n- `<keyword>`          Substring match in subject, body, sender or recipient (case-insensitive)\n- `\"<phrase>\"`         Exact phrase match in subject or body (case-insensitive)\n- `+<term>`            Exact word match (case-insensitive)\n\n**Time-based Search:**\n- `after:<date>`       Messages after date (YYYY/MM/DD, MM/DD/YYYY, ISO format)\n- `before:<date>`      Messages before date (YYYY/MM/DD, MM/DD/YYYY, ISO format)\n- `older_than:<time>`  Messages older than time period (1d, 2m, 1y)\n- `newer_than:<time>`  Messages newer than time period (1d, 2m, 1y)\n\n**Status & Labels:**\n- `is:unread`          Unread messages\n- `is:read`            Read messages\n- `is:starred`         Starred messages\n- `is:important`       Important messages\n- `has:attachment`     Messages with attachments\n- `has:userlabels`     Messages with custom labels\n- `has:nouserlabels`   Messages without custom labels\n- `in:anywhere`        Include spam and trash messages\n\n**Size & Attachments:**\n- `size:<bytes>`       Exact message size in bytes\n- `larger:<size>`      Messages larger than size (e.g., 10M, 1G)\n- `smaller:<size>`     Messages smaller than size (e.g., 10M, 1G)\n- `filename:<name>`    Messages with attachment filename containing name\n\n**Categories & Lists:**\n- `category:<type>`    Messages in category (primary, social, promotions, etc.)\n- `list:<email>`       Messages from mailing list\n- `deliveredto:<email>` Messages delivered to specific address\n\n**Advanced:**\n- `rfc822msgid:<id>`   Messages with specific message ID\n- `has:youtube`        Messages with Youtube videos\n- `has:drive`          Messages with Drive files\n- `has:document`       Messages with GridwellDocs\n- `has:spreadsheet`    Messages with GridwellSheets\n- `has:presentation`   Messages with GridwellSlides\n- `has:pdf`            Messages with PDF attachments\n- `has:image`          Messages with image attachments\n- `has:video`          Messages with video attachments\n- `has:audio`          Messages with audio attachments\n- `has:yellow-star`    Messages with yellow star (and other star types)\n- `has:red-bang`       Messages with red bang (and other special markers)\n\n**Operators:**\n- `-<term>`            Excludes messages with the term\n- `OR` or `{}`         Logical OR for combining terms\n- `()`                 Grouping terms\n\nFilters are combined by implicit AND; token order does not matter.\nExamples:\n    # Threads from bob@example.com with \"report\" in the subject\n    q='from:bob@example.com subject:report'\n    # Threads mentioning the exact phrase \"urgent fix\"\n    q='\"urgent fix\"'\n    # Threads from bob or alice\n    q='from:bob@example.com OR from:alice@example.com'\n    q='{from:bob@example.com from:alice@example.com}'\n    # Threads from last week\n    q='after:2024/01/01 before:2024/01/08'\n    # Large threads with attachments\n    q='larger:10M has:attachment'\n    # Unread important threads\n    q='is:unread is:important'\nDefaults to ''.",
+          "type": "string",
+          "default": "",
+          "nullable": false
+        },
+        "labelIds": {
+          "description": "Only return threads with labels that match all of the specified\nlabel IDs in uppercase.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "nullable": true,
+          "default": null
+        },
+        "include_spam_trash": {
+          "description": "Include threads from SPAM and TRASH in the results.\nDefaults to False.",
+          "type": "boolean",
+          "default": false,
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "modify_message_labels",
+    "description": "Modifies the labels on the specified message. Adds or removes labels from the message identified by the given ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the message to modify. Required.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        },
+        "addLabelIds": {
+          "description": "A list of label IDs to add. Label IDs are handled case-insensitively and stored in their uppercase form.",
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "nullable": true,
+          "default": null
+        },
+        "removeLabelIds": {
+          "description": "A list of label IDs to remove. Label IDs are handled case-insensitively and stored in their uppercase form.",
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "modify_thread_labels",
+    "description": "Modifies the labels applied to the specified thread.\n\nAdds or removes labels from all messages within the specified thread.\nIt utilizes the `Messages.modify` function for each message in the thread.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me'\ncan be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the thread to modify. Required parameter.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "addLabelIds": {
+          "description": "A list of IDs of labels to add to this thread. You can add up to 100 labels with each update.",
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "nullable": true,
+          "default": null
+        },
+        "removeLabelIds": {
+          "description": "A list of IDs of labels to remove from this thread. You can remove up to 100 labels with each update.",
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "patch_label",
+    "description": "Updates a label's metadata (e.g., name, color) using PATCH semantics. This performs a partial update - only provided properties are updated; omitted properties preserve their existing values. Note: update_label is an alias of this function and has identical PATCH semantics. Server-managed properties like message counts are always preserved.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Must not be empty or contain whitespace.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the label to update/patch. Required. Cannot be empty or contain whitespace. Label lookup is case-insensitive for ALL labels. System labels (e.g., INBOX, SENT, DRAFT) are read-only and cannot be modified.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "label": {
+          "description": "Label data model for PATCH operations (partial updates).\n\nUses Pydantic's model_fields_set to distinguish between:\n- Field not provided -> not in model_fields_set -> preserve existing value\n- Field explicitly provided -> in model_fields_set -> update to new value\n\nNote: Only 'color' can be explicitly set to None (to remove it).\nOther fields (name, messageListVisibility, etc.) cannot be None.\n\nOnly allows 'user' type since:\n- Custom labels can only be created as 'user' type\n- System labels are read-only and cannot be updated",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "The new display name for the label. If omitted, preserves the existing name. If provided, must be a non-empty string. Explicitly setting to null is rejected at runtime.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "messageListVisibility": {
+              "description": "The visibility of the label in the message list. If omitted, existing value is preserved (PATCH semantics). Must be one of: 'show', 'hide'. Explicitly setting to null is rejected at runtime.",
+              "type": "string",
+              "enum": [
+                "show",
+                "hide"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "labelListVisibility": {
+              "description": "The visibility of the label in the label list. If omitted, existing value is preserved (PATCH semantics). Must be one of: 'labelShow', 'labelShowIfUnread', 'labelHide'. Explicitly setting to null is rejected at runtime.",
+              "type": "string",
+              "enum": [
+                "labelShow",
+                "labelShowIfUnread",
+                "labelHide"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "type": {
+              "description": "The owner type for the label. If omitted, existing value is preserved (PATCH semantics). Must be 'user' for custom labels. System labels cannot have their type changed. Explicitly setting to null is rejected at runtime.",
+              "type": "string",
+              "enum": [
+                "user"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "color": {
+              "description": "Color definition for GridwellMail labels as rendered in the UI and returned by the API.\n\nBoth fields must be supplied together when customizing a label color. Values are hex sRGB\nstrings. For accessibility, clients commonly enforce sufficient contrast between text and\nbackground. In this simulation, values are validated syntactically; the default DB may omit\ncolors for system labels.",
+              "type": "object",
+              "properties": {
+                "textColor": {
+                  "description": "The text color of the label, represented as a hex string #RRGGBB. Must be a valid hex color (pattern: ^#[0-9a-fA-F]{6}$).",
+                  "type": "string",
+                  "pattern": "^#[0-9a-fA-F]{6}$",
+                  "nullable": false
+                },
+                "backgroundColor": {
+                  "description": "The background color represented as a hex string #RRGGBB. Must be a valid hex color (pattern: ^#[0-9a-fA-F]{6}$).",
+                  "type": "string",
+                  "pattern": "^#[0-9a-fA-F]{6}$",
+                  "nullable": false
+                }
+              },
+              "required": [
+                "textColor",
+                "backgroundColor"
+              ],
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "patch_send_as_alias",
+    "description": "Updates the specified 'Send as' alias configuration. Alias for update.\n\nThis function is an alias for the `update` function. It modifies an\nexisting alias. Note: This implementation performs patch as a full update.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "send_as_email": {
+          "description": "The email address of the 'Send as' alias to update.",
+          "type": "string",
+          "default": "",
+          "format": "email",
+          "nullable": false
+        },
+        "send_as": {
+          "description": "Payload model for the 'send_as' parameter in update and patch functions.",
+          "type": "object",
+          "properties": {
+            "displayName": {
+              "description": "The display name for the alias.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "replyToAddress": {
+              "description": "The reply-to address.",
+              "type": "string",
+              "format": "email",
+              "nullable": true,
+              "default": null
+            },
+            "signature": {
+              "description": "The email signature for the alias.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "verificationStatus": {
+              "description": "The verification status of the alias.",
+              "type": "string",
+              "enum": [
+                "accepted",
+                "pending",
+                "rejected"
+              ],
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "patch_send_as_smime_info",
+    "description": "Updates the specified S/MIME info. Alias for update. Modifies an existing S/MIME certificate, carrying over the `isDefault` status. If the status is missing or corrupt, it is reset to `false`.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "send_as_email": {
+          "description": "The email address of the 'Send as' alias associated with the S/MIME info. Required.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the S/MIME info to update/patch. Required.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "smime": {
+          "description": "The S/MIME properties for the certificate. If provided, it must contain an 'encryptedKey' field.",
+          "type": "object",
+          "properties": {
+            "encryptedKey": {
+              "description": "The encrypted key for the S/MIME certificate. Required if 'smime' is provided.",
+              "type": "string",
+              "minLength": 1,
+              "nullable": false
+            }
+          },
+          "required": [
+            "encryptedKey"
+          ],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "send_as_email",
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "send_draft",
+    "description": "Sends the specified draft.\n\nSends the message associated with an existing draft. The draft must already\nbe stored in the mailbox and is identified by its `id`. After the message is\nsent successfully, the draft is deleted.\n\nAttachment size limits are enforced: individual attachments cannot exceed 25MB,\nand the total message size (including all attachments) cannot exceed 100MB.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "anyOf": [
+            {
+              "description": "Text value.",
+              "type": "string",
+              "format": "email"
+            },
+            {
+              "description": "Text value.",
+              "type": "string",
+              "enum": [
+                "me"
+              ]
+            }
+          ],
+          "description": "The user's email address. The special value 'me' indicates the authenticated user.",
+          "nullable": false,
+          "default": "me"
+        },
+        "draft": {
+          "description": "Request payload identifying which draft to send.",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "Identifier of the draft to send.",
+              "type": "string",
+              "nullable": false
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "nullable": false
+        }
+      },
+      "required": [
+        "draft"
+      ]
+    }
+  },
+  {
+    "name": "send_message",
+    "description": "Sends the specified message to the specified recipients with CC/BCC support.\n\nProcesses RFC 2822 MIME messages by parsing the base64url-encoded raw message\nto extract headers and payload structure. Automatically extracts and stores\nany attachments, creating the proper GridwellMail API payload structure with parts references.\n\nSupports comma-separated recipients in TO, CC, and BCC fields. At least one recipient\n(TO, CC, or BCC) must be specified. Each email in recipient/cc/bcc fields is validated\nand an error is raised if any invalid email format is detected.\n\nThe `userId` parameter accepts either an email address or the special value 'me' to indicate\nthe authenticated user. When `userId='me'`, if `sender` is invalid, empty, or not provided,\nit automatically defaults to the authenticated user's email address.\n\nValidates that at least one recipient is present either in raw MIME headers or as outer fields.\nWhen both raw MIME and outer fields are provided, raw MIME takes precedence.\n\nAttachment size limits are enforced: individual attachments cannot exceed 25MB,\nand the total message size (including all attachments) cannot exceed 100MB.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me'\ncan be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "msg": {
+          "description": "Message payload for sending a message via GridwellMail API.",
+          "type": "object",
+          "properties": {
+            "raw": {
+              "description": "The entire message represented as a base64url-encoded string (RFC 4648 Section 5). The raw string must be RFC 2822 compliant and may include attachments (e.g., as multipart MIME). Individual attachments are limited to 25MB each, with a total message size limit of 100MB. Optional; if not provided, the message will be constructed from 'sender', 'recipient', 'subject', 'body', etc. For messages with attachments, this should be created using create_mime_message_with_attachments().",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "threadId": {
+              "description": "Thread ID to assign to the message. If not specified, a new thread will be created. Defaults to auto-generated.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "labelIds": {
+              "description": "List of label IDs to apply to the message. The 'SENT' label is automatically applied.",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "nullable": false
+              },
+              "nullable": true,
+              "default": null
+            },
+            "sender": {
+              "description": "Sender email address. If invalid or not provided, defaults to the authenticated user's email.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "recipient": {
+              "description": "Comma-separated list of TO recipient email addresses.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "cc": {
+              "description": "Comma-separated list of CC (Carbon Copy) recipient email addresses.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "bcc": {
+              "description": "Comma-separated list of BCC (Blind Carbon Copy) recipient email addresses.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "subject": {
+              "description": "Message subject line.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "body": {
+              "description": "Plain text message body.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "date": {
+              "description": "Message date in RFC 2822 format.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "internalDate": {
+              "description": "Internal timestamp as milliseconds since epoch. Must be a valid numeric timestamp string.",
+              "type": "string",
+              "format": "date-time",
+              "nullable": true,
+              "default": null
+            },
+            "isRead": {
+              "description": "Whether the message has been read.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "set_default_send_as_smime_info",
+    "description": "Sets the specified S/MIME certificate as the default for the alias. Marks the S/MIME info identified by `id` as the default configuration for the given 'Send as' alias, removing the default status from any other S/MIME configurations for that alias.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "send_as_email": {
+          "description": "The email address of the 'Send as' alias associated with the S/MIME info. Required.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the S/MIME info to set as default. Required.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        }
+      },
+      "required": [
+        "send_as_email",
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "stop_mailbox_watch",
+    "description": "Stop receiving push notifications for the user's mailbox.\n\nClears the stored watch configuration for the specified user.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S.*$",
+          "nullable": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "trash_message",
+    "description": "Moves the specified message to the trash.\n\nAdds the 'TRASH' label to the message identified by the given ID.\nIf the message already has the 'TRASH' label, it remains unchanged.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the message to trash.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "trash_thread",
+    "description": "Moves the specified thread to the trash.\n\nThis operation marks the thread and all messages within it as trashed.\nIt utilizes the `Messages.trash` function for each message in the thread.\nIf a message within the thread does not exist, it is skipped without error.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the thread to trash. Required parameter.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "untrash_message",
+    "description": "Removes the specified message from the trash.\n\nRemoves the 'TRASH' label (uppercase) from the message.\nIf the message does not have 'TRASH', it remains unchanged.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the message to untrash.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "untrash_thread",
+    "description": "Removes the specified thread from the trash.\n\nThis operation restores the thread and all messages within it from the trash.\nIt utilizes the `Messages.untrash` function for each message in the thread.\nIf a message within the thread does not exist, it is skipped without error.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the thread to untrash. Required parameter.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "update_auto_forwarding_settings",
+    "description": "Updates the auto-forwarding setting for the specified user.\n\nModifies the auto-forwarding configuration for the user's account based\non the provided `auto_forwarding_settings`.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me'\ncan be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "auto_forwarding_settings": {
+          "description": "Auto-forwarding configuration consistent with GridwellMail Settings behavior.\n\nWhen enabled, new incoming mail is forwarded to a verified destination address. The\n`disposition` determines what happens to the original copy (e.g., remain in Inbox, be\narchived, marked read, or trashed). In the default DB, forwarding is typically disabled.",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "True to forward new incoming messages to `emailAddress` (requires prior address verification).",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "emailAddress": {
+              "description": "Verified destination address that will receive forwarded messages.",
+              "type": "string",
+              "format": "email",
+              "nullable": true,
+              "default": null
+            },
+            "disposition": {
+              "description": "Post-forwarding mailbox handling: leave in Inbox, archive (remove Inbox), trash (move to Trash), or mark read.",
+              "type": "string",
+              "enum": [
+                "dispositionUnspecified",
+                "leaveInInbox",
+                "archive",
+                "trash",
+                "markRead"
+              ],
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "update_draft",
+    "description": "Replaces a draft's content.\n\nUpdates an existing draft message identified by its ID with the content\nprovided in the `draft` argument. If the draft with the specified ID\ndoes not exist, it returns None.\nEnsures the 'DRAFT' label is present on the updated message.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' indicates the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the draft to update.",
+          "type": "string",
+          "nullable": false
+        },
+        "draft": {
+          "description": "Pydantic model for the partial draft resource supplied to updateDraft.",
+          "type": "object",
+          "properties": {
+            "message": {
+              "description": "Pydantic model for the 'message' part of the draft update.\nAll fields are optional as this model represents an update payload.\nSupports CC/BCC fields and multiple recipients.",
+              "type": "object",
+              "properties": {
+                "id": {
+                  "description": "The message ID associated with the draft.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "threadId": {
+                  "description": "The ID of the thread this message belongs to.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "raw": {
+                  "description": "Base64url-encoded raw message content.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "labelIds": {
+                  "description": "List of label IDs applied to this message.",
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "nullable": false
+                  },
+                  "nullable": true,
+                  "default": null
+                },
+                "snippet": {
+                  "description": "A short part of the message text.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "historyId": {
+                  "description": "Identifier of the last history record that modified this message.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "internalDate": {
+                  "description": "Message creation timestamp in epoch milliseconds.",
+                  "type": "string",
+                  "format": "date-time",
+                  "nullable": true,
+                  "default": null
+                },
+                "payload": {
+                  "description": "Structured representation of headers and body tree for a message.",
+                  "type": "object",
+                  "properties": {
+                    "mimeType": {
+                      "description": "Top-level content type; multipart types enumerate `parts`.",
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9!#$&\\-\\^_]*\\/[a-zA-Z0-9][a-zA-Z0-9!#$&\\-\\^_.]*$",
+                      "nullable": true,
+                      "default": null
+                    },
+                    "parts": {
+                      "description": "Child parts for multipart payloads (attachments, alternatives, inline images).",
+                      "type": "array",
+                      "items": {
+                        "description": "Leaf part in a message payload (inline body or attachment).",
+                        "type": "object",
+                        "properties": {
+                          "partId": {
+                            "description": "Part ID within the message (e.g., '0', '1', '0.1').",
+                            "type": "string",
+                            "nullable": true,
+                            "default": null
+                          },
+                          "mimeType": {
+                            "description": "RFC 2045/2046 MIME type (e.g., 'text/plain', 'image/png').",
+                            "type": "string",
+                            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9!#$&\\-\\^_]*\\/[a-zA-Z0-9][a-zA-Z0-9!#$&\\-\\^_.]*$",
+                            "nullable": false
+                          },
+                          "filename": {
+                            "description": "Attachment filename if applicable; empty for inline parts.",
+                            "type": "string",
+                            "nullable": true,
+                            "default": null
+                          },
+                          "headers": {
+                            "description": "RFC 5322 headers associated with this part.",
+                            "type": "array",
+                            "items": {
+                              "description": "RFC 5322 header as present on a payload.",
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "description": "Header field name (e.g., 'From', 'To', 'Subject', case-insensitive).",
+                                  "type": "string",
+                                  "nullable": false
+                                },
+                                "value": {
+                                  "description": "Header field value exactly as transmitted.",
+                                  "type": "string",
+                                  "default": "",
+                                  "nullable": false
+                                }
+                              },
+                              "required": [
+                                "name"
+                              ],
+                              "nullable": false
+                            },
+                            "nullable": true,
+                            "default": null
+                          },
+                          "body": {
+                            "description": "Container for part payload bytes.\n\nGridwellMail returns inline body bytes as web-safe Base64 (base64url) in `data`. Large parts are\nreferenced by `attachmentId` and fetched via the attachments API. In this default DB, small\nexamples may store human-readable strings for clarity; real API responses use base64url.",
+                            "type": "object",
+                            "properties": {
+                              "data": {
+                                "description": "Base64url-encoded bytes for inline parts (e.g., text/plain, text/html).",
+                                "type": "string",
+                                "nullable": true,
+                                "default": null
+                              },
+                              "attachmentId": {
+                                "description": "Identifier for large parts stored separately; retrieve via the attachments endpoint.",
+                                "type": "string",
+                                "nullable": true,
+                                "default": null
+                              },
+                              "size": {
+                                "description": "Decoded byte length of this part. GridwellMail enforces a ~25MB total message size.",
+                                "type": "integer",
+                                "nullable": true,
+                                "default": null
+                              }
+                            },
+                            "required": [],
+                            "nullable": false
+                          }
+                        },
+                        "required": [
+                          "mimeType",
+                          "body"
+                        ],
+                        "nullable": false
+                      },
+                      "nullable": true,
+                      "default": null
+                    },
+                    "headers": {
+                      "description": "RFC 5322 headers associated with this payload.",
+                      "type": "array",
+                      "items": {
+                        "description": "RFC 5322 header as present on a payload.",
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "description": "Header field name (e.g., 'From', 'To', 'Subject', case-insensitive).",
+                            "type": "string",
+                            "nullable": false
+                          },
+                          "value": {
+                            "description": "Header field value exactly as transmitted.",
+                            "type": "string",
+                            "default": "",
+                            "nullable": false
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ],
+                        "nullable": false
+                      },
+                      "nullable": true,
+                      "default": null
+                    },
+                    "body": {
+                      "description": "Container for part payload bytes.\n\nGridwellMail returns inline body bytes as web-safe Base64 (base64url) in `data`. Large parts are\nreferenced by `attachmentId` and fetched via the attachments API. In this default DB, small\nexamples may store human-readable strings for clarity; real API responses use base64url.",
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "description": "Base64url-encoded bytes for inline parts (e.g., text/plain, text/html).",
+                          "type": "string",
+                          "nullable": true,
+                          "default": null
+                        },
+                        "attachmentId": {
+                          "description": "Identifier for large parts stored separately; retrieve via the attachments endpoint.",
+                          "type": "string",
+                          "nullable": true,
+                          "default": null
+                        },
+                        "size": {
+                          "description": "Decoded byte length of this part. GridwellMail enforces a ~25MB total message size.",
+                          "type": "integer",
+                          "nullable": true,
+                          "default": null
+                        }
+                      },
+                      "required": [],
+                      "nullable": true,
+                      "default": null
+                    }
+                  },
+                  "required": [],
+                  "nullable": true,
+                  "default": null
+                },
+                "sizeEstimate": {
+                  "description": "Estimated size in bytes of the message.",
+                  "type": "integer",
+                  "nullable": true,
+                  "default": null
+                },
+                "sender": {
+                  "anyOf": [
+                    {
+                      "description": "Text value.",
+                      "type": "string",
+                      "format": "email"
+                    },
+                    {
+                      "description": "Text value.",
+                      "type": "string",
+                      "enum": [
+                        "me"
+                      ]
+                    }
+                  ],
+                  "description": "Sender email address.",
+                  "nullable": true,
+                  "default": null
+                },
+                "recipient": {
+                  "description": "Comma-separated list of TO recipient email addresses.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "cc": {
+                  "description": "Comma-separated list of CC recipient email addresses.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "bcc": {
+                  "description": "Comma-separated list of BCC recipient email addresses.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "subject": {
+                  "description": "The message subject.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "body": {
+                  "description": "Message body text.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "isRead": {
+                  "description": "Whether the message has been read.",
+                  "type": "boolean",
+                  "nullable": true,
+                  "default": null
+                },
+                "date": {
+                  "description": "Message date in ISO 8601 format.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                }
+              },
+              "required": [],
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "update_imap_settings",
+    "description": "Updates the IMAP settings for the specified user.\n\nModifies the IMAP configuration for the user's account based on the provided\n`imap_settings`.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "nullable": false
+        },
+        "imap_settings": {
+          "description": "IMAP access configuration used by traditional email clients.",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "True if IMAP access is permitted for the account.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "server": {
+              "description": "IMAP server hostname (e.g., 'imap.gridwellmail.com' in the default DB).",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "port": {
+              "description": "IMAP server port (commonly 993 for IMAPS).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535,
+              "nullable": true,
+              "default": null
+            },
+            "autoExpunge": {
+              "description": "Whether to automatically expunge messages when marked deleted.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "expungeBehavior": {
+              "description": "Enum for expunge behavior options.",
+              "type": "string",
+              "enum": [
+                "expungeBehaviorUnspecified",
+                "archive",
+                "trash",
+                "deleteForever"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "maxFolderSize": {
+              "description": "Optional cap on IMAP folder size: one of 0, 1000, 2000, 5000, 10000.",
+              "type": "integer",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "update_label",
+    "description": "Updates a label's metadata (e.g., name, color) using PATCH semantics. This performs a partial update - only provided properties are updated; omitted properties preserve their existing values. This is an alias of patch_label. Server-managed properties like message counts are always preserved.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Must not be empty or contain whitespace.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the label to update/patch. Required. Cannot be empty or contain whitespace. Label lookup is case-insensitive for ALL labels. System labels (e.g., INBOX, SENT, DRAFT) are read-only and cannot be modified.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "label": {
+          "description": "Label data model for PATCH operations (partial updates).\n\nUses Pydantic's model_fields_set to distinguish between:\n- Field not provided -> not in model_fields_set -> preserve existing value\n- Field explicitly provided -> in model_fields_set -> update to new value\n\nNote: Only 'color' can be explicitly set to None (to remove it).\nOther fields (name, messageListVisibility, etc.) cannot be None.\n\nOnly allows 'user' type since:\n- Custom labels can only be created as 'user' type\n- System labels are read-only and cannot be updated",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "The new display name for the label. If omitted, preserves the existing name. If provided, must be a non-empty string. Explicitly setting to null is rejected at runtime.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "messageListVisibility": {
+              "description": "The visibility of the label in the message list. If omitted, existing value is preserved (PATCH semantics). Must be one of: 'show', 'hide'. Explicitly setting to null is rejected at runtime.",
+              "type": "string",
+              "enum": [
+                "show",
+                "hide"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "labelListVisibility": {
+              "description": "The visibility of the label in the label list. If omitted, existing value is preserved (PATCH semantics). Must be one of: 'labelShow', 'labelShowIfUnread', 'labelHide'. Explicitly setting to null is rejected at runtime.",
+              "type": "string",
+              "enum": [
+                "labelShow",
+                "labelShowIfUnread",
+                "labelHide"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "type": {
+              "description": "The owner type for the label. If omitted, existing value is preserved (PATCH semantics). Must be 'user' for custom labels. System labels cannot have their type changed. Explicitly setting to null is rejected at runtime.",
+              "type": "string",
+              "enum": [
+                "user"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "color": {
+              "description": "Color definition for GridwellMail labels as rendered in the UI and returned by the API.\n\nBoth fields must be supplied together when customizing a label color. Values are hex sRGB\nstrings. For accessibility, clients commonly enforce sufficient contrast between text and\nbackground. In this simulation, values are validated syntactically; the default DB may omit\ncolors for system labels.",
+              "type": "object",
+              "properties": {
+                "textColor": {
+                  "description": "The text color of the label, represented as a hex string #RRGGBB. Must be a valid hex color (pattern: ^#[0-9a-fA-F]{6}$).",
+                  "type": "string",
+                  "pattern": "^#[0-9a-fA-F]{6}$",
+                  "nullable": false
+                },
+                "backgroundColor": {
+                  "description": "The background color represented as a hex string #RRGGBB. Must be a valid hex color (pattern: ^#[0-9a-fA-F]{6}$).",
+                  "type": "string",
+                  "pattern": "^#[0-9a-fA-F]{6}$",
+                  "nullable": false
+                }
+              },
+              "required": [
+                "textColor",
+                "backgroundColor"
+              ],
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "update_language_settings",
+    "description": "Updates the language settings for the specified user.\n\nModifies the language configuration for the user's account based on the\nprovided `language_settings`.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "nullable": false
+        },
+        "language_settings": {
+          "description": "Pydantic model for validating the 'language_settings' dictionary in updateLanguage function.\nAll fields are optional as this is for updating existing settings.",
+          "type": "object",
+          "properties": {
+            "displayLanguage": {
+              "description": "The language code for display (e.g., 'en-US' for English).",
+              "type": "string",
+              "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "update_pop_settings",
+    "description": "Updates the POP settings for the specified user.\n\nModifies the POP configuration for the user's account based on the provided\n`pop_settings`.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "pop_settings": {
+          "description": "Model for POP settings, used for both input (update) and output (response).",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "True if POP3 access is permitted for the account.",
+              "type": "boolean",
+              "nullable": true,
+              "default": null
+            },
+            "server": {
+              "description": "POP server hostname (e.g., 'pop.gridwellmail.com').",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "port": {
+              "description": "POP server port (commonly 995 for POP3S).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535,
+              "nullable": true,
+              "default": null
+            },
+            "accessWindow": {
+              "description": "The range of messages which are accessible via POP. Valid values: accessWindowUnspecified, disabled, fromNowOn, allMail.",
+              "type": "string",
+              "enum": [
+                "accessWindowUnspecified",
+                "disabled",
+                "fromNowOn",
+                "allMail"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "disposition": {
+              "description": "The action that will be executed on a message after it has been fetched via POP. Valid values: dispositionUnspecified, leaveInInbox, archive, trash, markRead.",
+              "type": "string",
+              "enum": [
+                "dispositionUnspecified",
+                "leaveInInbox",
+                "archive",
+                "trash",
+                "markRead"
+              ],
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "update_send_as_alias",
+    "description": "Updates the specified 'Send as' alias configuration.\n\nModifies an existing custom 'from' address (alias) identified by its email\naddress, using the properties provided in the `send_as` argument.\nThis performs a full update.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "send_as_email": {
+          "description": "The email address of the 'Send as' alias to update.",
+          "type": "string",
+          "default": "",
+          "format": "email",
+          "nullable": false
+        },
+        "send_as": {
+          "description": "Payload model for the 'send_as' parameter in update and patch functions.",
+          "type": "object",
+          "properties": {
+            "displayName": {
+              "description": "The display name for the alias.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "replyToAddress": {
+              "description": "The reply-to address.",
+              "type": "string",
+              "format": "email",
+              "nullable": true,
+              "default": null
+            },
+            "signature": {
+              "description": "The email signature for the alias.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "verificationStatus": {
+              "description": "The verification status of the alias.",
+              "type": "string",
+              "enum": [
+                "accepted",
+                "pending",
+                "rejected"
+              ],
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "update_send_as_smime_info",
+    "description": "Updates the specified S/MIME info. Modifies an existing S/MIME certificate, carrying over the `isDefault` status. If the status is missing or corrupt, it is reset to `false`.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "send_as_email": {
+          "description": "The email address of the 'Send as' alias associated with the S/MIME info. Required.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "id": {
+          "description": "The ID of the S/MIME info to update. Required.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "nullable": false
+        },
+        "smime": {
+          "description": "The S/MIME properties for the certificate. If provided, it must contain an 'encryptedKey' field.",
+          "type": "object",
+          "properties": {
+            "encryptedKey": {
+              "description": "The encrypted key for the S/MIME certificate. Required if 'smime' is provided.",
+              "type": "string",
+              "minLength": 1,
+              "nullable": false
+            }
+          },
+          "required": [
+            "encryptedKey"
+          ],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "send_as_email",
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "update_vacation_settings",
+    "description": "Updates the vacation responder settings for the specified user.\n\nModifies the vacation auto-reply configuration for the user's account based\non the provided `vacation_settings`.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "vacation_settings": {
+          "description": "Model for vacation settings, used for both input (update) and output (response).",
+          "type": "object",
+          "properties": {
+            "enableAutoReply": {
+              "description": "True to auto-reply to incoming messages during the vacation period.",
+              "type": "boolean",
+              "default": false,
+              "nullable": false
+            },
+            "responseBodyPlainText": {
+              "description": "Plain-text auto-reply body (see default DB for example text).",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "responseSubject": {
+              "description": "Subject line for the auto-reply message.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "responseBodyHtml": {
+              "description": "HTML-formatted auto-reply body.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "restrictToContacts": {
+              "description": "If True, only send auto-replies to contacts.",
+              "type": "boolean",
+              "default": false,
+              "nullable": false
+            },
+            "restrictToDomain": {
+              "description": "If True, only send auto-replies to users in the same domain.",
+              "type": "boolean",
+              "default": false,
+              "nullable": false
+            },
+            "startTime": {
+              "description": "An optional start time for sending auto-replies, expressed as epoch milliseconds in a numeric string (digits only, up to 16 characters).",
+              "type": "string",
+              "maxLength": 16,
+              "pattern": "^\\d+$",
+              "nullable": true,
+              "default": null
+            },
+            "endTime": {
+              "description": "An optional end time for sending auto-replies, expressed as epoch milliseconds in a numeric string (digits only, up to 16 characters).",
+              "type": "string",
+              "maxLength": 16,
+              "pattern": "^\\d+$",
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "verify_send_as_alias",
+    "description": "Verifies the specified 'Send as' alias.\n\nInitiates the verification process for a custom 'from' address. If the alias\nexists and requires verification (e.g., status is 'pending'), its status\nmay be updated to 'accepted' upon successful verification.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user. Defaults to 'me'.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "nullable": false
+        },
+        "send_as_email": {
+          "description": "The email address of the 'Send as' alias. Must be a valid email address.",
+          "type": "string",
+          "format": "email",
+          "nullable": false
+        }
+      },
+      "required": [
+        "send_as_email"
+      ]
+    }
+  },
+  {
+    "name": "watch_user_mailbox",
+    "description": "Set up or update a watch on the user's mailbox.\n\nStores the watch request configuration for the specified user.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "description": "The user's email address. The special value 'me' can be used to indicate the authenticated user.",
+          "type": "string",
+          "default": "me",
+          "minLength": 1,
+          "pattern": "^\\S.*$",
+          "nullable": false
+        },
+        "request": {
+          "description": "Model for the watch request body.",
+          "type": "object",
+          "properties": {
+            "topicName": {
+              "description": "The Google Cloud Pub/Sub topic name where notifications are published.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "labelIds": {
+              "description": "A list of label IDs to filter notifications.",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "nullable": false
+              },
+              "nullable": true,
+              "default": null
+            },
+            "labelFilterAction": {
+              "description": "Label filter action (include/exclude)",
+              "type": "string",
+              "enum": [
+                "include",
+                "exclude"
+              ],
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  }
+]

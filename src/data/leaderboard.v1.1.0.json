@@ -1,0 +1,2141 @@
+{
+  "schemaVersion": 1,
+  "release": "v1.1.0",
+  "generatedBy": "scripts/export_leaderboard.py",
+  "inputs": {
+    "validation": {
+      "file": "MultiVerse-validation-400-bare-results.json",
+      "sha256": "b954f0ce109e0945fcd353d3dcf734274721e4c5a54cfcbc2c108c315a7d0480"
+    },
+    "test": {
+      "file": "MultiVerse-test-400-bare-results.json",
+      "sha256": "756640392125abbb7be4c09022aafbffaec797d3af5bcfd4fccb9cb3dd7a61c2"
+    }
+  },
+  "sets": {
+    "validation": {
+      "split": "validation",
+      "metric": "Success rate (%) for one scored trajectory per model and task under the bare harness",
+      "runs": 1,
+      "uncertainty": {
+        "method": "percentile-task-bootstrap",
+        "confidenceLevel": 0.95,
+        "resamples": 10000,
+        "seed": 260831,
+        "rng": "numpy.random.PCG64",
+        "strata": [
+          "ST",
+          "IF",
+          "MT",
+          "MTIF"
+        ],
+        "taskOrder": "lexicographic",
+        "sharedTaskDraws": true,
+        "runsPerTask": 1,
+        "average": "equal-weight task-setting mean",
+        "quantileMethod": "linear"
+      },
+      "taskCounts": {
+        "ST": 100,
+        "IF": 100,
+        "MT": 100,
+        "MTIF": 100
+      },
+      "settings": [
+        {
+          "id": "Average",
+          "name": "Average",
+          "description": "Equal-weight mean of the four task settings"
+        },
+        {
+          "id": "ST",
+          "name": "ST",
+          "description": "Single-turn"
+        },
+        {
+          "id": "IF",
+          "name": "IF",
+          "description": "Instruction following"
+        },
+        {
+          "id": "MT",
+          "name": "MT",
+          "description": "Multi-turn"
+        },
+        {
+          "id": "MTIF",
+          "name": "MTIF",
+          "description": "Multi-turn + instruction following"
+        }
+      ],
+      "harnesses": [
+        {
+          "id": "bare",
+          "name": "Bare",
+          "abbr": "B",
+          "kind": "bare"
+        }
+      ],
+      "models": [
+        {
+          "id": "gemini_4_argon",
+          "name": "Gemini 4 Argon",
+          "developer": "Google",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "claude_fable_5_1",
+          "name": "Claude Fable 5.1",
+          "developer": "Anthropic",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "claude_opus_5_5",
+          "name": "Claude Opus 5.5",
+          "developer": "Anthropic",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "gpt_6_astra",
+          "name": "GPT 6 Astra",
+          "developer": "OpenAI",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "gpt_6_1_sol",
+          "name": "GPT 6.1 Sol",
+          "developer": "OpenAI",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "claude_sonnet_5_5",
+          "name": "Claude Sonnet 5.5",
+          "developer": "Anthropic",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "gemini_3_8_flash_thinking",
+          "name": "Gemini 3.8 Flash",
+          "developer": "Google",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "deepseek_v4_1_flash",
+          "name": "DeepSeek V4.1 Flash",
+          "developer": "DeepSeek",
+          "access": "open",
+          "reference": false
+        },
+        {
+          "id": "gpt_5_6_sol",
+          "name": "GPT 5.6 Sol",
+          "developer": "OpenAI",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "gemini_3_5_flash_thinking",
+          "name": "Gemini 3.5 Flash",
+          "developer": "Google",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "kimi_k3",
+          "name": "Kimi K3",
+          "developer": "Moonshot AI",
+          "access": "open",
+          "reference": false
+        },
+        {
+          "id": "glm_5_3",
+          "name": "GLM 5.3",
+          "developer": "Z.ai",
+          "access": "open",
+          "reference": false
+        }
+      ],
+      "results": {
+        "Average": {
+          "gemini_4_argon": {
+            "bare": {
+              "mean": 83.0,
+              "meanText": "83.0",
+              "rank": 1,
+              "passed": 332,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                79.25,
+                86.5
+              ]
+            }
+          },
+          "claude_fable_5_1": {
+            "bare": {
+              "mean": 77.0,
+              "meanText": "77.0",
+              "rank": 2,
+              "passed": 308,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                72.75,
+                81.0
+              ]
+            }
+          },
+          "claude_opus_5_5": {
+            "bare": {
+              "mean": 74.25,
+              "meanText": "74.3",
+              "rank": 3,
+              "passed": 297,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                70.0,
+                78.5
+              ]
+            }
+          },
+          "gpt_6_astra": {
+            "bare": {
+              "mean": 71.75,
+              "meanText": "71.8",
+              "rank": 4,
+              "passed": 287,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                67.5,
+                76.0
+              ]
+            }
+          },
+          "gpt_6_1_sol": {
+            "bare": {
+              "mean": 69.5,
+              "meanText": "69.5",
+              "rank": 5,
+              "passed": 278,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                65.0,
+                74.0
+              ]
+            }
+          },
+          "claude_sonnet_5_5": {
+            "bare": {
+              "mean": 68.75,
+              "meanText": "68.8",
+              "rank": 6,
+              "passed": 275,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                64.25,
+                73.25
+              ]
+            }
+          },
+          "gemini_3_8_flash_thinking": {
+            "bare": {
+              "mean": 66.75,
+              "meanText": "66.8",
+              "rank": 7,
+              "passed": 267,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                62.5,
+                71.0
+              ]
+            }
+          },
+          "deepseek_v4_1_flash": {
+            "bare": {
+              "mean": 62.5,
+              "meanText": "62.5",
+              "rank": 8,
+              "passed": 250,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                57.5,
+                67.25
+              ]
+            }
+          },
+          "gpt_5_6_sol": {
+            "bare": {
+              "mean": 59.75,
+              "meanText": "59.8",
+              "rank": 9,
+              "passed": 239,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                55.0,
+                64.25
+              ]
+            }
+          },
+          "gemini_3_5_flash_thinking": {
+            "bare": {
+              "mean": 52.0,
+              "meanText": "52.0",
+              "rank": 10,
+              "passed": 208,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                47.75,
+                56.25
+              ]
+            }
+          },
+          "kimi_k3": {
+            "bare": {
+              "mean": 50.5,
+              "meanText": "50.5",
+              "rank": 11,
+              "passed": 202,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                45.75,
+                55.5
+              ]
+            }
+          },
+          "glm_5_3": {
+            "bare": {
+              "mean": 49.25,
+              "meanText": "49.3",
+              "rank": 12,
+              "passed": 197,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                44.5,
+                54.0
+              ]
+            }
+          }
+        },
+        "ST": {
+          "gemini_4_argon": {
+            "bare": {
+              "mean": 90.0,
+              "meanText": "90.0",
+              "rank": 1,
+              "passed": 90,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                84.0,
+                96.0
+              ]
+            }
+          },
+          "claude_fable_5_1": {
+            "bare": {
+              "mean": 78.0,
+              "meanText": "78.0",
+              "rank": 4,
+              "passed": 78,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                70.0,
+                86.0
+              ]
+            }
+          },
+          "claude_opus_5_5": {
+            "bare": {
+              "mean": 76.0,
+              "meanText": "76.0",
+              "rank": 7,
+              "passed": 76,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                68.0,
+                84.0
+              ]
+            }
+          },
+          "gpt_6_astra": {
+            "bare": {
+              "mean": 81.0,
+              "meanText": "81.0",
+              "rank": 2,
+              "passed": 81,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                73.0,
+                88.0
+              ]
+            }
+          },
+          "gpt_6_1_sol": {
+            "bare": {
+              "mean": 77.0,
+              "meanText": "77.0",
+              "rank": 6,
+              "passed": 77,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                68.0,
+                85.0
+              ]
+            }
+          },
+          "claude_sonnet_5_5": {
+            "bare": {
+              "mean": 78.0,
+              "meanText": "78.0",
+              "rank": 4,
+              "passed": 78,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                70.0,
+                86.0
+              ]
+            }
+          },
+          "gemini_3_8_flash_thinking": {
+            "bare": {
+              "mean": 79.0,
+              "meanText": "79.0",
+              "rank": 3,
+              "passed": 79,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                71.0,
+                87.0
+              ]
+            }
+          },
+          "deepseek_v4_1_flash": {
+            "bare": {
+              "mean": 69.0,
+              "meanText": "69.0",
+              "rank": 9,
+              "passed": 69,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                60.0,
+                78.0
+              ]
+            }
+          },
+          "gpt_5_6_sol": {
+            "bare": {
+              "mean": 65.0,
+              "meanText": "65.0",
+              "rank": 10,
+              "passed": 65,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                55.0,
+                74.0
+              ]
+            }
+          },
+          "gemini_3_5_flash_thinking": {
+            "bare": {
+              "mean": 71.0,
+              "meanText": "71.0",
+              "rank": 8,
+              "passed": 71,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                62.0,
+                80.0
+              ]
+            }
+          },
+          "kimi_k3": {
+            "bare": {
+              "mean": 53.0,
+              "meanText": "53.0",
+              "rank": 11,
+              "passed": 53,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                43.0,
+                63.0
+              ]
+            }
+          },
+          "glm_5_3": {
+            "bare": {
+              "mean": 53.0,
+              "meanText": "53.0",
+              "rank": 11,
+              "passed": 53,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                43.0,
+                63.0
+              ]
+            }
+          }
+        },
+        "IF": {
+          "gemini_4_argon": {
+            "bare": {
+              "mean": 85.0,
+              "meanText": "85.0",
+              "rank": 1,
+              "passed": 85,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                78.0,
+                92.0
+              ]
+            }
+          },
+          "claude_fable_5_1": {
+            "bare": {
+              "mean": 79.0,
+              "meanText": "79.0",
+              "rank": 5,
+              "passed": 79,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                71.0,
+                87.0
+              ]
+            }
+          },
+          "claude_opus_5_5": {
+            "bare": {
+              "mean": 74.0,
+              "meanText": "74.0",
+              "rank": 7,
+              "passed": 74,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                65.0,
+                82.0
+              ]
+            }
+          },
+          "gpt_6_astra": {
+            "bare": {
+              "mean": 80.0,
+              "meanText": "80.0",
+              "rank": 3,
+              "passed": 80,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                72.0,
+                87.0
+              ]
+            }
+          },
+          "gpt_6_1_sol": {
+            "bare": {
+              "mean": 80.0,
+              "meanText": "80.0",
+              "rank": 3,
+              "passed": 80,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                72.0,
+                88.0
+              ]
+            }
+          },
+          "claude_sonnet_5_5": {
+            "bare": {
+              "mean": 69.0,
+              "meanText": "69.0",
+              "rank": 9,
+              "passed": 69,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                60.0,
+                78.0
+              ]
+            }
+          },
+          "gemini_3_8_flash_thinking": {
+            "bare": {
+              "mean": 83.0,
+              "meanText": "83.0",
+              "rank": 2,
+              "passed": 83,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                75.0,
+                90.0
+              ]
+            }
+          },
+          "deepseek_v4_1_flash": {
+            "bare": {
+              "mean": 61.0,
+              "meanText": "61.0",
+              "rank": 10,
+              "passed": 61,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                51.0,
+                70.0
+              ]
+            }
+          },
+          "gpt_5_6_sol": {
+            "bare": {
+              "mean": 74.0,
+              "meanText": "74.0",
+              "rank": 7,
+              "passed": 74,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                65.0,
+                82.0
+              ]
+            }
+          },
+          "gemini_3_5_flash_thinking": {
+            "bare": {
+              "mean": 75.0,
+              "meanText": "75.0",
+              "rank": 6,
+              "passed": 75,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                66.0,
+                83.0
+              ]
+            }
+          },
+          "kimi_k3": {
+            "bare": {
+              "mean": 58.0,
+              "meanText": "58.0",
+              "rank": 11,
+              "passed": 58,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                48.0,
+                68.0
+              ]
+            }
+          },
+          "glm_5_3": {
+            "bare": {
+              "mean": 49.0,
+              "meanText": "49.0",
+              "rank": 12,
+              "passed": 49,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                39.0,
+                59.0
+              ]
+            }
+          }
+        },
+        "MT": {
+          "gemini_4_argon": {
+            "bare": {
+              "mean": 75.0,
+              "meanText": "75.0",
+              "rank": 1,
+              "passed": 75,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                66.0,
+                83.0
+              ]
+            }
+          },
+          "claude_fable_5_1": {
+            "bare": {
+              "mean": 70.0,
+              "meanText": "70.0",
+              "rank": 3,
+              "passed": 70,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                61.0,
+                79.0
+              ]
+            }
+          },
+          "claude_opus_5_5": {
+            "bare": {
+              "mean": 71.0,
+              "meanText": "71.0",
+              "rank": 2,
+              "passed": 71,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                62.0,
+                80.0
+              ]
+            }
+          },
+          "gpt_6_astra": {
+            "bare": {
+              "mean": 62.0,
+              "meanText": "62.0",
+              "rank": 4,
+              "passed": 62,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                52.0,
+                71.0
+              ]
+            }
+          },
+          "gpt_6_1_sol": {
+            "bare": {
+              "mean": 59.0,
+              "meanText": "59.0",
+              "rank": 6,
+              "passed": 59,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                49.0,
+                68.0
+              ]
+            }
+          },
+          "claude_sonnet_5_5": {
+            "bare": {
+              "mean": 60.0,
+              "meanText": "60.0",
+              "rank": 5,
+              "passed": 60,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                50.0,
+                70.0
+              ]
+            }
+          },
+          "gemini_3_8_flash_thinking": {
+            "bare": {
+              "mean": 38.0,
+              "meanText": "38.0",
+              "rank": 10,
+              "passed": 38,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                29.0,
+                48.0
+              ]
+            }
+          },
+          "deepseek_v4_1_flash": {
+            "bare": {
+              "mean": 57.0,
+              "meanText": "57.0",
+              "rank": 7,
+              "passed": 57,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                47.0,
+                66.025
+              ]
+            }
+          },
+          "gpt_5_6_sol": {
+            "bare": {
+              "mean": 35.0,
+              "meanText": "35.0",
+              "rank": 11,
+              "passed": 35,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                26.0,
+                45.0
+              ]
+            }
+          },
+          "gemini_3_5_flash_thinking": {
+            "bare": {
+              "mean": 16.0,
+              "meanText": "16.0",
+              "rank": 12,
+              "passed": 16,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                9.0,
+                23.025
+              ]
+            }
+          },
+          "kimi_k3": {
+            "bare": {
+              "mean": 41.0,
+              "meanText": "41.0",
+              "rank": 9,
+              "passed": 41,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                31.0,
+                51.0
+              ]
+            }
+          },
+          "glm_5_3": {
+            "bare": {
+              "mean": 43.0,
+              "meanText": "43.0",
+              "rank": 8,
+              "passed": 43,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                33.0,
+                53.0
+              ]
+            }
+          }
+        },
+        "MTIF": {
+          "gemini_4_argon": {
+            "bare": {
+              "mean": 82.0,
+              "meanText": "82.0",
+              "rank": 1,
+              "passed": 82,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                74.0,
+                89.0
+              ]
+            }
+          },
+          "claude_fable_5_1": {
+            "bare": {
+              "mean": 81.0,
+              "meanText": "81.0",
+              "rank": 2,
+              "passed": 81,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                73.0,
+                88.0
+              ]
+            }
+          },
+          "claude_opus_5_5": {
+            "bare": {
+              "mean": 76.0,
+              "meanText": "76.0",
+              "rank": 3,
+              "passed": 76,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                68.0,
+                84.0
+              ]
+            }
+          },
+          "gpt_6_astra": {
+            "bare": {
+              "mean": 64.0,
+              "meanText": "64.0",
+              "rank": 7,
+              "passed": 64,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                54.0,
+                73.0
+              ]
+            }
+          },
+          "gpt_6_1_sol": {
+            "bare": {
+              "mean": 62.0,
+              "meanText": "62.0",
+              "rank": 9,
+              "passed": 62,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                53.0,
+                72.0
+              ]
+            }
+          },
+          "claude_sonnet_5_5": {
+            "bare": {
+              "mean": 68.0,
+              "meanText": "68.0",
+              "rank": 4,
+              "passed": 68,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                59.0,
+                77.0
+              ]
+            }
+          },
+          "gemini_3_8_flash_thinking": {
+            "bare": {
+              "mean": 67.0,
+              "meanText": "67.0",
+              "rank": 5,
+              "passed": 67,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                57.0,
+                76.0
+              ]
+            }
+          },
+          "deepseek_v4_1_flash": {
+            "bare": {
+              "mean": 63.0,
+              "meanText": "63.0",
+              "rank": 8,
+              "passed": 63,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                54.0,
+                72.0
+              ]
+            }
+          },
+          "gpt_5_6_sol": {
+            "bare": {
+              "mean": 65.0,
+              "meanText": "65.0",
+              "rank": 6,
+              "passed": 65,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                55.0,
+                74.0
+              ]
+            }
+          },
+          "gemini_3_5_flash_thinking": {
+            "bare": {
+              "mean": 46.0,
+              "meanText": "46.0",
+              "rank": 12,
+              "passed": 46,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                36.0,
+                56.0
+              ]
+            }
+          },
+          "kimi_k3": {
+            "bare": {
+              "mean": 50.0,
+              "meanText": "50.0",
+              "rank": 11,
+              "passed": 50,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                40.0,
+                60.0
+              ]
+            }
+          },
+          "glm_5_3": {
+            "bare": {
+              "mean": 52.0,
+              "meanText": "52.0",
+              "rank": 10,
+              "passed": 52,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                42.0,
+                62.0
+              ]
+            }
+          }
+        }
+      }
+    },
+    "test": {
+      "split": "test",
+      "metric": "Success rate (%) for one scored trajectory per model and task under the bare harness",
+      "runs": 1,
+      "uncertainty": {
+        "method": "percentile-task-bootstrap",
+        "confidenceLevel": 0.95,
+        "resamples": 10000,
+        "seed": 260831,
+        "rng": "numpy.random.PCG64",
+        "strata": [
+          "ST",
+          "IF",
+          "MT",
+          "MTIF"
+        ],
+        "taskOrder": "lexicographic",
+        "sharedTaskDraws": true,
+        "runsPerTask": 1,
+        "average": "equal-weight task-setting mean",
+        "quantileMethod": "linear"
+      },
+      "taskCounts": {
+        "ST": 100,
+        "IF": 100,
+        "MT": 100,
+        "MTIF": 100
+      },
+      "settings": [
+        {
+          "id": "Average",
+          "name": "Average",
+          "description": "Equal-weight mean of the four task settings"
+        },
+        {
+          "id": "ST",
+          "name": "ST",
+          "description": "Single-turn"
+        },
+        {
+          "id": "IF",
+          "name": "IF",
+          "description": "Instruction following"
+        },
+        {
+          "id": "MT",
+          "name": "MT",
+          "description": "Multi-turn"
+        },
+        {
+          "id": "MTIF",
+          "name": "MTIF",
+          "description": "Multi-turn + instruction following"
+        }
+      ],
+      "harnesses": [
+        {
+          "id": "bare",
+          "name": "Bare",
+          "abbr": "B",
+          "kind": "bare"
+        }
+      ],
+      "models": [
+        {
+          "id": "gemini_4_argon",
+          "name": "Gemini 4 Argon",
+          "developer": "Google",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "claude_opus_5_5",
+          "name": "Claude Opus 5.5",
+          "developer": "Anthropic",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "claude_fable_5_1",
+          "name": "Claude Fable 5.1",
+          "developer": "Anthropic",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "claude_sonnet_5_5",
+          "name": "Claude Sonnet 5.5",
+          "developer": "Anthropic",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "gpt_6_astra",
+          "name": "GPT 6 Astra",
+          "developer": "OpenAI",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "gpt_6_1_sol",
+          "name": "GPT 6.1 Sol",
+          "developer": "OpenAI",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "gemini_3_8_flash_thinking",
+          "name": "Gemini 3.8 Flash",
+          "developer": "Google",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "gpt_5_6_sol",
+          "name": "GPT 5.6 Sol",
+          "developer": "OpenAI",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "deepseek_v4_1_flash",
+          "name": "DeepSeek V4.1 Flash",
+          "developer": "DeepSeek",
+          "access": "open",
+          "reference": false
+        },
+        {
+          "id": "gemini_3_5_flash_thinking",
+          "name": "Gemini 3.5 Flash",
+          "developer": "Google",
+          "access": "closed",
+          "reference": false
+        },
+        {
+          "id": "kimi_k3",
+          "name": "Kimi K3",
+          "developer": "Moonshot AI",
+          "access": "open",
+          "reference": false
+        },
+        {
+          "id": "glm_5_3",
+          "name": "GLM 5.3",
+          "developer": "Z.ai",
+          "access": "open",
+          "reference": false
+        }
+      ],
+      "results": {
+        "Average": {
+          "gemini_4_argon": {
+            "bare": {
+              "mean": 79.75,
+              "meanText": "79.8",
+              "rank": 1,
+              "passed": 319,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                75.75,
+                83.5
+              ]
+            }
+          },
+          "claude_opus_5_5": {
+            "bare": {
+              "mean": 75.25,
+              "meanText": "75.3",
+              "rank": 2,
+              "passed": 301,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                71.25,
+                79.5
+              ]
+            }
+          },
+          "claude_fable_5_1": {
+            "bare": {
+              "mean": 71.5,
+              "meanText": "71.5",
+              "rank": 3,
+              "passed": 286,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                67.25,
+                75.75
+              ]
+            }
+          },
+          "claude_sonnet_5_5": {
+            "bare": {
+              "mean": 70.0,
+              "meanText": "70.0",
+              "rank": 4,
+              "passed": 280,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                65.5,
+                74.5
+              ]
+            }
+          },
+          "gpt_6_astra": {
+            "bare": {
+              "mean": 67.0,
+              "meanText": "67.0",
+              "rank": 5,
+              "passed": 268,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                62.25,
+                71.5
+              ]
+            }
+          },
+          "gpt_6_1_sol": {
+            "bare": {
+              "mean": 66.0,
+              "meanText": "66.0",
+              "rank": 6,
+              "passed": 264,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                61.25,
+                70.5
+              ]
+            }
+          },
+          "gemini_3_8_flash_thinking": {
+            "bare": {
+              "mean": 60.25,
+              "meanText": "60.3",
+              "rank": 7,
+              "passed": 241,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                55.75,
+                64.5
+              ]
+            }
+          },
+          "gpt_5_6_sol": {
+            "bare": {
+              "mean": 56.75,
+              "meanText": "56.8",
+              "rank": 8,
+              "passed": 227,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                51.75,
+                61.75
+              ]
+            }
+          },
+          "deepseek_v4_1_flash": {
+            "bare": {
+              "mean": 56.25,
+              "meanText": "56.3",
+              "rank": 9,
+              "passed": 225,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                51.25,
+                61.0
+              ]
+            }
+          },
+          "gemini_3_5_flash_thinking": {
+            "bare": {
+              "mean": 50.5,
+              "meanText": "50.5",
+              "rank": 10,
+              "passed": 202,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                46.25,
+                54.75
+              ]
+            }
+          },
+          "kimi_k3": {
+            "bare": {
+              "mean": 46.5,
+              "meanText": "46.5",
+              "rank": 11,
+              "passed": 186,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                41.5,
+                51.25
+              ]
+            }
+          },
+          "glm_5_3": {
+            "bare": {
+              "mean": 44.5,
+              "meanText": "44.5",
+              "rank": 12,
+              "passed": 178,
+              "scored": 400,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                39.75,
+                49.25
+              ]
+            }
+          }
+        },
+        "ST": {
+          "gemini_4_argon": {
+            "bare": {
+              "mean": 85.0,
+              "meanText": "85.0",
+              "rank": 1,
+              "passed": 85,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                78.0,
+                92.0
+              ]
+            }
+          },
+          "claude_opus_5_5": {
+            "bare": {
+              "mean": 85.0,
+              "meanText": "85.0",
+              "rank": 1,
+              "passed": 85,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                78.0,
+                92.0
+              ]
+            }
+          },
+          "claude_fable_5_1": {
+            "bare": {
+              "mean": 83.0,
+              "meanText": "83.0",
+              "rank": 3,
+              "passed": 83,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                75.0,
+                90.0
+              ]
+            }
+          },
+          "claude_sonnet_5_5": {
+            "bare": {
+              "mean": 81.0,
+              "meanText": "81.0",
+              "rank": 4,
+              "passed": 81,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                73.0,
+                88.0
+              ]
+            }
+          },
+          "gpt_6_astra": {
+            "bare": {
+              "mean": 77.0,
+              "meanText": "77.0",
+              "rank": 5,
+              "passed": 77,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                68.0,
+                85.0
+              ]
+            }
+          },
+          "gpt_6_1_sol": {
+            "bare": {
+              "mean": 77.0,
+              "meanText": "77.0",
+              "rank": 5,
+              "passed": 77,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                69.0,
+                85.0
+              ]
+            }
+          },
+          "gemini_3_8_flash_thinking": {
+            "bare": {
+              "mean": 73.0,
+              "meanText": "73.0",
+              "rank": 7,
+              "passed": 73,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                64.0,
+                81.0
+              ]
+            }
+          },
+          "gpt_5_6_sol": {
+            "bare": {
+              "mean": 59.0,
+              "meanText": "59.0",
+              "rank": 10,
+              "passed": 59,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                49.0,
+                68.0
+              ]
+            }
+          },
+          "deepseek_v4_1_flash": {
+            "bare": {
+              "mean": 70.0,
+              "meanText": "70.0",
+              "rank": 8,
+              "passed": 70,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                61.0,
+                79.0
+              ]
+            }
+          },
+          "gemini_3_5_flash_thinking": {
+            "bare": {
+              "mean": 70.0,
+              "meanText": "70.0",
+              "rank": 8,
+              "passed": 70,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                61.0,
+                79.0
+              ]
+            }
+          },
+          "kimi_k3": {
+            "bare": {
+              "mean": 51.0,
+              "meanText": "51.0",
+              "rank": 12,
+              "passed": 51,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                41.0,
+                61.0
+              ]
+            }
+          },
+          "glm_5_3": {
+            "bare": {
+              "mean": 57.0,
+              "meanText": "57.0",
+              "rank": 11,
+              "passed": 57,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                47.0,
+                67.0
+              ]
+            }
+          }
+        },
+        "IF": {
+          "gemini_4_argon": {
+            "bare": {
+              "mean": 85.0,
+              "meanText": "85.0",
+              "rank": 1,
+              "passed": 85,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                78.0,
+                92.0
+              ]
+            }
+          },
+          "claude_opus_5_5": {
+            "bare": {
+              "mean": 66.0,
+              "meanText": "66.0",
+              "rank": 7,
+              "passed": 66,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                57.0,
+                75.0
+              ]
+            }
+          },
+          "claude_fable_5_1": {
+            "bare": {
+              "mean": 72.0,
+              "meanText": "72.0",
+              "rank": 4,
+              "passed": 72,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                63.0,
+                80.0
+              ]
+            }
+          },
+          "claude_sonnet_5_5": {
+            "bare": {
+              "mean": 64.0,
+              "meanText": "64.0",
+              "rank": 9,
+              "passed": 64,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                55.0,
+                74.0
+              ]
+            }
+          },
+          "gpt_6_astra": {
+            "bare": {
+              "mean": 69.0,
+              "meanText": "69.0",
+              "rank": 6,
+              "passed": 69,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                60.0,
+                78.0
+              ]
+            }
+          },
+          "gpt_6_1_sol": {
+            "bare": {
+              "mean": 70.0,
+              "meanText": "70.0",
+              "rank": 5,
+              "passed": 70,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                61.0,
+                79.0
+              ]
+            }
+          },
+          "gemini_3_8_flash_thinking": {
+            "bare": {
+              "mean": 81.0,
+              "meanText": "81.0",
+              "rank": 2,
+              "passed": 81,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                73.0,
+                88.0
+              ]
+            }
+          },
+          "gpt_5_6_sol": {
+            "bare": {
+              "mean": 65.0,
+              "meanText": "65.0",
+              "rank": 8,
+              "passed": 65,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                56.0,
+                74.0
+              ]
+            }
+          },
+          "deepseek_v4_1_flash": {
+            "bare": {
+              "mean": 48.0,
+              "meanText": "48.0",
+              "rank": 11,
+              "passed": 48,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                38.0,
+                58.0
+              ]
+            }
+          },
+          "gemini_3_5_flash_thinking": {
+            "bare": {
+              "mean": 73.0,
+              "meanText": "73.0",
+              "rank": 3,
+              "passed": 73,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                64.0,
+                81.0
+              ]
+            }
+          },
+          "kimi_k3": {
+            "bare": {
+              "mean": 50.0,
+              "meanText": "50.0",
+              "rank": 10,
+              "passed": 50,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                40.0,
+                60.0
+              ]
+            }
+          },
+          "glm_5_3": {
+            "bare": {
+              "mean": 38.0,
+              "meanText": "38.0",
+              "rank": 12,
+              "passed": 38,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                29.0,
+                47.0
+              ]
+            }
+          }
+        },
+        "MT": {
+          "gemini_4_argon": {
+            "bare": {
+              "mean": 78.0,
+              "meanText": "78.0",
+              "rank": 2,
+              "passed": 78,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                70.0,
+                86.0
+              ]
+            }
+          },
+          "claude_opus_5_5": {
+            "bare": {
+              "mean": 81.0,
+              "meanText": "81.0",
+              "rank": 1,
+              "passed": 81,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                73.0,
+                88.0
+              ]
+            }
+          },
+          "claude_fable_5_1": {
+            "bare": {
+              "mean": 66.0,
+              "meanText": "66.0",
+              "rank": 4,
+              "passed": 66,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                57.0,
+                75.0
+              ]
+            }
+          },
+          "claude_sonnet_5_5": {
+            "bare": {
+              "mean": 71.0,
+              "meanText": "71.0",
+              "rank": 3,
+              "passed": 71,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                62.0,
+                80.0
+              ]
+            }
+          },
+          "gpt_6_astra": {
+            "bare": {
+              "mean": 62.0,
+              "meanText": "62.0",
+              "rank": 5,
+              "passed": 62,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                52.0,
+                71.0
+              ]
+            }
+          },
+          "gpt_6_1_sol": {
+            "bare": {
+              "mean": 59.0,
+              "meanText": "59.0",
+              "rank": 6,
+              "passed": 59,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                49.0,
+                68.0
+              ]
+            }
+          },
+          "gemini_3_8_flash_thinking": {
+            "bare": {
+              "mean": 32.0,
+              "meanText": "32.0",
+              "rank": 11,
+              "passed": 32,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                23.0,
+                41.0
+              ]
+            }
+          },
+          "gpt_5_6_sol": {
+            "bare": {
+              "mean": 47.0,
+              "meanText": "47.0",
+              "rank": 9,
+              "passed": 47,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                37.0,
+                57.0
+              ]
+            }
+          },
+          "deepseek_v4_1_flash": {
+            "bare": {
+              "mean": 56.0,
+              "meanText": "56.0",
+              "rank": 7,
+              "passed": 56,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                46.0,
+                65.0
+              ]
+            }
+          },
+          "gemini_3_5_flash_thinking": {
+            "bare": {
+              "mean": 13.0,
+              "meanText": "13.0",
+              "rank": 12,
+              "passed": 13,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                7.0,
+                20.0
+              ]
+            }
+          },
+          "kimi_k3": {
+            "bare": {
+              "mean": 41.0,
+              "meanText": "41.0",
+              "rank": 10,
+              "passed": 41,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                32.0,
+                50.0
+              ]
+            }
+          },
+          "glm_5_3": {
+            "bare": {
+              "mean": 48.0,
+              "meanText": "48.0",
+              "rank": 8,
+              "passed": 48,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                38.0,
+                58.0
+              ]
+            }
+          }
+        },
+        "MTIF": {
+          "gemini_4_argon": {
+            "bare": {
+              "mean": 71.0,
+              "meanText": "71.0",
+              "rank": 1,
+              "passed": 71,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                62.0,
+                80.0
+              ]
+            }
+          },
+          "claude_opus_5_5": {
+            "bare": {
+              "mean": 69.0,
+              "meanText": "69.0",
+              "rank": 2,
+              "passed": 69,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                60.0,
+                78.0
+              ]
+            }
+          },
+          "claude_fable_5_1": {
+            "bare": {
+              "mean": 65.0,
+              "meanText": "65.0",
+              "rank": 3,
+              "passed": 65,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                55.975,
+                74.0
+              ]
+            }
+          },
+          "claude_sonnet_5_5": {
+            "bare": {
+              "mean": 64.0,
+              "meanText": "64.0",
+              "rank": 4,
+              "passed": 64,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                54.0,
+                73.0
+              ]
+            }
+          },
+          "gpt_6_astra": {
+            "bare": {
+              "mean": 60.0,
+              "meanText": "60.0",
+              "rank": 5,
+              "passed": 60,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                50.0,
+                69.0
+              ]
+            }
+          },
+          "gpt_6_1_sol": {
+            "bare": {
+              "mean": 58.0,
+              "meanText": "58.0",
+              "rank": 6,
+              "passed": 58,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                48.0,
+                67.0
+              ]
+            }
+          },
+          "gemini_3_8_flash_thinking": {
+            "bare": {
+              "mean": 55.0,
+              "meanText": "55.0",
+              "rank": 8,
+              "passed": 55,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                45.0,
+                65.0
+              ]
+            }
+          },
+          "gpt_5_6_sol": {
+            "bare": {
+              "mean": 56.0,
+              "meanText": "56.0",
+              "rank": 7,
+              "passed": 56,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                46.0,
+                66.0
+              ]
+            }
+          },
+          "deepseek_v4_1_flash": {
+            "bare": {
+              "mean": 51.0,
+              "meanText": "51.0",
+              "rank": 9,
+              "passed": 51,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                41.0,
+                61.0
+              ]
+            }
+          },
+          "gemini_3_5_flash_thinking": {
+            "bare": {
+              "mean": 46.0,
+              "meanText": "46.0",
+              "rank": 10,
+              "passed": 46,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                36.0,
+                56.0
+              ]
+            }
+          },
+          "kimi_k3": {
+            "bare": {
+              "mean": 44.0,
+              "meanText": "44.0",
+              "rank": 11,
+              "passed": 44,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                34.0,
+                54.0
+              ]
+            }
+          },
+          "glm_5_3": {
+            "bare": {
+              "mean": 35.0,
+              "meanText": "35.0",
+              "rank": 12,
+              "passed": 35,
+              "scored": 100,
+              "sd": null,
+              "sdText": null,
+              "ci95": [
+                26.0,
+                44.0
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

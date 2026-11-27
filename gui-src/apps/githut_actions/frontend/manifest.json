@@ -1,0 +1,12 @@
+{
+  "id": "githut_actions",
+  "name": "GithutActions",
+  "icon": "./icons/githut_actions.svg",
+  "iconBackground": "linear-gradient(135deg, #0F766E 0%, #14B8A6 100%)",
+  "description": "GithutActions Workflows",
+  "backendService": "githut_actions",
+  "defaultWindow": {
+    "width": 1000,
+    "height": 650
+  }
+}

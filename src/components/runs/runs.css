@@ -1,0 +1,73 @@
+/* The task-by-model matrix uses the project page's type, surfaces and outcomes. */
+.rg {
+  --rg-task-width: 312px;
+  --rg-model-width: 64px;
+  --rg-total-width: 72px;
+  color: var(--mv-ink);
+  font-family: var(--mv-body);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.rg-heading { display: flex; justify-content: flex-end; margin: 0 0 16px; }
+.rg-key { display: flex; flex: none; flex-wrap: wrap; gap: 8px 18px; margin: 2px 0 0; padding: 0; color: var(--mv-ink-2); font-size: 13px; list-style: none; }
+.rg-key li { display: inline-flex; align-items: center; gap: 7px; }
+.rg-key .rg-mark { width: 22px; height: 22px; border-radius: 5px; }
+
+.rg-panel { min-width: 0; overflow: hidden; border: 1px solid var(--mv-line); border-radius: var(--mv-radius); background: var(--mv-card); }
+.rg-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding: 16px 18px; border-bottom: 1px solid var(--mv-line); }
+.rg-count { margin-left: auto; color: var(--mv-ink-3); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rg-scroll-hint { display: none; margin: 0; padding: 8px 18px; border-bottom: 1px solid var(--mv-line); color: var(--mv-ink-3); font-size: 12px; }
+.rg-status { margin: 0; padding: 18px; border: 1px solid var(--mv-line); border-radius: var(--mv-radius-sm); color: var(--mv-ink-3); }
+
+/* One continuous matrix; task names and model headings stay visible on scroll. */
+.rg-scroll { max-height: min(70vh, 620px); overflow: auto; overscroll-behavior: contain; scrollbar-color: var(--mv-line-strong) transparent; background: var(--mv-card); }
+.rg-scroll:focus-visible { outline: 2px solid var(--mv-focus); outline-offset: -2px; }
+.rg-table { width: 100%; min-width: calc(var(--rg-task-width) + var(--rg-model-count) * var(--rg-model-width) + var(--rg-total-width)); table-layout: fixed; border-collapse: separate; border-spacing: 0; }
+.rg-table th, .rg-table td { padding: 5px 4px; border-bottom: 1px solid var(--mv-line); text-align: center; vertical-align: middle; }
+.rg-table tbody tr:last-child th, .rg-table tbody tr:last-child td { border-bottom: 0; }
+.rg-table thead th { position: sticky; top: 0; z-index: 2; height: 108px; padding: 12px 5px; background: var(--mv-sunken); color: var(--mv-ink-2); font-size: 12px; font-weight: 550; line-height: 1.4; }
+.rg-table .rg-task-head, .rg-table .rg-task { position: sticky; left: 0; width: var(--rg-task-width); padding-left: 16px; padding-right: 16px; border-right: 1px solid var(--mv-line); text-align: left; }
+.rg-table .rg-task-head { z-index: 3; font-size: 13px; }
+.rg-table .rg-task { z-index: 1; padding-top: 10px; padding-bottom: 10px; background: var(--mv-card); font-weight: 400; }
+.rg-task-content { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.rg-setting { display: inline-flex; flex: 0 0 34px; align-items: center; justify-content: center; min-height: 24px; border: 1px solid var(--mv-line); border-radius: 5px; background: var(--mv-sunken); color: var(--mv-ink-3); font-size: 11px; font-weight: 550; letter-spacing: .02em; }
+.rg-task a { display: -webkit-box; min-width: 0; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: var(--mv-ink); font-size: 14px; font-weight: 450; line-height: 1.5; text-decoration: none; overflow-wrap: anywhere; }
+.rg-task a:hover { color: var(--mv-purple); text-decoration: underline; text-underline-offset: 3px; }
+.rg-model-head { width: var(--rg-model-width); }
+.rg-model-name { display: flex; align-items: center; justify-content: center; min-height: 4.2em; white-space: normal; overflow-wrap: normal; }
+.rg-model-head .run-harness { margin-top: 6px; padding: 2px; font-size: 10px; }
+.rg-passed-head { width: var(--rg-total-width); border-left: 1px solid var(--mv-line); }
+.rg-passed { border-left: 1px solid var(--mv-line); color: var(--mv-ink-3); font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rg-passed strong { color: var(--mv-ink-2); font-weight: 550; }
+.rg-table tbody tr:hover > td, .rg-table tbody tr:focus-within > td, .rg-table tbody tr:hover > .rg-task, .rg-table tbody tr:focus-within > .rg-task { background: var(--mv-sunken); }
+
+.rg-cell { display: inline-flex; align-items: center; justify-content: center; width: 100%; min-height: 44px; border-radius: 5px; text-decoration: none; }
+.rg-mark { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; }
+.rg-mark[data-passed='true'] { background: var(--mv-pass-tint); color: var(--mv-pass); }
+.rg-mark[data-passed='false'] { background: var(--mv-fail-tint); color: var(--mv-fail); }
+.rg-missing { color: var(--mv-ink-3); }
+.rg-cell:hover .rg-mark { box-shadow: 0 0 0 1px currentColor; }
+.rg-cell:focus-visible, .rg-task a:focus-visible { outline: 2px solid var(--mv-focus); outline-offset: 1px; }
+
+@media (max-width: 1280px) {
+  .rg-scroll-hint { display: block; }
+}
+
+@media (max-width: 800px) {
+  .rg { --rg-task-width: 240px; }
+  .rg-controls { gap: 12px 20px; }
+  .rg-count { margin-left: 0; }
+}
+
+@media (max-width: 480px) {
+  .rg { --rg-task-width: 180px; }
+  .rg-key { margin-top: 0; }
+  .rg-controls { padding: 14px 12px; }
+  .rg-scroll-hint { padding-left: 12px; padding-right: 12px; }
+  .rg-controls .mv-seg-label { flex-basis: 100%; }
+  .rg-table .rg-task-head, .rg-table .rg-task { padding-left: 10px; padding-right: 10px; }
+  .rg-task-content { align-items: flex-start; flex-direction: column; gap: 5px; }
+  .rg-setting { flex-basis: auto; min-height: 20px; padding: 0 6px; font-size: 10px; }
+  .rg-task a { font-size: 13px; line-height: 1.4; }
+}

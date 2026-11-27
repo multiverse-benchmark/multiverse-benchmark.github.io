@@ -1,0 +1,12 @@
+{
+  "id": "gridwell_mail",
+  "name": "GridwellMail",
+  "icon": "./icons/gridwell_mail.svg",
+  "iconBackground": "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)",
+  "description": "GridwellMail",
+  "backendService": "gridwell_mail",
+  "defaultWindow": {
+    "width": 1200,
+    "height": 700
+  }
+}

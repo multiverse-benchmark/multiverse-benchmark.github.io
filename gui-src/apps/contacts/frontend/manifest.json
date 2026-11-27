@@ -1,0 +1,12 @@
+{
+  "id": "contacts",
+  "name": "Contacts",
+  "icon": "./icons/contacts.svg",
+  "iconBackground": "linear-gradient(135deg, #4285F4 0%, #34A853 100%)",
+  "description": "Manage your contacts",
+  "backendService": "contacts",
+  "defaultWindow": {
+    "width": 1000,
+    "height": 700
+  }
+}

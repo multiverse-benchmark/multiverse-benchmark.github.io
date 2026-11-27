@@ -1,0 +1,28 @@
+.analytics-consent, .analytics-settings {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  z-index: 1000;
+  color: #24212a;
+  background: #fff;
+  border: 1px solid #d8d0e4;
+  border-radius: .6rem;
+  box-shadow: 0 3px 16px #00000014;
+  font: inherit;
+}
+.analytics-consent { width: min(25rem, calc(100vw - 2rem)); padding: 1rem; font-size: 1rem; line-height: 1.5; }
+.analytics-consent p { margin: 0 0 .75rem; }
+.analytics-consent-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+.analytics-consent-actions button, .analytics-settings {
+  padding: .5rem .75rem;
+  font-size: .875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.analytics-consent-actions button { border: 1px solid #d8d0e4; border-radius: .4rem; color: inherit; background: transparent; }
+.analytics-consent-actions button:hover, .analytics-settings:hover { border-color: #7143bd; }
+.analytics-consent-actions button:focus-visible, .analytics-settings:focus-visible { outline: 2px solid #7143bd; outline-offset: 3px; }
+.analytics-consent[hidden], .analytics-settings[hidden] { display: none; }
+[data-theme="dark"] .analytics-consent, [data-theme="dark"] .analytics-settings { background: #17151c; color: #f4f0fa; border-color: #50465f; }
+[data-theme="dark"] .analytics-consent-actions button { border-color: #50465f; }
+@media print { .analytics-consent, .analytics-settings { display: none; } }

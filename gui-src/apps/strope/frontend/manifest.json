@@ -1,0 +1,12 @@
+{
+  "id": "strope",
+  "name": "Strope",
+  "icon": "./icons/strope.svg",
+  "iconBackground": "linear-gradient(135deg, #0891B2 0%, #1E293B 100%)",
+  "description": "Strope is a payment dashboard for managing your transactions and subscriptions.",
+  "backendService": "strope",
+  "defaultWindow": {
+    "width": 1200,
+    "height": 600
+  }
+}

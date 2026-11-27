@@ -1,0 +1,12 @@
+{
+  "id": "notifications",
+  "name": "Notifications",
+  "icon": "./icons/notifications.svg",
+  "iconBackground": "linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)",
+  "description": "Manage device notifications and messages",
+  "backendService": "notifications",
+  "defaultWindow": {
+    "width": 900,
+    "height": 700
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "id": "common_utils",
+  "name": "Common Utils",
+  "icon": "./icons/common_utils.svg",
+  "iconBackground": "linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%)",
+  "description": "Framework utilities & monitoring",
+  "backendService": "common_utils",
+  "defaultWindow": { "width": 900, "height": 650 }
+}

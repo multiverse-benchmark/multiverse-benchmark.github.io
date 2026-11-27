@@ -1,0 +1,396 @@
+/*
+ * Results section: the shell (res-) around the leaderboard, whose own styles
+ * are in ../leaderboard/leaderboard.css. The same parts draw the paper's
+ * results (v1.0.0) and the leaderboard of v1.1.0. Tokens come from
+ * ../paper/paper.css.
+ *
+ * Numbers that have to line up in columns are set in Manrope, which has
+ * tabular figures. DM Sans, as Google Fonts serves it, does not.
+ *
+ * The base type is set on each block, not on .res, so that the chart the page
+ * renders into the shell's slot inherits nothing from here.
+ */
+.res-sets,
+.res-callout,
+.res-notes {
+  --res-numeric: var(--mv-display);
+  color: var(--mv-ink);
+  font-family: var(--mv-body);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ======================================================================
+   Section shell
+   ====================================================================== */
+/* The section has two names, "Results" and "Leaderboard": the second anchor is at the same place as the section's own. */
+.results-section {
+  position: relative;
+}
+
+.results-anchor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.res-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 32px;
+  margin-bottom: 20px;
+}
+
+.res-statement {
+  flex: 1 0 100%;
+  margin: 2px 0 0;
+  color: var(--mv-ink-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.res-panel > .gap {
+  margin-bottom: 20px;
+}
+
+/* ---- result-set tabs: the validation and test sets of the v1.1.0 leaderboard ---- */
+.res-sets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 28px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--mv-line);
+}
+
+.res-set {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  /* The selected tab's rule sits on the line under the tabs. */
+  margin-bottom: -1px;
+  padding: 10px 2px 11px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--mv-ink-2);
+  font: inherit;
+  cursor: pointer;
+}
+
+.res-set-name {
+  font-family: var(--mv-display);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  line-height: 1.4;
+}
+
+.res-set-note {
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.res-set:hover {
+  border-bottom-color: var(--mv-line-strong);
+  color: var(--mv-ink);
+}
+
+.res-set[aria-selected='true'] {
+  border-bottom-color: var(--mv-purple);
+  color: var(--mv-purple-dark);
+}
+
+.res-set:focus-visible {
+  border-radius: 4px;
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .res-sets {
+    gap: 0 22px;
+  }
+
+  .res-set {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+}
+
+/* ---- call-outs ---------------------------------------------------------
+   Two share one frame: above the results of v1.0.0, the note that they are
+   the paper's and that new evaluations belong to v1.1.0; under the table of
+   the v1.1.0 leaderboard, the contact for submissions. */
+.res-callout {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: var(--mv-radius);
+  background: var(--mv-green-tint);
+}
+
+.res-paper-note {
+  margin-bottom: 22px;
+}
+
+.res-contact {
+  margin-bottom: 22px;
+}
+
+/* Under the leaderboard: the link to the result explorer, where there is one, and the download at the right. */
+.res-export {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-top: 18px;
+}
+
+.res-explore {
+  margin: 0;
+  color: var(--mv-ink-2);
+  font-family: var(--mv-body);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.res-export .res-download {
+  margin-left: auto;
+}
+
+/* The panel and the contact take the focus when a note's action leads to them; they are not controls, so they show no ring for it, and the contact is marked while it holds the focus. */
+.res-panel:focus,
+.res-contact:focus {
+  outline: none;
+}
+
+.res-contact:focus {
+  box-shadow: 0 0 0 3px var(--mv-focus);
+}
+
+.res-callout-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--mv-card);
+  color: var(--mv-green);
+  box-shadow: 0 0 0 1px var(--mv-line-strong);
+}
+
+.res-callout-text {
+  min-width: 0;
+}
+
+.res-callout-lead {
+  margin: 0;
+  color: var(--mv-ink);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.res-callout-more {
+  margin: 8px 0 0;
+  color: var(--mv-ink-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.res-paper-note .res-callout-more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 22px;
+  margin-top: 4px;
+}
+
+.res-callout-chip {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 1px 9px;
+  border-radius: 999px;
+  background: var(--mv-green);
+  color: var(--mv-on-fill);
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  vertical-align: 1px;
+}
+
+/* The links of the paper-results note: to the v1.1.0 leaderboard, and to the deep dive's section on
+   how the releases differ. The vertical padding enlarges the pointer target. */
+.res-paper-note-action {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--mv-green-dark);
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.res-paper-note-action:hover {
+  color: var(--mv-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.res-paper-note-action:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+/* The vertical padding enlarges the pointer target without changing the line height. */
+.res-contact-email {
+  overflow-wrap: anywhere;
+  padding: 7px 0;
+  border-radius: 3px;
+  color: var(--mv-green-dark);
+  font-weight: 650;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.res-contact-email:hover {
+  color: var(--mv-ink);
+  text-decoration-thickness: 2px;
+}
+
+.res-contact-email:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .res-callout {
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .res-callout-icon {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* ---- chart slot ------------------------------------------------------- */
+.res-chart {
+  margin-top: 44px;
+}
+
+/* ---- notes ------------------------------------------------------------ */
+.res-notes {
+  container: res-notes / inline-size;
+  margin-top: 44px;
+  padding-top: 26px;
+  border-top: 1px solid var(--mv-line);
+}
+
+.res-notes-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 24px;
+  margin-bottom: 18px;
+}
+
+.res-notes-title {
+  margin: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+  line-height: 1.3;
+}
+
+.res-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: var(--mv-radius-sm);
+  background: var(--mv-card);
+  color: var(--mv-ink);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.res-download svg {
+  flex: none;
+  color: var(--mv-green);
+}
+
+.res-download:hover {
+  border-color: var(--mv-sage);
+  background: var(--mv-green-tint);
+}
+
+.res-download:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+.res-notes-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 48px;
+  margin: 0;
+}
+
+.res-note {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: baseline;
+}
+
+.res-note dt {
+  color: var(--mv-ink);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.7;
+}
+
+.res-note dd {
+  margin: 0;
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+@container res-notes (max-width: 820px) {
+  .res-notes-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+}
+
+@container res-notes (max-width: 460px) {
+  .res-note {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

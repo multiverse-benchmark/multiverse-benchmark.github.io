@@ -1,0 +1,12 @@
+{
+  "id": "device_setting",
+  "name": "Device Settings",
+  "icon": "./icons/settings.svg",
+  "iconBackground": "linear-gradient(135deg, #607D8B 0%, #455A64 100%)",
+  "description": "Manage device settings, volume, connectivity, and apps.",
+  "backendService": "device_setting",
+  "defaultWindow": {
+    "width": 1024,
+    "height": 768
+  }
+}

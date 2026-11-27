@@ -1,0 +1,444 @@
+/*
+ * Tools and environment: all simulated services around the MultiVerse mark,
+ * inside a frame that stands for the sandbox. Type and radii come from the
+ * tokens in ./paper/paper.css. The sandbox itself is a dark night sky in the
+ * light and the dark theme alike and sets its own colours.
+ */
+.tenv {
+  container: tenv / inline-size;
+  display: grid;
+  gap: 14px;
+  color: var(--mv-ink);
+  font-family: var(--mv-body);
+}
+
+/* ---- the sandbox: one boundary around everything the agent can reach ---- */
+/*
+ * The box is a patch of night sky in both themes: dark, with stars, and a
+ * faint blue glow. Its surface is dark whatever the page's surfaces are, so
+ * the colours for what sits on it are set here and not taken from the page's
+ * ink and line tokens.
+ */
+.tenv-sandbox {
+  --tenv-space: #070a1c;
+  --tenv-on-space: #f4f6fd;
+  --tenv-on-space-2: #c6cce4;
+  --tenv-space-line: rgb(255 255 255 / 0.3);
+  /* The sky's blues are fixed values: the sky is the same in the light and the dark theme. */
+  --tenv-space-accent: rgb(154 177 245);
+  position: relative;
+  padding: 26px 18px 14px;
+  border: 1.5px dashed rgb(255 255 255 / 0.4);
+  border-radius: calc(var(--mv-radius) + 6px);
+  background:
+    radial-gradient(ellipse 44% 50% at 50% 46%, rgb(43 79 218 / 0.4), transparent 72%),
+    radial-gradient(ellipse 36% 42% at 10% 8%, rgb(28 52 145 / 0.5), transparent 70%),
+    radial-gradient(ellipse 40% 46% at 92% 96%, rgb(28 52 145 / 0.4), transparent 70%),
+    linear-gradient(160deg, #0c1132 0%, var(--tenv-space) 55%, #04050d 100%);
+  color: var(--tenv-on-space);
+}
+
+/* The stars fill the box, behind everything else in it. */
+.tenv-sky {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.tenv-star {
+  fill: #fff;
+}
+
+.tenv-star--cool {
+  fill: #c3d6ff;
+}
+
+.tenv-star--warm {
+  fill: #ffe6bf;
+}
+
+.tenv-star-halo {
+  fill: url(#tenv-star-glow);
+}
+
+/* The label sits on the boundary, as the name of what the boundary encloses. */
+.tenv-sandbox-label {
+  position: absolute;
+  top: 0;
+  left: 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 3px 12px 3px 9px;
+  border: 1px solid rgb(255 255 255 / 0.4);
+  border-radius: 999px;
+  background: #10163a;
+  color: var(--tenv-on-space);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.5;
+  transform: translateY(-50%);
+}
+
+.tenv-sandbox-label > svg {
+  color: var(--tenv-space-accent);
+}
+
+.tenv-sandbox-note {
+  position: relative;
+  margin: 4px 8px 0;
+  color: var(--tenv-on-space-2);
+  font-size: 12.5px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* ---- the stage: two rings of services around the mark ------------------- */
+.tenv-stage {
+  position: relative;
+  aspect-ratio: var(--tenv-aspect);
+}
+
+.tenv-rings {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tenv-rings ellipse {
+  fill: none;
+  stroke: var(--tenv-space-line);
+  stroke-dasharray: 3 6;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.tenv-link {
+  stroke: var(--tenv-space-accent);
+  stroke-dasharray: 4 4;
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+
+.tenv-core {
+  position: absolute;
+  width: 13%;
+  transform: translate(-50%, -50%);
+}
+
+.tenv-core img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.tenv-services {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tenv-service-slot {
+  position: absolute;
+  transform: translate(-50%, -20px);
+}
+
+.tenv-service {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  width: 88px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--tenv-on-space-2);
+  font: inherit;
+  cursor: pointer;
+}
+
+/* On the dark sky a tile gets a thin light edge, so that dark tiles keep their outline. */
+.tenv-tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.2), 0 3px 10px rgb(0 0 0 / 0.45);
+  forced-color-adjust: none;
+  transition: box-shadow 0.14s ease, transform 0.14s ease;
+}
+
+.tenv-tile img {
+  display: block;
+  width: 23px;
+  height: 23px;
+}
+
+.tenv-service-label {
+  max-width: 100%;
+  font-size: 11px;
+  font-weight: 550;
+  line-height: 1.25;
+  text-align: center;
+  text-wrap: balance;
+  /* Keeps a label readable where a star sits behind it. */
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.75);
+}
+
+/* The service the panel below is about: under the pointer, or the one whose tools are listed. */
+.tenv-service:hover .tenv-tile,
+.tenv-service[data-current='true'] .tenv-tile {
+  box-shadow: 0 0 0 2px var(--tenv-space), 0 0 0 4px var(--tenv-space-accent), 0 0 18px 3px rgb(111 140 240 / 0.6);
+}
+
+.tenv-service[data-current='true'] .tenv-service-label {
+  color: #fff;
+  font-weight: 700;
+}
+
+.tenv-service:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* ---- the selected service ------------------------------------------------ */
+/*
+ * Three lines beside the tile: the name with its tool count (and, at the right
+ * end, the link to the code), what the service is, and a few of its tools.
+ * Each line has the full width, so that it does not wrap in the ring layout
+ * and the strip keeps one height while the selection moves between services.
+ */
+.tenv-detail {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    'tile name link'
+    'tile description description'
+    'tile tools tools';
+  align-items: center;
+  gap: 4px 14px;
+  padding: 13px 18px 14px;
+  border: 1px solid var(--mv-line);
+  border-radius: var(--mv-radius);
+  background: var(--mv-card);
+}
+
+.tenv-detail .tenv-tile {
+  grid-area: tile;
+  align-self: start;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.tenv-detail .tenv-tile img {
+  width: 22px;
+  height: 22px;
+}
+
+.tenv-detail-name {
+  grid-area: name;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 10px;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.tenv-detail-name strong {
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.tenv-detail-name span {
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.tenv-detail-description {
+  grid-area: description;
+  margin: 0;
+  color: var(--mv-ink);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.tenv-detail-tools {
+  grid-area: tools;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 0;
+  color: var(--mv-ink-3);
+  font-size: 12px;
+}
+
+.tenv-detail-tools code {
+  padding: 1px 7px;
+  border: 1px solid var(--mv-line);
+  border-radius: 5px;
+  background: var(--mv-sunken);
+  color: var(--mv-ink-2);
+  font-family: var(--mv-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.tenv-detail-link {
+  grid-area: link;
+  justify-self: end;
+  white-space: nowrap;
+}
+
+/*
+ * A clicked service: all of its tools, each a link to the tool's code. The list wraps like text
+ * and takes the height it needs, from two tools to about ninety.
+ */
+.tenv-detail[data-tenv-listed='true'] {
+  grid-template-areas:
+    'tile name name'
+    'tile description description'
+    'tile tools tools';
+}
+
+.tenv-detail-all {
+  grid-area: tools;
+  display: grid;
+  gap: 8px;
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--mv-line);
+}
+
+.tenv-detail-all .tenv-detail-eg {
+  margin: 0;
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.tenv-tool-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tenv-tool-list a {
+  display: block;
+  padding: 1px 7px;
+  border: 1px solid var(--mv-line);
+  border-radius: 5px;
+  background: var(--mv-sunken);
+  color: var(--mv-ink-2);
+  font-family: var(--mv-mono);
+  font-size: 11.5px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.tenv-tool-list a:hover {
+  border-color: var(--mv-purple);
+  background: var(--mv-purple-tint);
+  color: var(--mv-purple-dark);
+}
+
+.tenv-tool-list a:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 1px;
+}
+
+.tenv-notes {
+  display: grid;
+  gap: 4px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tenv-tile {
+    transition: none;
+  }
+}
+
+/* ---- narrow containers: no room for rings, so the services form a grid --- */
+@container tenv (max-width: 900px) {
+  .tenv-sandbox {
+    padding: 28px 14px 14px;
+  }
+
+  .tenv-stage {
+    aspect-ratio: auto;
+  }
+
+  .tenv-rings,
+  .tenv-core {
+    display: none;
+  }
+
+  .tenv-services {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+    gap: 14px 4px;
+  }
+
+  .tenv-service-slot {
+    position: static;
+    transform: none;
+  }
+
+  .tenv-service {
+    width: 100%;
+  }
+
+  .tenv-sandbox-note {
+    margin-top: 14px;
+  }
+}
+
+/* Phone widths: the link moves under the tools, and the text uses the full width. */
+@container tenv (max-width: 560px) {
+  .tenv-detail {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'tile name'
+      'description description'
+      'tools tools'
+      'link link';
+    row-gap: 8px;
+  }
+
+  .tenv-detail[data-tenv-listed='true'] {
+    grid-template-areas:
+      'tile name'
+      'description description'
+      'tools tools';
+  }
+
+  .tenv-detail .tenv-tile {
+    align-self: center;
+  }
+
+  .tenv-detail-link {
+    justify-self: start;
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "demoId": "figure1-message-demo",
+  "validationTask": false,
+  "sourceCache": "3c0d566fdd6af0bca0e1c3a2.json",
+  "sourceSha256": "50a400d173f4cf7dc6ad813fea9b12ad29b2a3687a7612dfb7d8ead73b7e3ba9",
+  "taskSourceSha256": "39f7ad8c8072cb2b7630d33a7da3a050c34451decc1c4b25f58320bf10207d62",
+  "authoredToolCalls": 10,
+  "files": [
+    {
+      "file": "initial.json.gz",
+      "sha256": "3520756220dc0dc865b08e5ebac018f11b12b67bffb39f65fb0ab080e19665eb",
+      "bytes": 70548
+    },
+    {
+      "file": "final.json.gz",
+      "sha256": "82c9df3add9c4c5282ef18c3a45ada8c13319003e54bffbecead802d9ae9921b",
+      "bytes": 71309
+    },
+    {
+      "file": "task.json.gz",
+      "sha256": "1d0154f1617c4cc7436aaf06377dba53a8a533701984da86de18479f9c93feab",
+      "bytes": 1768
+    },
+    {
+      "file": "replay.json.gz",
+      "sha256": "b12eec299cc2161a195070fbe612563772109ec048d523c603bc551256f97899",
+      "bytes": 13000
+    }
+  ]
+}

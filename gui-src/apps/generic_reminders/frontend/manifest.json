@@ -1,0 +1,12 @@
+{
+  "id": "generic_reminders",
+  "name": "Reminders",
+  "icon": "./icons/generic_reminders.svg",
+  "iconBackground": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+  "description": "Manage your reminders",
+  "backendService": "generic_reminders",
+  "defaultWindow": {
+    "width": 1200,
+    "height": 900
+  }
+}

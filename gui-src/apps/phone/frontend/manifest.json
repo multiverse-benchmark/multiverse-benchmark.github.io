@@ -1,0 +1,12 @@
+{
+  "id": "phone",
+  "name": "Phone",
+  "icon": "./icons/phone.svg",
+  "iconBackground": "linear-gradient(135deg, #4CAF50 0%, #45a049 100%)",
+  "description": "Make and manage phone calls",
+  "backendService": "phone",
+  "defaultWindow": {
+    "width": 600,
+    "height": 700
+  }
+}

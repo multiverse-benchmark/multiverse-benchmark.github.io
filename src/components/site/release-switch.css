@@ -1,0 +1,68 @@
+/* The switch between the releases: a pill fixed at the corner of the window, above the page. */
+.release-switch {
+  position: fixed;
+  right: 24px;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  max-width: calc(100vw - 24px);
+  padding: 5px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: 999px;
+  background: var(--mv-card);
+  color: var(--mv-ink-2);
+  box-shadow: 0 3px 16px #20212424;
+  font-family: var(--mv-body);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.release-switch-label {
+  padding: 0 10px 0 11px;
+  color: var(--mv-ink-3);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.release-switch button {
+  min-height: 36px;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--mv-ink-2);
+  font: inherit;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transition: background-color .15s ease;
+}
+
+.release-switch button:hover { background: var(--mv-tint); }
+.release-switch button[aria-pressed='true'] { background: var(--mv-purple-tint); color: var(--mv-purple-dark); }
+.release-switch button:focus-visible { outline: 2px solid var(--mv-focus); outline-offset: 2px; }
+
+/* The last lines of the footer can scroll above the switch. */
+.site-footer { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+
+@media (max-width: 600px) {
+  .release-switch {
+    right: auto;
+    left: 50%;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+  }
+  .release-switch button { min-height: 40px; padding-inline: 12px; }
+  .release-switch-label { padding-inline: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .release-switch button { transition: none; }
+}
+
+@media print {
+  .release-switch { display: none; }
+  .site-footer { padding-bottom: 0; }
+}

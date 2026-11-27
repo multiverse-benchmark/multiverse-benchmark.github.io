@@ -1,0 +1,650 @@
+[
+  {
+    "name": "batch_update_document",
+    "description": "Apply batch updates to a document.\n\nELEMENT-BASED INDEXING: The 'index' parameter refers to positions in the content element array. index 0 = position before the first element, index N = position after the Nth element (0-indexed). Valid range for a document with N elements: 0 to N (inclusive). For an empty document, only index 0 is valid. Using index 1 on an empty document will raise ValueError.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "documentId": {
+          "description": "The ID of the document to update.",
+          "type": "string",
+          "minLength": 1
+        },
+        "requests": {
+          "description": "A list of update requests to apply. Each dictionary\nin the list must be one of the specified request types. Each request\ndictionary typically has a single key identifying the type of request\n(e.g., 'insertText', 'updateDocumentStyle'), and its value is a dictionary containing the\nparameters for that request. Note: Request names like \"UpdateDocumentStyleRequest\"\nare just type names, not keys to be used. The supported request types and their\nstructures are:",
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "description": "A single update request object. Must be one of: insertText, updateDocumentStyle, deleteContentRange, replaceAllText, or insertTable.",
+            "anyOf": [
+              {
+                "description": "Request object for inserting text into the document.",
+                "type": "object",
+                "properties": {
+                  "insertText": {
+                    "description": "Inserts text into the document. Exactly one of 'location' or 'endOfSegmentLocation' must be provided (never both, never neither).",
+                    "type": "object",
+                    "properties": {
+                      "text": {
+                        "description": "The text to insert.",
+                        "type": "string"
+                      },
+                      "location": {
+                        "description": "Specifies where to insert the text by element index. Mutually exclusive with 'endOfSegmentLocation' - provide exactly one of them.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "index": {
+                            "description": "The zero-based element index in the document's content array. For a document with N elements, valid range is 0 to N. For an empty document, only index 0 is valid.",
+                            "type": "integer",
+                            "minimum": 0
+                          }
+                        },
+                        "required": [
+                          "index"
+                        ]
+                      },
+                      "endOfSegmentLocation": {
+                        "description": "Specifies where to insert the text at the end of a segment. Mutually exclusive with 'location' - provide exactly one of them.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "segmentId": {
+                            "description": "The ID of the header, footer or footnote the location is in. An empty or unspecified segment ID signifies the document's body. Element IDs of content items such as paragraphs, tables, or table cells are not segment IDs.",
+                            "type": "string",
+                            "default": ""
+                          }
+                        },
+                        "required": []
+                      }
+                    },
+                    "required": [
+                      "text"
+                    ]
+                  }
+                },
+                "required": [
+                  "insertText"
+                ]
+              },
+              {
+                "description": "Request object for updating the document style.",
+                "type": "object",
+                "properties": {
+                  "updateDocumentStyle": {
+                    "description": "Updates the document's style.",
+                    "type": "object",
+                    "properties": {
+                      "documentStyle": {
+                        "description": "The new document style to apply.\nDocumentStyle represents the style of the document with the following structure:",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "background": {
+                            "description": "The background of the document. Documents cannot have a transparent background color.\nBackground represents the background of a document with the following structure:",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "color": {
+                                "description": "The background color.\nColor represents a solid color with the following structure:",
+                                "type": "object",
+                                "nullable": true,
+                                "properties": {
+                                  "rgbColor": {
+                                    "description": "The RGB color value.\nRgbColor represents an RGB color with the following structure:",
+                                    "type": "object",
+                                    "nullable": true,
+                                    "properties": {
+                                      "red": {
+                                        "description": "The red component of the color, from 0.0 to 1.0.",
+                                        "type": "number",
+                                        "minimum": 0.0,
+                                        "maximum": 1.0,
+                                        "default": 0.0
+                                      },
+                                      "green": {
+                                        "description": "The green component of the color, from 0.0 to 1.0.",
+                                        "type": "number",
+                                        "minimum": 0.0,
+                                        "maximum": 1.0,
+                                        "default": 0.0
+                                      },
+                                      "blue": {
+                                        "description": "The blue component of the color, from 0.0 to 1.0.",
+                                        "type": "number",
+                                        "minimum": 0.0,
+                                        "maximum": 1.0,
+                                        "default": 0.0
+                                      }
+                                    },
+                                    "required": []
+                                  }
+                                },
+                                "required": []
+                              }
+                            },
+                            "required": []
+                          },
+                          "defaultHeaderId": {
+                            "description": "The ID of the default header. If not set, there's no default header. This property is read-only.",
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "defaultFooterId": {
+                            "description": "The ID of the default footer. If not set, there's no default footer. This property is read-only.",
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "evenPageHeaderId": {
+                            "description": "The ID of the header used only for even pages. The value of useEvenPageHeaderFooter determines whether to use the defaultHeaderId or this value for the header on even pages. If not set, there's no even page header. This property is read-only.",
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "evenPageFooterId": {
+                            "description": "The ID of the footer used only for even pages. The value of useEvenPageHeaderFooter determines whether to use the defaultFooterId or this value for the footer on even pages. If not set, there's no even page footer. This property is read-only.",
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "firstPageHeaderId": {
+                            "description": "The ID of the header used only for the first page. If not set then a unique header for the first page does not exist. The value of useFirstPageHeaderFooter determines whether to use the defaultHeaderId or this value for the header on the first page. If not set, there's no first page header. This property is read-only.",
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "firstPageFooterId": {
+                            "description": "The ID of the footer used only for the first page. If not set then a unique footer for the first page does not exist. The value of useFirstPageHeaderFooter determines whether to use the defaultFooterId or this value for the footer on the first page. If not set, there's no first page footer. This property is read-only.",
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "useFirstPageHeaderFooter": {
+                            "description": "Indicates whether to use the first page header / footer IDs for the first page.",
+                            "type": "boolean",
+                            "nullable": true
+                          },
+                          "useEvenPageHeaderFooter": {
+                            "description": "Indicates whether to use the even page header / footer IDs for the even pages.",
+                            "type": "boolean",
+                            "nullable": true
+                          },
+                          "pageNumberStart": {
+                            "description": "The page number from which to start counting the number of pages.",
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "marginTop": {
+                            "description": "The top page margin. Updating the top page margin on the document style clears the top page margin on all section styles.\nIt has the following structure:",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "magnitude": {
+                                "description": "The magnitude (non-negative).",
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              "unit": {
+                                "description": "The units for magnitude. Possible values:\n - \"UNIT_UNSPECIFIED\": The units are unknown.\n- \"PT\": A point, 1/72 of an inch.",
+                                "type": "string",
+                                "enum": [
+                                  "EMU",
+                                  "IN",
+                                  "PT",
+                                  "UNIT_UNSPECIFIED"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "magnitude",
+                              "unit"
+                            ]
+                          },
+                          "marginBottom": {
+                            "description": "The bottom page margin. Updating the bottom page margin on the document style clears the bottom page margin on all section styles.\nIt has the following structure:",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "magnitude": {
+                                "description": "The magnitude (non-negative).",
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              "unit": {
+                                "description": "The units for magnitude. Possible values:\n - \"UNIT_UNSPECIFIED\": The units are unknown.\n- \"PT\": A point, 1/72 of an inch.",
+                                "type": "string",
+                                "enum": [
+                                  "EMU",
+                                  "IN",
+                                  "PT",
+                                  "UNIT_UNSPECIFIED"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "magnitude",
+                              "unit"
+                            ]
+                          },
+                          "marginRight": {
+                            "description": "The right page margin. Updating the right page margin on the document style clears the right page margin on all section styles. It may also cause columns to resize in all sections.\nIt has the following structure:",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "magnitude": {
+                                "description": "The magnitude (non-negative).",
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              "unit": {
+                                "description": "The units for magnitude. Possible values:\n - \"UNIT_UNSPECIFIED\": The units are unknown.\n- \"PT\": A point, 1/72 of an inch.",
+                                "type": "string",
+                                "enum": [
+                                  "EMU",
+                                  "IN",
+                                  "PT",
+                                  "UNIT_UNSPECIFIED"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "magnitude",
+                              "unit"
+                            ]
+                          },
+                          "marginLeft": {
+                            "description": "The left page margin. Updating the left page margin on the document style clears the left page margin on all section styles. It may also cause columns to resize in all sections.\nIt has the following structure:",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "magnitude": {
+                                "description": "The magnitude (non-negative).",
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              "unit": {
+                                "description": "The units for magnitude. Possible values:\n - \"UNIT_UNSPECIFIED\": The units are unknown.\n- \"PT\": A point, 1/72 of an inch.",
+                                "type": "string",
+                                "enum": [
+                                  "EMU",
+                                  "IN",
+                                  "PT",
+                                  "UNIT_UNSPECIFIED"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "magnitude",
+                              "unit"
+                            ]
+                          },
+                          "pageSize": {
+                            "description": "The size of a page in the document.",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "height": {
+                                "description": "The height of the page.",
+                                "type": "object",
+                                "nullable": true,
+                                "properties": {
+                                  "magnitude": {
+                                    "description": "The magnitude (non-negative).",
+                                    "type": "number",
+                                    "minimum": 0
+                                  },
+                                  "unit": {
+                                    "description": "The units for magnitude. Possible values: \"UNIT_UNSPECIFIED\" (the units are unknown), \"PT\" (point, 1/72 of an inch).",
+                                    "type": "string",
+                                    "enum": [
+                                      "EMU",
+                                      "IN",
+                                      "PT",
+                                      "UNIT_UNSPECIFIED"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "magnitude",
+                                  "unit"
+                                ]
+                              },
+                              "width": {
+                                "description": "The width of the page.",
+                                "type": "object",
+                                "nullable": true,
+                                "properties": {
+                                  "magnitude": {
+                                    "description": "The magnitude (non-negative).",
+                                    "type": "number",
+                                    "minimum": 0
+                                  },
+                                  "unit": {
+                                    "description": "The units for magnitude. Possible values: \"UNIT_UNSPECIFIED\" (the units are unknown), \"PT\" (point, 1/72 of an inch).",
+                                    "type": "string",
+                                    "enum": [
+                                      "EMU",
+                                      "IN",
+                                      "PT",
+                                      "UNIT_UNSPECIFIED"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "magnitude",
+                                  "unit"
+                                ]
+                              }
+                            },
+                            "required": []
+                          },
+                          "marginHeader": {
+                            "description": "The amount of space between the top of the page and the contents of the header.\nIt has the following structure:",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "magnitude": {
+                                "description": "The magnitude (non-negative).",
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              "unit": {
+                                "description": "The units for magnitude. Possible values:\n - \"UNIT_UNSPECIFIED\": The units are unknown.\n- \"PT\": A point, 1/72 of an inch.",
+                                "type": "string",
+                                "enum": [
+                                  "EMU",
+                                  "IN",
+                                  "PT",
+                                  "UNIT_UNSPECIFIED"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "magnitude",
+                              "unit"
+                            ]
+                          },
+                          "marginFooter": {
+                            "description": "The amount of space between the bottom of the page and the contents of the footer.\nIt has the following structure:",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "magnitude": {
+                                "description": "The magnitude (non-negative).",
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              "unit": {
+                                "description": "The units for magnitude. Possible values:\n - \"UNIT_UNSPECIFIED\": The units are unknown.\n- \"PT\": A point, 1/72 of an inch.",
+                                "type": "string",
+                                "enum": [
+                                  "EMU",
+                                  "IN",
+                                  "PT",
+                                  "UNIT_UNSPECIFIED"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "magnitude",
+                              "unit"
+                            ]
+                          },
+                          "useCustomHeaderFooterMargins": {
+                            "description": "Indicates whether DocumentStyle marginHeader, SectionStyle marginHeader and DocumentStyle marginFooter, SectionStyle marginFooter are respected. When false, the default values in the Docs editor for header and footer margin is used. This property is read-only.",
+                            "type": "boolean",
+                            "nullable": true
+                          },
+                          "flipPageOrientation": {
+                            "description": "Optional. Indicates whether to flip the dimensions of the pageSize, which allows changing the page orientation between portrait and landscape.",
+                            "type": "boolean",
+                            "nullable": true
+                          },
+                          "documentFormat": {
+                            "description": "The format of the document.",
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "documentMode": {
+                                "description": "Document mode: 'PAGELESS' for continuous flow, 'PAGES' for paginated.",
+                                "type": "string",
+                                "nullable": true,
+                                "enum": [
+                                  "PAGELESS",
+                                  "PAGES"
+                                ]
+                              }
+                            },
+                            "required": []
+                          }
+                        },
+                        "required": []
+                      }
+                    },
+                    "required": []
+                  }
+                },
+                "required": [
+                  "updateDocumentStyle"
+                ]
+              },
+              {
+                "description": "Request object for deleting content from the document.",
+                "type": "object",
+                "properties": {
+                  "deleteContentRange": {
+                    "description": "Deletes content within a specified range in the document.",
+                    "type": "object",
+                    "properties": {
+                      "range": {
+                        "description": "The range of content to delete.",
+                        "type": "object",
+                        "properties": {
+                          "startIndex": {
+                            "description": "The zero-based element index where deletion starts (inclusive). Must be < content length.",
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "endIndex": {
+                            "description": "The zero-based element index where deletion ends (exclusive). Must be <= content length.",
+                            "type": "integer",
+                            "minimum": 0
+                          }
+                        },
+                        "required": [
+                          "startIndex",
+                          "endIndex"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "range"
+                    ]
+                  }
+                },
+                "required": [
+                  "deleteContentRange"
+                ]
+              },
+              {
+                "description": "Request object for replacing all instances of text in the document.",
+                "type": "object",
+                "properties": {
+                  "replaceAllText": {
+                    "description": "Replaces all instances of specified text in the document.",
+                    "type": "object",
+                    "properties": {
+                      "containsText": {
+                        "description": "Criteria for matching text to replace.",
+                        "type": "object",
+                        "properties": {
+                          "text": {
+                            "description": "The text to search for and replace.",
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "matchCase": {
+                            "description": "Whether to match case. Defaults to False.",
+                            "type": "boolean",
+                            "nullable": true,
+                            "default": false
+                          }
+                        },
+                        "required": [
+                          "text"
+                        ]
+                      },
+                      "replaceText": {
+                        "description": "The text that will replace the matched text.",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "containsText",
+                      "replaceText"
+                    ]
+                  }
+                },
+                "required": [
+                  "replaceAllText"
+                ]
+              },
+              {
+                "description": "Request object for inserting a table into the document.",
+                "type": "object",
+                "properties": {
+                  "insertTable": {
+                    "description": "Inserts a table into the document. Exactly one of 'location' or 'endOfSegmentLocation' must be provided (never both, never neither). The API automatically inserts a newline element before the table, so this operation adds two content elements.",
+                    "type": "object",
+                    "properties": {
+                      "rows": {
+                        "description": "The number of rows in the table. Must be between 1 and 20.",
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 20
+                      },
+                      "columns": {
+                        "description": "The number of columns in the table. Must be between 1 and 20.",
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 20
+                      },
+                      "location": {
+                        "description": "Specifies where to insert the table by element index. Mutually exclusive with 'endOfSegmentLocation' - provide exactly one of them.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "index": {
+                            "description": "The zero-based element index in the document's content array. For a document with N elements, valid range is 0 to N. For an empty document, only index 0 is valid.",
+                            "type": "integer",
+                            "minimum": 0
+                          }
+                        },
+                        "required": [
+                          "index"
+                        ]
+                      },
+                      "endOfSegmentLocation": {
+                        "description": "Specifies where to insert the table at the end of a segment. Mutually exclusive with 'location' - provide exactly one of them.",
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "segmentId": {
+                            "description": "The ID of the header, footer or footnote the location is in. An empty or unspecified segment ID signifies the document's body. Element IDs of content items such as paragraphs, tables, or table cells are not segment IDs.",
+                            "type": "string",
+                            "default": ""
+                          }
+                        },
+                        "required": []
+                      }
+                    },
+                    "required": [
+                      "rows",
+                      "columns"
+                    ]
+                  }
+                },
+                "required": [
+                  "insertTable"
+                ]
+              }
+            ]
+          }
+        },
+        "userId": {
+          "description": "The ID of the user. Defaults to \"me\".",
+          "type": "string",
+          "minLength": 1,
+          "nullable": true,
+          "default": "me"
+        }
+      },
+      "required": [
+        "documentId",
+        "requests"
+      ]
+    }
+  },
+  {
+    "name": "create_document",
+    "description": "Create a new document.\n\nThis endpoint creates a new GridwellDocs document with the specified title and associates it with the given user. The document is initialized with default settings and empty content.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "description": "The title of the document. Defaults to 'Untitled Document'. Cannot be empty or whitespace.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": true,
+          "default": "Untitled Document"
+        },
+        "userId": {
+          "description": "The ID of the user performing the action. Defaults to 'me'. Cannot be empty or whitespace.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": true,
+          "default": "me"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_document",
+    "description": "Get a document by ID.\n\nThis endpoint retrieves a complete GridwellDocs document including its content, metadata, and permissions. The response can be customized with suggestions view mode and optional tab content inclusion.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "documentId": {
+          "description": "The ID of the document to retrieve. Cannot be empty or whitespace.",
+          "type": "string",
+          "minLength": 1
+        },
+        "suggestionsViewMode": {
+          "description": "The mode for viewing suggestions. Defaults to 'DEFAULT_FOR_CURRENT_ACCESS'.",
+          "type": "string",
+          "nullable": true,
+          "enum": [
+            "DEFAULT_FOR_CURRENT_ACCESS",
+            "SUGGESTIONS_INLINE",
+            "PREVIEW_SUGGESTIONS_ACCEPTED",
+            "PREVIEW_WITHOUT_SUGGESTIONS"
+          ],
+          "default": "DEFAULT_FOR_CURRENT_ACCESS"
+        },
+        "includeTabsContent": {
+          "description": "Whether to include tab content. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "userId": {
+          "description": "The ID of the user performing the action. Defaults to 'me'. Cannot be empty or whitespace.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": true,
+          "default": "me"
+        }
+      },
+      "required": [
+        "documentId"
+      ]
+    }
+  }
+]

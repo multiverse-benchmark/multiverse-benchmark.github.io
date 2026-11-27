@@ -1,0 +1,507 @@
+[
+  {
+    "name": "cancel_workflow_run",
+    "description": "Cancel a workflow run.\n\nThis function cancels a workflow run. It uses the `owner` of the repository,\nthe `repo` name, and the `run_id` to identify the specific workflow run\nto be cancelled.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "owner": {
+          "description": "The account owner of the repository. This is typically the username or organization name. The name is not case sensitive.",
+          "type": "string"
+        },
+        "repo": {
+          "description": "The name of the repository. The name is not case sensitive.",
+          "type": "string"
+        },
+        "run_id": {
+          "description": "The unique identifier of the workflow run to be cancelled.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "owner",
+        "repo",
+        "run_id"
+      ]
+    }
+  },
+  {
+    "name": "get_workflow",
+    "description": "Get details of a specific workflow.\n\nGets details of a specific workflow.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "owner": {
+          "description": "The owner of the repository.",
+          "type": "string",
+          "nullable": false
+        },
+        "repo": {
+          "description": "The name of the repository.",
+          "type": "string",
+          "nullable": false
+        },
+        "workflow_id": {
+          "anyOf": [
+            {
+              "description": "The workflow's unique integer ID.",
+              "type": "integer"
+            },
+            {
+              "description": "The workflow's filename (e.g., 'main.yml' or '.githut/workflows/main.yml').",
+              "type": "string"
+            }
+          ],
+          "nullable": false,
+          "description": "The identifier of the workflow.\nThis can be the workflow's integer ID (as a string)\nor its filename (e.g., \"main.yml\" or \".githut/workflows/main.yml\")."
+        }
+      },
+      "required": [
+        "owner",
+        "repo",
+        "workflow_id"
+      ]
+    }
+  },
+  {
+    "name": "get_workflow_run",
+    "description": "Get details of a specific workflow run.\n\nThis function retrieves detailed information for a specific workflow run.\nIt takes the repository owner's name, the repository name, and the unique\nidentifier of the workflow run as input. The function returns a dictionary\ncontaining comprehensive details about the workflow run, including its\nstatus, timing, associated commit, involved actors, and the repository\nit belongs to. Datetime fields within the response are ISO 8601 formatted strings\nwith a 'Z' suffix indicating UTC.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "owner": {
+          "description": "The account owner of the repository. The name is not case sensitive.",
+          "type": "string",
+          "nullable": false
+        },
+        "repo": {
+          "description": "The name of the repository without the .git extension. The name is not case sensitive.",
+          "type": "string",
+          "nullable": false
+        },
+        "run_id": {
+          "description": "The unique identifier of the workflow run.",
+          "type": "integer",
+          "nullable": false
+        }
+      },
+      "required": [
+        "owner",
+        "repo",
+        "run_id"
+      ]
+    }
+  },
+  {
+    "name": "get_workflow_run_jobs",
+    "description": "Get jobs for a specific workflow run.\n\nGets jobs for a specific workflow run, identified by owner, repository, and run ID.\nThe function allows controlling job uniqueness and paginating through the results.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "owner": {
+          "description": "The account owner of the repository. The name is not case sensitive.",
+          "type": "string",
+          "nullable": false
+        },
+        "repo": {
+          "description": "The name of the repository without the .git extension. The name is not case sensitive.",
+          "type": "string",
+          "nullable": false
+        },
+        "run_id": {
+          "description": "The unique identifier of the workflow run.",
+          "type": "integer",
+          "nullable": false
+        },
+        "filter": {
+          "description": "Controls which jobs are returned based on uniqueness. Valid values: 'latest' (default)\nreturns the latest job for each job name, 'all' returns all jobs for the run.\nDefaults to 'latest'.",
+          "type": "string",
+          "nullable": true
+        },
+        "page": {
+          "description": "Page number of the results to fetch. Starts at 1. Defaults to 1.",
+          "type": "integer",
+          "nullable": true
+        },
+        "per_page": {
+          "description": "The number of results per page (maximum 100). Defaults to 30.",
+          "type": "integer",
+          "nullable": true
+        }
+      },
+      "required": [
+        "owner",
+        "repo",
+        "run_id"
+      ]
+    }
+  },
+  {
+    "name": "get_workflow_usage",
+    "description": "Get usage statistics of a workflow.\n\nThis function retrieves the billable usage statistics for a specific workflow,\nbroken down by operating system.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "owner": {
+          "description": "The account owner of the repository. The name is not case sensitive.",
+          "type": "string",
+          "nullable": false
+        },
+        "repo": {
+          "description": "The name of the repository without the .git extension. The name is not case sensitive.",
+          "type": "string",
+          "nullable": false
+        },
+        "workflow_id": {
+          "description": "The ID of the workflow (as an positive integer) or the workflow's filename\n(as a string, e.g., 'ci.yml').",
+          "nullable": false,
+          "anyOf": [
+            {
+              "description": "The ID of the workflow (as an positive integer)",
+              "type": "integer"
+            },
+            {
+              "description": "The workflow's filename (as a string, e.g., 'ci.yml')",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "required": [
+        "owner",
+        "repo",
+        "workflow_id"
+      ]
+    }
+  },
+  {
+    "name": "list_workflow_runs",
+    "description": "List all workflow runs for a repository or a specific workflow.\n\nThis function lists workflow runs for a given repository. It supports\nfiltering by various attributes of the workflow run such as the triggering actor,\nbranch, event, status, creation date, and associated workflow ID.\nIt also allows for excluding runs triggered by pull requests and filtering by\na specific check suite ID. Pagination is supported via page and per_page\nparameters. Datetime fields in the response are ISO 8601 formatted strings\nwith a 'Z' suffix indicating UTC.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "owner": {
+          "description": "The account owner of the repository. The name is not case sensitive.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        },
+        "repo": {
+          "description": "The name of the repository without the .git extension. The name is not case sensitive.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        },
+        "workflow_id": {
+          "anyOf": [
+            {
+              "description": "A workflow ID as an integer.",
+              "type": "integer"
+            },
+            {
+              "description": "A workflow file name as a string.",
+              "type": "string"
+            }
+          ],
+          "description": "Filters runs by a specific workflow ID (integer) or workflow file name (string).",
+          "nullable": true,
+          "default": null
+        },
+        "actor": {
+          "description": "Filters runs by the login of the actor who initiated them.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "branch": {
+          "description": "Filters runs by the branch they ran on.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "event": {
+          "description": "Filters runs by the event that triggered them.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "status": {
+          "description": "Filters runs by their current status.",
+          "type": "string",
+          "enum": [
+            "queued",
+            "in_progress",
+            "completed",
+            "action_required",
+            "cancelled",
+            "failure",
+            "neutral",
+            "skipped",
+            "stale",
+            "success",
+            "timed_out",
+            "waiting",
+            "requested",
+            "pending"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "created": {
+          "description": "Filters runs by their creation date or date range.\nSupported formats:\n- 'YYYY-MM-DD': For runs created on this specific day.\n- '>=YYYY-MM-DD': For runs created on or after this date.\n- '<=YYYY-MM-DD': For runs created on or before this date.\n- 'YYYY-MM-DD..YYYY-MM-DD': For runs created within this inclusive range.",
+          "type": "string",
+          "pattern": "^(\\d{4}-\\d{2}-\\d{2}|>=\\d{4}-\\d{2}-\\d{2}|<=\\d{4}-\\d{2}-\\d{2}|\\d{4}-\\d{2}-\\d{2}\\.\\.\\d{4}-\\d{2}-\\d{2})$",
+          "nullable": true,
+          "default": null
+        },
+        "exclude_pull_requests": {
+          "description": "If true, runs triggered by 'pull_request' events are excluded.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "check_suite_id": {
+          "description": "Filters runs by the ID of an associated check suite. Must be a positive integer.",
+          "type": "integer",
+          "minimum": 1,
+          "nullable": true,
+          "default": null
+        },
+        "page": {
+          "description": "Page number for pagination, starting at 1.",
+          "type": "integer",
+          "minimum": 1,
+          "nullable": false,
+          "default": 1
+        },
+        "per_page": {
+          "description": "Number of results per page for pagination. Maximum is 100.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "nullable": false,
+          "default": 30
+        }
+      },
+      "required": [
+        "owner",
+        "repo"
+      ]
+    }
+  },
+  {
+    "name": "list_workflows",
+    "description": "List workflows in a Githut repository.\n\nThis function lists workflows in a Githut repository. It allows for pagination\nto retrieve workflows in chunks.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "owner": {
+          "description": "The account owner of the repository. The name is not case sensitive.",
+          "type": "string"
+        },
+        "repo": {
+          "description": "The name of the repository without the .git extension. The name is not case sensitive.",
+          "type": "string"
+        },
+        "page": {
+          "description": "Page number of the results to fetch. Defaults to 1.",
+          "type": "integer",
+          "default": 1,
+          "nullable": true
+        },
+        "per_page": {
+          "description": "The number of results per page (max 100). Defaults to 30.",
+          "type": "integer",
+          "default": 30,
+          "nullable": true
+        }
+      },
+      "required": [
+        "owner",
+        "repo"
+      ]
+    }
+  },
+  {
+    "name": "rerun_workflow",
+    "description": "Re-run a workflow run.\n\nThis API endpoint allows re-running a previously executed workflow run.\nIt creates a new workflow run attempt based on the original run's configuration.\nThe new run will start in a 'queued' state and returns the created workflow run data.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "owner": {
+          "description": "The account owner of the repository. The name is not case sensitive.",
+          "type": "string"
+        },
+        "repo": {
+          "description": "The name of the repository without the .git extension. The name is not case sensitive.",
+          "type": "string"
+        },
+        "run_id": {
+          "description": "The unique identifier of the workflow run to re-run.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "owner",
+        "repo",
+        "run_id"
+      ]
+    }
+  },
+  {
+    "name": "trigger_workflow",
+    "description": "Triggers a workflow dispatch event for a given workflow. Creates a new workflow run record in the database and returns an acknowledgement.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "owner": {
+          "description": "The account owner of the repository.",
+          "type": "string",
+          "nullable": false
+        },
+        "repo": {
+          "description": "The name of the repository without the .git extension.",
+          "type": "string",
+          "nullable": false
+        },
+        "workflow_id": {
+          "anyOf": [
+            {
+              "description": "The workflow's unique integer ID.",
+              "type": "integer"
+            },
+            {
+              "description": "The workflow's filename (e.g., 'main.yaml', 'ci.yml').",
+              "type": "string"
+            }
+          ],
+          "description": "The ID of the workflow (integer) or the workflow file name (string, e.g., 'main.yaml', 'ci.yml').",
+          "nullable": false
+        },
+        "ref": {
+          "description": "The Git reference for the workflow. This can be a branch name (e.g., 'main'), a tag name (e.g., 'v1.0.0'), or a commit SHA.",
+          "type": "string",
+          "nullable": false
+        },
+        "inputs": {
+          "description": "Optional input parameters to pass to the workflow, corresponding to the 'inputs' defined in the workflow's 'on.workflow_dispatch' trigger. This can be omitted or an empty dictionary if the workflow does not expect inputs.",
+          "type": "object",
+          "nullable": true,
+          "properties": {
+            "environment": {
+              "description": "The target environment (e.g., \"staging\", \"production\", \"dev\").",
+              "type": "string",
+              "nullable": true
+            },
+            "version": {
+              "description": "A version or release tag to deploy/test (e.g., \"v1.2.3\", \"latest\").",
+              "type": "string",
+              "nullable": true
+            },
+            "run_tests": {
+              "anyOf": [
+                {
+                  "description": "Boolean true/false value.",
+                  "type": "boolean"
+                },
+                {
+                  "description": "String representation (\"true\"/\"false\").",
+                  "type": "string"
+                }
+              ],
+              "description": "Whether to execute automated tests (true/false).",
+              "nullable": true
+            },
+            "debug": {
+              "anyOf": [
+                {
+                  "description": "Boolean true/false value.",
+                  "type": "boolean"
+                },
+                {
+                  "description": "String representation (\"true\"/\"false\").",
+                  "type": "string"
+                }
+              ],
+              "description": "Enable debug mode for additional logging (true/false).",
+              "nullable": true
+            },
+            "config": {
+              "description": "Configuration file path or JSON string with settings.",
+              "type": "string",
+              "nullable": true
+            },
+            "branch": {
+              "description": "Target branch for deployment or testing.",
+              "type": "string",
+              "nullable": true
+            },
+            "force": {
+              "anyOf": [
+                {
+                  "description": "Boolean true/false value.",
+                  "type": "boolean"
+                },
+                {
+                  "description": "String representation (\"true\"/\"false\").",
+                  "type": "string"
+                }
+              ],
+              "description": "Force execution even if conditions aren't met (true/false).",
+              "nullable": true
+            },
+            "timeout": {
+              "anyOf": [
+                {
+                  "description": "Integer timeout value in minutes.",
+                  "type": "integer"
+                },
+                {
+                  "description": "String representation of timeout.",
+                  "type": "string"
+                }
+              ],
+              "description": "Timeout value in minutes for workflow execution.",
+              "nullable": true
+            },
+            "notify": {
+              "anyOf": [
+                {
+                  "description": "Boolean true/false value.",
+                  "type": "boolean"
+                },
+                {
+                  "description": "String representation (\"true\"/\"false\").",
+                  "type": "string"
+                }
+              ],
+              "description": "Whether to send notifications upon completion (true/false).",
+              "nullable": true
+            },
+            "dry_run": {
+              "anyOf": [
+                {
+                  "description": "Boolean true/false value.",
+                  "type": "boolean"
+                },
+                {
+                  "description": "String representation (\"true\"/\"false\").",
+                  "type": "string"
+                }
+              ],
+              "description": "Execute in dry-run mode without making actual changes (true/false).",
+              "nullable": true
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "owner",
+        "repo",
+        "workflow_id",
+        "ref"
+      ]
+    }
+  }
+]

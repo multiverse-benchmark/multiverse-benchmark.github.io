@@ -1,0 +1,311 @@
+{
+  "source": {
+    "title": "Establishing Best Practices for Building Rigorous Agentic Benchmarks",
+    "url": "https://arxiv.org/html/2507.02825v5",
+    "version": "v5",
+    "wording": "verbatim"
+  },
+  "items": {
+    "O.a.1": {
+      "definition": "Considers expressions semantically equivalent to ground truth.",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.a.1"
+    },
+    "O.a.2": {
+      "definition": "Handles redundant words used by agents.",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.a.2"
+    },
+    "O.b.1": {
+      "definition": "Handles negation modifiers used by agents.",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.b.1"
+    },
+    "O.b.2": {
+      "definition": "Is robust against systematically listing all possible answers.",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.b.2"
+    },
+    "O.b.3": {
+      "definition": "Ground truth is sufficiently complex to prevent guessing.",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.b.3"
+    },
+    "O.c.1": {
+      "definition": "Demonstrates documented or experimental evidence of the judge’s accuracy, self-consistency, and agreement with human.",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.c.1"
+    },
+    "O.c.2": {
+      "definition": "Is designed to resist adversarial inputs and reward hacking.",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.c.2"
+    },
+    "O.d.1": {
+      "definition": "Verifies test cases for correctness and quality (e.g., by human).",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.d.1"
+    },
+    "O.d.2": {
+      "definition": "Measures quality of test cases using objective metrics (e.g., code coverage, cyclomatic complexity control).",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.d.2"
+    },
+    "O.e.1": {
+      "definition": "Addresses potential edge cases.",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.e.1"
+    },
+    "O.e.2": {
+      "definition": "Ensures comprehensive coverage of all relevant input variations (e.g., data types, memory layouts, value ranges).",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.e.2"
+    },
+    "O.e.3": {
+      "definition": "Generates inputs that the code under testing is sensitive to.",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.e.3"
+    },
+    "O.f.1": {
+      "definition": "Exercises all relevant parts of the code being tested.",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.f.1"
+    },
+    "O.f.2": {
+      "definition": "Prevents non-deterministic (“flaky”) test results.",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.f.2"
+    },
+    "O.g.1": {
+      "definition": "Ground truth includes all states achievable after success.",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.g.1"
+    },
+    "O.g.2": {
+      "definition": "Checks relevant and irrelevant states for the challenge.",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.g.2"
+    },
+    "O.g.3": {
+      "definition": "Ground truth is complex to prevent trivial state modifications.",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.g.3"
+    },
+    "O.h.1": {
+      "definition": "Specifies required answer formats in challenge descriptions.",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.h.1"
+    },
+    "O.h.2": {
+      "definition": "Minimizes the possibility of success by random guessing.",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.h.2"
+    },
+    "O.i.1": {
+      "definition": "Designs quality metrics that prevent exploitation (e.g., achieving high scores by reward hacking).",
+      "verbatim": true,
+      "page": 6,
+      "figure": 3,
+      "sourceId": "O.I.1"
+    },
+    "T.1": {
+      "definition": "Versions of all tools (e.g., Python) are clearly specified.",
+      "verbatim": true,
+      "page": 5,
+      "figure": 2,
+      "sourceId": "T.1"
+    },
+    "T.2": {
+      "definition": "Required API tools are consistently accessible during evaluation.",
+      "verbatim": true,
+      "page": 5,
+      "figure": 2,
+      "sourceId": "T.2"
+    },
+    "T.3": {
+      "definition": "Evaluation process terminates or handles errors appropriately if an API becomes inaccessible.",
+      "verbatim": true,
+      "page": 5,
+      "figure": 2,
+      "sourceId": "T.3"
+    },
+    "T.4": {
+      "definition": "Residual data or state are fully cleared between runs.",
+      "verbatim": true,
+      "page": 5,
+      "figure": 2,
+      "sourceId": "T.4"
+    },
+    "T.5": {
+      "definition": "Agent is completely isolated from any ground truth information.",
+      "verbatim": true,
+      "page": 5,
+      "figure": 2,
+      "sourceId": "T.5"
+    },
+    "T.6": {
+      "definition": "Setup does not change over time (e.g., no live website).",
+      "verbatim": true,
+      "page": 5,
+      "figure": 2,
+      "sourceId": "T.6"
+    },
+    "T.7": {
+      "definition": "Annotated ground truth is verified for correctness.",
+      "verbatim": true,
+      "page": 5,
+      "figure": 2,
+      "sourceId": "T.7"
+    },
+    "T.8": {
+      "definition": "Each task is verified to be solvable.",
+      "verbatim": true,
+      "page": 5,
+      "figure": 2,
+      "sourceId": "T.8"
+    },
+    "T.9": {
+      "definition": "Benchmark includes an Oracle solver that can automatically solve all challenges.",
+      "verbatim": true,
+      "page": 5,
+      "figure": 2,
+      "sourceId": "T.9"
+    },
+    "T.10": {
+      "definition": "Implementation is free of vulnerabilities that could be exploited to pass evaluations without completing tasks.",
+      "verbatim": true,
+      "page": 5,
+      "figure": 2,
+      "sourceId": "T.10"
+    },
+    "R.1": {
+      "definition": "Is fully or at least partially open-sourced.",
+      "verbatim": true,
+      "page": 7,
+      "figure": 4,
+      "sourceId": "R.1"
+    },
+    "R.2": {
+      "definition": "Offers an open-source evaluation harness for users.",
+      "verbatim": true,
+      "page": 7,
+      "figure": 4,
+      "sourceId": "R.2"
+    },
+    "R.3": {
+      "definition": "Includes measures to prevent data contamination at the time of benchmark release, such as a private, held-out test set.",
+      "verbatim": true,
+      "page": 7,
+      "figure": 4,
+      "sourceId": "R.3"
+    },
+    "R.4": {
+      "definition": "Includes measures or plans to consistently update challenges over time to avoid overfitting.",
+      "verbatim": true,
+      "page": 7,
+      "figure": 4,
+      "sourceId": "R.4"
+    },
+    "R.5": {
+      "definition": "Clearly states the relationship between the agent capabilities it aims to evaluate and the constructs or outcomes it measures.",
+      "verbatim": true,
+      "page": 7,
+      "figure": 4,
+      "sourceId": "R.5"
+    },
+    "R.6": {
+      "definition": "Clearly states the evaluation subjective of the benchmark (e.g., a model or an agent framework).",
+      "verbatim": true,
+      "page": 7,
+      "figure": 4,
+      "sourceId": "R.6"
+    },
+    "R.7": {
+      "definition": "Describes steps taken to prevent, identify, and correct flaws.",
+      "verbatim": true,
+      "page": 7,
+      "figure": 4,
+      "sourceId": "R.7"
+    },
+    "R.8": {
+      "definition": "Includes qualitative discussions of the potential impact of unavoidable flaws.",
+      "verbatim": true,
+      "page": 7,
+      "figure": 4,
+      "sourceId": "R.8"
+    },
+    "R.9": {
+      "definition": "Includes quantitative analysis to assess the impact of unavoidable flaws (e.g., noise of ground truth).",
+      "verbatim": true,
+      "page": 7,
+      "figure": 4,
+      "sourceId": "R.9"
+    },
+    "R.10": {
+      "definition": "Reports metrics about statistical significance, such as confidence intervals.",
+      "verbatim": true,
+      "page": 7,
+      "figure": 4,
+      "sourceId": "R.10"
+    },
+    "R.11": {
+      "definition": "Provides guidance on interpreting results with eval flaws.",
+      "verbatim": true,
+      "page": 7,
+      "figure": 4,
+      "sourceId": "R.11"
+    },
+    "R.12": {
+      "definition": "Reports results of non-AI baselines (e.g., human experts).",
+      "verbatim": true,
+      "page": 7,
+      "figure": 4,
+      "sourceId": "R.12"
+    },
+    "R.13": {
+      "definition": "Reports results of trivial agents (e.g., one that does nothing).",
+      "verbatim": true,
+      "page": 7,
+      "figure": 4,
+      "sourceId": "R.13"
+    }
+  }
+}

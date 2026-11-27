@@ -1,0 +1,297 @@
+[
+  {
+    "name": "adjust_volume",
+    "description": "Adjusts the volume by a certain percentage.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "by": {
+          "description": "The amount to adjust the volume by, in percentage points. Can be positive or negative.\nValues are clamped between 0 and 100 after adjustment.",
+          "type": "integer"
+        },
+        "setting": {
+          "description": "The specific volume setting to adjust. If None or \"UNSPECIFIED\", adjusts all volume settings.\nCase insensitive - accepts both uppercase and lowercase.\nValid options: \"ALARM\", \"CALL\", \"MEDIA\", \"NOTIFICATION\", \"RING\", \"VOLUME\", \"UNSPECIFIED\"",
+          "type": "string",
+          "nullable": true
+        }
+      },
+      "required": [
+        "by"
+      ]
+    }
+  },
+  {
+    "name": "connect_wifi",
+    "description": "Connects to a specific WiFi network.\n\nThis function automatically turns on WiFi if it is currently off. If the WiFi settings do not exist, they will be initialized with default values. The function performs a network scan to discover available networks only if the specified network is not already in the available_networks list. It then attempts to connect to the specified network. The function can connect to networks that are either currently available (in the available_networks list) or previously saved (in the saved_networks list). If the network is successfully connected, it will be added to the saved_networks list if not already present. The function also persists the current available_networks list back to settings.\n\nNote: The network_name parameter will have leading and trailing whitespace automatically stripped before processing.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "network_name": {
+          "description": "Name of the WiFi network to connect to. Must be a non-empty string (whitespace-only strings are not allowed). Leading and trailing whitespace will be automatically stripped. The network must be either currently available in the available_networks list (discovered via scan) or previously saved in the saved_networks list. Note: The existence check is performed as business logic - if the network is not found, a normal failure response is returned (not a ValidationError).",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "network_name"
+      ]
+    }
+  },
+  {
+    "name": "get",
+    "description": "Gets the current value of a device setting. If the setting does not exist in the database, returns realistic default values (toggleable settings: \"off\", percentage-based settings: vary by type).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "setting_type": {
+          "description": "Setting to get the value of. Must be one of the getable device settings.\nCase insensitive - accepts both uppercase and lowercase.\nValid values include: \"AIRPLANE_MODE\", \"ALARM_VOLUME\", \"AUTO_ROTATE\", \"BATTERY\",\n\"BATTERY_SAVER\", \"BLUETOOTH\", \"BRIGHTNESS\", \"CALL_VOLUME\", \"DO_NOT_DISTURB\", \"FLASHLIGHT\",\n\"HOT_SPOT\", \"MEDIA_VOLUME\", \"NETWORK\", \"NFC\", \"NIGHT_MODE\", \"NOTIFICATION_VOLUME\",\n\"RING_VOLUME\", \"TALK_BACK\", \"VOLUME\", \"VIBRATION\", \"WIFI\"",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "setting_type"
+      ]
+    }
+  },
+  {
+    "name": "get_app_notification_status",
+    "description": "Gets the current notification setting for a specific app.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "app_name": {
+          "description": "Name of the app to get notification settings for. Must be a non-empty string (after trimming whitespace). Leading and trailing whitespace will be automatically trimmed. The app must be installed on the device. Case-insensitive and whitespace-insensitive matching is used (e.g., \"Messages\" == \"messages\" == \"appstore\" for \"App Store\"). Raises ValidationError if app_name is empty/whitespace-only or AppNotInstalledError if the app is not installed.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "app_name"
+      ]
+    }
+  },
+  {
+    "name": "get_device_insights",
+    "description": "Generates device insights based on user's current device state.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "device_state_type": {
+          "description": "The type of device state to get insights for. If None or \"UNCATEGORIZED\",\nreturns general device insights. Valid options: \"UNCATEGORIZED\", \"BATTERY\", \"STORAGE\"",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_installed_apps",
+    "description": "Retrieves a list of all applications installed on the device, excluding their notification settings.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "list_all_available_wifi",
+    "description": "Lists all available WiFi networks.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "mute",
+    "description": "Mutes the device volume.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "setting": {
+          "description": "The specific volume setting to mute. If None or \"UNSPECIFIED\", mutes all volume settings.\nCase insensitive - accepts both uppercase and lowercase.\nValid options: \"ALARM\", \"CALL\", \"MEDIA\", \"NOTIFICATION\", \"RING\", \"VOLUME\", \"UNSPECIFIED\".\nDefault: None (mutes all volume settings when omitted).",
+          "type": "string",
+          "nullable": true
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "off",
+    "description": "Turns off a device setting.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "setting": {
+          "description": "Setting to turn off. Must be one of the toggleable device settings.\nCase insensitive - accepts both uppercase and lowercase.\nValid values include: \"AIRPLANE_MODE\", \"AUTO_ROTATE\", \"BATTERY_SAVER\",\n\"BLUETOOTH\", \"DO_NOT_DISTURB\", \"FLASHLIGHT\", \"HOT_SPOT\", \"NETWORK\",\n\"NFC\", \"NIGHT_MODE\", \"TALK_BACK\", \"VIBRATION\", \"WIFI\"",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "setting"
+      ]
+    }
+  },
+  {
+    "name": "on",
+    "description": "Turns on a device setting.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "setting": {
+          "description": "Setting to turn on. Must be one of the toggleable device settings.\nCase insensitive - accepts both uppercase and lowercase.\nValid values include: \"AIRPLANE_MODE\", \"AUTO_ROTATE\", \"BATTERY_SAVER\",\n\"BLUETOOTH\", \"DO_NOT_DISTURB\", \"FLASHLIGHT\", \"HOT_SPOT\", \"NETWORK\",\n\"NFC\", \"NIGHT_MODE\", \"TALK_BACK\", \"VIBRATION\", \"WIFI\"",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "setting"
+      ]
+    }
+  },
+  {
+    "name": "open",
+    "description": "Navigates to the settings page for a given setting type.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "setting_type": {
+          "description": "Setting to open. Can be a DeviceSettingType enum value as string.\nCase insensitive - accepts both uppercase and lowercase.\nUse \"UNSPECIFIED\" if the user only mentions \"settings.\"\nIf None or UNSPECIFIED, open general device settings page.",
+          "type": "string",
+          "enum": [
+            "UNSPECIFIED",
+            "ACCESSIBILITY",
+            "ACCOUNT",
+            "AIRPLANE_MODE",
+            "ALARM_VOLUME",
+            "APPLICATION",
+            "APP_DATA_USAGE",
+            "AUTO_ROTATE",
+            "BATTERY",
+            "BATTERY_SAVER",
+            "BIOMETRIC",
+            "BLUETOOTH",
+            "BLUETOOTH_PAIRING",
+            "BRIGHTNESS",
+            "CALL_VOLUME",
+            "CAST",
+            "DARK_THEME",
+            "DATA_SAVER",
+            "DATE_TIME",
+            "DEVELOPER_OPTION",
+            "DEVICE_INFO",
+            "DISPLAY",
+            "DO_NOT_DISTURB",
+            "GEMINI",
+            "GRIDWELL_ASSISTANT",
+            "HOT_SPOT",
+            "INTERNAL_STORAGE",
+            "LANGUAGE",
+            "LOCATION",
+            "LOCK_SCREEN",
+            "MEDIA_VOLUME",
+            "NETWORK",
+            "NFC",
+            "NIGHT_MODE",
+            "NOTIFICATION",
+            "NOTIFICATION_VOLUME",
+            "PASSWORD",
+            "PHONE_NUMBER",
+            "PRIVACY",
+            "RINGTONE",
+            "RING_VOLUME",
+            "SECURITY",
+            "SYSTEM_UPDATE",
+            "TALK_BACK",
+            "TEXT_TO_SPEECH",
+            "VIBRATION",
+            "VOLUME",
+            "VPN",
+            "WIFI"
+          ],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "set_app_notification_status",
+    "description": "Sets the current notification setting for a specific app.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "app_name": {
+          "description": "Name of the app to modify. Must be a non-empty string. Case-insensitive matching is performed against installed apps. The app must be installed on the device.",
+          "type": "string",
+          "nullable": false
+        },
+        "notifications": {
+          "description": "The notification state to set. Must be either \"on\" or \"off\" (case-insensitive). Whitespace is automatically trimmed and the value is normalized to lowercase before validation.",
+          "type": "string",
+          "enum": [
+            "off",
+            "on"
+          ],
+          "nullable": false
+        }
+      },
+      "required": [
+        "app_name",
+        "notifications"
+      ]
+    }
+  },
+  {
+    "name": "set_volume",
+    "description": "Sets the volume to a specific percentage. When setting an individual volume (ALARM, CALL, MEDIA, NOTIFICATION, RING), recalculates the master VOLUME as the average of all individual volumes. When setting VOLUME directly, scales all individual volumes proportionally to maintain their relative differences while achieving the target average.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "to": {
+          "description": "The volume level to set to, in percentage points. Must be between 0 and 100.",
+          "type": "integer"
+        },
+        "setting": {
+          "description": "The specific volume setting to set. If None or \"UNSPECIFIED\", sets all volume settings.\nCase insensitive - accepts both uppercase and lowercase.\nValid options: \"ALARM\", \"CALL\", \"MEDIA\", \"NOTIFICATION\", \"RING\", \"VOLUME\", \"UNSPECIFIED\"",
+          "type": "string",
+          "enum": [
+            "ALARM",
+            "CALL",
+            "MEDIA",
+            "NOTIFICATION",
+            "RING",
+            "UNSPECIFIED",
+            "VOLUME"
+          ],
+          "nullable": true
+        }
+      },
+      "required": [
+        "to"
+      ]
+    }
+  },
+  {
+    "name": "unmute",
+    "description": "Unmutes the device volume by setting to default levels.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "setting": {
+          "description": "The specific volume setting to unmute. If None or \"UNSPECIFIED\", unmutes all volume settings.\nCase insensitive - accepts both uppercase and lowercase.\nValid options: \"ALARM\", \"CALL\", \"MEDIA\", \"NOTIFICATION\", \"RING\", \"VOLUME\", \"UNSPECIFIED\"\nDefault levels: ALARM_VOLUME=50, CALL_VOLUME=70, MEDIA_VOLUME=60,\n               NOTIFICATION_VOLUME=40, RING_VOLUME=80, VOLUME=65\nNote: Unmute only acts when the volume is currently muted (at 0). If the volume is already non-zero, it will remain unchanged.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  }
+]

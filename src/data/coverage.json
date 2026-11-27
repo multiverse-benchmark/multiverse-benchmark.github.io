@@ -1,0 +1,22 @@
+{
+  "v1.0.0": {
+    "source": "paper",
+    "statementCoveragePercent": 88,
+    "serviceCoverageRangePercent": [79, 98]
+  },
+  "v1.1.0": {
+    "source": "measured",
+    "statementCoveragePercent": 89,
+    "serviceCoverageRangePercent": [81, 98],
+    "measurement": {
+      "date": "2026-11-27",
+      "fileListSha256": "d056e65b5bc9f6de4940cfe429d1a79f3f428127597474a9bfa4d83c489147e7",
+      "method": "Statement coverage (coverage.py) of the Python code under APIs/, tests excluded, from `coverage run -m pytest` followed by `coverage report`, run in the release's folder (api_runtime/v1.1.0) with the folder's own coverage settings. `fileListSha256` is the SHA-256 of the folder's SHA256SUMS.",
+      "statements": 135135,
+      "missedStatements": 15049,
+      "statementCoverage": 88.86,
+      "lowestService": { "service": "sapspend", "statementCoverage": 80.65 },
+      "highestService": { "service": "gridwell_meet", "statementCoverage": 98.37 }
+    }
+  }
+}

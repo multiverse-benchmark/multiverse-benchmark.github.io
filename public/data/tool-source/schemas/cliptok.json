@@ -1,0 +1,223 @@
+[
+  {
+    "name": "get_business_profile_data",
+    "description": "Get profile data of a Cliptok account, including analytics and insights.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "business_id": {
+          "description": "Application specific unique identifier for the Cliptok account.",
+          "type": "string",
+          "nullable": false
+        },
+        "fields": {
+          "description": "List of requested fields to include in the response. Defaults to None. Allowed fields: username, display_name, profile, analytics, settings. Must be a non-empty list if provided.",
+          "type": "array",
+          "nullable": true,
+          "default": null,
+          "items": {
+            "description": "Field to include in the response.",
+            "type": "string",
+            "nullable": false,
+            "enum": [
+              "username",
+              "display_name",
+              "profile",
+              "analytics",
+              "settings"
+            ]
+          }
+        }
+      },
+      "required": [
+        "business_id"
+      ]
+    }
+  },
+  {
+    "name": "get_business_publish_status",
+    "description": "Get the publishing status of a Cliptok video or photo post.\n\nThis endpoint allows you to check the current status of a post publishing task,\nincluding whether it has completed successfully or is still in progress.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "business_id": {
+          "description": "Application specific unique identifier for the Cliptok account.",
+          "type": "string",
+          "nullable": false
+        },
+        "publish_id": {
+          "description": "Unique identifier for a post publishing task.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "business_id",
+        "publish_id"
+      ]
+    }
+  },
+  {
+    "name": "list_business_accounts",
+    "description": "List and search all available Cliptok business accounts. This method allows you to discover business_id values that can be used with other Cliptok API methods.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "search_query": {
+          "description": "Optional search query to filter accounts by username, display_name, or bio. Case-insensitive partial matching.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "fields": {
+          "description": "List of fields to include in the response. Defaults to basic fields (business_id, username, display_name, profile) if not specified. Must be one of the available fields:\nAvailable fields:\n- business_id (always included)\n- username\n- display_name\n- profile (includes bio, followers_count, following_count, website if available)\n- analytics (includes total_likes, total_views, engagement_rate if available)\n- settings (includes notifications_enabled, ads_enabled, language if available)",
+          "type": "array",
+          "nullable": true,
+          "default": null,
+          "items": {
+            "description": "Field to include in the response.",
+            "type": "string",
+            "nullable": false,
+            "enum": [
+              "business_id",
+              "username",
+              "display_name",
+              "profile",
+              "analytics",
+              "settings"
+            ]
+          }
+        },
+        "limit": {
+          "description": "Maximum number of accounts to return. Defaults to 50, must be between 1 and 100.",
+          "type": "integer",
+          "nullable": true,
+          "default": 50
+        },
+        "offset": {
+          "description": "Number of accounts to skip for pagination. Defaults to 0. Must be non-negative.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "publish_business_video",
+    "description": "Publish a public video post to a Cliptok account.\n\nThis endpoint allows you to upload and publish a video to your Cliptok account with various\ncustomization options for the post's visibility and interaction settings.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "business_id": {
+          "description": "Application specific unique identifier for the Cliptok account.",
+          "type": "string",
+          "nullable": false
+        },
+        "video_url": {
+          "description": "URL of the video to be published.",
+          "type": "string",
+          "nullable": false
+        },
+        "post_info": {
+          "description": "Additional information about the post.",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "title": {
+              "description": "Title of the video.",
+              "type": "string",
+              "nullable": false
+            },
+            "description": {
+              "description": "Description of the video.",
+              "type": "string",
+              "nullable": false
+            },
+            "tags": {
+              "description": "List of tags for the video.",
+              "type": "array",
+              "items": {
+                "description": "Tag for the video.",
+                "type": "string",
+                "nullable": false
+              },
+              "nullable": false
+            },
+            "thumbnail_url": {
+              "description": "URL of the thumbnail for the video.",
+              "type": "string",
+              "nullable": false
+            },
+            "thumbnail_offset": {
+              "description": "Time offset in seconds for video thumbnail.",
+              "type": "integer",
+              "nullable": false
+            },
+            "is_ai_generated": {
+              "description": "Whether the content is AI-generated.",
+              "type": "boolean",
+              "nullable": false
+            }
+          },
+          "required": [
+            "title",
+            "description",
+            "tags",
+            "thumbnail_url",
+            "thumbnail_offset",
+            "is_ai_generated"
+          ]
+        },
+        "caption": {
+          "description": "Caption text for the video. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "is_brand_organic": {
+          "description": "Whether the post is organic branded content. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "is_branded_content": {
+          "description": "Whether the post is branded content. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "disable_comment": {
+          "description": "Whether to disable comments. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "disable_duet": {
+          "description": "Whether to disable duet feature. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "disable_stitch": {
+          "description": "Whether to disable stitch feature. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "upload_to_draft": {
+          "description": "Whether to save as draft instead of publishing. Defaults to False.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        }
+      },
+      "required": [
+        "business_id",
+        "video_url",
+        "post_info"
+      ]
+    }
+  }
+]

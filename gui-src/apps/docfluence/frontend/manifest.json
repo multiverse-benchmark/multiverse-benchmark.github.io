@@ -1,0 +1,12 @@
+{
+  "id": "docfluence",
+  "name": "Docfluence",
+  "icon": "./icons/docfluence.svg",
+  "iconBackground": "linear-gradient(135deg, #FF6B6B 0%, #F4E1C1 100%)",
+  "description": "Documentation and knowledge management platform",
+  "backendService": "docfluence",
+  "defaultWindow": {
+    "width": 1400,
+    "height": 900
+  }
+}

@@ -1,0 +1,516 @@
+[
+  {
+    "name": "download_media",
+    "description": "Download media from a Whatsup message and get the local file path.\n\nThis function downloads media content from a specific Whatsup message. It uses the provided message ID and chat JID to locate the message, attempts to retrieve its media, and if successful, saves the media to a local file. The function then returns a dictionary detailing the outcome of this operation, including the success status, a message, and the path to the downloaded file.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "message_id": {
+          "description": "The ID of the message containing the media. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "chat_jid": {
+          "description": "The JID of the chat containing the message. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "message_id",
+        "chat_jid"
+      ]
+    }
+  },
+  {
+    "name": "get_chat",
+    "description": "Get Whatsup chat metadata by JID.\n\nThis function retrieves metadata for a Whatsup chat identified by its\nJabber Identifier (JID). It can also include the last message of the\nchat if specified.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "chat_jid": {
+          "description": "The JID of the chat to retrieve.",
+          "type": "string",
+          "nullable": false
+        },
+        "include_last_message": {
+          "description": "Whether to include the last message (default True).",
+          "type": "boolean",
+          "nullable": false,
+          "default": true
+        }
+      },
+      "required": [
+        "chat_jid"
+      ]
+    }
+  },
+  {
+    "name": "get_contact_chats",
+    "description": "Get all Whatsup chats involving the contact.\n\nThis function retrieves all Whatsup chats that involve the contact specified by their JID.\nThe number of chats returned can be controlled using `limit`, and `page` allows for\nfetching subsequent sets of chats.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "jid": {
+          "description": "The contact's JID to search for (e.g., '19876543210@s.whatsup.net').",
+          "type": "string",
+          "nullable": false
+        },
+        "limit": {
+          "description": "Maximum number of chats to return per page. Must be greater than 0. Defaults to 20.",
+          "type": "integer",
+          "nullable": false,
+          "default": 20
+        },
+        "page": {
+          "description": "Zero-based page number for pagination. Must be >= 0. Defaults to 0.",
+          "type": "integer",
+          "nullable": false,
+          "default": 0
+        }
+      },
+      "required": [
+        "jid"
+      ]
+    }
+  },
+  {
+    "name": "get_direct_chat_by_contact",
+    "description": "Get Whatsup chat metadata by sender phone number.\n\nThis function retrieves metadata for a direct Whatsup chat associated with a specific sender's phone number.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "sender_phone_number": {
+          "description": "The phone number to search for. Accepts various formats including E.164 format with country code (e.g., '+14155552671'), without the plus sign (e.g., '14155552671'), or with common separators like spaces, hyphens, or parentheses (e.g., '+1 (415) 555-2671').",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "sender_phone_number"
+      ]
+    }
+  },
+  {
+    "name": "get_last_interaction",
+    "description": "Gets the most recent Whatsup message involving the contact.\n\nThis function gets the most recent Whatsup message that was either sent to\nor received from the contact specified by the JID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "jid": {
+          "description": "The JID of the contact to search for. Must be a valid Whatsup JID in the format: digits@s.whatsup.net (e.g., \"1234567890@s.whatsup.net\").",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "jid"
+      ]
+    }
+  },
+  {
+    "name": "get_message_context",
+    "description": "Get context around a specific Whatsup message.\n\nThis function retrieves context around a specific Whatsup message. It allows specifying the number of messages to fetch before and after the identified target message, aiding in understanding the conversation flow around that particular message.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "message_id": {
+          "description": "The ID of the message to get context for.",
+          "type": "string",
+          "nullable": false
+        },
+        "before": {
+          "description": "Number of messages to include before the target message. Defaults to 5.",
+          "type": "integer",
+          "nullable": false,
+          "default": 5
+        },
+        "after": {
+          "description": "Number of messages to include after the target message. Defaults to 5.",
+          "type": "integer",
+          "nullable": false,
+          "default": 5
+        }
+      },
+      "required": [
+        "message_id"
+      ]
+    }
+  },
+  {
+    "name": "list_chats",
+    "description": "Get Whatsup chats matching specified criteria.\n\nThis function retrieves Whatsup chats based on specified criteria including an optional\nsearch term to filter chats by name or JID, pagination controls, an option to include\nthe last message preview, and sorting options.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "Optional search term to filter chats by name or JID. Performs case-insensitive substring matching.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "limit": {
+          "description": "Maximum number of chats to return. Use 0 for unlimited (not recommended for large datasets). Must be a non-negative integer. Defaults to 20.",
+          "type": "integer",
+          "nullable": false,
+          "default": 20
+        },
+        "page": {
+          "description": "Page number for pagination (0-based). First page is 0. Must be a non-negative integer. Cannot be used with limit=0. Defaults to 0.",
+          "type": "integer",
+          "nullable": false,
+          "default": 0
+        },
+        "include_last_message": {
+          "description": "Whether to include a preview of the last message in each chat. Set to False for faster responses when message previews are not needed. Defaults to True.",
+          "type": "boolean",
+          "nullable": false,
+          "default": true
+        },
+        "sort_by": {
+          "description": "Sort order for the chat list. Supports 'last_active' (most recently active chats first) or 'name' (alphabetically by chat name). Defaults to 'last_active'.",
+          "type": "string",
+          "nullable": false,
+          "default": "last_active",
+          "enum": [
+            "last_active",
+            "name"
+          ]
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_messages",
+    "description": "Get Whatsup messages matching specified criteria with optional context.\n\nThis function searches and retrieves Whatsup messages based on various filter criteria including\ntime ranges, sender, chat, and text content. Results can be paginated and optionally include\nsurrounding context messages for better conversation understanding.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "after": {
+          "description": "ISO-8601 datetime string to filter messages sent after this time. Only messages with timestamps strictly after this value are returned.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "before": {
+          "description": "ISO-8601 datetime string to filter messages sent before this time. Only messages with timestamps strictly before this value are returned.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "sender_phone_number": {
+          "description": "Filter messages by sender's phone number in E.164 format (e.g., \"+14155552671\"). Must start with '+' followed by 7 to 15 digits. This value is validated for proper format and MUST include the plus sign (+).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "chat_jid": {
+          "description": "Filter messages by chat JID (must contain '@'). Example: '1234567890@s.whatsup.net' for individual chats or '1234567890@g.us' for group chats.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "query": {
+          "description": "Search for messages containing this text (case-insensitive substring matching).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "limit": {
+          "description": "Maximum number of messages to return per page. Must be a non-negative integer. Defaults to 20.",
+          "type": "integer",
+          "nullable": false,
+          "default": 20
+        },
+        "page": {
+          "description": "Page number for pagination (0-based). First page is 0. Must be a non-negative integer. Defaults to 0.",
+          "type": "integer",
+          "nullable": false,
+          "default": 0
+        },
+        "include_context": {
+          "description": "Whether to include surrounding messages for context. If True, results include context_before and context_after arrays. If False, results are flat message objects. Defaults to True.",
+          "type": "boolean",
+          "nullable": false,
+          "default": true
+        },
+        "context_before": {
+          "description": "Number of messages to include before each matched message as context. Only used if include_context is True. Must be a non-negative integer. Defaults to 1.",
+          "type": "integer",
+          "nullable": false,
+          "default": 1
+        },
+        "context_after": {
+          "description": "Number of messages to include after each matched message as context. Only used if include_context is True. Must be a non-negative integer. Defaults to 1.",
+          "type": "integer",
+          "nullable": false,
+          "default": 1
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "make_call",
+    "description": "Make a call to a single recipient with exactly one phone number endpoint.\n\nTo resolve the phone number endpoint, you may have to call one or more tools\nprior to calling this operation. Before calling this operation, always check\nif the Geofencing Policy applies. If there is a recipient with more than one\nphone number endpoints, ask the user for the intended endpoint by invoking\nshow_call_recipient_choices. Do not call this operation until the user has\nchosen a single recipient with exactly one phone number endpoint.\n\nThe function validates that contact_name and contact_endpoints belong to the same contact\nin the database to prevent mismatched data.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "recipient": {
+          "description": "The recipient of the phone call. Contains contact_id, contact_name, contact_endpoints (with endpoint_type, endpoint_value, endpoint_label), contact_photo_url, recipient_type, address, distance, and confidence_level fields.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "contact_id": {
+              "description": "Unique identifier for the contact",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "contact_name": {
+              "description": "Name of the contact",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "contact_endpoints": {
+              "description": "List of endpoints for the contact",
+              "type": "array",
+              "nullable": true,
+              "default": null,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "endpoint_type": {
+                    "description": "Type of endpoint. Always populate this field with \"PHONE_NUMBER\" when using the calls tool.",
+                    "type": "string",
+                    "nullable": false,
+                    "default": "PHONE_NUMBER",
+                    "enum": [
+                      "PHONE_NUMBER"
+                    ]
+                  },
+                  "endpoint_value": {
+                    "description": "The endpoint value (e.g., phone number)",
+                    "type": "string",
+                    "nullable": false
+                  },
+                  "endpoint_label": {
+                    "description": "Label for the endpoint",
+                    "type": "string",
+                    "nullable": true,
+                    "default": null
+                  }
+                },
+                "required": [
+                  "endpoint_value"
+                ]
+              }
+            },
+            "contact_photo_url": {
+              "description": "URL to the contact's profile photo",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "recipient_type": {
+              "description": "Type of recipient (\"CONTACT\", \"BUSINESS\", \"DIRECT\", \"VOICEMAIL\")",
+              "type": "string",
+              "nullable": true,
+              "default": null,
+              "enum": [
+                "CONTACT",
+                "BUSINESS",
+                "DIRECT",
+                "VOICEMAIL"
+              ]
+            },
+            "address": {
+              "description": "Address of the recipient",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "distance": {
+              "description": "Distance to the recipient",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "confidence_level": {
+              "description": "Confidence level of the recipient match. Can be \"LOW\", \"MEDIUM\", or \"HIGH\".",
+              "type": "string",
+              "nullable": true,
+              "default": null,
+              "enum": [
+                "LOW",
+                "MEDIUM",
+                "HIGH"
+              ]
+            }
+          },
+          "required": []
+        },
+        "on_speakerphone": {
+          "description": "If True, the phone call will be placed on the speakerphone. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        "recipient_name": {
+          "description": "The recipient's name.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "recipient_phone_number": {
+          "description": "The phone number of the recipient to make the call to, e.g. \"+11234567890\". This value is validated for proper format.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "recipient_photo_url": {
+          "description": "The url to the profile photo of the recipient.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "video_call": {
+          "description": "If True, the phone call will be a video call. Defaults to False.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "mark_messages_as_read",
+    "description": "Mark one or more messages as read in a Whatsup chat.\n\nThis function marks the specified messages as read for the current user. It updates the\nis_read field of each message to True and decrements the chat's unread_count accordingly.\nOnly incoming messages (is_outgoing=False) that were previously unread will be affected.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "chat_jid": {
+          "description": "The JID of the chat containing the messages to mark as read.",
+          "type": "string",
+          "nullable": false
+        },
+        "message_ids": {
+          "description": "List of message IDs to mark as read.",
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "description": "Message ID",
+            "type": "string",
+            "nullable": false
+          }
+        }
+      },
+      "required": [
+        "chat_jid",
+        "message_ids"
+      ]
+    }
+  },
+  {
+    "name": "search_contacts",
+    "description": "Search contacts by name or phone number.\n\nThis function searches contacts by name or phone number. It uses the provided query term to match against contact names or phone numbers using case-insensitive substring matching.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "Search term to match against contact names or phone numbers. Must be a non-empty string with at least 1 character.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  {
+    "name": "send_audio_message",
+    "description": "Send any audio file as a Whatsup audio message to the specified recipient.\n\nFor group messages, the JID is used for the recipient. If an error occurs due to ffmpeg not being installed or conversion failing, an attempt is made to send the original file as a generic audio message. The function sends the audio file specified by `media_path`; this file is converted to Opus .ogg if it is not already a .ogg file.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "recipient": {
+          "description": "The recipient - either a phone number with country code, optionally with + prefix, or a JID (e.g., \"123456789@s.whatsup.net\" or a group JID like \"123456789@g.us\"). Must be a non-empty string.",
+          "type": "string",
+          "nullable": false
+        },
+        "media_path": {
+          "description": "The absolute path to the audio file to send (will be converted to Opus .ogg if it's not a .ogg file). Must be a non-empty string pointing to an existing file.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "recipient",
+        "media_path"
+      ]
+    }
+  },
+  {
+    "name": "send_file",
+    "description": "Send a file such as a picture, raw audio, video or document via Whatsup to the specified recipient.\n\nThis function sends various types of media files (images, videos, documents, audio) to a Whatsup contact or group.\nThe file type is automatically detected based on the file extension and MIME type.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "recipient": {
+          "description": "The recipient - either a phone number (which will be validated) with country code, optionally with + prefix, or a JID (e.g., \"123456789@s.whatsup.net\" or a group JID like \"123456789@g.us\").",
+          "type": "string",
+          "nullable": false
+        },
+        "media_path": {
+          "description": "The absolute path to the media file to send.",
+          "type": "string",
+          "nullable": false
+        },
+        "caption": {
+          "description": "Optional caption text to accompany the media file.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "recipient",
+        "media_path"
+      ]
+    }
+  },
+  {
+    "name": "send_message",
+    "description": "Send a Whatsup message to a person or group.\n\nThis function sends a Whatsup message to a specified person or group.\nFor group chats, the JID (Jabber ID) must be used as the recipient identifier.\nYou can send message as a response to a specific thread by providing the preceding message's ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "recipient": {
+          "description": "The recipient - either a phone number (which will be validated) with country code, optionally with + prefix, or a JID (e.g., '123456789@s.whatsup.net' or a group JID like '123456789@g.us').",
+          "type": "string",
+          "nullable": false
+        },
+        "message": {
+          "description": "The message text to send. Cannot be empty.",
+          "type": "string",
+          "nullable": false
+        },
+        "reply_to_message_id": {
+          "description": "The ID of the message to reply to. If provided, the new message will be sent as a reply to the specified message.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "recipient",
+        "message"
+      ]
+    }
+  }
+]

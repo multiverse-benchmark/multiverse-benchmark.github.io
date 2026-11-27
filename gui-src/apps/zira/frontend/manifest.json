@@ -1,0 +1,12 @@
+{
+  "id": "zira",
+  "name": "Zira",
+  "icon": "./icons/zira.svg",
+  "iconBackground": "linear-gradient(135deg, #CA8A04 0%, #334155 100%)",
+  "description": "Zira",
+  "backendService": "zira",
+  "defaultWindow": {
+    "width": 1700,
+    "height": 900
+  }
+}

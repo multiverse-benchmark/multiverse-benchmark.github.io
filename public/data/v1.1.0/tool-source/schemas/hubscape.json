@@ -1,0 +1,2889 @@
+[
+  {
+    "name": "archive_campaign",
+    "description": "Archives a campaign by setting its is_archived flag to true. The campaign remains in the database but is marked as archived.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "campaign_id": {
+          "description": "The opaque id of the campaign, as returned by campaign listing.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "campaign_id"
+      ]
+    }
+  },
+  {
+    "name": "cancel_marketing_event",
+    "description": "Marks a marketing event as cancelled.\n\nThis function updates the eventCancelled field of a marketing event to true, indicating that\nthe event has been cancelled. The event must exist in the database and belong to the specified\nexternal account. Once an event is cancelled, attempting to cancel it again will raise an error.\nAn event that is already completed cannot be cancelled, since eventCancelled and eventCompleted\nare mutually exclusive states.\nThis operation is useful for managing event lifecycles and notifying attendees of cancellations.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "externalEventId": {
+          "description": "The unique identifier for the marketing event as per the external system where the event was created. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "externalAccountId": {
+          "description": "The unique identifier for the account where the event was created. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "externalEventId",
+        "externalAccountId"
+      ]
+    }
+  },
+  {
+    "name": "clone_marketing_email",
+    "description": "Clones an existing marketing email by creating a copy with a new name and unique ID.\n\nThis function creates a duplicate of an existing marketing email with all the same properties\n(subject, htmlBody, status, etc.) except for the name, which is set to the provided value,\nand the email_id, which is automatically generated as a new unique identifier. The original\nemail remains unchanged. This is useful for creating similar email campaigns or templates\nbased on existing ones without having to recreate all the content and settings.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "email_id": {
+          "description": "The ID of the marketing email to clone. Must be a non-empty string that corresponds to an existing marketing email in the database.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "name": {
+          "description": "The name for the new, cloned email. Must be a non-empty string. This will be the internal name of the cloned marketing email.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "email_id",
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "create_campaign",
+    "description": "Creates a new marketing campaign with the specified properties. Automatically generates a unique ID and slug if not provided. Validates date components and ensures start date is before end date.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the campaign. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "slug": {
+          "description": "The URL-safe slug of the campaign. Auto-generated from name if not provided or if provided slug is invalid. Defaults to None.",
+          "type": "string",
+          "nullable": true
+        },
+        "description": {
+          "description": "The description of the campaign.",
+          "type": "string",
+          "nullable": true
+        },
+        "start_year": {
+          "description": "The start year of the campaign. Must be 1900 or later.",
+          "type": "integer",
+          "nullable": true,
+          "minimum": 1900
+        },
+        "start_month": {
+          "description": "The start month of the campaign (1-12).",
+          "type": "integer",
+          "nullable": true,
+          "minimum": 1,
+          "maximum": 12
+        },
+        "start_day": {
+          "description": "The start day of the campaign (1-31). Validated against month/year.",
+          "type": "integer",
+          "nullable": true,
+          "minimum": 1,
+          "maximum": 31
+        },
+        "end_year": {
+          "description": "The end year of the campaign. Must be 1900 or later.",
+          "type": "integer",
+          "nullable": true,
+          "minimum": 1900
+        },
+        "end_month": {
+          "description": "The end month of the campaign (1-12).",
+          "type": "integer",
+          "nullable": true,
+          "minimum": 1,
+          "maximum": 12
+        },
+        "end_day": {
+          "description": "The end day of the campaign (1-31). Validated against month/year.",
+          "type": "integer",
+          "nullable": true,
+          "minimum": 1,
+          "maximum": 31
+        },
+        "theme": {
+          "description": "The theme of the campaign.",
+          "type": "string",
+          "nullable": true
+        },
+        "resource": {
+          "description": "The resource of the campaign.",
+          "type": "string",
+          "nullable": true
+        },
+        "color_label": {
+          "description": "The color label of the campaign.",
+          "type": "string",
+          "nullable": true
+        },
+        "budget": {
+          "description": "The budget for the campaign. Must be zero or greater when provided.",
+          "type": "number",
+          "nullable": true,
+          "minimum": 0
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "create_form",
+    "description": "Creates a new marketing form with the specified configuration. A unique ID will be \n\ngenerated for the form, and timestamps will be recorded for its creation and last update.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the new form. Must be a non-empty string.",
+          "type": "string",
+          "minLength": 1
+        },
+        "submitText": {
+          "description": "The text displayed on the form's submit button. Must be a non-empty string.",
+          "type": "string",
+          "minLength": 1
+        },
+        "fieldGroups": {
+          "description": "A list of field groups in the form. Each group must contain:",
+          "type": "array",
+          "items": {
+            "description": "Model for field group validation.",
+            "type": "object",
+            "properties": {
+              "groupType": {
+                "description": "The type of the field group.",
+                "type": "string",
+                "minLength": 1
+              },
+              "richTextType": {
+                "description": "The type of rich text (default: 'text').",
+                "type": "string",
+                "default": "text",
+                "minLength": 1
+              },
+              "richText": {
+                "description": "HTML content displayed in the field group.",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              },
+              "fields": {
+                "description": "A list of fields within the group, each containing:",
+                "type": "array",
+                "items": {
+                  "description": "Model for form field validation.",
+                  "type": "object",
+                  "properties": {
+                    "fieldType": {
+                      "description": "The type of the form field. Must be one of: email, phone, mobile_phone, single_line_text, multi_line_text, number, single_checkbox, multiple_checkboxes, dropdown, radio, datepicker, file, payment_link_radio.",
+                      "type": "string",
+                      "enum": [
+                        "email",
+                        "phone",
+                        "mobile_phone",
+                        "single_line_text",
+                        "multi_line_text",
+                        "number",
+                        "single_checkbox",
+                        "multiple_checkboxes",
+                        "dropdown",
+                        "radio",
+                        "datepicker",
+                        "file",
+                        "payment_link_radio"
+                      ]
+                    },
+                    "name": {
+                      "description": "The internal name of the field.",
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "label": {
+                      "description": "The public-facing label for the field.",
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "required": {
+                      "description": "Whether the field must be filled out.",
+                      "type": "boolean"
+                    },
+                    "placeholder": {
+                      "description": "Placeholder text for the field.",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    },
+                    "defaultValue": {
+                      "description": "The default value for the field.",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    },
+                    "options": {
+                      "description": "Choice labels for discrete-value fields. When fieldType is 'dropdown', 'radio', or 'multiple_checkboxes', this must be a non-empty array (null or omitting the property raises FormFieldOptionsRequiredError). For other field types, null or omission is allowed.",
+                      "type": "array",
+                      "nullable": true,
+                      "default": null,
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "hidden": {
+                      "description": "Whether the field is hidden from view.",
+                      "type": "boolean",
+                      "nullable": true,
+                      "default": false
+                    }
+                  },
+                  "required": [
+                    "fieldType",
+                    "name",
+                    "label",
+                    "required"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "groupType",
+              "fields"
+            ]
+          }
+        },
+        "legalConsentOptions": {
+          "description": "Legal consent options for the form. Defaults to None.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "explicitConsentToProcess": {
+              "description": "Options for explicit consent.",
+              "type": "object",
+              "nullable": true,
+              "default": null,
+              "properties": {
+                "communicationsCheckboxes": {
+                  "description": "A list of checkboxes for communication consent.",
+                  "type": "array",
+                  "items": {
+                    "description": "Model for communication checkbox in consent options.",
+                    "type": "object",
+                    "properties": {
+                      "subscriptionTypeId": {
+                        "description": "The ID of the subscription type.",
+                        "type": "integer"
+                      },
+                      "label": {
+                        "description": "The label for the checkbox.",
+                        "type": "string"
+                      },
+                      "required": {
+                        "description": "Whether the checkbox is required.",
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "subscriptionTypeId",
+                      "label",
+                      "required"
+                    ]
+                  }
+                },
+                "communicationConsentText": {
+                  "description": "Text for communication consent.",
+                  "type": "string"
+                },
+                "consentToProcessCheckboxLabel": {
+                  "description": "Label for the consent to process checkbox.",
+                  "type": "string"
+                },
+                "consentToProcessFooterText": {
+                  "description": "Footer text for consent to process.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "The type of consent.",
+                  "type": "string",
+                  "enum": [
+                    "explicit_consent_to_process"
+                  ]
+                },
+                "privacyText": {
+                  "description": "Text regarding privacy.",
+                  "type": "string"
+                },
+                "consentToProcessText": {
+                  "description": "Text for consent to process.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "communicationsCheckboxes",
+                "communicationConsentText",
+                "consentToProcessCheckboxLabel",
+                "consentToProcessFooterText",
+                "type",
+                "privacyText",
+                "consentToProcessText"
+              ]
+            },
+            "implicitConsentToProcess": {
+              "description": "Options for implicit consent.",
+              "type": "object",
+              "nullable": true,
+              "default": null,
+              "properties": {
+                "communicationsCheckboxes": {
+                  "description": "A list of checkboxes for communication consent.",
+                  "type": "array",
+                  "items": {
+                    "description": "Model for communication checkbox in consent options.",
+                    "type": "object",
+                    "properties": {
+                      "subscriptionTypeId": {
+                        "description": "The ID of the subscription type.",
+                        "type": "integer"
+                      },
+                      "label": {
+                        "description": "The label for the checkbox.",
+                        "type": "string"
+                      },
+                      "required": {
+                        "description": "Whether the checkbox is required.",
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "subscriptionTypeId",
+                      "label",
+                      "required"
+                    ]
+                  }
+                },
+                "communicationConsentText": {
+                  "description": "Text for communication consent.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "The type of consent.",
+                  "type": "string",
+                  "enum": [
+                    "implicit_consent_to_process"
+                  ]
+                },
+                "privacyText": {
+                  "description": "Text regarding privacy.",
+                  "type": "string"
+                },
+                "consentToProcessText": {
+                  "description": "Text for consent to process.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "communicationsCheckboxes",
+                "communicationConsentText",
+                "type",
+                "privacyText",
+                "consentToProcessText"
+              ]
+            },
+            "legitimateInterest": {
+              "description": "Options for legitimate interest.",
+              "type": "object",
+              "nullable": true,
+              "default": null,
+              "properties": {
+                "lawfulBasis": {
+                  "description": "The lawful basis for the consent.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "The type of the legitimate interest.",
+                  "type": "string",
+                  "enum": [
+                    "legitimate_interest"
+                  ]
+                },
+                "privacyText": {
+                  "description": "The privacy text of the legitimate interest.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "lawfulBasis",
+                "type",
+                "privacyText"
+              ]
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "name",
+        "submitText",
+        "fieldGroups"
+      ]
+    }
+  },
+  {
+    "name": "create_form_global_event_subscription",
+    "description": "Creates a new webhook subscription for global form events.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "description": "The endpoint of the subscription. Must be a valid absolute http or https URL when provided. Optional.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "subscriptionDetails": {
+          "description": "The subscription details of the subscription. Optional. Defaults to None.",
+          "type": "object",
+          "properties": {
+            "contact_id": {
+              "description": "The id of the contact. Optional.",
+              "type": "string",
+              "nullable": true,
+              "minLength": 1
+            },
+            "subscribed": {
+              "description": "Whether the contact is subscribed to the subscription. Optional.",
+              "type": "boolean",
+              "nullable": true
+            },
+            "opt_in_date": {
+              "description": "The date and time the contact opted in to the subscription, in ISO 8601 format (e.g. 2024-01-15T10:30:00Z). Optional.",
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "create_marketing_email",
+    "description": "Creates a new marketing email with specified properties.\n\nThis function creates and stores a new marketing email in the database with a unique auto-generated\nidentifier. The email can include various properties such as subject, HTML body, status, and promotional\nfields like discount codes, expiration dates, and reward points. Only the name field is required;\nall other fields are optional. The isTransactional field defaults to False if not provided.\nThis is useful for creating email campaigns, promotional emails, or transactional notifications.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The internal name of the email. Must be a non-empty string that serves as an identifier for the email campaign.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "subject": {
+          "description": "The email subject line that recipients will see in their inbox.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1
+        },
+        "htmlBody": {
+          "description": "The HTML body content of the email. Can contain HTML markup for rich formatting.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1
+        },
+        "isTransactional": {
+          "description": "Whether this is a transactional email (e.g., order confirmations, password resets). Defaults to False for marketing emails.",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        },
+        "status": {
+          "description": "The current status of the email. Must be one of: 'sent', 'pending', 'scheduled', or 'draft'. Indicates the email's state in the sending workflow.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "enum": [
+            "sent",
+            "pending",
+            "scheduled",
+            "draft"
+          ]
+        },
+        "discount_code": {
+          "description": "Discount code for promotional emails. Can be used to track and provide special offers to recipients.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1
+        },
+        "expiration": {
+          "description": "Expiration date for time-limited offers in YYYY-MM-DD format (e.g., \"2024-12-31\"). Must be a valid date.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "launch_date": {
+          "description": "Launch date for product announcements in YYYY-MM-DD format (e.g., \"2024-01-15\"). Must be a valid date.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "sale_end_date": {
+          "description": "End date for sales promotions in YYYY-MM-DD format (e.g., \"2024-06-30\"). Must be a valid date.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "reward_points": {
+          "description": "Number of reward points for loyalty program emails. Must be a non-negative integer.",
+          "type": "integer",
+          "nullable": true,
+          "default": null,
+          "minimum": 0
+        },
+        "access_code": {
+          "description": "Access code for VIP or exclusive offers. Can be used to grant special access to recipients.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "create_marketing_event",
+    "description": "Create a marketing event.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "externalEventId": {
+          "description": "The unique identifier for the marketing event as per the external system where the event was created.",
+          "type": "string",
+          "minLength": 1
+        },
+        "externalAccountId": {
+          "description": "The unique identifier for the account(external system) where the event was created.",
+          "type": "string",
+          "minLength": 1
+        },
+        "event_name": {
+          "description": "The name of the marketing event.",
+          "type": "string",
+          "minLength": 1
+        },
+        "event_type": {
+          "description": "The type of the marketing event.",
+          "type": "string",
+          "minLength": 1
+        },
+        "event_organizer": {
+          "description": "The organizer of the marketing event.",
+          "type": "string",
+          "minLength": 1
+        },
+        "start_date_time": {
+          "description": "The start date and time of the marketing event in ISO 8601 format.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "end_date_time": {
+          "description": "The end date and time of the marketing event in ISO 8601 format.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "event_description": {
+          "description": "A description of the marketing event.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "event_url": {
+          "description": "A URL for more information about the marketing event. Must be a valid absolute http or https URL when provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "custom_properties": {
+          "description": "Custom properties associated with the marketing event.",
+          "type": "array",
+          "nullable": true,
+          "items": {
+            "description": "Custom properties associated with the marketing event.",
+            "type": "object",
+            "properties": {
+              "sourceId": {
+                "description": "The source id of the custom property.",
+                "type": "string",
+                "nullable": true
+              },
+              "selectedByUser": {
+                "description": "Whether the property was selected by the user.",
+                "type": "boolean",
+                "nullable": true
+              },
+              "sourceLabel": {
+                "description": "The label of the source.",
+                "type": "string",
+                "nullable": true
+              },
+              "source": {
+                "description": "The source of the property.",
+                "type": "string",
+                "enum": [
+                  "ACADEMY",
+                  "ACCEPTANCE_TEST",
+                  "ACTIVITY_AUTO_ASSOCIATE",
+                  "ADS",
+                  "AI_GROUP",
+                  "ANALYTICS",
+                  "API",
+                  "APPROVALS",
+                  "ASSISTS",
+                  "ASSOCIATIONS",
+                  "AUTO_ASSOCIATE_BY_DOMAIN",
+                  "AUTOMATION_JOURNEY",
+                  "AUTOMATION_PLATFORM",
+                  "AVATARS_SERVICE",
+                  "BATCH_UPDATE",
+                  "BCC_TO_CRM",
+                  "BEHAVIORAL_EVENTS",
+                  "BET_ASSIGNMENT",
+                  "BET_CRM_CONNECTOR",
+                  "BIDEN",
+                  "BILLING",
+                  "BOT",
+                  "CALCULATED",
+                  "CENTRAL_EXCHANGE_RATES",
+                  "CHATSPOT",
+                  "CLONE_OBJECTS",
+                  "COMMUNICATOR",
+                  "COMPANIES",
+                  "COMPANY_FAMILIES",
+                  "COMPANY_INSIGHTS",
+                  "CONTACTS",
+                  "CONTACTS_WEB",
+                  "CONTENT_MEMBERSHIP",
+                  "CONVERSATIONAL_ENRICHMENT",
+                  "CONVERSATIONS",
+                  "CRM_PROCESSES_PLATFORM",
+                  "CRM_UI",
+                  "CRM_UI_BULK_ACTION",
+                  "CUSTOMER_AGENT",
+                  "DATA_ENRICHMENT",
+                  "DATASET",
+                  "DEALS",
+                  "DEFAULT",
+                  "DELETE_OBJECTS",
+                  "EMAIL",
+                  "EMAIL_INBOX_IMPORT",
+                  "EMAIL_INTEGRATION",
+                  "ENGAGEMENTS",
+                  "EXTENSION",
+                  "FILE_MANAGER",
+                  "FLYWHEEL_PRODUCT_DATA_SYNC",
+                  "FORECASTING",
+                  "FORM",
+                  "FORWARD_TO_CRM",
+                  "GRIDWELL_MAIL_INTEGRATION",
+                  "GOALS",
+                  "HEISENBERG",
+                  "HELP_DESK",
+                  "HELP_DESK_AI",
+                  "IMPORT",
+                  "INTEGRATION",
+                  "INTEGRATIONS_PLATFORM",
+                  "INTEGRATIONS_SYNC",
+                  "INTENT",
+                  "INTERNAL_PROCESSING",
+                  "LEADIN",
+                  "LEGAL_BASIS_REMEDIATION",
+                  "MARKET_SOURCING",
+                  "MARKETPLACE",
+                  "MEETINGS",
+                  "MERGE_COMPANIES",
+                  "MERGE_CONTACTS",
+                  "MERGE_OBJECTS",
+                  "MERGE_REVERT_OBJECTS",
+                  "MICROAPPS",
+                  "MIGRATION",
+                  "MOBILE_ANDROID",
+                  "MOBILE_IOS",
+                  "PAYMENTS",
+                  "PIPELINE_SETTINGS",
+                  "PLAYBOOKS",
+                  "PORTAL_OBJECT_SYNC",
+                  "PORTAL_USER_ASSOCIATOR",
+                  "PRESENTATIONS",
+                  "PRIMARY_AUTOMATION",
+                  "PROPERTY_DEFAULT_VALUE",
+                  "PROPERTY_RESTORE",
+                  "PROPERTY_SETTINGS",
+                  "PROSPECTING_AGENT",
+                  "QUOTAS",
+                  "QUOTES",
+                  "RECYCLING_BIN",
+                  "RESTORE_OBJECTS",
+                  "SALES",
+                  "SALES_MESSAGES",
+                  "SALESPOWER",
+                  "SEQUENCES",
+                  "SETTINGS",
+                  "SIDEKICK",
+                  "SIGNALS",
+                  "SLICK_INTEGRATION",
+                  "SMART_DATA_CAPTURE",
+                  "SOCIAL",
+                  "SUCCESS",
+                  "TALLY",
+                  "TASK",
+                  "UNKNOWN",
+                  "WAL_INCREMENTAL",
+                  "WORK_UI",
+                  "WORKFLOW_CONTACT_DELETE_ACTION",
+                  "WORKFLOWS"
+                ],
+                "nullable": true
+              },
+              "updatedByUserId": {
+                "description": "The id of the user who last updated the property.",
+                "type": "integer",
+                "nullable": true
+              },
+              "persistenceTimestamp": {
+                "description": "Persistence timestamp",
+                "type": "integer",
+                "nullable": true
+              },
+              "sourceMetadata": {
+                "description": "The metadata of the source.",
+                "type": "string",
+                "nullable": true
+              },
+              "dataSensitivity": {
+                "description": "The data sensitivity of the property.",
+                "type": "string",
+                "nullable": true,
+                "enum": [
+                  "high",
+                  "none",
+                  "standard"
+                ]
+              },
+              "unit": {
+                "description": "The unit of the property.",
+                "type": "string",
+                "nullable": true
+              },
+              "requestId": {
+                "description": "The request id of the property.",
+                "type": "string",
+                "nullable": true
+              },
+              "isEncrypted": {
+                "description": "Whether the property is encrypted.",
+                "type": "boolean",
+                "nullable": true
+              },
+              "name": {
+                "description": "The name of the property.",
+                "type": "string",
+                "minLength": 1
+              },
+              "useTimestampAsPersistenceTimestamp": {
+                "description": "Whether to use timestamp as persistence timestamp.",
+                "type": "boolean",
+                "nullable": true
+              },
+              "value": {
+                "description": "The value of the property.",
+                "type": "string",
+                "minLength": 1
+              },
+              "selectedByUserTimestamp": {
+                "description": "The timestamp of the property. Defaults to the current time in milliseconds.",
+                "type": "integer",
+                "nullable": true
+              },
+              "timestamp": {
+                "description": "Property timestamp",
+                "type": "integer",
+                "nullable": true
+              },
+              "isLargeValue": {
+                "description": "Whether the property is large.",
+                "type": "boolean",
+                "nullable": true
+              },
+              "sourceUpstreamDeployable": {
+                "description": "Indicates which upstream service made the property change",
+                "type": "string",
+                "nullable": true,
+                "default": "app-service",
+                "minLength": 1
+              },
+              "sourceVid": {
+                "description": "The unique identifier associated with the source.",
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "nullable": true,
+                "default": [
+                  1,
+                  2,
+                  3
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "value"
+            ]
+          }
+        }
+      },
+      "required": [
+        "externalEventId",
+        "externalAccountId",
+        "event_name",
+        "event_type",
+        "event_organizer"
+      ]
+    }
+  },
+  {
+    "name": "create_or_update_marketing_event_attendee",
+    "description": "Create or update an attendee for a marketing event.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "externalEventId": {
+          "description": "The unique identifier for the marketing event as per the external system where the event was created.",
+          "type": "string",
+          "minLength": 1
+        },
+        "externalAccountId": {
+          "description": "The unique identifier for the account where the event was created.",
+          "type": "string",
+          "minLength": 1
+        },
+        "email": {
+          "description": "The email address of the attendee.",
+          "type": "string",
+          "minLength": 1
+        },
+        "joinedAt": {
+          "description": "The date and time when the attendee joined the event (ISO 8601 format).",
+          "type": "string",
+          "nullable": true,
+          "format": "date-time",
+          "default": null
+        },
+        "leftAt": {
+          "description": "The date and time when the attendee left the event (ISO 8601 format).",
+          "type": "string",
+          "nullable": true,
+          "format": "date-time",
+          "default": null
+        },
+        "contactProperties": {
+          "description": "Arbitrary user-defined custom contact properties to attach to the attendee. Both keys and values must be strings. The attendee's contactProperties are REPLACED with this dict on each call; omit or pass an empty object to clear existing values. Defaults to an empty object.",
+          "type": "object",
+          "nullable": true,
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        }
+      },
+      "required": [
+        "externalEventId",
+        "externalAccountId",
+        "email"
+      ]
+    }
+  },
+  {
+    "name": "create_template",
+    "description": "Create a new coded template object in Design Manager. This function is idempotent: if a template with the same source content and parameters (template_type, category_id, folder, path, is_available_for_new_content) already exists, the existing template is returned. If source matches but parameters differ, a new template is created.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "description": "The source code of the template. Must be non-empty.",
+          "type": "string",
+          "minLength": 1
+        },
+        "created": {
+          "description": "The creation date in milliseconds since epoch. Must be a string of digits only (e.g., \"1702857600000\"). Default is None (auto-generated).",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "pattern": "^\\d{13}$"
+        },
+        "template_type": {
+          "description": "The type of template to create. Default is 2 (Email template). Valid values: 2=Email, 4=Page, 11=Error, 12=Subscription preferences, 13=Backup unsubscribe, 14=Subscriptions update confirmation, 19=Password prompt, 27=Search results, 29=Membership login, 30=Membership registration, 31=Membership reset password confirmation, 32=Membership reset password request.",
+          "type": "integer",
+          "default": 2
+        },
+        "category_id": {
+          "description": "The category type. Default is 2 (Email). Valid values: 0=Unmapped, 1=Landing Pages, 2=Email, 3=Blog Post, 4=Site Page.",
+          "type": "integer",
+          "default": 2
+        },
+        "folder": {
+          "description": "The folder to save the template. Default is '/templates/'. Can be set to None.",
+          "type": "string",
+          "nullable": true,
+          "minLength": 1,
+          "default": "/templates/"
+        },
+        "path": {
+          "description": "The path to save the template. Default is '/home/templates/'. Can be set to None.",
+          "type": "string",
+          "nullable": true,
+          "minLength": 1,
+          "default": "/home/templates/"
+        },
+        "is_available_for_new_content": {
+          "description": "Whether the template should be available for new content. Default is False.",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "source"
+      ]
+    }
+  },
+  {
+    "name": "delete_form",
+    "description": "Delete a form",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "formId": {
+          "description": "The id of the form to delete. Must be non-empty and contain at least one non-whitespace character.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^.*\\S.*$"
+        }
+      },
+      "required": [
+        "formId"
+      ]
+    }
+  },
+  {
+    "name": "delete_form_global_event_subscription",
+    "description": "Deletes (unsubscribes) a webhook subscription.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "description": "The unique identifier of the subscription to delete. Must be a non-empty string that exists in the subscription database.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "subscriptionId"
+      ]
+    }
+  },
+  {
+    "name": "delete_marketing_email",
+    "description": "Deletes a marketing email from the database.\n\nThis function permanently removes a marketing email from the database using its unique identifier.\nOnce deleted, the email and all its associated data (subject, body, promotional fields, etc.)\ncannot be recovered. This operation is irreversible. Use with caution. This is useful for\nremoving outdated campaigns, test emails, or emails that are no longer needed.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "email_id": {
+          "description": "The unique ID of the marketing email to delete. Must be a non-empty string that corresponds to an existing marketing email in the database.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "email_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_marketing_event",
+    "description": "Delete a marketing event.\n\nRemoves a marketing event from the system using its external event ID and account ID. \nThe event must exist and belong to the specified account.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "externalEventId": {
+          "description": "The unique identifier for the marketing event as per the external system where the event was created",
+          "type": "string",
+          "minLength": 1
+        },
+        "externalAccountId": {
+          "description": "The unique identifier for the account where the event was created",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "externalEventId",
+        "externalAccountId"
+      ]
+    }
+  },
+  {
+    "name": "delete_marketing_event_attendee",
+    "description": "Remove an attendee from a marketing event.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "externalEventId": {
+          "description": "The unique identifier for the marketing event as per the external system where the event was created.",
+          "type": "string",
+          "minLength": 1
+        },
+        "attendeeId": {
+          "description": "The unique identifier for the attendee.",
+          "type": "string",
+          "minLength": 1
+        },
+        "externalAccountId": {
+          "description": "The unique identifier for the account where the event was created.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "externalEventId",
+        "attendeeId",
+        "externalAccountId"
+      ]
+    }
+  },
+  {
+    "name": "delete_template_by_id",
+    "description": "Marks the selected Template as deleted. The Template can be restored later via a POST to the restore-deleted endpoint.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "template_id": {
+          "description": "Unique identifier for the template.",
+          "type": "string",
+          "minLength": 1
+        },
+        "deleted_at": {
+          "description": "Timestamp in milliseconds since epoch of when the template was deleted. If None, current timestamp will be used. Default is None.",
+          "type": "string",
+          "pattern": "^\\d+$",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "template_id"
+      ]
+    }
+  },
+  {
+    "name": "get_campaign_by_id",
+    "description": "Gets a single campaign by its unique ID. Returns the complete campaign object with all fields, or null if the campaign is not found.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "campaign_id": {
+          "description": "The unique identifier of the campaign to retrieve.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "campaign_id"
+      ]
+    }
+  },
+  {
+    "name": "get_campaigns",
+    "description": "Returns a list of marketing campaigns with optional filtering and pagination. Supports filtering by ID, name, creation date, and update date with various comparison operators.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "The maximum number of campaigns to return. Must be a positive integer (>= 1).",
+          "type": "integer",
+          "minimum": 1,
+          "nullable": true
+        },
+        "offset": {
+          "description": "The number of campaigns to skip for pagination. Must be a non-negative integer.",
+          "type": "integer",
+          "minimum": 0,
+          "nullable": true
+        },
+        "created_at": {
+          "description": "Filter campaigns by exact creation date in ISO 8601 format (e.g., \"2024-01-15T10:30:00Z\").",
+          "type": "string",
+          "nullable": true
+        },
+        "created_at__gt": {
+          "description": "Filter campaigns created after this date in ISO 8601 format.",
+          "type": "string",
+          "nullable": true
+        },
+        "created_at__gte": {
+          "description": "Filter campaigns created on or after this date in ISO 8601 format.",
+          "type": "string",
+          "nullable": true
+        },
+        "created_at__lt": {
+          "description": "Filter campaigns created before this date in ISO 8601 format.",
+          "type": "string",
+          "nullable": true
+        },
+        "created_at__lte": {
+          "description": "Filter campaigns created on or before this date in ISO 8601 format.",
+          "type": "string",
+          "nullable": true
+        },
+        "updated_at": {
+          "description": "Filter campaigns by exact update date in ISO 8601 format.",
+          "type": "string",
+          "nullable": true
+        },
+        "updated_at__gt": {
+          "description": "Filter campaigns updated after this date in ISO 8601 format.",
+          "type": "string",
+          "nullable": true
+        },
+        "updated_at__gte": {
+          "description": "Filter campaigns updated on or after this date in ISO 8601 format.",
+          "type": "string",
+          "nullable": true
+        },
+        "updated_at__lt": {
+          "description": "Filter campaigns updated before this date in ISO 8601 format.",
+          "type": "string",
+          "nullable": true
+        },
+        "updated_at__lte": {
+          "description": "Filter campaigns updated on or before this date in ISO 8601 format.",
+          "type": "string",
+          "nullable": true
+        },
+        "name": {
+          "description": "Filter campaigns by exact name match.",
+          "type": "string",
+          "nullable": true
+        },
+        "name__contains": {
+          "description": "Filter campaigns by name containing this string (case sensitive).",
+          "type": "string",
+          "nullable": true
+        },
+        "name__icontains": {
+          "description": "Filter campaigns by name containing this string (case insensitive).",
+          "type": "string",
+          "nullable": true
+        },
+        "name__ne": {
+          "description": "Filter campaigns by name not equal to this string.",
+          "type": "string",
+          "nullable": true
+        },
+        "id": {
+          "description": "Filter campaigns by exact ID match.",
+          "type": "string",
+          "nullable": true
+        },
+        "id__ne": {
+          "description": "Filter campaigns by ID not equal to this string.",
+          "type": "string",
+          "nullable": true
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_form_by_id",
+    "description": "Get a Marketing Form by ID.\n\nRetrieves a single marketing form by its unique identifier. The form includes all field groups, legal consent options, and metadata such as creation and update timestamps.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "formId": {
+          "description": "The unique identifier of the form to retrieve",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "formId"
+      ]
+    }
+  },
+  {
+    "name": "get_form_global_event_subscription_definitions",
+    "description": "Get all global form event subscription definitions.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_form_global_event_subscriptions",
+    "description": "Retrieves all form global event subscriptions. The subscriptions table is exclusively for form global events.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "get_forms",
+    "description": "Retrieves marketing forms, with options for filtering and pagination.\n\nYou can filter by creation or update dates, form name, form ID, or archived status. The results \ncan be paginated using 'after' and 'limit' parameters.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "after": {
+          "description": "The paging cursor token to fetch the next page of results",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "limit": {
+          "description": "The maximum number of results to return per page",
+          "type": "integer",
+          "nullable": true,
+          "minimum": 1,
+          "default": null
+        },
+        "created_at": {
+          "description": "Filter by exact creation date (ISO 8601 format)",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "created_at__gt": {
+          "description": "Filter for forms created after this date (ISO 8601 format)",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "created_at__gte": {
+          "description": "Filter for forms created on or after this date (ISO 8601 format)",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "created_at__lt": {
+          "description": "Filter for forms created before this date (ISO 8601 format)",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "created_at__lte": {
+          "description": "Filter for forms created on or before this date (ISO 8601 format)",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "updated_at": {
+          "description": "Filter by exact last update date (ISO 8601 format)",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "updated_at__gt": {
+          "description": "Filter for forms updated after this date (ISO 8601 format)",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "updated_at__gte": {
+          "description": "Filter for forms updated on or after this date (ISO 8601 format)",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "updated_at__lt": {
+          "description": "Filter for forms updated before this date (ISO 8601 format)",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "updated_at__lte": {
+          "description": "Filter for forms updated on or before this date (ISO 8601 format)",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "name": {
+          "description": "Filter by exact form name",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "id": {
+          "description": "Filter by exact form ID",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "archived": {
+          "description": "Filter by archived status (true/false/null for all)",
+          "type": "boolean",
+          "nullable": true,
+          "default": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_marketing_email_by_id",
+    "description": "Retrieves a marketing email by its unique identifier.\n\nThis function fetches and returns the complete details of a marketing email from the database\nusing its unique email_id. The returned object includes all email properties such as name,\nsubject, HTML body, status, and any promotional fields (discount codes, dates, reward points, etc.).\nThis is useful for viewing email details, editing campaigns, or checking email configuration\nbefore sending or cloning.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "email_id": {
+          "description": "The unique ID of the marketing email to retrieve. Must be a non-empty string that corresponds to an existing marketing email in the database.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "email_id"
+      ]
+    }
+  },
+  {
+    "name": "get_marketing_event_attendees",
+    "description": "Get attendees of a marketing event.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "externalEventId": {
+          "description": "The unique identifier for the marketing event as per the external system where the event was created.",
+          "type": "string",
+          "minLength": 1
+        },
+        "limit": {
+          "description": "The maximum number of attendees to return. Defaults to 10. The maximum is 100.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 10
+        },
+        "after": {
+          "description": "A cursor for pagination.",
+          "type": "string",
+          "nullable": true
+        }
+      },
+      "required": [
+        "externalEventId"
+      ]
+    }
+  },
+  {
+    "name": "get_marketing_event_by_id",
+    "description": "Get a marketing event by its external ID, scoped to a specific external account. Validates that the event belongs to the provided externalAccountId.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "externalEventId": {
+          "description": "The unique identifier for the marketing event as per the external system where the event was created.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "externalAccountId": {
+          "description": "The unique identifier for the account where the event was created.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "externalEventId",
+        "externalAccountId"
+      ]
+    }
+  },
+  {
+    "name": "get_marketing_events",
+    "description": "Get all marketing events with optional filtering and pagination.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "occurredAfter": {
+          "description": "ISO 8601 timestamp to filter events that occurred after this time.",
+          "type": "string",
+          "nullable": true
+        },
+        "occurredBefore": {
+          "description": "ISO 8601 timestamp to filter events that occurred before this time.",
+          "type": "string",
+          "nullable": true
+        },
+        "limit": {
+          "description": "The maximum number of events to return (1-100). Defaults to 10.",
+          "type": "integer",
+          "nullable": true,
+          "default": 10,
+          "minimum": 1,
+          "maximum": 100
+        },
+        "after": {
+          "description": "A cursor for pagination, used to fetch the next set of results.",
+          "type": "string",
+          "nullable": true
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_template_by_id",
+    "description": "Get a specific template by ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "template_id": {
+          "description": "The unique identifier of the template.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "template_id"
+      ]
+    }
+  },
+  {
+    "name": "get_templates",
+    "description": "Get all templates. Supports paging and filtering. Results are sorted by creation timestamp (ascending) for stable pagination. Note: When filter parameters are not provided (None/null), no filtering is applied for that field - all values are included. To filter by a specific value, provide that value explicitly.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "The maximum number of templates to return. Default is 20.",
+          "type": "integer",
+          "minimum": 0,
+          "default": 20
+        },
+        "offset": {
+          "description": "The offset of the first template to return. Default is 0.",
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "deleted_at": {
+          "description": "Filter by deletion timestamp in milliseconds since epoch. When null/not provided, returns templates regardless of deletion status (no filtering). Provide a specific timestamp to filter for that value.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "id": {
+          "description": "Filter by template ID. When null/not provided, returns all templates (no filtering). Must be non-empty if provided.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": true,
+          "default": null
+        },
+        "is_available_for_new_content": {
+          "description": "Filter by availability for new content ('true' or 'false'). When null/not provided, returns templates regardless of availability (no filtering).",
+          "type": "string",
+          "enum": [
+            "true",
+            "false"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "label": {
+          "description": "Filter by template label. When null/not provided, returns templates regardless of label (no filtering). Must be non-empty if provided.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": true,
+          "default": null
+        },
+        "path": {
+          "description": "Filter by template path. When null/not provided, returns templates regardless of path (no filtering). Must be non-empty if provided.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "restore_deleted_template",
+    "description": "Restores a previously deleted Template.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "template_id": {
+          "description": "Unique identifier for the template.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "template_id"
+      ]
+    }
+  },
+  {
+    "name": "send_single_email_with_template",
+    "description": "Simulates sending a single transactional email using a pre-existing email template by recording a send event in the internal database (no actual email is dispatched).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "template_id": {
+          "description": "The ID of the pre-existing transactional email template to send.",
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "description": "An object containing email content and recipient info.",
+          "type": "object",
+          "properties": {
+            "to": {
+              "description": "Required. List of recipient objects.",
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "description": "Model for Hubscape email user.",
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "description": "Required. Email address of the recipient.",
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "name": {
+                    "description": "Name of the recipient.",
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            },
+            "cc": {
+              "description": "List of CC recipient objects.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "description": "Model for Hubscape email user.",
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "description": "Required. Email address of the CC recipient.",
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "name": {
+                    "description": "Name of the CC recipient.",
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            },
+            "bcc": {
+              "description": "List of BCC recipient objects.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "description": "Model for Hubscape email user.",
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "description": "Required. Email address of the BCC recipient.",
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "name": {
+                    "description": "Name of the BCC recipient.",
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            },
+            "from": {
+              "description": "Sender information.",
+              "type": "object",
+              "properties": {
+                "email": {
+                  "description": "Required. Email address of the sender.",
+                  "type": "string",
+                  "format": "email"
+                },
+                "name": {
+                  "description": "Name of the sender.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "email"
+              ]
+            },
+            "replyTo": {
+              "description": "List of reply-to addresses.",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "description": "Model for Hubscape email user.",
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "description": "Required. Reply-to email address.",
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "name": {
+                    "description": "Reply-to name.",
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          },
+          "required": [
+            "to",
+            "from"
+          ]
+        },
+        "customProperties": {
+          "description": "Custom property values for template personalization.\n- key : The key of the custom property of string type. Must be non-empty after\n  stripping whitespace; whitespace is stripped from accepted keys.\n- value : The value of the custom property, union of string, integer, boolean,\n  number. String values must also be non-empty after stripping whitespace\n  (numeric/boolean values are accepted as-is). Duplicate keys after\n  whitespace stripping are rejected.",
+          "type": "object",
+          "nullable": true,
+          "properties": {},
+          "additionalProperties": {
+            "description": "A value of the custom property. Can be a string, integer, number, or boolean.",
+            "anyOf": [
+              {
+                "description": "A string value of the custom property.",
+                "type": "string"
+              },
+              {
+                "description": "An integer value of the custom property.",
+                "type": "integer"
+              },
+              {
+                "description": "A number value of the custom property.",
+                "type": "number"
+              },
+              {
+                "description": "A boolean value of the custom property.",
+                "type": "boolean"
+              }
+            ]
+          },
+          "required": []
+        },
+        "contactProperties": {
+          "description": "Contact property values.\n- key : The key of the contact property of string type. Must be non-empty after\n  stripping whitespace; whitespace is stripped from accepted keys.\n- value : The value of the contact property, union of string, integer, boolean,\n  number. String values must also be non-empty after stripping whitespace\n  (numeric/boolean values are accepted as-is). Duplicate keys after\n  whitespace stripping are rejected.",
+          "type": "object",
+          "nullable": true,
+          "properties": {},
+          "additionalProperties": {
+            "description": "A value of the custom property. Can be a string, integer, number, or boolean.",
+            "anyOf": [
+              {
+                "description": "A string value of the custom property.",
+                "type": "string"
+              },
+              {
+                "description": "An integer value of the custom property.",
+                "type": "integer"
+              },
+              {
+                "description": "A number value of the custom property.",
+                "type": "number"
+              },
+              {
+                "description": "A boolean value of the custom property.",
+                "type": "boolean"
+              }
+            ]
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "template_id",
+        "message"
+      ]
+    }
+  },
+  {
+    "name": "send_transactional_email",
+    "description": "Simulates sending a single transactional email by storing the email data in the database and marking its status as sent.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "description": "An object containing email content and recipient info.",
+          "type": "object",
+          "properties": {
+            "to": {
+              "description": "Email address of the recipient.",
+              "type": "string",
+              "format": "email"
+            },
+            "from": {
+              "description": "Email address of the sender.",
+              "type": "string",
+              "format": "email"
+            },
+            "subject": {
+              "description": "Subject line of the email.",
+              "type": "string",
+              "minLength": 1
+            },
+            "htmlBody": {
+              "description": "HTML content of the email.",
+              "type": "string",
+              "minLength": 1
+            },
+            "cc": {
+              "description": "CC recipient email address(es).",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string",
+                "format": "email"
+              }
+            },
+            "bcc": {
+              "description": "BCC recipient email address(es).",
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string",
+                "format": "email"
+              }
+            },
+            "replyTo": {
+              "description": "Reply-to email address.",
+              "type": "string",
+              "nullable": true,
+              "format": "email"
+            }
+          },
+          "required": [
+            "to",
+            "from",
+            "subject",
+            "htmlBody"
+          ]
+        },
+        "customProperties": {
+          "description": "Custom properties for the email. Can include any key-value pairs for email personalization.",
+          "type": "object",
+          "nullable": true,
+          "properties": {},
+          "required": [],
+          "additionalProperties": {
+            "description": "Custom property value for email personalization.",
+            "anyOf": [
+              {
+                "description": "String value",
+                "type": "string"
+              },
+              {
+                "description": "Integer value",
+                "type": "integer"
+              },
+              {
+                "description": "Float value",
+                "type": "number"
+              },
+              {
+                "description": "Boolean value",
+                "type": "boolean"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "message"
+      ]
+    }
+  },
+  {
+    "name": "update_campaign",
+    "description": "Updates an existing campaign with new values. Supports partial updates - only provided fields are updated. Note: Date order validation only occurs in create_campaign, not in updates.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "campaign_id": {
+          "description": "The opaque id of the campaign, as returned by campaign listing.",
+          "type": "string",
+          "nullable": false
+        },
+        "name": {
+          "description": "The name of the campaign.",
+          "type": "string",
+          "nullable": true
+        },
+        "slug": {
+          "description": "The slug of the campaign.",
+          "type": "string",
+          "nullable": true
+        },
+        "description": {
+          "description": "The description of the campaign.",
+          "type": "string",
+          "nullable": true
+        },
+        "start_year": {
+          "description": "The start year of the campaign.",
+          "type": "integer",
+          "nullable": true,
+          "minimum": 1900
+        },
+        "start_month": {
+          "description": "The start month of the campaign.",
+          "type": "integer",
+          "nullable": true,
+          "minimum": 1,
+          "maximum": 12
+        },
+        "start_day": {
+          "description": "The start day of the campaign.",
+          "type": "integer",
+          "nullable": true,
+          "minimum": 1,
+          "maximum": 31
+        },
+        "end_year": {
+          "description": "The end year of the campaign.",
+          "type": "integer",
+          "nullable": true,
+          "minimum": 1900
+        },
+        "end_month": {
+          "description": "The end month of the campaign.",
+          "type": "integer",
+          "nullable": true,
+          "minimum": 1,
+          "maximum": 12
+        },
+        "end_day": {
+          "description": "The end day of the campaign.",
+          "type": "integer",
+          "nullable": true,
+          "minimum": 1,
+          "maximum": 31
+        },
+        "theme": {
+          "description": "The theme of the campaign.",
+          "type": "string",
+          "nullable": true
+        },
+        "resource": {
+          "description": "The resource of the campaign.",
+          "type": "string",
+          "nullable": true
+        },
+        "color_label": {
+          "description": "The new color label of the campaign.",
+          "type": "string",
+          "nullable": true
+        },
+        "budget": {
+          "description": "The new budget for the campaign. Must be zero or greater when provided.",
+          "type": "number",
+          "nullable": true,
+          "minimum": 0
+        }
+      },
+      "required": [
+        "campaign_id"
+      ]
+    }
+  },
+  {
+    "name": "update_form",
+    "description": "Update a Marketing Form.\n\nThis function updates an existing marketing form with the specified fields. Only the \nprovided fields will be updated, while others remain unchanged. The form must exist \nin the system before it can be updated.\n\nNote: For dictionary-type fields, providing the field will replace the entire \ndictionary with the new value rather than merging individual fields within it.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "formId": {
+          "description": "The ID of the form to update. Must be a non-empty string and \ncorrespond to an existing form.",
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "description": "The new name of the form. Must be a non-empty string if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "minLength": 1,
+          "default": null
+        },
+        "submitText": {
+          "description": "The new submit text of the form. Must be a non-empty \nstring if provided. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "minLength": 1,
+          "default": null
+        },
+        "fieldGroups": {
+          "description": "The new field groups of the form. \nEach field group must contain:",
+          "type": "array",
+          "nullable": true,
+          "default": null,
+          "items": {
+            "description": "Model for field group validation.",
+            "type": "object",
+            "properties": {
+              "groupType": {
+                "description": "The type of the field group",
+                "type": "string",
+                "nullable": false,
+                "minLength": 1
+              },
+              "richTextType": {
+                "description": "The type of rich text included. Optional, defaults to \"text\" if not provided.",
+                "type": "string",
+                "nullable": false,
+                "default": "text",
+                "minLength": 1
+              },
+              "richText": {
+                "description": "A block of rich text or an image",
+                "type": "string",
+                "nullable": true,
+                "default": null
+              },
+              "fields": {
+                "description": "The fields of the field group, each containing:",
+                "type": "array",
+                "items": {
+                  "description": "Model for form field validation.",
+                  "type": "object",
+                  "properties": {
+                    "fieldType": {
+                      "description": "The type of the field. Must be one of: email, phone,\n mobile_phone, single_line_text, multi_line_text, number, single_checkbox,\nmultiple_checkboxes, dropdown, radio, datepicker, file, payment_link_radio",
+                      "type": "string",
+                      "nullable": false,
+                      "enum": [
+                        "datepicker",
+                        "dropdown",
+                        "email",
+                        "file",
+                        "mobile_phone",
+                        "multi_line_text",
+                        "multiple_checkboxes",
+                        "number",
+                        "payment_link_radio",
+                        "phone",
+                        "radio",
+                        "single_checkbox",
+                        "single_line_text"
+                      ]
+                    },
+                    "name": {
+                      "description": "The name of the field",
+                      "type": "string",
+                      "nullable": false,
+                      "minLength": 1
+                    },
+                    "label": {
+                      "description": "The label of the field",
+                      "type": "string",
+                      "nullable": false,
+                      "minLength": 1
+                    },
+                    "required": {
+                      "description": "Whether the field is required",
+                      "type": "boolean",
+                      "nullable": false
+                    },
+                    "placeholder": {
+                      "description": "The placeholder text of the field. Defaults to None.",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    },
+                    "defaultValue": {
+                      "description": "The default value of the field. Defaults to None.",
+                      "type": "string",
+                      "nullable": true,
+                      "default": null
+                    },
+                    "options": {
+                      "description": "Choice labels for discrete-value fields. When fieldType is 'dropdown', 'radio', or 'multiple_checkboxes', this must be a non-empty array (null or omitting the property raises FormFieldOptionsRequiredError). For other field types, null or omission is allowed.",
+                      "type": "array",
+                      "nullable": true,
+                      "default": null,
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "hidden": {
+                      "description": "Whether the field is hidden (default: False)",
+                      "type": "boolean",
+                      "nullable": true,
+                      "default": false
+                    }
+                  },
+                  "required": [
+                    "fieldType",
+                    "name",
+                    "label",
+                    "required"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "groupType",
+              "fields"
+            ]
+          }
+        },
+        "legalConsentOptions": {
+          "description": "The new legal consent options of the form.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "explicitConsentToProcess": {
+              "description": "Options for explicit consent.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "communicationsCheckboxes": {
+                  "description": "A list of checkboxes for communication consent.",
+                  "type": "array",
+                  "nullable": false,
+                  "items": {
+                    "description": "Model for communication checkbox in consent options.",
+                    "type": "object",
+                    "properties": {
+                      "subscriptionTypeId": {
+                        "description": "The ID of the subscription type.",
+                        "type": "integer",
+                        "nullable": false
+                      },
+                      "label": {
+                        "description": "The label for the checkbox.",
+                        "type": "string",
+                        "nullable": false
+                      },
+                      "required": {
+                        "description": "Whether the checkbox is required.",
+                        "type": "boolean",
+                        "nullable": false
+                      }
+                    },
+                    "required": [
+                      "subscriptionTypeId",
+                      "label",
+                      "required"
+                    ]
+                  }
+                },
+                "communicationConsentText": {
+                  "description": "Text for communication consent.",
+                  "type": "string",
+                  "nullable": false
+                },
+                "consentToProcessCheckboxLabel": {
+                  "description": "Label for the consent to process checkbox.",
+                  "type": "string",
+                  "nullable": false
+                },
+                "consentToProcessFooterText": {
+                  "description": "Footer text for consent to process.",
+                  "type": "string",
+                  "nullable": false
+                },
+                "type": {
+                  "description": "The type of consent. Must be the literal value 'explicit_consent_to_process'.",
+                  "type": "string",
+                  "nullable": false,
+                  "enum": [
+                    "explicit_consent_to_process"
+                  ]
+                },
+                "privacyText": {
+                  "description": "Text regarding privacy.",
+                  "type": "string",
+                  "nullable": false
+                },
+                "consentToProcessText": {
+                  "description": "Text for consent to process.",
+                  "type": "string",
+                  "nullable": false
+                }
+              },
+              "required": [
+                "communicationsCheckboxes",
+                "communicationConsentText",
+                "consentToProcessCheckboxLabel",
+                "consentToProcessFooterText",
+                "type",
+                "privacyText",
+                "consentToProcessText"
+              ]
+            },
+            "implicitConsentToProcess": {
+              "description": "Options for implicit consent.",
+              "type": "object",
+              "nullable": true,
+              "default": null,
+              "properties": {
+                "communicationsCheckboxes": {
+                  "description": "A list of checkboxes for communication consent.",
+                  "type": "array",
+                  "nullable": false,
+                  "items": {
+                    "description": "Model for communication checkbox in consent options.",
+                    "type": "object",
+                    "properties": {
+                      "subscriptionTypeId": {
+                        "description": "The ID of the subscription type.",
+                        "type": "integer",
+                        "nullable": false
+                      },
+                      "label": {
+                        "description": "The label for the checkbox.",
+                        "type": "string",
+                        "nullable": false
+                      },
+                      "required": {
+                        "description": "Whether the checkbox is required.",
+                        "type": "boolean",
+                        "nullable": false
+                      }
+                    },
+                    "required": [
+                      "subscriptionTypeId",
+                      "label",
+                      "required"
+                    ]
+                  }
+                },
+                "communicationConsentText": {
+                  "description": "Text for communication consent.",
+                  "type": "string",
+                  "nullable": false
+                },
+                "type": {
+                  "description": "The type of consent. Must be the literal value 'implicit_consent_to_process'.",
+                  "type": "string",
+                  "nullable": false,
+                  "enum": [
+                    "implicit_consent_to_process"
+                  ]
+                },
+                "privacyText": {
+                  "description": "Text regarding privacy.",
+                  "type": "string",
+                  "nullable": false
+                },
+                "consentToProcessText": {
+                  "description": "Text for consent to process.",
+                  "type": "string",
+                  "nullable": false
+                }
+              },
+              "required": [
+                "communicationsCheckboxes",
+                "communicationConsentText",
+                "type",
+                "privacyText",
+                "consentToProcessText"
+              ]
+            },
+            "legitimateInterest": {
+              "description": "Options for legitimate interest.",
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "lawfulBasis": {
+                  "description": "The lawful basis for the consent.",
+                  "type": "string",
+                  "nullable": false
+                },
+                "type": {
+                  "description": "The type of the legitimate interest. Must be the literal value 'legitimate_interest'.",
+                  "type": "string",
+                  "nullable": false,
+                  "enum": [
+                    "legitimate_interest"
+                  ]
+                },
+                "privacyText": {
+                  "description": "The privacy text of the legitimate interest.",
+                  "type": "string",
+                  "nullable": false
+                }
+              },
+              "required": [
+                "lawfulBasis",
+                "type",
+                "privacyText"
+              ]
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "formId"
+      ]
+    }
+  },
+  {
+    "name": "update_form_global_event_subscription",
+    "description": "Updates (specifically, activates or deactivates) a webhook subscription.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "description": "The id of the subscription. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "active": {
+          "description": "Whether the subscription is active.",
+          "type": "boolean",
+          "nullable": false
+        }
+      },
+      "required": [
+        "subscriptionId",
+        "active"
+      ]
+    }
+  },
+  {
+    "name": "update_marketing_email",
+    "description": "Updates an existing marketing email with new values for specified fields.\n\nThis function performs a partial update (PATCH operation) on a marketing email, modifying only\nthe fields that are explicitly provided while leaving all other fields unchanged. Only the email_id\nis required; all other parameters are optional. Fields set to None are ignored and will not update\nthe corresponding email properties. This is useful for making targeted changes to email campaigns\nsuch as updating the subject line, changing the status, or modifying promotional fields without\nneeding to provide the complete email definition.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "email_id": {
+          "description": "The unique ID of the marketing email to update. Must be a non-empty string that corresponds to an existing marketing email in the database.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "name": {
+          "description": "The internal name of the email. If provided, updates the email name.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1
+        },
+        "subject": {
+          "description": "The email subject line. If provided, updates the subject.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1
+        },
+        "htmlBody": {
+          "description": "The HTML body of the email. If provided, updates the email body content.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1
+        },
+        "isTransactional": {
+          "description": "Whether this is a transactional email",
+          "type": "boolean",
+          "nullable": true,
+          "default": null
+        },
+        "status": {
+          "description": "The status of the email. Must be one of: 'sent', 'pending', 'scheduled', or 'draft'. If provided, updates the email status.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "enum": [
+            "sent",
+            "pending",
+            "scheduled",
+            "draft"
+          ]
+        },
+        "discount_code": {
+          "description": "Discount code for promotional emails. If provided, updates the discount code.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1
+        },
+        "expiration": {
+          "description": "Expiration date for time-limited offers in YYYY-MM-DD format (e.g., \"2024-12-31\"). Must be a valid date if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "launch_date": {
+          "description": "Launch date for product announcements in YYYY-MM-DD format (e.g., \"2024-01-15\"). Must be a valid date if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "sale_end_date": {
+          "description": "End date for sales promotions in YYYY-MM-DD format (e.g., \"2024-06-30\"). Must be a valid date if provided.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "reward_points": {
+          "description": "Number of reward points for loyalty program emails",
+          "type": "integer",
+          "nullable": true,
+          "default": null,
+          "minimum": 0
+        },
+        "access_code": {
+          "description": "Access code for VIP or exclusive offers. If provided, updates the access code.",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "email_id"
+      ]
+    }
+  },
+  {
+    "name": "update_marketing_event",
+    "description": "Update a marketing event.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "externalEventId": {
+          "description": "The unique identifier for the marketing event as per the external system where the event was created.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "externalAccountId": {
+          "description": "The unique identifier for the account where the event was created.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "registrants": {
+          "description": "The number of Hubscape contacts that registered for this marketing event (non-negative).",
+          "type": "integer",
+          "nullable": true,
+          "minimum": 0
+        },
+        "event_name": {
+          "description": "The name of the marketing event.",
+          "type": "string",
+          "nullable": true
+        },
+        "event_type": {
+          "description": "The type of the marketing event.",
+          "type": "string",
+          "nullable": true
+        },
+        "start_date_time": {
+          "description": "The start date and time of the marketing event. Must be in valid format (YYYY-MM-DDTHH:MM:SS).",
+          "type": "string",
+          "nullable": true,
+          "format": "date-time"
+        },
+        "end_date_time": {
+          "description": "The end date and time of the marketing event. Must be in valid format (YYYY-MM-DDTHH:MM:SS).",
+          "type": "string",
+          "nullable": true,
+          "format": "date-time"
+        },
+        "event_organizer": {
+          "description": "The organizer of the marketing event.",
+          "type": "string",
+          "nullable": true
+        },
+        "event_description": {
+          "description": "A description of the marketing event.",
+          "type": "string",
+          "nullable": true
+        },
+        "event_url": {
+          "description": "A URL for more information about the marketing event. Must be a valid absolute http or https URL when provided.",
+          "type": "string",
+          "nullable": true
+        },
+        "attendees": {
+          "description": "A dictionary of attendees for this marketing event, keyed by attendee ID. Each value is an attendee object containing attendeeId, email, eventId, externalAccountId, and optional joinedAt and leftAt timestamps in ISO 8601 format.",
+          "type": "object",
+          "nullable": true,
+          "additionalProperties": {
+            "description": "Model for individual attendee information. Shared between db_models and endpoint_models.",
+            "type": "object",
+            "properties": {
+              "attendeeId": {
+                "description": "Unique identifier for the attendee.",
+                "type": "string",
+                "nullable": false,
+                "minLength": 1
+              },
+              "email": {
+                "description": "Email address of the attendee.",
+                "type": "string",
+                "nullable": false,
+                "format": "email"
+              },
+              "eventId": {
+                "description": "External event ID.",
+                "type": "string",
+                "nullable": false,
+                "minLength": 1
+              },
+              "externalAccountId": {
+                "description": "External account ID.",
+                "type": "string",
+                "nullable": false,
+                "minLength": 1
+              },
+              "joinedAt": {
+                "description": "Timestamp when attendee joined (ISO 8601).",
+                "type": "string",
+                "nullable": true
+              },
+              "leftAt": {
+                "description": "Timestamp when attendee left (ISO 8601).",
+                "type": "string",
+                "nullable": true
+              },
+              "contactProperties": {
+                "description": "Arbitrary user-defined custom contact properties attached to the attendee (e.g., 'session_track', 'badge_type', 'dietary_preference'). Both keys and values must be strings. Defaults to an empty dictionary.",
+                "type": "object",
+                "nullable": true,
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "default": {}
+              }
+            },
+            "required": [
+              "attendeeId",
+              "email",
+              "eventId",
+              "externalAccountId"
+            ]
+          }
+        },
+        "no_shows": {
+          "description": "The number of no-shows (non-negative). Only allowed when the event is completed.",
+          "type": "integer",
+          "nullable": true,
+          "minimum": 0
+        },
+        "event_completed": {
+          "description": "Whether the event is completed.",
+          "type": "boolean",
+          "nullable": true
+        },
+        "custom_properties": {
+          "description": "Custom properties associated with the marketing event.",
+          "type": "array",
+          "nullable": true,
+          "items": {
+            "description": "Custom properties associated with the marketing event.",
+            "type": "object",
+            "properties": {
+              "sourceId": {
+                "description": "The source id of the custom property.",
+                "type": "string",
+                "nullable": true
+              },
+              "selectedByUser": {
+                "description": "Whether the property was selected by the user.",
+                "type": "boolean",
+                "nullable": true
+              },
+              "sourceLabel": {
+                "description": "The label of the source.",
+                "type": "string",
+                "nullable": true
+              },
+              "source": {
+                "description": "The source of the property.",
+                "type": "string",
+                "enum": [
+                  "ACADEMY",
+                  "ACCEPTANCE_TEST",
+                  "ACTIVITY_AUTO_ASSOCIATE",
+                  "ADS",
+                  "AI_GROUP",
+                  "ANALYTICS",
+                  "API",
+                  "APPROVALS",
+                  "ASSISTS",
+                  "ASSOCIATIONS",
+                  "AUTO_ASSOCIATE_BY_DOMAIN",
+                  "AUTOMATION_JOURNEY",
+                  "AUTOMATION_PLATFORM",
+                  "AVATARS_SERVICE",
+                  "BATCH_UPDATE",
+                  "BCC_TO_CRM",
+                  "BEHAVIORAL_EVENTS",
+                  "BET_ASSIGNMENT",
+                  "BET_CRM_CONNECTOR",
+                  "BIDEN",
+                  "BILLING",
+                  "BOT",
+                  "CALCULATED",
+                  "CENTRAL_EXCHANGE_RATES",
+                  "CHATSPOT",
+                  "CLONE_OBJECTS",
+                  "COMMUNICATOR",
+                  "COMPANIES",
+                  "COMPANY_FAMILIES",
+                  "COMPANY_INSIGHTS",
+                  "CONTACTS",
+                  "CONTACTS_WEB",
+                  "CONTENT_MEMBERSHIP",
+                  "CONVERSATIONAL_ENRICHMENT",
+                  "CONVERSATIONS",
+                  "CRM_PROCESSES_PLATFORM",
+                  "CRM_UI",
+                  "CRM_UI_BULK_ACTION",
+                  "CUSTOMER_AGENT",
+                  "DATA_ENRICHMENT",
+                  "DATASET",
+                  "DEALS",
+                  "DEFAULT",
+                  "DELETE_OBJECTS",
+                  "EMAIL",
+                  "EMAIL_INBOX_IMPORT",
+                  "EMAIL_INTEGRATION",
+                  "ENGAGEMENTS",
+                  "EXTENSION",
+                  "FILE_MANAGER",
+                  "FLYWHEEL_PRODUCT_DATA_SYNC",
+                  "FORECASTING",
+                  "FORM",
+                  "FORWARD_TO_CRM",
+                  "GRIDWELL_MAIL_INTEGRATION",
+                  "GOALS",
+                  "HEISENBERG",
+                  "HELP_DESK",
+                  "HELP_DESK_AI",
+                  "IMPORT",
+                  "INTEGRATION",
+                  "INTEGRATIONS_PLATFORM",
+                  "INTEGRATIONS_SYNC",
+                  "INTENT",
+                  "INTERNAL_PROCESSING",
+                  "LEADIN",
+                  "LEGAL_BASIS_REMEDIATION",
+                  "MARKET_SOURCING",
+                  "MARKETPLACE",
+                  "MEETINGS",
+                  "MERGE_COMPANIES",
+                  "MERGE_CONTACTS",
+                  "MERGE_OBJECTS",
+                  "MERGE_REVERT_OBJECTS",
+                  "MICROAPPS",
+                  "MIGRATION",
+                  "MOBILE_ANDROID",
+                  "MOBILE_IOS",
+                  "PAYMENTS",
+                  "PIPELINE_SETTINGS",
+                  "PLAYBOOKS",
+                  "PORTAL_OBJECT_SYNC",
+                  "PORTAL_USER_ASSOCIATOR",
+                  "PRESENTATIONS",
+                  "PRIMARY_AUTOMATION",
+                  "PROPERTY_DEFAULT_VALUE",
+                  "PROPERTY_RESTORE",
+                  "PROPERTY_SETTINGS",
+                  "PROSPECTING_AGENT",
+                  "QUOTAS",
+                  "QUOTES",
+                  "RECYCLING_BIN",
+                  "RESTORE_OBJECTS",
+                  "SALES",
+                  "SALES_MESSAGES",
+                  "SALESPOWER",
+                  "SEQUENCES",
+                  "SETTINGS",
+                  "SIDEKICK",
+                  "SIGNALS",
+                  "SLICK_INTEGRATION",
+                  "SMART_DATA_CAPTURE",
+                  "SOCIAL",
+                  "SUCCESS",
+                  "TALLY",
+                  "TASK",
+                  "UNKNOWN",
+                  "WAL_INCREMENTAL",
+                  "WORK_UI",
+                  "WORKFLOW_CONTACT_DELETE_ACTION",
+                  "WORKFLOWS"
+                ],
+                "nullable": true
+              },
+              "updatedByUserId": {
+                "description": "The id of the user who last updated the property.",
+                "type": "integer",
+                "nullable": true
+              },
+              "persistenceTimestamp": {
+                "description": "Persistence timestamp",
+                "type": "integer",
+                "nullable": true
+              },
+              "sourceMetadata": {
+                "description": "The metadata of the source.",
+                "type": "string",
+                "nullable": true
+              },
+              "dataSensitivity": {
+                "description": "The data sensitivity of the property.",
+                "type": "string",
+                "nullable": true,
+                "enum": [
+                  "high",
+                  "none",
+                  "standard"
+                ]
+              },
+              "unit": {
+                "description": "The unit of the property.",
+                "type": "string",
+                "nullable": true
+              },
+              "requestId": {
+                "description": "The request id of the property.",
+                "type": "string",
+                "nullable": true
+              },
+              "isEncrypted": {
+                "description": "Whether the property is encrypted.",
+                "type": "boolean",
+                "nullable": true
+              },
+              "name": {
+                "description": "The name of the property.",
+                "type": "string",
+                "minLength": 1
+              },
+              "useTimestampAsPersistenceTimestamp": {
+                "description": "Whether to use timestamp as persistence timestamp.",
+                "type": "boolean",
+                "nullable": true
+              },
+              "value": {
+                "description": "The value of the property.",
+                "type": "string",
+                "minLength": 1
+              },
+              "selectedByUserTimestamp": {
+                "description": "The timestamp of the property. Defaults to the current time in milliseconds.",
+                "type": "integer",
+                "nullable": true
+              },
+              "timestamp": {
+                "description": "Property timestamp",
+                "type": "integer",
+                "nullable": true
+              },
+              "isLargeValue": {
+                "description": "Whether the property is large.",
+                "type": "boolean",
+                "nullable": true
+              },
+              "sourceUpstreamDeployable": {
+                "description": "Indicates which upstream service made the property change",
+                "type": "string",
+                "nullable": true,
+                "default": "app-service",
+                "minLength": 1
+              },
+              "sourceVid": {
+                "description": "The unique identifier associated with the source.",
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "nullable": true,
+                "default": [
+                  1,
+                  2,
+                  3
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "value"
+            ]
+          }
+        }
+      },
+      "required": [
+        "externalEventId",
+        "externalAccountId"
+      ]
+    }
+  },
+  {
+    "name": "update_template_by_id",
+    "description": "Updates a template. If not all the fields are included in the body, we will only update the included fields.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "template_id": {
+          "description": "Unique identifier for the template.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "category_id": {
+          "description": "Category type (0: Unmapped, 1: Landing Pages, 2: Email, 3: Blog Post, 4: Site Page). Defaults to None.",
+          "type": "integer",
+          "nullable": true
+        },
+        "folder": {
+          "description": "The folder where the template is saved. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "minLength": 1
+        },
+        "template_type": {
+          "description": "Type of template (2: Email, 4: Page, 11: Error, etc.). Defaults to None.",
+          "type": "integer",
+          "nullable": true
+        },
+        "source": {
+          "description": "The source code of the template. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "minLength": 1
+        },
+        "path": {
+          "description": "The path where the template is saved. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "minLength": 1
+        },
+        "created": {
+          "description": "Creation timestamp in milliseconds since epoch. Defaults to None.",
+          "type": "string",
+          "nullable": true,
+          "pattern": "^\\d{13}$"
+        },
+        "is_available_for_new_content": {
+          "description": "Whether the template is available for new content. Defaults to None.",
+          "type": "boolean",
+          "nullable": true
+        },
+        "versions": {
+          "description": "List of template versions. Defaults to None.\nEach version should have:",
+          "type": "array",
+          "nullable": true,
+          "items": {
+            "description": "Model for a template version. Shared between db_models and endpoint_models.",
+            "type": "object",
+            "properties": {
+              "source": {
+                "description": "The source code of this version.",
+                "type": "string",
+                "nullable": false,
+                "minLength": 1
+              },
+              "version_id": {
+                "description": "The version identifier.",
+                "type": "string",
+                "nullable": false,
+                "minLength": 1
+              }
+            },
+            "required": [
+              "source",
+              "version_id"
+            ]
+          }
+        },
+        "label": {
+          "description": "Label of the template.",
+          "type": "string",
+          "nullable": true,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "template_id"
+      ]
+    }
+  }
+]

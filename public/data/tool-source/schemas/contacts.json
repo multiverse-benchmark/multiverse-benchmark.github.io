@@ -1,0 +1,228 @@
+[
+  {
+    "name": "create_contact",
+    "description": "Creates a new contact in your contacts.\n\nThis function creates a new contact entry in contacts using the provided personal details. The 'given_name' field is required. In addition, at least one of 'email' or 'phone' must be provided.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "given_name": {
+          "description": "First name of the contact.",
+          "type": "string",
+          "nullable": false
+        },
+        "family_name": {
+          "description": "Last name of the contact.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "email": {
+          "description": "Email address of the contact.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "phone": {
+          "description": "Phone number of the contact. Must be 7-15 digits and may include a country code with '+' prefix. Examples: '+11234567890', '1234567890', '(123) 456-7890'.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "notes": {
+          "description": "Notes or additional information about the contact.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "given_name"
+      ]
+    }
+  },
+  {
+    "name": "delete_contact",
+    "description": "Deletes a contact by resource name from your contacts.\n\nThis function deletes a contact using its specified resource name. Only your personal contacts can be deleted.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "resource_name": {
+          "description": "Contact resource name (people/*) of a personal contact to delete.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "resource_name"
+      ]
+    }
+  },
+  {
+    "name": "get_contact",
+    "description": "Retrieves detailed information about a specific contact.\n\nGets a contact by their resource name or email address, retrieving detailed information for that specific contact.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "description": "Resource name (people/*) or email address of the contact.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "identifier"
+      ]
+    }
+  },
+  {
+    "name": "get_other_contacts",
+    "description": "Retrieves contacts from the 'Other contacts' section.\n\nRetrieves contacts from the 'Other contacts' section, which contains people you have interacted with but not explicitly added to your contacts.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "max_results": {
+          "description": "Maximum number of results to return. Must be a positive integer. Defaults to 50.",
+          "type": "integer",
+          "nullable": true,
+          "default": 50
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_contacts",
+    "description": "List all contacts or filter by search query.\n\nLists all your contacts or filters them by a search query that matches against names, emails, phone numbers, notes, and organization details.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name_filter": {
+          "description": "Search query to filter contacts. Matches against names, emails, phone numbers, notes, and organization details. If None, all contacts are returned.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "max_results": {
+          "description": "Maximum number of contacts to return (default: 100).",
+          "type": "integer",
+          "nullable": true,
+          "default": 100
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_workspace_users",
+    "description": "Lists Gridwell Workspace users in your organization's directory.\n\nThis function lists users from the Gridwell Workspace directory. It allows for\nfiltering the results based on a search term and controlling the number of\nusers returned in a single request.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "Search term to find specific users. The search looks through names, email addresses, phone numbers, and organization details (name, title, department). Defaults to None. If None, all workspace users are returned.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "max_results": {
+          "description": "Maximum number of results to return. Must be a positive integer. Defaults to 50.",
+          "type": "integer",
+          "nullable": false,
+          "default": 50
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "search_contacts",
+    "description": "Search contacts by name, email, phone number, notes, or organization.\n\nSearches for contacts across all collections (myContacts, otherContacts, directory) using a provided search term. Results are deduplicated by resourceName.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "Search term to find in contacts. Matches against names, emails, phone numbers, notes, and organization details.",
+          "type": "string"
+        },
+        "max_results": {
+          "description": "Maximum number of results to return (default: 10).",
+          "type": "integer",
+          "nullable": true,
+          "default": 10
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  {
+    "name": "search_directory",
+    "description": "Performs a targeted search of your organization's Gridwell Workspace directory.\n\nSearches for people in the Gridwell Workspace directory by matching the query against names, email addresses, phone numbers, and organization details (name, title, department). Returns only workspace users (isWorkspaceUser=true), consistent with list_workspace_users.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "Search term to find directory members. Matches against names, email addresses, phone numbers, and organization details. Must be a non-empty string.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        },
+        "max_results": {
+          "description": "Maximum number of results to return. Must be a positive integer. Defaults to 20.",
+          "type": "integer",
+          "nullable": false,
+          "default": 20
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  {
+    "name": "update_contact",
+    "description": "Updates an existing contact with new information.\n\nUpdates an existing contact by applying the provided new details. At least one optional parameter must be provided to perform an update.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "resource_name": {
+          "description": "Contact resource name (people/*).",
+          "type": "string"
+        },
+        "given_name": {
+          "description": "Updated first name.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "family_name": {
+          "description": "Updated last name.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "email": {
+          "description": "Updated email address.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "phone": {
+          "description": "Updated phone number. Must be 7-15 digits and may include a country code with '+' prefix.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "notes": {
+          "description": "Updated notes or additional information about the contact.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "resource_name"
+      ]
+    }
+  }
+]

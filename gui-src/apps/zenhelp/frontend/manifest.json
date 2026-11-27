@@ -1,0 +1,12 @@
+{
+  "id": "zenhelp",
+  "name": "Zenhelp",
+  "icon": "./icons/zenhelp.svg",
+  "iconBackground": "linear-gradient(135deg, #9A3412 0%, #1C1917 100%)",
+  "description": "Zenhelp Support - Ticket Management Platform",
+  "backendService": "zenhelp",
+  "defaultWindow": {
+    "width": 1600,
+    "height": 900
+  }
+}

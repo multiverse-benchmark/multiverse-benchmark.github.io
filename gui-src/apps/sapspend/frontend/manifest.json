@@ -1,0 +1,12 @@
+{
+  "id": "sapspend",
+  "name": "Sapspend",
+  "icon": "./icons/sapspend.svg",
+  "iconBackground": "linear-gradient(135deg, #7F1D1D 0%, #78716C 55%, #FDE68A 100%)",
+  "description": "Travel booking and expense management",
+  "backendService": "sapspend",
+  "defaultWindow": {
+    "width": 1200,
+    "height": 800
+  }
+}

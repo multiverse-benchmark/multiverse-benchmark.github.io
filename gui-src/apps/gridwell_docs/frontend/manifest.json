@@ -1,0 +1,12 @@
+{
+  "id": "gridwell_docs",
+  "name": "GridwellDocs",
+  "icon": "./icons/gridwell_docs.svg",
+  "iconBackground": "linear-gradient(135deg, #0F766E 0%, #14B8A6 100%)",
+  "description": "GridwellDocs",
+  "backendService": "gridwell_docs",
+  "defaultWindow": {
+    "width": 1100,
+    "height": 750
+  }
+}

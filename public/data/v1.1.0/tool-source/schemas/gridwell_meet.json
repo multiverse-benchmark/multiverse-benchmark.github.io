@@ -1,0 +1,505 @@
+[
+  {
+    "name": "create_meeting_space",
+    "description": "Creates a new meeting space with specified configuration.\n\nThis function creates and stores a new GridwellMeet meeting space in the database\nwith a unique identifier and comprehensive configuration details including meeting\ncodes, access controls, and entry point settings. The space must have a unique name\nthat doesn't conflict with existing spaces. Once created, the space can be used to\nhost meetings and conferences with the specified access permissions and entry points.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "space_name": {
+          "description": "The unique identifier (name) for the new meeting space. This must be a non-empty string that will serve as the key to identify and retrieve the space. The name must be unique across all existing spaces in the database and cannot consist solely of whitespace characters.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        },
+        "space_content": {
+          "description": "A structured object containing all the configuration details required for the new meeting space, including the meeting code, URI, access controls, and entry point settings. All required fields within this object must be provided to successfully create the space.",
+          "type": "object",
+          "properties": {
+            "meetingCode": {
+              "description": "The unique alphanumeric code used to join this meeting space. Format per GridwellMeet REST API v2: three lowercase alphanumeric groups separated by hyphens (`[a-z0-9]+-[a-z0-9]+-[a-z0-9]+`, e.g., 'abc-mnop-xyz', 'shaw-legal-123'), max 128 characters. Must be globally unique across all meeting spaces.",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[a-z0-9]+-[a-z0-9]+-[a-z0-9]+$",
+              "nullable": false
+            },
+            "meetingUri": {
+              "description": "The complete URI participants can use to join the meeting. Per GridwellMeet REST API v2, format is 'https://meet.gridwell.com/{meetingCode}' (e.g., 'https://meet.gridwell.com/abc-mnop-xyz').",
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^https://meet\\.gridwell\\.com/[a-z0-9]+-[a-z0-9]+-[a-z0-9]+$",
+              "nullable": false
+            },
+            "accessType": {
+              "description": "Enum for meeting space access type control.",
+              "type": "string",
+              "enum": [
+                "TRUSTED",
+                "RESTRICTED",
+                "OPEN"
+              ],
+              "nullable": false
+            },
+            "entryPointAccess": {
+              "description": "Enum for entry point access control.",
+              "type": "string",
+              "enum": [
+                "ALL",
+                "CREATOR_APP_ONLY"
+              ],
+              "nullable": false,
+              "default": "ALL"
+            }
+          },
+          "required": [
+            "meetingCode",
+            "meetingUri",
+            "accessType"
+          ],
+          "nullable": false
+        }
+      },
+      "required": [
+        "space_name",
+        "space_content"
+      ]
+    }
+  },
+  {
+    "name": "end_active_conference_in_space",
+    "description": "Ends an active conference in a meeting space.\n\nThis function terminates any currently active conference in the specified meeting space\nby removing the activeConference field from the space record. This operation is\nirreversible and permanently removes all active conference data (including conference ID\nand details) from the space. The space itself remains intact and can be used for future\nmeetings. If no active conference exists in the space, the operation completes without\nerror and returns an informational message. This function is useful for cleanup operations\nor when manually terminating a conference session.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The unique identifier (name) of the meeting space in which to end the active conference. Must be a non-empty string that corresponds to an existing space in the database.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "get_conference_participant",
+    "description": "Gets a participant by ID.\n\nRetrieves comprehensive information about a specific conference participant,\nincluding their identifier, conference record, join time, and other\nparticipant-specific properties. This function is useful for fetching details\nabout a particular participant after obtaining their resource name from a list\noperation or other source.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Resource name of the participant. Must be a non-empty string that uniquely identifies the participant in the database.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "get_conference_record",
+    "description": "Gets a conference record by conference ID.\n\nRetrieves comprehensive detailed information about a specific conference record, including\nits unique identifier, start and end timestamps, descriptive name, and meeting code.\nThis function is useful for obtaining complete details about a past or ongoing conference\nsession when you have its resource name or ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Resource name of the conference record to retrieve. Must be a non-empty string that uniquely identifies the conference record in the database. This is typically the conference ID (e.g., \"conf1\", \"conf2\").",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "get_conference_recording",
+    "description": "Gets a recording by recording ID.\n\nRetrieves comprehensive information about a specific GridwellMeet recording,\nincluding its identifier, parent conference record, start time, and other\nrecording-specific properties. This function is useful for fetching details\nabout a particular recording after obtaining its resource name from a list\noperation or other source.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Resource name of the recording. Must be a non-empty string that uniquely identifies the recording in the database.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "get_conference_transcript",
+    "description": "Gets a transcript by transcript ID.\n\nRetrieves comprehensive information about a specific GridwellMeet transcript,\nincluding its identifier, parent conference record, start time, and other\ntranscript-specific properties. This function is useful for fetching details\nabout a particular transcript after obtaining its resource name from a list\noperation or other source.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Resource name of the transcript. Must be a non-empty string that uniquely identifies the transcript in the database.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "get_meeting_space_details",
+    "description": "Gets details about a meeting space.\n\nRetrieves comprehensive information about a specific GridwellMeet meeting space,\nincluding its meeting code, URI, access controls, entry point settings, and\ninformation about any active conference currently taking place in the space.\nThis function is useful for checking space configuration and availability before\njoining or modifying a meeting.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The unique identifier (name) of the meeting space to retrieve. Must be a non-empty string that corresponds to a space in the database.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "get_participant_session",
+    "description": "Gets a participant session by session ID.\n\nRetrieves comprehensive detailed information about a specific participant session, including\nthe session identifier, parent participant ID, and join timestamp. A participant session\nrepresents a single continuous period of participation in a conference - each time a\nparticipant joins and leaves creates a new session. This function is useful for obtaining\ndetails about a specific session instance when you have its resource name or ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Resource name (ID) of the participant session to retrieve. Must be a non-empty string that uniquely identifies the session in the database (e.g., \"session1\", \"session2\").",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "get_transcript_entry",
+    "description": "Gets a transcript entry by entry ID.\n\nRetrieves detailed information about a specific transcript entry,\nincluding its identifier, parent transcript, start time, and text content.\nThis function is useful for fetching details about a particular entry\nafter obtaining its resource name from a list operation or other source.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Resource name of the entry. Must be a non-empty string that uniquely identifies the entry in the database.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "list_conference_participants",
+    "description": "Lists participants of a conference record.\n\nRetrieves a paginated list of participants associated with a specific conference record.\nThis function supports pagination through the pageSize and pageToken parameters, allowing\nretrieval of large result sets in manageable chunks.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "pageSize": {
+          "description": "The maximum number of participants to return in a single page of results. Must be a positive integer (minimum 1). Defaults to 100 if not specified. Use smaller values for faster responses or larger values to reduce the number of API calls needed to retrieve all participants.",
+          "type": "integer",
+          "default": 100,
+          "minimum": 1,
+          "nullable": false
+        },
+        "pageToken": {
+          "description": "The token for continued list pagination. Use the nextPageToken from a previous response to retrieve the next page of results. Defaults to None.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": true,
+          "default": null
+        },
+        "parent": {
+          "description": "The parent conference record resource name. Must be a non-empty string.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        }
+      },
+      "required": [
+        "parent"
+      ]
+    }
+  },
+  {
+    "name": "list_conference_recordings",
+    "description": "Lists the recordings of a conference.\n\nRetrieves a paginated list of recordings associated with a specific conference record.\nThe recordings are sorted chronologically by start time in ascending order. This function\nsupports pagination through the pageSize and pageToken parameters, allowing retrieval\nof large result sets in manageable chunks. If the parent parameter's last segment\ndoesn't match the parent_conference_record, an error response is returned.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "description": "The parent resource name. Must be a non-empty string in the format 'conferenceRecords/{conferenceRecordId}'.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        },
+        "parent_conference_record": {
+          "description": "The parent conference record ID. Must be a non-empty string that matches the last segment of the parent resource name.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        },
+        "pageSize": {
+          "description": "The maximum number of recordings to return in a single page of results. Must be a positive integer (minimum 1). Defaults to 100 if not specified. Use smaller values for faster responses or larger values to reduce the number of API calls needed to retrieve all recordings.",
+          "type": "integer",
+          "default": 100,
+          "minimum": 1,
+          "nullable": false
+        },
+        "pageToken": {
+          "description": "The token for continued list pagination. Use the nextPageToken from a previous response to retrieve the next page of results. Defaults to None.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "parent",
+        "parent_conference_record"
+      ]
+    }
+  },
+  {
+    "name": "list_conference_records",
+    "description": "Lists conference records with optional filtering and pagination.\n\nRetrieves a paginated list of conference records from the database, optionally filtered\nusing a user specified filtering condition in EBNF format. Results are automatically\nordered by start time in descending chronological order (most recent conferences first),\nmaking it easy to view the latest meeting activity. This function supports pagination to\nefficiently handle large numbers of conference records, allowing clients to retrieve\nresults in manageable chunks.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "pageSize": {
+          "description": "The maximum number of conference records to return in a single page of results. Must be a positive integer (minimum 1). Defaults to 100 if not specified. Use smaller values for faster responses or larger values to reduce the number of API calls needed to retrieve all records.",
+          "type": "integer",
+          "default": 100,
+          "minimum": 1,
+          "nullable": false
+        },
+        "pageToken": {
+          "description": "A pagination token obtained from a previous list_conference_records call. Use this to retrieve the next page of results. If not provided or set to None, the first page of results is returned. The token represents the starting index for the next set of results. Defaults to None.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": true,
+          "default": null
+        },
+        "filter": {
+          "description": "User specified filtering condition in EBNF format. The following are the filterable fields: space.meeting_code, space.name, start_time, end_time. For example: space.name = \"spaces/NAME\", space.meeting_code = \"abc-mnop-xyz\", start_time>=\"2024-01-01T00:00:00.000Z\" AND start_time<=\"2024-01-02T00:00:00.000Z\", end_time IS NULL. Multiple conditions can be combined using AND. If not provided, all records are returned. Defaults to None.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "list_conference_transcript",
+    "description": "Lists the transcripts of a conference.\n\nRetrieves a paginated list of transcripts associated with a specific conference record.\nThe transcripts are sorted chronologically by start time in ascending order. This function\nsupports pagination through the pageSize and pageToken parameters, allowing retrieval\nof large result sets in manageable chunks.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "pageSize": {
+          "description": "The maximum number of transcripts to return in a single page of results. Must be a positive integer (minimum 1). Defaults to 100 if not specified. Use smaller values for faster responses or larger values to reduce the number of API calls needed to retrieve all transcripts.",
+          "type": "integer",
+          "default": 100,
+          "minimum": 1,
+          "nullable": false
+        },
+        "pageToken": {
+          "description": "The token for continued list pagination. Use the nextPageToken from a previous response to retrieve the next page of results. Defaults to None.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": true,
+          "default": null
+        },
+        "parent": {
+          "description": "The parent conference record resource name. Must be a non-empty string.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        }
+      },
+      "required": [
+        "parent"
+      ]
+    }
+  },
+  {
+    "name": "list_participant_sessions",
+    "description": "Lists the sessions of a participant with optional filtering and pagination.\n\nRetrieves all sessions associated with the specified participant from the database, optionally\nfiltered by a search string. A participant session represents a single continuous period of\nparticipation in a conference - each time a participant joins and leaves creates a new session.\nResults are automatically ordered by join time in ascending chronological order (earliest\nsessions first), making it easy to track a participant's meeting history. This function supports\npagination to efficiently handle participants with many sessions across multiple meetings.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "pageSize": {
+          "description": "The maximum number of sessions to return in a single page of results. Must be a positive integer (minimum 1). Defaults to 100 if not specified. Use smaller values for faster responses or larger values to reduce the number of API calls needed to retrieve all sessions.",
+          "type": "integer",
+          "default": 100,
+          "minimum": 1,
+          "nullable": false
+        },
+        "pageToken": {
+          "description": "A pagination token obtained from a previous list_participant_sessions call. Use this to retrieve the next page of results. If not provided or set to None, the first page of results is returned. The token represents the starting index for the next set of results.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": true,
+          "default": null
+        },
+        "parent": {
+          "description": "The parent participant resource name (participant ID). Must be a non-empty string that identifies the participant whose sessions should be retrieved. This participant must exist in the database.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        },
+        "filter": {
+          "description": "An optional filter string to apply to the sessions. The filter is applied to the string representation of each session object in a case-insensitive manner, allowing you to search for sessions containing specific text patterns. If not provided, all sessions for the participant are returned.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "parent"
+      ]
+    }
+  },
+  {
+    "name": "list_transcript_entries",
+    "description": "Lists the entries of a transcript.\n\nRetrieves a paginated list of entries associated with a specific transcript.\nThe entries are sorted chronologically by start time in ascending order. This function\nsupports pagination through the pageSize and pageToken parameters, allowing retrieval\nof large result sets in manageable chunks.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "pageSize": {
+          "description": "The maximum number of entries to return in a single page of results. Must be a positive integer (minimum 1). Defaults to 100 if not specified. Use smaller values for faster responses or larger values to reduce the number of API calls needed to retrieve all entries.",
+          "type": "integer",
+          "default": 100,
+          "minimum": 1,
+          "nullable": false
+        },
+        "pageToken": {
+          "description": "The token for continued list pagination. Use the nextPageToken from a previous response to retrieve the next page of results. Defaults to None.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": true,
+          "default": null
+        },
+        "parent": {
+          "description": "The parent transcript resource name. Must be a non-empty string.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        }
+      },
+      "required": [
+        "parent"
+      ]
+    }
+  },
+  {
+    "name": "update_meeting_space",
+    "description": "Updates specific fields of an existing meeting space.\n\nPerforms a partial update (PATCH operation) on a meeting space, modifying only the\nfields specified in the update_mask parameter while leaving all other fields unchanged.\nOnly fields with non-null values in the update_mask are applied; fields set to null\nare skipped. This function is useful for making targeted configuration changes to a\nspace without needing to provide the complete space definition. Common use cases include\nchanging access controls, updating meeting codes/URIs, or managing active conference\ninformation. To remove an active conference, use end_active_conference_in_space instead.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The unique identifier (name) of the meeting space to update. Must be a non-empty string that corresponds to an existing space in the database.",
+          "type": "string",
+          "minLength": 1,
+          "nullable": false
+        },
+        "update_mask": {
+          "description": "A dictionary specifying which fields of the meeting space should be updated and their new values. Only fields with non-null values are applied; fields set to null are skipped and left unchanged. Fields not included in this dictionary remain unmodified. If None or an empty dictionary is provided, no changes will be made to the space. This enables precise, granular updates to space configuration.",
+          "type": "object",
+          "properties": {
+            "meetingCode": {
+              "description": "The unique alphanumeric code used to join this meeting space. When updating, this code must remain globally unique. Format per GridwellMeet REST API v2: three lowercase alphanumeric groups separated by hyphens (`[a-z0-9]+-[a-z0-9]+-[a-z0-9]+`, e.g., 'abc-mnop-xyz', 'shaw-legal-123'), max 128 characters.",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[a-z0-9]+-[a-z0-9]+-[a-z0-9]+$",
+              "nullable": true,
+              "default": null
+            },
+            "meetingUri": {
+              "description": "The complete URI participants can use to join the meeting. Per GridwellMeet REST API v2, format is 'https://meet.gridwell.com/{meetingCode}' (e.g., 'https://meet.gridwell.com/abc-mnop-xyz').",
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^https://meet\\.gridwell\\.com/[a-z0-9]+-[a-z0-9]+-[a-z0-9]+$",
+              "nullable": true,
+              "default": null
+            },
+            "accessType": {
+              "description": "Enum for meeting space access type control.",
+              "type": "string",
+              "enum": [
+                "TRUSTED",
+                "RESTRICTED",
+                "OPEN"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "entryPointAccess": {
+              "description": "Enum for entry point access control.",
+              "type": "string",
+              "enum": [
+                "ALL",
+                "CREATOR_APP_ONLY"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "activeConference": {
+              "description": "Model for active conference information within a space.\n\nUsed by both DB validation and API endpoint validation.\nPer API documentation:\n- conferenceId is REQUIRED when activeConference is present\n- details is OPTIONAL\n- Other fields (status, startTime) are NOT documented and should be rejected",
+              "type": "object",
+              "properties": {
+                "conferenceId": {
+                  "description": "The unique identifier for the currently active conference in this space. Must be a non-empty string.",
+                  "type": "string",
+                  "minLength": 1,
+                  "nullable": false
+                },
+                "details": {
+                  "description": "Additional descriptive details about the currently active conference, such as the meeting title, purpose, or other contextual information.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                }
+              },
+              "required": [
+                "conferenceId"
+              ],
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": [],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  }
+]

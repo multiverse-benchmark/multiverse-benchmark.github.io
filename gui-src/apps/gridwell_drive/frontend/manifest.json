@@ -1,0 +1,12 @@
+{
+  "id": "gridwell_drive",
+  "name": "GridwellDrive",
+  "icon": "./icons/gridwell_drive.svg",
+  "iconBackground": "linear-gradient(135deg, #0D9488 0%, #0891B2 100%)",
+  "description": "GridwellDrive file storage",
+  "backendService": "gridwell_drive",
+  "defaultWindow": {
+    "width": 1400,
+    "height": 800
+  }
+}

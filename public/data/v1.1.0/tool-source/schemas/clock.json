@@ -1,0 +1,945 @@
+[
+  {
+    "name": "change_alarm_state",
+    "description": "Changes an alarm's state or bulk changes all alarms' state. Either provide at least one filter parameter (alarm_ids, alarm_type, time_of_day, label, date, start_date, end_date) or set bulk_operation=true to operate on all alarms.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "alarm_ids": {
+          "description": "List of alarm IDs to change state for (e.g., [\"ALARM-1\", \"ALARM-2\"]).",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true,
+          "default": null
+        },
+        "alarm_type": {
+          "description": "Type of the alarm to be modified. Valid values: \"UPCOMING\" (scheduled for future), \"ACTIVE\" (will fire, currently firing, or snoozed), \"DISABLED\" (turned off, cancelled, dismissed, stopped, or paused).",
+          "type": "string",
+          "enum": [
+            "UPCOMING",
+            "ACTIVE",
+            "DISABLED"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "time_of_day": {
+          "description": "Time of the day of the alarm in strict HH:MM:SS format (e.g., '13:30:00', '01:00:00').",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "am_pm_or_unknown": {
+          "description": "One of 'AM', 'PM' or 'UNKNOWN'.",
+          "type": "string",
+          "enum": [
+            "AM",
+            "PM",
+            "UNKNOWN"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "label": {
+          "description": "Alarm label to filter by (e.g., \"Morning workout\", \"Take medicine\"). Max 200 characters.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "state_operation": {
+          "description": "Operation to change the alarm state. Required. One of: \"ENABLE\" (activate a turned-off alarm; auto-reschedules if fire_time is past), \"DISABLE\" (turn off without deleting; preserves schedule), \"DELETE\" (permanently remove), \"CANCEL\" (cancel the alarm), \"DISMISS\" (for recurring alarms: advances to next recurrence day and stays ACTIVE, also works as pre-fire skip; for non-recurring alarms: sets state to DISMISSED), \"STOP\" (stop the alarm), \"PAUSE\" (pause the alarm), \"SNOOZE\" (postpone by configured snooze duration; updates fire_time but preserves original time_of_day and date).",
+          "type": "string",
+          "enum": [
+            "ENABLE",
+            "DISABLE",
+            "DELETE",
+            "CANCEL",
+            "DISMISS",
+            "STOP",
+            "PAUSE",
+            "SNOOZE"
+          ]
+        },
+        "date": {
+          "description": "The date of the alarm to be modified. Format: YYYY-MM-DD (e.g., \"2024-12-25\").",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "start_date": {
+          "description": "Filter for alarm scheduled to fire on or after this date. Format: YYYY-MM-DD (e.g., \"2024-12-25\").",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "end_date": {
+          "description": "Filter for alarm scheduled to fire on or before this date. Format: YYYY-MM-DD (e.g., \"2024-12-25\").",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "bulk_operation": {
+          "description": "Set to true when the user wants to change state of multiple alarms matched by filters (label, type, date) or all alarms when no filters are given. Skip this if multiple alarm_ids are provided.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        }
+      },
+      "required": [
+        "state_operation"
+      ]
+    }
+  },
+  {
+    "name": "change_timer_state",
+    "description": "Changes timers' state such as to resume, pause, reset, cancel, delete, stop, dismiss etc. Either provide at least one filter parameter (timer_ids, timer_type, duration, label) or set bulk_operation=true to operate on all timers.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "timer_ids": {
+          "description": "List of timer IDs to change state for (e.g., [\"TIMER-1\", \"TIMER-2\"]).",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true,
+          "default": null
+        },
+        "timer_type": {
+          "description": "Type of the timer. Valid values: \"UPCOMING\" (scheduled to fire in future), \"RUNNING\" (actively counting), \"PAUSED\" (temporarily stopped, cancelled, stopped, or reset).",
+          "type": "string",
+          "enum": [
+            "UPCOMING",
+            "RUNNING",
+            "PAUSED"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "duration": {
+          "description": "Duration of the timer to filter for. Format: \"<hours>h<minutes>m<seconds>s\", e.g., \"10m\", \"1h30m\", \"45s\".",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "label": {
+          "description": "The label of the timer to change state for (e.g., \"Cooking timer\", \"Study break\"). Max 200 characters.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "state_operation": {
+          "description": "Operation to change the timer state. One of: \"PAUSE\", \"RESUME\", \"RESET\", \"DELETE\", \"CANCEL\", \"DISMISS\", \"STOP\".",
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "PAUSE",
+            "RESUME",
+            "RESET",
+            "DELETE",
+            "CANCEL",
+            "DISMISS",
+            "STOP"
+          ]
+        },
+        "bulk_operation": {
+          "description": "Set to true when the user wants to change state of multiple timers matched by filters (label, type, duration) or all timers when no filters are given. Skip this if multiple timer_ids are provided.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        }
+      },
+      "required": [
+        "state_operation"
+      ]
+    }
+  },
+  {
+    "name": "create_alarm",
+    "description": "Create a new alarm.\n\nThis method can:\n1) Create an alarm with a given duration. (For example, set an alarm for 15 minutes.)\n2) Create an alarm at a specific time of the day. (For example, set an alarm at 10:30am.)\n\nEither duration or time must be provided. If both duration and time are provided, duration takes precedence.\nTime must be provided if recurrence is provided and duration cannot be used with recurrence.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "description": "Duration of the alarm. Format: \"<hours>h<minutes>m<seconds>s\", e.g., \"5h30m20s\", \"10m\", \"2m15s\", \"5h\", or \"45s\". Any combination of these units is allowed, but the total duration must be greater than 0 seconds.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "time": {
+          "description": "Time of the day that the alarm should fire. Supports 24-hour format (\"HH:MM\", \"HH:MM:SS\") and 12-hour format (\"HH:MM AM/PM\", \"HH:MM:SS AM/PM\"). Examples: \"9:30:00\", \"14:30\", \"7:00 AM\", \"2:30 PM\", \"6:00PM\", \"5:30pm\".",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "date": {
+          "description": "Scheduled date in format of YYYY-MM-DD (e.g., \"2024-12-25\").",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "label": {
+          "description": "Label of the alarm (e.g., \"Morning workout\", \"Take medicine\"). Max 200 characters.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "recurrence": {
+          "description": "Recurrence days. Valid values: \"SUNDAY\", \"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\", \"SATURDAY\", \"sunday\", \"monday\", \"tuesday\", \"wednesday\", \"thursday\", \"friday\", \"saturday\".",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "SUNDAY",
+              "MONDAY",
+              "TUESDAY",
+              "WEDNESDAY",
+              "THURSDAY",
+              "FRIDAY",
+              "SATURDAY",
+              "sunday",
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday",
+              "saturday"
+            ]
+          },
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "create_clock",
+    "description": "Creates a clock object which can either be a timer or an alarm.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "Type of the clock component. Either \"TIMER\" or \"ALARM\".",
+          "type": "string",
+          "enum": [
+            "TIMER",
+            "ALARM"
+          ],
+          "nullable": false
+        },
+        "duration": {
+          "description": "Duration of the timer or alarm. Format: \"<hours>h<minutes>m<seconds>s\", e.g., \"5h30m20s\", \"10m\", \"2m15s\", \"5h\", or \"45s\". Any combination of these units is allowed, but the total duration must be greater than 0 seconds.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "time_of_day": {
+          "description": "Time of the day in strict HH:MM:SS format (e.g., '13:30:00', '01:00:00').",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "am_pm_or_unknown": {
+          "description": "One of 'AM', 'PM', or 'UNKNOWN'.",
+          "type": "string",
+          "enum": [
+            "AM",
+            "PM",
+            "UNKNOWN"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "date": {
+          "description": "Scheduled date in format of YYYY-MM-DD. Only applicable for alarms.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "label": {
+          "description": "Label of the timer or alarm. Max 200 characters.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "recurrence": {
+          "description": "Recurrence days. Valid values: \"SUNDAY\", \"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\", \"SATURDAY\", \"sunday\", \"monday\", \"tuesday\", \"wednesday\", \"thursday\", \"friday\", \"saturday\". Only applicable for alarms.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "SUNDAY",
+              "MONDAY",
+              "TUESDAY",
+              "WEDNESDAY",
+              "THURSDAY",
+              "FRIDAY",
+              "SATURDAY",
+              "sunday",
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday",
+              "saturday"
+            ],
+            "nullable": false
+          },
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": [
+        "type"
+      ]
+    }
+  },
+  {
+    "name": "create_timer",
+    "description": "Create a new timer.\n\nThis method can:\n1) Create a timer with a given duration. (For example, set a timer for 10 minutes.)\n2) Create a timer for a specific time. (For example, set a timer to go off at 10:30.)\n\nEither duration or time must be provided. If both duration and time are provided, duration takes precedence.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "description": "Duration of the timer. Format: \"<hours>h<minutes>m<seconds>s\", e.g., \"5h30m20s\", \"10m\", \"2m15s\", \"5h\", or \"45s\". Any combination of these units is allowed, but the total duration must be greater than 0 seconds.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "time": {
+          "description": "Time of the day that the timer should fire. Supports 24-hour format (\"HH:MM\", \"HH:MM:SS\") and 12-hour format (\"HH:MM AM/PM\", \"HH:MM:SS AM/PM\"). Examples: \"9:30:00\", \"14:30\", \"7:00 AM\", \"2:30 PM\", \"6:00PM\", \"5:30pm\".",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "label": {
+          "description": "Label of the timer (e.g., \"Cooking timer\", \"Study break\"). Max 200 characters.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "lap_stopwatch",
+    "description": "Records a lap time for the currently running stopwatch.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "modify_alarm",
+    "description": "Modifies when alarm(s) should go off. Either provide at least one filter parameter (query, alarm_type, alarm_ids, date) or set bulk_operation=true to operate on all alarms.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "Either the exact time or the label of the alarm (case insensitive). Time supports 24-hour format (\"HH:MM\", \"HH:MM:SS\") and 12-hour format (\"HH:MM AM/PM\", \"HH:MM:SS AM/PM\"). Examples: \"9:30\", \"7:00 AM\", \"medicine alarm\".",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "alarm_type": {
+          "description": "Type of the alarm to be modified (case insensitive). Valid values: \"UPCOMING\" (scheduled for future), \"ACTIVE\" (will fire, currently firing, or snoozed), \"DISABLED\" (turned off, cancelled, dismissed, stopped, or paused). Examples: \"upcoming\", \"ACTIVE\", \"disabled\".",
+          "type": "string",
+          "enum": [
+            "UPCOMING",
+            "ACTIVE",
+            "DISABLED"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "new_time_of_day": {
+          "description": "The new time of the day in strict HH:MM:SS format (e.g., '13:30:00', '01:00:00').",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "new_am_pm_or_unknown": {
+          "description": "One of 'AM', 'PM' or 'UNKNOWN'.",
+          "type": "string",
+          "enum": [
+            "AM",
+            "PM",
+            "UNKNOWN"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "new_label": {
+          "description": "The new label to be updated to (e.g., \"Morning workout\", \"Take medicine\"). Max 200 characters.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "alarm_ids": {
+          "description": "List of alarm IDs to modify (e.g., [\"ALARM-1\", \"ALARM-2\"]).",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true,
+          "default": null
+        },
+        "duration_to_add": {
+          "description": "The duration to add to the current alarm. Format: \"<hours>h<minutes>m<seconds>s\", e.g., \"30m\", \"1h15m\", \"45s\".",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "date": {
+          "description": "The alarm with the date that should modify for. Format: YYYY-MM-DD (e.g., \"2024-12-25\").",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "new_date": {
+          "description": "The new date that the alarm should be updated to. Format: YYYY-MM-DD (e.g., \"2024-12-25\").",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "new_recurrence": {
+          "description": "New recurrence pattern. Valid values: [\"SUNDAY\", \"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\", \"SATURDAY\", \"sunday\", \"monday\", \"tuesday\", \"wednesday\", \"thursday\", \"friday\", \"saturday\"].",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "SUNDAY",
+              "MONDAY",
+              "TUESDAY",
+              "WEDNESDAY",
+              "THURSDAY",
+              "FRIDAY",
+              "SATURDAY",
+              "sunday",
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday",
+              "saturday"
+            ]
+          },
+          "nullable": true,
+          "default": null
+        },
+        "bulk_operation": {
+          "description": "Set to true when the user wants to modify multiple alarms matched by filters (query, type, date) or to modify all alarms when no filters are given. Skip this if multiple alarm_ids are provided.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "modify_alarm_v2",
+    "description": "Modifies an alarm or multiple alarms, including their label, time, date, recurrence, and state. Supports deleting alarms via the state_operation parameter. Either provide at least one filter parameter (time, label, date_range, date, alarm_type, alarm_ids) or set bulk_operation=true to operate on all alarms.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "description": "Filters to identify the existing alarms that need to be modified.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "time": {
+              "description": "The time that the alarm will fire. Supports 24-hour format (\"HH:MM\", \"HH:MM:SS\") and 12-hour format (\"HH:MM AM/PM\", \"HH:MM:SS AM/PM\"). Examples: \"9:30:00\", \"14:30\", \"7:00 AM\", \"2:30 PM\".",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "label": {
+              "description": "The label of the alarm to filter for (e.g., \"Morning workout\", \"Take medicine\"). Max 200 characters.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "date_range": {
+              "description": "Date range to filter alarms within a specific period. Note: To represent a single date, make start_date and end_date the same.",
+              "type": "object",
+              "nullable": true,
+              "default": null,
+              "properties": {
+                "start_date": {
+                  "description": "Start date in YYYY-MM-DD format. Must not be in the past.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                },
+                "end_date": {
+                  "description": "End date in YYYY-MM-DD format. Must not be in the past.",
+                  "type": "string",
+                  "nullable": true,
+                  "default": null
+                }
+              },
+              "required": []
+            },
+            "date": {
+              "description": "Filter alarms scheduled to fire on a specific date. Format: YYYY-MM-DD (e.g., \"2024-12-25\"). This is a convenience field that can be used instead of date_range for single-date filtering.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "alarm_type": {
+              "description": "Type of the alarm (case insensitive). Valid values: \"UPCOMING\", \"DISABLED\", \"ACTIVE\", \"SNOOZED\". Examples: \"upcoming\", \"ACTIVE\", \"disabled\", \"snoozed\".",
+              "type": "string",
+              "enum": [
+                "UPCOMING",
+                "DISABLED",
+                "ACTIVE",
+                "SNOOZED"
+              ],
+              "nullable": true,
+              "default": null
+            },
+            "alarm_ids": {
+              "description": "List of alarm IDs to filter for.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": []
+        },
+        "modifications": {
+          "description": "A dictionary of changes to apply.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "time": {
+              "description": "New time that the alarm should fire at. Supports 24-hour format (\"HH:MM\", \"HH:MM:SS\") and 12-hour format (\"HH:MM AM/PM\", \"HH:MM:SS AM/PM\"). Examples: \"9:30:00\", \"14:30\", \"7:00 AM\", \"2:30 PM\".",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "duration_to_add": {
+              "description": "Duration to add to the alarm. Format: \"<hours>h<minutes>m<seconds>s\" (e.g., \"1h00m00s\", \"30m\", \"15s\"). Must be greater than 0 seconds.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "date": {
+              "description": "Date that the alarm should be updated to, in YYYY-MM-DD format (e.g., \"2024-12-25\").",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "label": {
+              "description": "Label that the alarm should be updated to (e.g., \"Morning workout\", \"Take medicine\").",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "recurrence": {
+              "description": "List of recurrence days, valid values: [\"SUNDAY\", \"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\", \"SATURDAY\", \"sunday\", \"monday\", \"tuesday\", \"wednesday\", \"thursday\", \"friday\", \"saturday\"].",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "SUNDAY",
+                  "MONDAY",
+                  "TUESDAY",
+                  "WEDNESDAY",
+                  "THURSDAY",
+                  "FRIDAY",
+                  "SATURDAY",
+                  "sunday",
+                  "monday",
+                  "tuesday",
+                  "wednesday",
+                  "thursday",
+                  "friday",
+                  "saturday"
+                ]
+              },
+              "nullable": true,
+              "default": null
+            },
+            "state_operation": {
+              "description": "State operation to perform (case insensitive). One of: \"ENABLE\" (activate a turned-off alarm; if fire_time is in the past, auto-reschedules to the next valid time), \"DISABLE\" (turn off the alarm so it will not fire, but keep its schedule for later re-enabling), \"DELETE\" (permanently remove the alarm from the system), \"CANCEL\" (cancel the alarm, similar to disable but semantically indicates user no longer wants it), \"DISMISS\" (acknowledge/dismiss the alarm; for recurring alarms this advances fire_time and date to the next valid recurrence day and the alarm stays ACTIVE; for non-recurring alarms the alarm is set to DISMISSED state; can also be used to skip/dismiss a future occurrence of a recurring alarm before it fires), \"STOP\" (stop the alarm), \"PAUSE\" (pause the alarm), \"SNOOZE\" (postpone a firing alarm by the configured snooze duration; updates fire_time but preserves the original time_of_day and date).",
+              "type": "string",
+              "enum": [
+                "ENABLE",
+                "DISABLE",
+                "DELETE",
+                "CANCEL",
+                "DISMISS",
+                "STOP",
+                "PAUSE",
+                "SNOOZE"
+              ],
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": []
+        },
+        "bulk_operation": {
+          "description": "Set to true when the user wants to modify multiple alarms matched by filters (label, type, date) or to modify all alarms when no filters are given. Skip this if multiple alarm_ids are provided in filters.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "modify_timer",
+    "description": "Modifies timer(s)'s duration or label. Either provide at least one filter parameter (query, timer_type, timer_ids) or set bulk_operation=true to operate on all timers.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "Either the duration or the label of the timer. Duration format: \"<hours>h<minutes>m<seconds>s\" (e.g., \"10m\", \"1h30m\").",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "timer_type": {
+          "description": "Type of the timer (case insensitive). Valid values: \"UPCOMING\" (scheduled to fire in future), \"RUNNING\" (actively counting), \"PAUSED\" (temporarily stopped, cancelled, stopped, or reset). Examples: \"running\", \"PAUSED\", \"upcoming\".",
+          "type": "string",
+          "nullable": true,
+          "default": null,
+          "enum": [
+            "UPCOMING",
+            "RUNNING",
+            "PAUSED"
+          ]
+        },
+        "new_duration": {
+          "description": "New duration that the timer should be updated to. Format: \"<hours>h<minutes>m<seconds>s\", e.g., \"10m\", \"1h30m\", \"45s\". Must be greater than 0 seconds.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "duration_to_add": {
+          "description": "The duration to add to the current timer. Format: \"<hours>h<minutes>m<seconds>s\", e.g., \"30s\", \"5m\", \"1h\". Must be greater than 0 seconds.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "new_label": {
+          "description": "The new label to be updated to (e.g., \"Cooking timer\", \"Study break\"). Max 200 characters.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "timer_ids": {
+          "description": "List of timer IDs to modify (e.g., [\"TIMER-1\", \"TIMER-2\"]).",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true,
+          "default": null
+        },
+        "bulk_operation": {
+          "description": "Set to true when the user wants to modify multiple timers matched by filters (query, type) or to modify all timers when no filters are given. Skip this if multiple timer_ids are provided.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "modify_timer_v2",
+    "description": "Modifies a timer or multiple timers' label, duration, or state. Either provide at least one filter parameter (duration, label, timer_type, timer_ids) or set bulk_operation=true to operate on all timers.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "description": "A dictionary of key-value pairs to filter timers.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "duration": {
+              "description": "Duration of the timer. Format: \"<hours>h<minutes>m<seconds>s\", e.g., \"2h00m00s\", \"10m\", \"45s\".",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "label": {
+              "description": "Label of the timer to filter for (e.g., \"Cooking timer\", \"Study break\"). Max 200 characters.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "timer_type": {
+              "description": "Type of timer (case insensitive). \"UPCOMING\" (scheduled to fire in future), \"RUNNING\" (actively counting), \"PAUSED\" (temporarily stopped, cancelled, stopped, or reset).",
+              "type": "string",
+              "nullable": true,
+              "default": null,
+              "enum": [
+                "UPCOMING",
+                "RUNNING",
+                "PAUSED"
+              ]
+            },
+            "timer_ids": {
+              "description": "List of timer IDs to filter for.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "nullable": true,
+              "default": null
+            }
+          },
+          "required": []
+        },
+        "modifications": {
+          "description": "A dictionary specifying the changes to apply. Either 'duration' or 'duration_to_add' can be provided, but not both simultaneously.",
+          "type": "object",
+          "nullable": true,
+          "default": null,
+          "properties": {
+            "duration": {
+              "description": "The new total duration. Format: \"<hours>h<minutes>m<seconds>s\", e.g., \"10m\", \"1h30m\", \"45s\". Sets the timer to this duration and immediately starts it running. Must be greater than 0 seconds.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "duration_to_add": {
+              "description": "A duration to add to the timer's current duration. Format: '<hours>h<minutes>m<seconds>s', e.g., '30s', '5m', '1h'. Must be greater than 0 seconds.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "label": {
+              "description": "The new label for the timer (e.g., \"Cooking timer\", \"Study break\"). Max 200 characters.",
+              "type": "string",
+              "nullable": true,
+              "default": null
+            },
+            "state_operation": {
+              "description": "An operation to change the timer's state (case insensitive). Valid values: 'PAUSE', 'RESUME', 'RESET', 'DELETE', 'CANCEL', 'DISMISS', 'STOP'.",
+              "type": "string",
+              "nullable": true,
+              "default": null,
+              "enum": [
+                "PAUSE",
+                "RESUME",
+                "RESET",
+                "DELETE",
+                "CANCEL",
+                "DISMISS",
+                "STOP"
+              ]
+            }
+          },
+          "required": []
+        },
+        "bulk_operation": {
+          "description": "Set to true when the user wants to modify multiple timers matched by filters (label, type, duration) or to modify all timers when no filters are given. Skip this if multiple timer_ids are provided in filters.",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "pause_stopwatch",
+    "description": "Pauses the currently running stopwatch.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "reset_stopwatch",
+    "description": "Resets the stopwatch to 00:00:00 and clears all lap times.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "show_matching_alarms",
+    "description": "Shows the matching alarms to the user.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "Either the exact time or the label of the alarm (case insensitive). Time supports 24-hour format (\"HH:MM\", \"HH:MM:SS\") and 12-hour format (\"HH:MM AM/PM\", \"HH:MM:SS AM/PM\"). Examples: \"9:30\", \"7:00 AM\", \"medicine alarm\".",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "alarm_type": {
+          "description": "Type of the alarm to show (case insensitive). Valid values: \"UPCOMING\" (scheduled for future), \"ACTIVE\" (will fire, currently firing, or snoozed), \"DISABLED\" (turned off, cancelled, dismissed, stopped, or paused), \"SNOOZED\" (currently snoozed). Examples: \"upcoming\", \"ACTIVE\", \"disabled\", \"snoozed\". Internally maps to alarm state groups (ACTIVE includes SNOOZED; UPCOMING uses future fire_time).",
+          "type": "string",
+          "enum": [
+            "UPCOMING",
+            "ACTIVE",
+            "DISABLED",
+            "SNOOZED"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "alarm_ids": {
+          "description": "Alarm ids to filter by (e.g., [\"ALARM-1\", \"ALARM-2\"]).",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true,
+          "default": null
+        },
+        "date": {
+          "description": "The date to show alarms for. Format: YYYY-MM-DD (e.g., \"2024-12-25\").",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "start_date": {
+          "description": "Filter for alarm scheduled to fire on or after this date. Format: YYYY-MM-DD (e.g., \"2024-12-25\").",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "end_date": {
+          "description": "Filter for alarm scheduled to fire on or before this date. Format: YYYY-MM-DD (e.g., \"2024-12-25\").",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "show_matching_timers",
+    "description": "Shows the matching timers to the user.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "Either the duration, time, or the label of the timer (case insensitive). Duration format: \"<hours>h<minutes>m<seconds>s\" (e.g., \"10m\", \"1h30m\"). Time supports 24-hour format (\"HH:MM\", \"HH:MM:SS\") and 12-hour format (\"HH:MM AM/PM\", \"HH:MM:SS AM/PM\"). Examples: \"10m\", \"9:30\", \"7:00 AM\".",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "timer_type": {
+          "description": "Type of the timer to show (case insensitive). Valid values: \"UPCOMING\" (scheduled to fire in future), \"RUNNING\" (actively counting), \"PAUSED\" (stopped, cancelled, reset, or paused). Examples: \"running\", \"PAUSED\", \"upcoming\". Internally maps to timer state filters (UPCOMING uses future fire_time, PAUSED covers paused/reset/stopped/cancelled).",
+          "type": "string",
+          "enum": [
+            "UPCOMING",
+            "PAUSED",
+            "RUNNING"
+          ],
+          "nullable": true,
+          "default": null
+        },
+        "timer_ids": {
+          "description": "List of timer IDs to show (e.g., [\"TIMER-1\", \"TIMER-2\"]).",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "show_stopwatch",
+    "description": "Opens the stopwatch app to show the state of the stopwatch.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "snooze",
+    "description": "Snoozes an alarm that is firing.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "time": {
+          "description": "The time to snooze until. Supports 24-hour format (\"HH:MM\", \"HH:MM:SS\") and 12-hour format (\"HH:MM AM/PM\", \"HH:MM:SS AM/PM\"). Examples: \"9:30:00\", \"14:30\", \"7:00 AM\", \"2:30 PM\".",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "duration": {
+          "description": "Duration to snooze the alarm, in seconds (e.g., 300 for 5 minutes, 600 for 10 minutes).",
+          "type": "integer",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "snooze_alarm",
+    "description": "Snoozes an alarm that has fired. If neither snooze_duration nor snooze_till_time_of_day is provided, defaults to 10 minutes (600 seconds).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "snooze_duration": {
+          "description": "Duration to snooze the alarm in seconds, without any units (e.g., \"300\" for 5 minutes).",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "snooze_till_time_of_day": {
+          "description": "The time of day to snooze the alarm until in strict HH:MM:SS format (e.g., '13:30:00', '01:00:00').",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        },
+        "am_pm_or_unknown": {
+          "description": "One of 'AM', 'PM' or 'UNKNOWN'.",
+          "type": "string",
+          "enum": [
+            "AM",
+            "PM",
+            "UNKNOWN"
+          ],
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "start_stopwatch",
+    "description": "Starts or resumes the stopwatch.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  }
+]

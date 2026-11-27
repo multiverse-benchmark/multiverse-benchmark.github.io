@@ -1,0 +1,12 @@
+{
+  "id": "whatsup",
+  "name": "Whatsup",
+  "icon": "./icons/whatsup.svg",
+  "iconBackground": "linear-gradient(135deg, #A78BFA 0%, #292524 100%)",
+  "description": "Whatsup messaging",
+  "backendService": "whatsup",
+  "defaultWindow": {
+    "width": 1000,
+    "height": 600
+  }
+}

@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* macOS Light Mode */
+  --bg-primary: #f5f5f7;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e8e8ed;
+  --bg-window: rgba(255, 255, 255, 0.85);
+  --bg-menubar: rgba(255, 255, 255, 0.8);
+  --bg-dock: rgba(255, 255, 255, 0.7);
+  --bg-desktop: linear-gradient(135deg, #667eea 0%,  #764ba2 100%);
+  --text-primary: #1d1d1f;
+  --text-secondary: #86868b;
+  --text-tertiary: #6e6e73;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --shadow-color: rgba(0, 0, 0, 0.15);
+  --accent-color: #007aff;
+  --accent-hover: #0066d6;
+  --success-color: #34c759;
+  --warning-color: #ff9500;
+  --danger-color: #ff3b30;
+}
+
+.dark {
+  /* macOS Dark Mode */
+  --bg-primary: #1e1e1e;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #3d3d3d;
+  --bg-window: rgba(40, 40, 40, 0.95);
+  --bg-menubar: rgba(30, 30, 30, 0.9);
+  --bg-dock: rgba(50, 50, 50, 0.8);
+  --bg-desktop: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  --text-primary: #f5f5f7;
+  --text-secondary: #a1a1a6;
+  --text-tertiary: #8e8e93;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --accent-color: #0a84ff;
+  --accent-hover: #409cff;
+  --success-color: #30d158;
+  --warning-color: #ff9f0a;
+  --danger-color: #ff453a;
+}
+
+html, body, #root {
+  @apply h-full w-full overflow-hidden;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Utility classes for theme colors */
+.bg-mac-primary { background-color: var(--bg-primary); }
+.bg-mac-secondary { background-color: var(--bg-secondary); }
+.bg-mac-tertiary { background-color: var(--bg-tertiary); }
+.bg-mac-window { background-color: var(--bg-window); }
+.bg-mac-menubar { background-color: var(--bg-menubar); }
+.bg-mac-dock { background-color: var(--bg-dock); }
+.text-mac-primary { color: var(--text-primary); }
+.text-mac-secondary { color: var(--text-secondary); }
+.text-mac-tertiary { color: var(--text-tertiary); }
+.border-mac { border-color: var(--border-color); }
+.shadow-mac { box-shadow: 0 10px 30px var(--shadow-color); }
+.accent-mac { color: var(--accent-color); }
+.bg-accent-mac { background-color: var(--accent-color); }
+.bg-accent-mac:hover { background-color: var(--accent-hover); }
+
+/* macOS-style scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-tertiary);
+  border-radius: 4px;
+  opacity: 0.5;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Professional animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 2000px;
+  }
+}
+
+.animate-slideIn {
+  animation: slideIn 0.3s ease-out;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}

@@ -1,0 +1,12 @@
+{
+  "id": "gridwell_meet",
+  "name": "GridwellMeet",
+  "icon": "./icons/gridwell_meet.svg",
+  "iconBackground": "linear-gradient(135deg, #0891B2 0%, #0E7490 100%)",
+  "description": "GridwellMeet video conferencing",
+  "backendService": "gridwell_meet",
+  "defaultWindow": {
+    "width": 1300,
+    "height": 840
+  }
+}

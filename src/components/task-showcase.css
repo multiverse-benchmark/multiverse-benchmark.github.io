@@ -1,0 +1,1164 @@
+/*
+ * The paper's Figure 1 as a five-step walkthrough: the left column of
+ * .environment-demo. Colors and type come from the tokens in ./paper/paper.css.
+ * Block colors follow the roles of the paper's Figure 1: task (purple), user
+ * (amber), services (gray), verifiers (green). The two agents the figure
+ * compares carry the outcome colors: failure case (red), success case (green).
+ *
+ * The walkthrough card is a size container: it is about 380 to 410px wide
+ * beside the desktop and up to 1040px wide in the one-column layout, where
+ * its lists become grids (see the container queries at the end).
+ */
+
+.task-showcase {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-body);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.task-showcase p,
+.task-showcase figure,
+.task-showcase blockquote,
+.task-showcase h4,
+.task-showcase h5,
+.task-showcase pre {
+  margin: 0;
+}
+
+.task-showcase ol,
+.task-showcase ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.task-showcase a:focus-visible,
+.task-showcase button:focus-visible,
+.task-showcase summary:focus-visible,
+.showcase-trajectory-list:focus-visible,
+.showcase-trajectory-output:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+/* ---- shared pieces ---------------------------------------------------- */
+
+.showcase-label {
+  color: var(--mv-ink-3);
+  font-family: var(--mv-body);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.9px;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+/* The figure's small note beside a panel title, for example "developer/user (IF, MTIF)". */
+.showcase-label-note {
+  margin-left: 4px;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  text-transform: none;
+}
+
+.showcase-hint {
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* A label with the content it names. */
+.showcase-block {
+  display: grid;
+  gap: 6px;
+}
+
+/* Pass or fail: an icon and a word. */
+.showcase-verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--mv-ink);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.showcase-verdict > svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  padding: 2px;
+  border-radius: 50%;
+  color: var(--mv-on-fill);
+  forced-color-adjust: none;
+}
+
+.showcase-verdict--pass > svg {
+  background: var(--mv-pass);
+}
+
+.showcase-verdict--fail > svg {
+  background: var(--mv-fail);
+}
+
+/* An app's dock icon: white glyph on the tile color the desktop uses. */
+.showcase-app-tile {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--mv-service);
+}
+
+.showcase-app-tile img {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+/* Opens a record or an app in the desktop. Pressed while the desktop shows it. */
+.showcase-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 5px 11px 5px 9px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: var(--mv-radius-sm);
+  background: var(--mv-card);
+  color: var(--mv-green-dark);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+}
+
+.showcase-open > svg {
+  flex: none;
+}
+
+.showcase-open:hover {
+  border-color: var(--mv-sage);
+  background: var(--mv-sunken);
+}
+
+.showcase-open[aria-pressed='true'] {
+  border-color: var(--mv-green);
+  background: var(--mv-green-tint);
+  box-shadow: inset 0 0 0 1px var(--mv-green);
+}
+
+.showcase-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ---- the stepper ------------------------------------------------------ */
+
+.showcase-tour {
+  container: showcase-tour / inline-size;
+  overflow: hidden;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: var(--mv-radius);
+  background: var(--mv-card);
+  box-shadow: var(--mv-shadow-sm);
+}
+
+.showcase-tour-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--mv-line);
+  background: var(--mv-band);
+}
+
+.showcase-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.showcase-progress p {
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.showcase-progress-track {
+  display: flex;
+  gap: 3px;
+}
+
+.showcase-progress-track span {
+  width: 14px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--mv-line-strong);
+}
+
+.showcase-progress-track span[data-state='done'] {
+  background: var(--mv-sage);
+}
+
+.showcase-progress-track span[data-state='active'] {
+  background: var(--mv-green);
+}
+
+/* The two agents the figure compares, named once above the steps. */
+.showcase-caseband {
+  display: grid;
+  gap: 7px;
+  padding: 12px 16px 13px;
+  border-bottom: 1px solid var(--mv-line);
+}
+
+.showcase-caseband-list {
+  display: grid;
+  gap: 6px;
+}
+
+.showcase-casechip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px 10px;
+  padding: 6px 10px 6px 11px;
+  border: 1px solid var(--mv-line);
+  border-left: 3px solid var(--mv-fail);
+  border-radius: 0 var(--mv-radius-sm) var(--mv-radius-sm) 0;
+  background: var(--mv-fail-tint);
+}
+
+.showcase-casechip--success {
+  border-left-color: var(--mv-pass);
+  background: var(--mv-pass-tint);
+}
+
+.showcase-casechip-text {
+  color: var(--mv-ink-2);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.showcase-casechip-text strong {
+  margin-right: 4px;
+  color: var(--mv-ink);
+  font-weight: 650;
+}
+
+.showcase-step + .showcase-step {
+  border-top: 1px solid var(--mv-line);
+}
+
+/* The open step carries an edge marker as well as its filled number. */
+.showcase-step[data-state='active'] {
+  box-shadow: inset 3px 0 0 var(--mv-green);
+}
+
+.showcase-step-heading {
+  font: inherit;
+}
+
+.showcase-step-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 50px;
+  padding: 9px 14px 9px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--mv-ink-2);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.showcase-step[data-state='active'] .showcase-step-button {
+  color: var(--mv-ink);
+}
+
+.showcase-step:not([data-state='active']) .showcase-step-button:hover {
+  background: var(--mv-sunken);
+}
+
+/* Full-width rows: the ring sits inside so the card does not clip it. */
+.task-showcase .showcase-step-button:focus-visible {
+  outline-offset: -3px;
+}
+
+.showcase-step-number {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: 50%;
+  background: var(--mv-card);
+  color: var(--mv-ink-2);
+  font-family: var(--mv-display);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.showcase-step[data-state='done'] .showcase-step-number {
+  border-color: var(--mv-trust-line);
+  background: var(--mv-green-tint);
+  color: var(--mv-green-dark);
+}
+
+.showcase-step[data-state='active'] .showcase-step-number {
+  border-color: var(--mv-green);
+  background: var(--mv-green);
+  color: var(--mv-on-fill);
+}
+
+/* The step's name and, beside it, what moves between the figure's components at that step. */
+.showcase-step-text {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 10px;
+  min-width: 0;
+}
+
+.showcase-step-title {
+  font-family: var(--mv-display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  line-height: 1.35;
+}
+
+.showcase-step-flow {
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.showcase-step-chevron {
+  flex: none;
+  color: var(--mv-ink-3);
+  transition: transform 160ms ease;
+}
+
+.showcase-step[data-state='active'] .showcase-step-chevron {
+  transform: rotate(180deg);
+}
+
+.showcase-panel {
+  display: grid;
+  gap: 14px;
+  padding: 2px 16px 16px;
+  animation: showcase-panel-in 180ms ease;
+}
+
+@keyframes showcase-panel-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.showcase-lead {
+  color: var(--mv-ink-2);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.showcase-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 2px;
+  padding-top: 12px;
+  border-top: 1px solid var(--mv-line);
+}
+
+.showcase-nav-back,
+.showcase-nav-restart {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 6px 10px 6px 8px;
+  border: 0;
+  border-radius: var(--mv-radius-sm);
+  background: none;
+  color: var(--mv-ink-2);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.showcase-nav-back:hover,
+.showcase-nav-restart:hover {
+  background: var(--mv-sunken);
+  color: var(--mv-ink);
+}
+
+/* The first step has nowhere to go back to; the slot stays so that Next does not move. */
+.showcase-nav-back:disabled {
+  visibility: hidden;
+}
+
+.showcase-nav-restart {
+  margin-left: auto;
+  border: 1px solid var(--mv-line-strong);
+  padding-right: 12px;
+  padding-left: 10px;
+}
+
+.showcase-nav-next {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  margin-left: auto;
+  padding: 7px 12px 7px 14px;
+  border: 0;
+  border-radius: var(--mv-radius-sm);
+  background: var(--mv-green);
+  color: var(--mv-on-fill);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+}
+
+.showcase-nav-next > svg {
+  flex: none;
+}
+
+.showcase-nav-next:hover {
+  background: var(--mv-green-dark);
+}
+
+/* ---- step 1: the request ---------------------------------------------- */
+
+.showcase-request {
+  padding: 11px 14px 13px;
+  border: 1px solid var(--mv-task-line);
+  border-left: 3px solid var(--mv-task);
+  border-radius: 0 var(--mv-radius-sm) var(--mv-radius-sm) 0;
+  background: var(--mv-task-tint);
+}
+
+.showcase-request .showcase-label {
+  color: var(--mv-task);
+}
+
+.showcase-request blockquote {
+  margin-top: 4px;
+  color: var(--mv-ink);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.showcase-request blockquote::before {
+  content: '\201C';
+}
+
+.showcase-request blockquote::after {
+  content: '\201D';
+}
+
+/* ---- step 1, continued: the instructions ------------------------------- */
+
+.showcase-instructions {
+  display: grid;
+  gap: 8px;
+}
+
+/* Number and text on the first row, the two record buttons across the card below. */
+.showcase-instruction {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 11px 12px 12px;
+  border: 1px solid var(--mv-task-line);
+  border-radius: var(--mv-radius-sm);
+  background: var(--mv-task-tint);
+}
+
+.showcase-instruction-number {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--mv-task);
+  color: var(--mv-on-fill);
+  font-family: var(--mv-display);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.showcase-instruction-body > p:first-child {
+  color: var(--mv-ink);
+  line-height: 1.55;
+}
+
+/* The instruction's category, as the figure prints it under each instruction. */
+.showcase-instruction-category {
+  margin-top: 3px;
+  color: var(--mv-task);
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.showcase-instruction > .showcase-actions {
+  grid-column: 1 / -1;
+}
+
+/* ---- step 2: the simulated services ------------------------------------ */
+
+.showcase-services-note {
+  color: var(--mv-ink-2);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.showcase-search-apps {
+  display: grid;
+  gap: 6px;
+}
+
+.showcase-search-app {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 5px 10px;
+  padding: 8px 8px 10px 12px;
+  border: 1px solid var(--mv-service-line);
+  border-radius: var(--mv-radius-sm);
+  background: var(--mv-service-tint);
+}
+
+.showcase-search-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.showcase-search-name strong {
+  color: var(--mv-ink);
+  font-weight: 650;
+}
+
+.showcase-search-name span {
+  color: var(--mv-ink-3);
+  font-size: 12px;
+}
+
+.showcase-tools {
+  display: flex;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+  gap: 2px 12px;
+}
+
+.showcase-tools code {
+  color: var(--mv-ink-2);
+  font-family: var(--mv-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* ---- steps 2 to 4: what the failure case and the success case do -------- */
+
+.showcase-cases {
+  display: grid;
+  gap: 6px;
+}
+
+.showcase-cases-grid {
+  display: grid;
+  gap: 6px;
+}
+
+.showcase-case {
+  padding: 9px 12px 11px;
+  border: 1px solid var(--mv-line);
+  border-left: 3px solid var(--mv-fail);
+  border-radius: 0 var(--mv-radius-sm) var(--mv-radius-sm) 0;
+  background: var(--mv-card);
+}
+
+.showcase-case--success {
+  border-left-color: var(--mv-pass);
+}
+
+.showcase-case-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mv-ink);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.showcase-case-title > svg {
+  flex: none;
+  color: var(--mv-fail);
+}
+
+.showcase-case--success .showcase-case-title > svg {
+  color: var(--mv-pass);
+}
+
+.showcase-case-steps {
+  display: grid;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.showcase-case-step {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 8px;
+  color: var(--mv-ink-2);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* The figure's step kinds: read, guess, ask, user, act. */
+.showcase-kind {
+  justify-self: start;
+  padding: 0 5px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: 4px;
+  background: var(--mv-sunken);
+  color: var(--mv-ink-2);
+  font-family: var(--mv-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 17px;
+}
+
+.showcase-case-step--guess .showcase-kind {
+  border-color: var(--mv-fail);
+  background: var(--mv-fail);
+  color: var(--mv-on-fill);
+}
+
+.showcase-case-step--ask .showcase-kind {
+  border-color: var(--mv-task);
+  background: var(--mv-task);
+  color: var(--mv-on-fill);
+}
+
+.showcase-case-step--user .showcase-kind {
+  border-color: var(--mv-user-line);
+  background: var(--mv-user-tint);
+  color: var(--mv-user);
+}
+
+.showcase-case-step--guess > span:last-child,
+.showcase-case-step--ask > span:last-child,
+.showcase-case-step--user > span:last-child {
+  color: var(--mv-ink);
+  font-weight: 600;
+}
+
+/* ---- step 3: the user simulator ----------------------------------------- */
+
+.showcase-usersim {
+  display: grid;
+  gap: 8px;
+  padding: 11px 13px 13px;
+  border: 1px solid var(--mv-user-line);
+  border-radius: var(--mv-radius-sm);
+  background: var(--mv-user-tint);
+}
+
+.showcase-usersim .showcase-label {
+  color: var(--mv-user);
+}
+
+.showcase-usersim-goal {
+  color: var(--mv-ink);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+/* What only the user knows. */
+.showcase-hidden {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+  padding: 8px 11px 9px;
+  border: 1px solid var(--mv-user-line);
+  border-radius: var(--mv-radius-sm);
+  background: var(--mv-card);
+  color: var(--mv-ink);
+  font-size: 13.5px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.showcase-hidden > svg {
+  margin-top: 3px;
+  color: var(--mv-user);
+}
+
+.showcase-usersim-why {
+  color: var(--mv-ink-2);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+/* ---- step 4: the records in the desktop -------------------------------- */
+
+.showcase-evidence-list {
+  display: grid;
+  gap: 6px;
+}
+
+/* The app's tile, what the agent did there, and the record before and after. */
+.showcase-evidence {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 8px 8px 8px 12px;
+  border: 1px solid var(--mv-service-line);
+  border-radius: var(--mv-radius-sm);
+  background: var(--mv-service-tint);
+}
+
+.showcase-evidence-title {
+  color: var(--mv-ink);
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Before and After: the same two-state switch as the desktop toolbar. */
+.showcase-states {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: 8px;
+  background: var(--mv-tint);
+}
+
+.showcase-state {
+  min-width: 56px;
+  min-height: 30px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--mv-ink-2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+.showcase-state:hover {
+  background: var(--mv-sunken);
+}
+
+.showcase-state[aria-pressed='true'] {
+  background: var(--mv-card);
+  color: var(--mv-ink);
+  box-shadow: 0 1px 4px #35204f2b;
+}
+
+/* ---- step 5: the verifiers --------------------------------------------- */
+
+.showcase-verifiers {
+  display: grid;
+  gap: 6px;
+}
+
+.showcase-verifier {
+  display: grid;
+  gap: 5px;
+  padding: 10px 12px 12px;
+  border: 1px solid var(--mv-verify-line);
+  border-radius: var(--mv-radius-sm);
+  background: var(--mv-verify-tint);
+}
+
+.showcase-verifier-name {
+  color: var(--mv-ink);
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.showcase-verifier-kind {
+  color: var(--mv-ink-2);
+  font-weight: 500;
+}
+
+.showcase-verifier-input {
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* The verifier's verdict on each of the two cases, with the figure's remark on the failure case. */
+.task-showcase .showcase-verdicts {
+  display: grid;
+  gap: 5px;
+  padding: 8px 11px 9px;
+  border: 1px solid var(--mv-verify-line);
+  border-radius: var(--mv-radius-sm);
+  background: var(--mv-card);
+}
+
+.showcase-verdicts > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
+}
+
+.showcase-verdicts .showcase-verdict {
+  align-self: center;
+}
+
+.showcase-verdict-note {
+  color: var(--mv-ink-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.showcase-verifier-text {
+  color: var(--mv-ink-2);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* Whether each case succeeds: it must pass every applicable verifier. */
+.showcase-outcome {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px 11px;
+  border-left: 3px solid var(--mv-sage);
+  border-radius: 0 var(--mv-radius-sm) var(--mv-radius-sm) 0;
+  background: var(--mv-sunken);
+}
+
+.showcase-outcome ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+}
+
+.showcase-outcome .showcase-verdict {
+  font-size: 13.5px;
+}
+
+/* ---- disclosures below the stepper ------------------------------------ */
+
+.showcase-disclosure {
+  border: 1px solid var(--mv-line);
+  border-radius: var(--mv-radius);
+  background: var(--mv-card);
+  scroll-margin-top: 8px;
+}
+
+.showcase-disclosure > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 8px 14px 8px 16px;
+  border-radius: var(--mv-radius);
+  color: var(--mv-ink);
+  font-weight: 600;
+  line-height: 1.4;
+  list-style: none;
+  cursor: pointer;
+}
+
+.showcase-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.showcase-disclosure > summary:hover {
+  background: var(--mv-sunken);
+}
+
+.showcase-disclosure-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.showcase-disclosure-meta {
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.showcase-disclosure-chevron {
+  flex: none;
+  color: var(--mv-ink-3);
+  transition: transform 160ms ease;
+}
+
+.showcase-disclosure[open] > summary .showcase-disclosure-chevron {
+  transform: rotate(180deg);
+}
+
+.showcase-disclosure-body {
+  display: grid;
+  gap: 10px;
+  padding: 0 16px 16px;
+  color: var(--mv-ink-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.showcase-trajectory-list {
+  max-height: 490px;
+  overflow: auto;
+  border: 1px solid var(--mv-line);
+  border-radius: var(--mv-radius-sm);
+  background: var(--mv-sunken);
+  scrollbar-width: thin;
+}
+
+.showcase-trajectory-list > li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--mv-line);
+}
+
+.showcase-trajectory-list > li:last-child {
+  border-bottom: 0;
+}
+
+.showcase-trajectory-message {
+  background: var(--mv-card);
+}
+
+.showcase-trajectory-number {
+  flex: none;
+  padding-top: 1px;
+  color: var(--mv-ink-3);
+  font-family: var(--mv-mono);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.showcase-trajectory-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.showcase-trajectory-kind {
+  display: block;
+  color: var(--mv-ink-3);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.9px;
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+
+.showcase-trajectory-list p {
+  margin-top: 2px;
+  color: var(--mv-ink);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.showcase-trajectory-list summary {
+  padding: 6px 0;
+  color: var(--mv-green-dark);
+  font-family: var(--mv-mono);
+  font-size: 12px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.showcase-trajectory-list pre {
+  margin-top: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--mv-line);
+  border-radius: var(--mv-radius-sm);
+  background: var(--mv-card);
+  color: var(--mv-ink-2);
+  font-family: var(--mv-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Inside an opened tool call: its arguments, then the output the service returned. */
+.showcase-trajectory-part,
+.showcase-trajectory-pending {
+  display: block;
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.showcase-trajectory-part {
+  margin-top: 6px;
+  font-weight: 650;
+}
+
+.showcase-trajectory-part:first-of-type {
+  margin-top: 0;
+}
+
+/* An output can run to hundreds of lines; it scrolls inside its own box. */
+.showcase-trajectory-list pre.showcase-trajectory-output {
+  max-height: 260px;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+/* ---- loading and error states (rendered by EnvironmentDemo) ----------- */
+
+.showcase-loading,
+.showcase-error {
+  margin: 0;
+  padding: 18px 16px;
+  border: 1px solid var(--mv-line);
+  border-radius: var(--mv-radius);
+  background: var(--mv-card);
+  color: var(--mv-ink-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.showcase-loading {
+  min-height: 420px;
+}
+
+.showcase-error {
+  border-color: var(--mv-user-line);
+  background: var(--mv-partial-tint);
+}
+
+.showcase-error a {
+  color: var(--mv-green-dark);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ---- the one-column layout: a wide walkthrough card -------------------- */
+
+@container showcase-tour (min-width: 620px) {
+  .showcase-step-button {
+    padding-right: 20px;
+    padding-left: 22px;
+  }
+
+  .showcase-panel {
+    padding: 4px 22px 20px;
+  }
+
+  .showcase-caseband {
+    padding-right: 22px;
+    padding-left: 22px;
+  }
+
+  .showcase-lead,
+  .showcase-hint,
+  .showcase-request,
+  .showcase-services-note,
+  .showcase-usersim,
+  .showcase-outcome {
+    max-width: 68ch;
+  }
+
+  .showcase-caseband-list,
+  .showcase-cases-grid,
+  .showcase-search-apps,
+  .showcase-evidence-list,
+  .showcase-verifiers {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .showcase-nav {
+    justify-content: flex-start;
+  }
+
+  .showcase-nav-next,
+  .showcase-nav-restart {
+    margin-left: 0;
+  }
+}
+
+@container showcase-tour (min-width: 800px) {
+  .showcase-instructions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* A phone-width card: the step count alone says where the visitor is. */
+@container showcase-tour (max-width: 339px) {
+  .showcase-progress-track {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase-panel {
+    animation: none;
+  }
+
+  .showcase-step-chevron,
+  .showcase-disclosure-chevron {
+    transition: none;
+  }
+}

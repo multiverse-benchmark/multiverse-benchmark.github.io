@@ -1,0 +1,1086 @@
+/*
+ * The leaderboard: its controls (lbc-), its chart (lbch-), and its ranked
+ * table (lb-). Tokens come from ../paper/paper.css, so the board follows the
+ * page's light and dark themes.
+ */
+.lbc,
+.lbch,
+.lb {
+  --lb-numeric: var(--mv-numeric, var(--mv-display));
+  color: var(--mv-ink);
+  font-family: var(--mv-body);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ======================================================================
+   Controls: one row, before the chart and the table that they drive
+   ====================================================================== */
+.lbc {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 28px;
+  margin-bottom: 20px;
+}
+
+/* Which harnesses have no results yet: one line under the controls. */
+.lbc-note {
+  flex: 1 1 100%;
+  margin: -2px 0 0;
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/*
+ * The same note where the board knows why those harnesses have no results and
+ * where results under them are: a box under the controls, in the dashed
+ * outline of the harnesses it is about, with the actions it offers.
+ */
+.lbc-note-full {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px dashed var(--mv-line-strong);
+  border-radius: var(--mv-radius-sm);
+  color: var(--mv-ink-2);
+  font-size: 13px;
+}
+
+.lbc-note-icon {
+  flex: none;
+  margin-top: 3px;
+  color: var(--mv-ink-3);
+}
+
+.lbc-note-body {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 22px;
+  min-width: 0;
+}
+
+.lbc-note-text {
+  flex: 1 1 520px;
+  margin: 0;
+}
+
+.lbc-note-lead {
+  color: var(--mv-ink);
+  font-weight: 600;
+}
+
+.lbc-note-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 20px;
+  margin: 0;
+}
+
+/* The vertical padding enlarges the pointer target without changing the line height. */
+.lbc-note-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--mv-green-dark);
+  font: inherit;
+  font-weight: 650;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.lbc-note-action:hover {
+  color: var(--mv-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.lbc-note-action:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+/* "Columns" changes the layout, not the numbers: it sits apart, at the end of the row. */
+.lbc .lbc-axis {
+  margin-left: auto;
+}
+
+@media (max-width: 720px) {
+  .lbc .lbc-axis {
+    margin-left: 0;
+  }
+}
+
+/* On a phone each control takes the full width, its name above it, and its options share the rows evenly. */
+@media (max-width: 560px) {
+  .lbc {
+    gap: 12px;
+  }
+
+  .lbc .mv-seg-field {
+    display: grid !important;
+    gap: 6px !important;
+    width: 100%;
+  }
+
+  .lbc .mv-seg-option {
+    flex: 1 0 auto;
+    justify-content: center;
+  }
+}
+
+/* ======================================================================
+   Chart
+   ====================================================================== */
+.lbch {
+  --lbch-plot-height: 21rem;
+  margin-bottom: 20px;
+  padding: 20px 24px 16px;
+}
+
+.lbch-loading {
+  height: 27rem;
+}
+
+.lbch-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 10px 32px;
+  margin-bottom: 8px;
+}
+
+.lbch-title {
+  margin: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.lbch-subtitle {
+  max-width: 62ch;
+  margin: 2px 0 0;
+  color: var(--mv-ink-2);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.lbch-uncertainty {
+  max-width: 74ch;
+  margin: 6px 0 0;
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.lbch-value-label {
+  fill: var(--mv-ink);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.lbch-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px 16px;
+  margin: 2px 0 0;
+  padding: 0;
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  list-style: none;
+}
+
+@media (max-width: 900px) {
+  .lbch-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.lbch-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.lbch-legend li[data-receded='true'] {
+  opacity: 0.5;
+}
+
+.lbch-legend b {
+  color: var(--mv-ink);
+  font-weight: 650;
+}
+
+.lbch-swatch {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  /* Keep the series colour when the system overrides colours. */
+  forced-color-adjust: none;
+}
+
+/* A chart with more models than fit keeps the width of each group and scrolls sideways. */
+.lbch-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+
+.lbch-scroll:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+.lbch-plot {
+  height: var(--lbch-plot-height);
+}
+
+.lbch-scroll-hint {
+  margin: 4px 0 0;
+  color: var(--mv-ink-3);
+  font-size: 12px;
+}
+
+.lbch-empty {
+  margin: 0;
+  padding: 64px 0;
+  color: var(--mv-ink-3);
+  font-size: 13px;
+  text-align: center;
+}
+
+.lbch-tip {
+  max-width: min(380px, calc(100vw - 48px));
+  max-height: calc(var(--lbch-plot-height) - 2rem);
+  overflow-y: auto;
+  pointer-events: auto;
+  padding: 8px 12px;
+  border: 1px solid var(--mv-line);
+  border-radius: 8px;
+  background: var(--mv-card);
+  box-shadow: var(--mv-shadow-sm);
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.lbch-tip:focus-visible {
+  outline: 2px solid var(--mv-focus);
+  outline-offset: -2px;
+}
+
+.lbch-tip p {
+  margin: 0;
+}
+
+.lbch-tip-name {
+  color: var(--mv-ink);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.lbch-tip-series + .lbch-tip-series {
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px solid var(--mv-line);
+}
+
+.lbch-tip-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.lbch-tip-row b {
+  margin-left: auto;
+  padding-left: 12px;
+  color: var(--mv-ink);
+  font-family: var(--lb-numeric);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+
+.lbch-tip-n {
+  min-width: 64px;
+  color: var(--mv-ink-3);
+  font-size: 11px;
+  text-align: right;
+}
+
+.lbch-tip .lbch-tip-uncertainty {
+  margin-left: 17px;
+  color: var(--mv-ink-2);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .lbch {
+    --lbch-plot-height: 18rem;
+    padding: 16px 14px 10px;
+  }
+}
+
+/* ======================================================================
+   Table
+   ====================================================================== */
+/*
+ * Column widths. LeaderboardTable.tsx measures the component and sets
+ * data-tier (wide, medium, narrow); the rules for the two narrower tiers are
+ * at the end of this section. The result columns share whatever width is left.
+ */
+.lb {
+  --lb-rank-w: 56px;
+  --lb-model-w: 360px;
+  --lb-result-min: 108px;
+  --lb-cell-px: 16px;
+  --lb-column-tint: var(--mv-sunken);
+  --lb-row-tint: var(--mv-sunken);
+  --lb-cross-tint: var(--mv-tint);
+}
+
+.lb-card {
+  overflow: hidden;
+}
+
+/* ---- toolbar ---------------------------------------------------------- */
+.lb-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 24px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--mv-line);
+}
+
+.lb-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.lb-search {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.lb-search svg {
+  position: absolute;
+  left: 10px;
+  width: 15px;
+  height: 15px;
+  color: var(--mv-ink-3);
+  pointer-events: none;
+}
+
+.lb-search input {
+  width: 210px;
+  height: 34px;
+  padding: 0 10px 0 32px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: 8px;
+  background: var(--mv-card);
+  color: var(--mv-ink);
+  font: inherit;
+  font-size: 13px;
+}
+
+.lb-search input::placeholder {
+  color: var(--mv-ink-3);
+}
+
+.lb-search input:focus-visible,
+.lb-advanced select:focus-visible,
+.lb-tool:focus-visible,
+.lb-model-open:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+.lb-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: 8px;
+  background: var(--mv-card);
+  color: var(--mv-ink);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.lb-tool svg {
+  width: 14px;
+  height: 14px;
+  color: var(--mv-ink-2);
+}
+
+.lb-tool:hover:not(:disabled) {
+  background: var(--mv-tint);
+}
+
+.lb-tool:disabled {
+  color: var(--mv-ink-3);
+  cursor: default;
+  opacity: 0.6;
+}
+
+.lb-tool[aria-expanded='true'],
+.lb-tool[data-active='true'] {
+  border-color: var(--mv-focus);
+  background: var(--mv-tint);
+}
+
+.lb-tool-clear {
+  border-color: transparent;
+  background: transparent;
+  color: var(--mv-ink-2);
+}
+
+.lb-advanced {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px 20px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--mv-line);
+  background: var(--mv-sunken);
+}
+
+.lb-advanced label {
+  display: grid;
+  gap: 4px;
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lb-advanced select {
+  min-width: 170px;
+  height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: 8px;
+  background: var(--mv-card);
+  color: var(--mv-ink);
+  font: inherit;
+  font-size: 13px;
+}
+
+.lb-advanced p {
+  flex: 1 1 220px;
+  margin: 0 0 7px;
+  color: var(--mv-ink-3);
+  font-size: 12px;
+}
+
+/* ---- caption: what the numbers are ------------------------------------ */
+.lb-caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 24px;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--mv-line);
+  background: var(--mv-sunken);
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.lb-caption p {
+  margin: 0;
+}
+
+.lb-scroll-hint {
+  color: var(--mv-ink-3);
+}
+
+.lb-harness-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  color: var(--mv-ink-3);
+  list-style: none;
+}
+
+.lb-harness-key b {
+  color: var(--mv-ink-2);
+  font-weight: 650;
+}
+
+/* ---- table ------------------------------------------------------------ */
+/*
+ * position: relative makes the region the containing block of the visually
+ * hidden labels inside the table, so they scroll with it instead of widening
+ * the page.
+ */
+.lb-scroll {
+  position: relative;
+  overflow-x: auto;
+  container-type: inline-size;
+}
+
+.lb-scroll:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: -3px;
+}
+
+/*
+ * The sticky columns paint over the region's own outline, so the frame draws
+ * the focus ring above them. The outline stays for browsers without :has().
+ */
+.lb-frame {
+  position: relative;
+}
+
+.lb-frame:has(> .lb-scroll:focus-visible)::after {
+  position: absolute;
+  z-index: 3;
+  border: 3px solid var(--mv-focus);
+  content: '';
+  inset: 0;
+  pointer-events: none;
+}
+
+.lb-table {
+  width: 100%;
+  min-width: calc(var(--lb-rank-w) + var(--lb-model-w) + var(--lb-result-count, 5) * var(--lb-result-min));
+  margin: 0;
+  border-spacing: 0;
+  border-collapse: separate;
+  table-layout: fixed;
+  font-size: 13px;
+}
+
+.lb-col-rank {
+  width: var(--lb-rank-w);
+}
+
+.lb-col-model {
+  width: var(--lb-model-w);
+}
+
+/* header */
+.lb-th {
+  height: 44px;
+  padding: 0 var(--lb-cell-px);
+  border-bottom: 1px solid var(--mv-line-strong);
+  background: var(--mv-sunken);
+  color: var(--mv-ink-3);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.9px;
+  text-align: left;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.lb-th-rank {
+  padding-right: 12px;
+  padding-left: 3px;
+  text-align: right;
+}
+
+.lb-th-result {
+  padding: 0;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.lb-th-result.is-selected {
+  background: var(--mv-tint);
+  box-shadow: inset 0 2px 0 var(--mv-green);
+}
+
+.lb-sort {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 var(--lb-cell-px);
+  border: 0;
+  background: transparent;
+  color: var(--mv-ink-2);
+  font-family: var(--mv-body);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.lb-sort:hover {
+  background: var(--mv-tint);
+  color: var(--mv-ink);
+}
+
+.lb-sort:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: -3px;
+}
+
+.lb-th-result.is-selected .lb-sort {
+  color: var(--mv-ink);
+  font-weight: 700;
+}
+
+.lb-sort-arrow {
+  flex: none;
+  opacity: 0;
+}
+
+.lb-sort:hover .lb-sort-arrow,
+.lb-sort:focus-visible .lb-sort-arrow {
+  opacity: 0.45;
+}
+
+.lb-th-result.is-selected .lb-sort-arrow {
+  color: var(--mv-green);
+  opacity: 1;
+}
+
+/* rows */
+.lb-row {
+  --lb-access: var(--mv-closed);
+}
+
+.lb-row[data-access='open'] {
+  --lb-access: var(--mv-open);
+}
+
+.lb-row.is-link {
+  cursor: pointer;
+}
+
+.lb-row > * {
+  padding: 10px var(--lb-cell-px);
+  border-bottom: 1px solid var(--mv-line);
+  background: var(--mv-card);
+  vertical-align: middle;
+}
+
+.lb-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.lb-row > .lb-cell.is-selected {
+  background: var(--lb-column-tint);
+}
+
+.lb-row:hover > * {
+  background: var(--lb-row-tint);
+}
+
+.lb-row:hover > .lb-cell.is-selected {
+  background: var(--lb-cross-tint);
+}
+
+/* rank, with the row's group colour as a 3px left edge */
+.lb-row > .lb-rank {
+  padding-right: 12px;
+  padding-left: 3px;
+  color: var(--mv-ink-2);
+  font-family: var(--lb-numeric);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: right;
+  box-shadow: inset 3px 0 0 var(--lb-access);
+}
+
+/* model */
+.lb-model {
+  font-weight: 400;
+  text-align: left;
+}
+
+.lb-model-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'name access'
+    'dev dev';
+  column-gap: 12px;
+  align-items: center;
+}
+
+.lb-model-name {
+  grid-area: name;
+  color: var(--mv-ink);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* The model name opens the model's results: a button, so the keyboard reaches it. */
+.lb-model-open {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lb-row:hover .lb-model-open,
+.lb-model-open:focus-visible {
+  color: var(--mv-green);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.lb-model-meta {
+  display: contents;
+}
+
+.lb-model-dev {
+  grid-area: dev;
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.lb-model-access {
+  display: inline-flex;
+  grid-area: access;
+}
+
+/* result cells: the rate, and a bar on a 0 to 100% track */
+.lb-value {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  font-family: var(--lb-numeric);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+/* The slot right-aligns every rate on its decimal point. */
+.lb-mean {
+  min-width: 2.4em;
+  color: var(--mv-ink-2);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: right;
+}
+
+.lb-sd {
+  color: var(--mv-ink-3);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.lb-cell.is-empty {
+  color: var(--mv-ink-3);
+}
+
+/* "Best harness": which harness gives the value. */
+.lb-cell-harness {
+  margin-left: auto;
+  padding: 0 5px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: 4px;
+  background: var(--mv-card);
+  color: var(--mv-ink-2);
+  font-family: var(--mv-body);
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 15px;
+}
+
+.lb-bar {
+  display: block;
+  height: 3px;
+  margin-top: 6px;
+  border-radius: 2px;
+  background: var(--mv-line);
+  background: color-mix(in srgb, var(--mv-ink) 9%, transparent);
+}
+
+.lb-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--lb-access);
+  opacity: 0.4;
+}
+
+.lb-cell.is-selected .lb-mean {
+  color: var(--mv-ink);
+  font-weight: 600;
+}
+
+.lb-cell.is-selected .lb-bar-fill {
+  opacity: 1;
+}
+
+/* The best value in each column is bold, as in the paper. */
+.lb-cell.is-best .lb-mean {
+  color: var(--mv-ink);
+  font-weight: 800;
+}
+
+.lb-skipped {
+  display: block;
+  margin-top: 3px;
+  color: var(--mv-partial, var(--mv-ink-3));
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.lb-none > td {
+  padding: 28px 16px;
+  color: var(--mv-ink-3);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* ---- the gap, in place ------------------------------------------------ */
+.lb-gap-row > td {
+  padding: 0;
+  border-bottom: 1px solid var(--mv-line-strong);
+  border-bottom-color: color-mix(in srgb, var(--mv-open) 26%, var(--mv-line));
+  background: var(--mv-open-tint);
+}
+
+/* Stays in view while the table scrolls sideways: as wide as the scroll region, pinned to its left edge. */
+.lb-gap-inner {
+  position: sticky;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  width: 100cqw;
+  max-width: 100%;
+  padding: 7px 16px 7px 19px;
+  color: var(--mv-ink);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  box-shadow: inset 3px 0 0 var(--mv-open);
+}
+
+.lb-gap-inner strong {
+  font-weight: 700;
+}
+
+.lb-gap-mark {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
+  background: var(--mv-open);
+  transform: rotate(45deg);
+}
+
+/* ---- footer ----------------------------------------------------------- */
+.lb-footer {
+  display: grid;
+  gap: 10px;
+  padding: 12px 16px 14px;
+  border-top: 1px solid var(--mv-line);
+}
+
+.lb-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 18px;
+  margin: 0;
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.lb-key div {
+  display: flex;
+  gap: 6px;
+}
+
+.lb-key dt {
+  color: var(--mv-ink-2);
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.lb-key dd {
+  margin: 0;
+}
+
+.lb-pages {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  color: var(--mv-ink-3);
+  font-size: 12px;
+}
+
+.lb-pager {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---- narrower tiers --------------------------------------------------- */
+/* Medium and narrow: the badge moves under the model name, after the developer. */
+.lb[data-tier='medium'] {
+  --lb-rank-w: 44px;
+  --lb-model-w: 190px;
+  --lb-result-min: 98px;
+  --lb-cell-px: 12px;
+}
+
+.lb:not([data-tier='wide']) .lb-model-inner {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'name'
+    'meta';
+  row-gap: 2px;
+}
+
+.lb:not([data-tier='wide']) .lb-model-meta {
+  display: flex;
+  grid-area: meta;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+}
+
+.lb:not([data-tier='wide']) .lb-row > .lb-rank,
+.lb:not([data-tier='wide']) .lb-th-rank {
+  padding-right: 8px;
+}
+
+/* Narrow: rank and model stay in view while the result columns scroll under them. */
+.lb[data-tier='narrow'] {
+  --lb-rank-w: 34px;
+  --lb-model-w: 146px;
+  --lb-result-min: 92px;
+  --lb-cell-px: 10px;
+}
+
+/* The badge drops its pill here, so the second line fits in every row. */
+.lb[data-tier='narrow'] .lb-model-access .mv-access {
+  gap: 5px;
+  padding: 0;
+  background: none;
+}
+
+.lb[data-tier='narrow'] .lb-toolbar,
+.lb[data-tier='narrow'] .lb-advanced,
+.lb[data-tier='narrow'] .lb-caption,
+.lb[data-tier='narrow'] .lb-footer {
+  padding-right: 12px;
+  padding-left: 12px;
+}
+
+.lb[data-tier='narrow'] .lb-tools,
+.lb[data-tier='narrow'] .lb-search {
+  flex: 1 1 100%;
+}
+
+.lb[data-tier='narrow'] .lb-search input {
+  width: 100%;
+}
+
+.lb[data-tier='narrow'] .lb-search {
+  flex: 1 1 140px;
+}
+
+.lb[data-tier='narrow'] .lb-model-name {
+  font-size: 13px;
+}
+
+/* Size and context length are in the model card; the narrow model column keeps to the developer. */
+.lb[data-tier='narrow'] .lb-model-size {
+  display: none;
+}
+
+.lb[data-tier='narrow'] .lb-row > .lb-model,
+.lb[data-tier='narrow'] .lb-th-model {
+  padding-right: 8px;
+  padding-left: 8px;
+}
+
+.lb[data-tier='narrow'] .lb-gap-inner {
+  padding-right: 12px;
+  padding-left: 13px;
+  font-size: 12px;
+}
+
+/* One entry per line; a long name (the four end-user harnesses) wraps with its text. */
+.lb[data-tier='narrow'] .lb-key {
+  display: grid;
+  gap: 0;
+}
+
+.lb[data-tier='narrow'] .lb-key div {
+  display: block;
+}
+
+.lb[data-tier='narrow'] .lb-key dt,
+.lb[data-tier='narrow'] .lb-key dd {
+  display: inline;
+}
+
+.lb[data-tier='narrow'] .lb-key dt {
+  margin-right: 6px;
+  white-space: normal;
+}
+
+/* Sticky rank and model columns, with an edge while content scrolls under them. */
+.lb-th-rank,
+.lb-th-model,
+.lb-row > .lb-rank,
+.lb-row > .lb-model {
+  position: sticky;
+  z-index: 1;
+}
+
+.lb-th-rank,
+.lb-row > .lb-rank {
+  left: 0;
+}
+
+.lb-th-model,
+.lb-row > .lb-model {
+  left: var(--lb-rank-w);
+}
+
+.lb[data-scrollable='true'] .lb-th-model,
+.lb[data-scrollable='true'] .lb-row > .lb-model {
+  border-right: 1px solid var(--mv-line-strong);
+}

@@ -1,0 +1,1482 @@
+[
+  {
+    "name": "create_my_profile",
+    "description": "Creates a new member profile and sets it as the current authenticated member.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "person_data": {
+          "description": "Dictionary containing the new member's profile data with keys:",
+          "type": "object",
+          "properties": {
+            "localizedFirstName": {
+              "description": "Member's first name in the preferred locale (e.g., 'Alice', 'Jean'). Required. Must be non-empty (minimum 1 character).",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1
+            },
+            "localizedLastName": {
+              "description": "Member's last name in the preferred locale (e.g., 'Smith', 'Dupont'). Required. Must be non-empty (minimum 1 character).",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "vanityName": {
+              "description": "URL-friendly version of the member's name used in profile URLs (e.g., 'alice-smith'). Required. Must be non-empty (minimum 1 character). Recommended format: lowercase with hyphens, minimum 3 characters.",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "firstName": {
+              "description": "Localized first name with locale mappings and preferred locale. Required. Structure: {'localized': {'en_US': 'Alice', 'fr_FR': 'Alice'}, 'preferredLocale': {'country': 'US', 'language': 'en'}}",
+              "type": "object",
+              "properties": {
+                "localized": {
+                  "description": "Dictionary mapping locale codes to localized first names. Keys are locale codes in format '<language>_<COUNTRY>' (e.g., 'en_US', 'fr_FR', 'de_DE', 'ja_JP'). Values are the corresponding localized first names.",
+                  "type": "object",
+                  "nullable": false,
+                  "additionalProperties": {
+                    "description": "Localized first name for the given locale",
+                    "type": "string"
+                  }
+                },
+                "preferredLocale": {
+                  "description": "Specifies which language and country version Linkedup considers the 'main' or 'default' for this content. This is the version that will be shown when no better match is available for a viewer's locale.",
+                  "type": "object",
+                  "properties": {
+                    "country": {
+                      "description": "Country code (e.g., 'US'). Required.",
+                      "type": "string",
+                      "nullable": false,
+                      "minLength": 2,
+                      "maxLength": 2,
+                      "pattern": "^[A-Z]{2}$"
+                    },
+                    "language": {
+                      "description": "Language code (e.g., 'en'). Required.",
+                      "type": "string",
+                      "nullable": false,
+                      "minLength": 2,
+                      "maxLength": 2,
+                      "pattern": "^[a-z]{2}$"
+                    }
+                  },
+                  "required": [
+                    "country",
+                    "language"
+                  ]
+                }
+              },
+              "nullable": false,
+              "required": [
+                "localized",
+                "preferredLocale"
+              ]
+            },
+            "lastName": {
+              "description": "Localized last name with mappings for different locales. Allows the name to be displayed in the user's preferred language.",
+              "type": "object",
+              "properties": {
+                "localized": {
+                  "description": "Dictionary mapping locale codes to localized last names. Keys are locale codes in format '<language>_<COUNTRY>' (e.g., 'en_US', 'fr_FR', 'de_DE', 'ja_JP'). Values are the corresponding localized last names.",
+                  "type": "object",
+                  "nullable": false,
+                  "additionalProperties": {
+                    "description": "Localized last name for the given locale",
+                    "type": "string"
+                  }
+                },
+                "preferredLocale": {
+                  "description": "Specifies which language and country version Linkedup considers the 'main' or 'default' for this content. This is the version that will be shown when no better match is available for a viewer's locale.",
+                  "type": "object",
+                  "properties": {
+                    "country": {
+                      "description": "Country code (e.g., 'US'). Required.",
+                      "type": "string",
+                      "nullable": false,
+                      "minLength": 2,
+                      "maxLength": 2,
+                      "pattern": "^[A-Z]{2}$"
+                    },
+                    "language": {
+                      "description": "Language code (e.g., 'en'). Required.",
+                      "type": "string",
+                      "nullable": false,
+                      "minLength": 2,
+                      "maxLength": 2,
+                      "pattern": "^[a-z]{2}$"
+                    }
+                  },
+                  "nullable": false,
+                  "required": [
+                    "country",
+                    "language"
+                  ]
+                }
+              },
+              "nullable": false,
+              "required": [
+                "localized",
+                "preferredLocale"
+              ]
+            }
+          },
+          "required": [
+            "localizedFirstName",
+            "localizedLastName",
+            "vanityName",
+            "firstName",
+            "lastName"
+          ]
+        }
+      },
+      "required": [
+        "person_data"
+      ]
+    }
+  },
+  {
+    "name": "create_organization",
+    "description": "Creates a new organization in the database. If a current_person_id is set, also creates an ACL entry granting that person administrator access to the new organization.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "organization_data": {
+          "description": "Dictionary required to create a new organization, including its public name, type, and localization settings:",
+          "type": "object",
+          "properties": {
+            "vanityName": {
+              "description": "Organization's vanity name (e.g., 'global-tech'). Contain only lowercase letters, numbers, hyphens, and underscores, minimum 3 characters, maximum 100 characters.",
+              "type": "string",
+              "nullable": false
+            },
+            "name": {
+              "description": "Localized organization name with keys:",
+              "type": "object",
+              "nullable": false,
+              "properties": {
+                "localized": {
+                  "description": "Dictionary mapping locale codes to localized names. Keys are locale codes in format '<language>_<COUNTRY>' (e.g., 'en_US', 'fr_FR', 'de_DE', 'ja_JP'). Values are the corresponding localized names.",
+                  "type": "object",
+                  "nullable": false,
+                  "additionalProperties": {
+                    "description": "Localized organization name for the given locale",
+                    "type": "string"
+                  }
+                },
+                "preferredLocale": {
+                  "description": "Dictionary specifying the default locale for this organization with keys:",
+                  "type": "object",
+                  "nullable": false,
+                  "properties": {
+                    "country": {
+                      "description": "Country code (e.g., 'US').",
+                      "type": "string",
+                      "nullable": false,
+                      "minLength": 2,
+                      "maxLength": 2,
+                      "pattern": "^[A-Z]{2}$"
+                    },
+                    "language": {
+                      "description": "Language code (e.g., 'en').",
+                      "type": "string",
+                      "nullable": false,
+                      "minLength": 2,
+                      "maxLength": 2,
+                      "pattern": "^[a-z]{2}$"
+                    }
+                  },
+                  "required": [
+                    "country",
+                    "language"
+                  ]
+                }
+              },
+              "required": [
+                "localized",
+                "preferredLocale"
+              ]
+            },
+            "primaryOrganizationType": {
+              "description": "Type of organization ('COMPANY' or 'SCHOOL').",
+              "type": "string",
+              "enum": [
+                "COMPANY",
+                "SCHOOL"
+              ],
+              "nullable": false
+            }
+          },
+          "required": [
+            "vanityName",
+            "name",
+            "primaryOrganizationType"
+          ],
+          "nullable": false
+        }
+      },
+      "required": [
+        "organization_data"
+      ]
+    }
+  },
+  {
+    "name": "create_organization_acl",
+    "description": "Creates a new organization ACL record in the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "acl_data": {
+          "description": "Dictionary for the new organization ACL record, including details about the role, assignee, and initial state. It should include the following keys:",
+          "type": "object",
+          "properties": {
+            "roleAssignee": {
+              "description": "URN of the person to assign the role to (e.g., 'urn:li:person:1'). Must match pattern: ^urn:li:person:\\d+$",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "role": {
+              "description": "Role to assign to the person. Must be one of: 'ADMINISTRATOR', 'DIRECT_SPONSORED_CONTENT_POSTER', 'RECRUITING_POSTER', 'LEAD_CAPTURE_ADMINISTRATOR', 'LEAD_GEN_FORMS_MANAGER', 'ANALYST', 'CURATOR', 'CONTENT_ADMINISTRATOR', 'EDITOR', 'VIEWER'.",
+              "type": "string",
+              "nullable": false,
+              "enum": [
+                "ADMINISTRATOR",
+                "ANALYST",
+                "CONTENT_ADMINISTRATOR",
+                "CURATOR",
+                "DIRECT_SPONSORED_CONTENT_POSTER",
+                "EDITOR",
+                "LEAD_CAPTURE_ADMINISTRATOR",
+                "LEAD_GEN_FORMS_MANAGER",
+                "RECRUITING_POSTER",
+                "VIEWER"
+              ]
+            },
+            "organization": {
+              "description": "URN of the organization (e.g., 'urn:li:organization:1'). Must match pattern: ^urn:li:organization:\\d+$",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "state": {
+              "description": "Initial state of the ACL. Must be one of: 'ACTIVE', 'REQUESTED'. Defaults to 'ACTIVE' if not provided. Terminal states ('REJECTED', 'REVOKED') are not allowed on creation; use update_organization_acl to set terminal states.",
+              "type": "string",
+              "nullable": false,
+              "default": "ACTIVE",
+              "enum": [
+                "ACTIVE",
+                "REQUESTED"
+              ]
+            }
+          },
+          "nullable": false,
+          "required": [
+            "roleAssignee",
+            "role",
+            "organization"
+          ]
+        }
+      },
+      "required": [
+        "acl_data"
+      ]
+    }
+  },
+  {
+    "name": "create_post",
+    "description": "Creates a Linkedup UGC (User Generated Content) Post. This endpoint allows you to publish new UGC posts containing commentary, media content, optional call-to-action labels, and visibility restrictions. It supports both organic and ad-related content.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "post_data": {
+          "description": "Dictionary containing UGC (User Generated Content) post fields.",
+          "type": "object",
+          "properties": {
+            "author": {
+              "description": "Uniform Resource Name of the post's author. Must be a Person or Organization Uniform Resource Name.",
+              "type": "string",
+              "nullable": false
+            },
+            "commentary": {
+              "description": "User-generated commentary text for the post.",
+              "type": "string",
+              "nullable": false
+            },
+            "distribution": {
+              "description": "Distribution settings, required.",
+              "type": "object",
+              "properties": {
+                "feedDistribution": {
+                  "description": "Where to distribute. One of: 'MAIN_FEED', 'NONE'",
+                  "type": "string",
+                  "nullable": false,
+                  "enum": [
+                    "MAIN_FEED",
+                    "NONE"
+                  ]
+                },
+                "targetEntities": {
+                  "description": "Targeting facets like geoLocations, industries, etc.",
+                  "type": "array",
+                  "items": {
+                    "description": "Targeting entity in the format of {entityType: 'GEO_LOCATION' | 'INDUSTRY' | 'COMPANY' | 'PERSON', entityUrn: 'urn:li:geoLocation:1234567890' | 'urn:li:industry:1234567890' | 'urn:li:company:1234567890' | 'urn:li:person:1234567890'}",
+                    "type": "object",
+                    "additionalProperties": {
+                      "description": "Value of the targeting entity",
+                      "type": "array",
+                      "items": {
+                        "description": "Individual value in the targeting entity array",
+                        "type": "string"
+                      }
+                    },
+                    "properties": {},
+                    "required": [],
+                    "nullable": false
+                  },
+                  "nullable": true
+                },
+                "thirdPartyDistributionChannels": {
+                  "description": "External platforms.",
+                  "type": "array",
+                  "items": {
+                    "description": "Third party distribution channel in the format of {channelType: 'FACEBOOK' | 'TWITTER' | 'PHOTOGRAM' | 'CLIPTOK' | 'YOUTUBE' | 'LINKEDUP', channelUrn: 'urn:li:thirdPartyDistributionChannel:1234567890'}",
+                    "type": "object",
+                    "additionalProperties": {
+                      "anyOf": [
+                        {
+                          "description": "Boolean value",
+                          "type": "boolean"
+                        },
+                        {
+                          "description": "Integer value",
+                          "type": "integer"
+                        },
+                        {
+                          "description": "String value",
+                          "type": "string"
+                        }
+                      ],
+                      "description": "Value of the third party distribution channel"
+                    },
+                    "properties": {},
+                    "required": [],
+                    "nullable": false
+                  },
+                  "nullable": true
+                }
+              },
+              "required": [
+                "feedDistribution"
+              ],
+              "nullable": false
+            },
+            "lifecycleState": {
+              "description": "Content lifecycle state. Must be PUBLISHED for creation. One of: 'DRAFT', 'PUBLISHED', 'PUBLISH_REQUESTED', 'PUBLISH_FAILED'",
+              "type": "string",
+              "nullable": false
+            },
+            "visibility": {
+              "description": "Member network visibility. One of: 'CONNECTIONS', 'PUBLIC', 'LOGGED_IN', 'CONTAINER'",
+              "type": "string",
+              "nullable": false,
+              "enum": [
+                "CONNECTIONS",
+                "CONTAINER",
+                "LOGGED_IN",
+                "PUBLIC"
+              ]
+            },
+            "contentLandingPage": {
+              "description": "URL opened when the member clicks on the content. Required if the campaign creative has the `WEBSITE_VISIT` objective.",
+              "type": "string",
+              "nullable": true
+            },
+            "adContext": {
+              "description": "Advertising metadata for ads or viral tracking.",
+              "type": "object",
+              "properties": {
+                "dscAdAccount": {
+                  "description": "Sponsored Account Uniform Resource Name. The Ad Account that created the Direct Sponsored Content (DSC). Required when `isDsc` is true; optional otherwise.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "dscAdType": {
+                  "description": "Type of the DSC. Required when `isDsc` is true; optional otherwise. One of: 'VIDEO', 'STANDARD', 'CAROUSEL', 'JOB_POSTING', 'NATIVE_DOCUMENT', 'EVENT'",
+                  "type": "string",
+                  "nullable": true,
+                  "enum": [
+                    "VIDEO",
+                    "STANDARD",
+                    "CAROUSEL",
+                    "JOB_POSTING",
+                    "NATIVE_DOCUMENT",
+                    "EVENT"
+                  ]
+                },
+                "dscName": {
+                  "description": "Plain text name of the DSC post.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "dscStatus": {
+                  "description": "The status of the advertising company content. Required when `isDsc` is true; optional otherwise. One of: 'ACTIVE', 'ARCHIVED'",
+                  "type": "string",
+                  "nullable": true,
+                  "enum": [
+                    "ACTIVE",
+                    "ARCHIVED"
+                  ]
+                },
+                "isDsc": {
+                  "description": "Whether or not this post is DSC. A posted DSC is created for the sole purpose of sponsorship.",
+                  "type": "boolean",
+                  "nullable": true
+                },
+                "objective": {
+                  "description": "Campaign objective (e.g., 'WEBSITE_VISIT'). When set to 'WEBSITE_VISIT', contentLandingPage becomes required.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": [],
+              "nullable": true
+            },
+            "container": {
+              "description": "Uniform Resource Name of the container entity holding the post.",
+              "type": "string",
+              "nullable": true
+            },
+            "content": {
+              "description": "Media content details.",
+              "type": "object",
+              "properties": {
+                "media": {
+                  "description": "Embedded media.",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Media asset identifier. Accepts an Linkedup media URN or a direct media URL.",
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "title": {
+                      "description": "Title of the media.",
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "altText": {
+                      "description": "Accessible text for the media.",
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title"
+                  ],
+                  "nullable": true
+                },
+                "poll": {
+                  "description": "Poll content (refer to Poll API).",
+                  "type": "object",
+                  "properties": {
+                    "question": {
+                      "description": "Question of the poll.",
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "settings": {
+                      "description": "Settings of the poll.",
+                      "type": "object",
+                      "properties": {
+                        "voteSelectionType": {
+                          "description": "Type of vote selection.",
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "duration": {
+                          "description": "Duration of the poll. One of: ONE_DAY, THREE_DAYS, SEVEN_DAYS, FOURTEEN_DAYS",
+                          "type": "string",
+                          "enum": [
+                            "ONE_DAY",
+                            "THREE_DAYS",
+                            "SEVEN_DAYS",
+                            "FOURTEEN_DAYS"
+                          ],
+                          "nullable": false
+                        },
+                        "isVoterVisibleToAuthor": {
+                          "description": "Whether the voter is visible to the author.",
+                          "type": "boolean",
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "duration"
+                      ],
+                      "nullable": true
+                    },
+                    "options": {
+                      "description": "Options of the poll.",
+                      "type": "array",
+                      "items": {
+                        "description": "Poll option within content.",
+                        "type": "object",
+                        "properties": {
+                          "text": {
+                            "description": "Text of the option.",
+                            "type": "string",
+                            "nullable": false
+                          }
+                        },
+                        "required": [
+                          "text"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "options"
+                  ],
+                  "nullable": true
+                },
+                "multiImage": {
+                  "description": "Multi-image post (refer to MultiImage API).",
+                  "type": "object",
+                  "properties": {
+                    "images": {
+                      "description": "Images of the multi-image post.",
+                      "type": "array",
+                      "items": {
+                        "description": "Image within multi-image content. Structurally identical to PostContentMedia — inherits id, title, altText. Kept as a named subclass for semantic clarity in multi-image contexts.",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "description": "Uniform Resource Name of the image asset.",
+                            "type": "string",
+                            "nullable": false
+                          },
+                          "title": {
+                            "description": "Title of the image.",
+                            "type": "string",
+                            "nullable": false
+                          },
+                          "altText": {
+                            "description": "Accessible text for the image.",
+                            "type": "string",
+                            "nullable": true
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title"
+                        ]
+                      }
+                    },
+                    "altText": {
+                      "description": "Accessible text for the multi-image post.",
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "images"
+                  ],
+                  "nullable": true
+                },
+                "article": {
+                  "description": "Article content.",
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "description": "Description of the article.",
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "source": {
+                      "description": "External article URL.",
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "thumbnail": {
+                      "description": "Uniform Resource Name of the thumbnail image.",
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "thumbnailAltText": {
+                      "description": "Alt text for the custom thumbnail. If empty, there's none. The length must be less than 4,086 characters.",
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "title": {
+                      "description": "Custom or saved title of the article.",
+                      "type": "string",
+                      "nullable": false
+                    }
+                  },
+                  "required": [
+                    "source",
+                    "title"
+                  ],
+                  "nullable": true
+                },
+                "carousel": {
+                  "description": "Carousel content.",
+                  "type": "object",
+                  "properties": {
+                    "cards": {
+                      "description": "The array of cards in the carousel.",
+                      "type": "array",
+                      "items": {
+                        "description": "Card within carousel content.",
+                        "type": "object",
+                        "properties": {
+                          "landingPage": {
+                            "description": "The URL to the landing page.",
+                            "type": "string",
+                            "nullable": false
+                          },
+                          "media": {
+                            "description": "The media of the card.",
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "description": "Uniform Resource Name of the media asset.",
+                                "type": "string",
+                                "nullable": false
+                              },
+                              "title": {
+                                "description": "Title of the media.",
+                                "type": "string",
+                                "nullable": false
+                              },
+                              "altText": {
+                                "description": "Accessible text for the media.",
+                                "type": "string",
+                                "nullable": true
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "title"
+                            ],
+                            "nullable": false
+                          }
+                        },
+                        "required": [
+                          "landingPage",
+                          "media"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "cards"
+                  ],
+                  "nullable": true
+                },
+                "celebration": {
+                  "description": "Celebration content.",
+                  "type": "object",
+                  "properties": {
+                    "recipient": {
+                      "description": "The Uniform Resource Name of the recipient.",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "nullable": true
+                    },
+                    "taggedEntities": {
+                      "description": "The Uniform Resource Name of the tagged entities.",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "nullable": true
+                    },
+                    "type": {
+                      "description": "Type of celebration",
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "text": {
+                      "description": "The text of the celebration.",
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "media": {
+                      "description": "The media of the celebration.",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "description": "Uniform Resource Name of the media asset.",
+                          "type": "string",
+                          "nullable": false
+                        },
+                        "title": {
+                          "description": "Title of the media.",
+                          "type": "string",
+                          "nullable": false
+                        },
+                        "altText": {
+                          "description": "Accessible text for the media.",
+                          "type": "string",
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "media"
+                  ],
+                  "nullable": true
+                },
+                "reference": {
+                  "description": "Reference content type (e.g., event, appreciation).",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "URN of the reference",
+                      "type": "string",
+                      "nullable": false
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "nullable": true
+                }
+              },
+              "required": [],
+              "nullable": true
+            },
+            "contentCallToActionLabel": {
+              "description": "Call-to-action label displayed on the creative. One of: 'APPLY', 'DOWNLOAD', 'VIEW_QUOTE', 'LEARN_MORE', 'SIGN_UP', 'SUBSCRIBE', 'REGISTER', 'JOIN', 'ATTEND', 'REQUEST_DEMO', 'SEE_MORE', 'BUY_NOW', 'SHOP_NOW'.",
+              "type": "string",
+              "nullable": true,
+              "enum": [
+                "APPLY",
+                "DOWNLOAD",
+                "VIEW_QUOTE",
+                "LEARN_MORE",
+                "SIGN_UP",
+                "SUBSCRIBE",
+                "REGISTER",
+                "JOIN",
+                "ATTEND",
+                "REQUEST_DEMO",
+                "SEE_MORE",
+                "BUY_NOW",
+                "SHOP_NOW"
+              ]
+            },
+            "isReshareDisabledByAuthor": {
+              "description": "If True, disables resharing of the post. Default is False.",
+              "type": "boolean",
+              "nullable": true,
+              "default": false
+            },
+            "lifecycleStateInfo": {
+              "description": "Additional lifecycle context:",
+              "type": "object",
+              "properties": {
+                "contentStatus": {
+                  "description": "The status of the content.",
+                  "type": "string",
+                  "nullable": true
+                },
+                "isEditedByAuthor": {
+                  "description": "Whether the content was edited by the author.",
+                  "type": "boolean",
+                  "nullable": true
+                },
+                "reviewStatus": {
+                  "description": "Review status of the post.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": [],
+              "nullable": true
+            },
+            "publishedAt": {
+              "description": "Epoch timestamp when the content was published.",
+              "type": "integer",
+              "nullable": true
+            },
+            "reshareContext": {
+              "description": "Context information for re-shares.",
+              "type": "object",
+              "properties": {
+                "parent": {
+                  "description": "Uniform Resource Name of the direct parent post.",
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": [],
+              "nullable": true
+            }
+          },
+          "required": [
+            "author",
+            "commentary",
+            "distribution",
+            "lifecycleState",
+            "visibility"
+          ]
+        }
+      },
+      "required": [
+        "post_data"
+      ]
+    }
+  },
+  {
+    "name": "delete_my_profile",
+    "description": "Deletes the authenticated member's profile from the database. Performs a cascade delete, also removing all posts and organization ACLs associated with the member.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "delete_organization_acl",
+    "description": "Deletes an organization ACL record from the database. Requires the authenticated member to be either the role assignee on the ACL or an active ADMINISTRATOR on the same organization.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "acl_id": {
+          "description": "Unique identifier of the ACL record to delete. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "acl_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_organization_by_id",
+    "description": "Deletes an organization from the database by its ID. This performs a cascade delete, removing the organization, all posts authored by this organization, and all organization ACL entries associated with this organization.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "organization_id": {
+          "description": "Unique identifier of the organization to delete. Must be a non-empty string (whitespace-only strings are not allowed). Leading and trailing whitespace will be automatically stripped.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "organization_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_organization_by_vanity_name",
+    "description": "Deletes organization(s) from the database by vanity name. This performs a cascade delete, removing all organizations matching the vanity name along with all their associated posts and organization ACL entries.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query_field": {
+          "description": "Query parameter expected to be 'vanityName'.",
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "vanityName"
+          ]
+        },
+        "vanity_name": {
+          "description": "The organization's vanity name to delete. Must be a non-empty string (whitespace-only strings are not allowed).",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      },
+      "required": [
+        "query_field",
+        "vanity_name"
+      ]
+    }
+  },
+  {
+    "name": "delete_post_by_id",
+    "description": "Deletes a post from the database. Also nullifies any reshareContext references to the deleted post in other posts. Requires the authenticated member to be the post's author (for person-authored posts) or an active ADMINISTRATOR on the owning organization (for organization-authored posts).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "description": "Unique identifier of the post to delete.",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    }
+  },
+  {
+    "name": "find_posts_by_author",
+    "description": "Searches for and lists posts based on the provided author identifier. Use this to discover valid post IDs instead of guessing them. You can obtain your own author URN using get_my_profile.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "author": {
+          "description": "The identifier of the author (e.g., \"urn:li:person:1\" or \"urn:li:organization:1\") used to filter posts.",
+          "type": "string",
+          "nullable": false
+        },
+        "start": {
+          "description": "Starting index for pagination. Must be a non-negative integer. Defaults to 0.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0
+        },
+        "count": {
+          "description": "Maximum number of posts to return. Must be a non-negative integer. Defaults to 10.",
+          "type": "integer",
+          "nullable": true,
+          "default": 10
+        }
+      },
+      "required": [
+        "author"
+      ]
+    }
+  },
+  {
+    "name": "get_my_profile",
+    "description": "Retrieves the authenticated member's profile data from the database. Use this to discover your own person URN for self-assignment. Returns all profile fields by default, or a subset of fields when projection is specified.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "projection": {
+          "description": "Field projection syntax for controlling which fields to return.\nThe projection string should consist of comma-separated field names and may optionally\nbe enclosed in parentheses. Valid field names are: id, localizedFirstName, localizedLastName,\nvanityName, firstName, lastName. When not provided or empty, all fields are returned.\nExamples: 'id,localizedFirstName', '(id,vanityName)', 'firstName,lastName'.",
+          "type": "string",
+          "nullable": true,
+          "default": null
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_organization_acls_by_role_assignee",
+    "description": "Retrieves ACL records by roleAssignee URN with optional field projection and pagination. Retrieve information about the roles and permissions that a specific Linkedup member (the \"role assignee\") has within one or more organizations on Linkedup",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query_field": {
+          "description": "Query parameter expected to be 'roleAssignee'.",
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "roleAssignee"
+          ]
+        },
+        "role_assignee": {
+          "description": "URN of the person whose ACL records are requested.",
+          "type": "string",
+          "nullable": false,
+          "pattern": "^urn:li:person:\\w+$"
+        },
+        "projection": {
+          "description": "Field projection syntax for controlling which fields to return.\nThe projection string should consist of comma-separated field names and may optionally\nbe enclosed in parentheses. Only these field names are accepted: aclId, organization,\nrole, roleAssignee, state; any other name is rejected with InvalidQueryFieldError.\nDefaults to None (all fields returned).",
+          "type": "string",
+          "nullable": true
+        },
+        "start": {
+          "description": "Starting index for pagination. Defaults to 0.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0,
+          "minimum": 0
+        },
+        "count": {
+          "description": "Number of items to return. Defaults to 10.",
+          "type": "integer",
+          "nullable": true,
+          "default": 10,
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "query_field",
+        "role_assignee"
+      ]
+    }
+  },
+  {
+    "name": "get_organizations_by_vanity_name",
+    "description": "Retrieves organization(s) by vanity name. Use this to discover organization URNs. Supports optional field projection and pagination.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query_field": {
+          "description": "Query parameter expected to be 'vanityName'.",
+          "type": "string",
+          "nullable": false
+        },
+        "vanity_name": {
+          "description": "The organization's vanity name to search for.",
+          "type": "string",
+          "nullable": false
+        },
+        "projection": {
+          "description": "Field projection syntax for controlling which fields to return.\nThe projection string should consist of comma-separated field names and may optionally be enclosed in parentheses. \nOnly these field names are accepted: id, name, primaryOrganizationType, vanityName. \nDefaults to None (all fields returned).",
+          "type": "string",
+          "nullable": true
+        },
+        "start": {
+          "description": "Starting index for pagination. Defaults to 0.",
+          "type": "integer",
+          "nullable": true,
+          "default": 0
+        },
+        "count": {
+          "description": "Number of items to return. Defaults to 10. Max 100.",
+          "type": "integer",
+          "nullable": true,
+          "default": 10
+        }
+      },
+      "required": [
+        "query_field",
+        "vanity_name"
+      ]
+    }
+  },
+  {
+    "name": "get_post_by_id",
+    "description": "Retrieves a Linkedup UGC (User Generated Content) post by its identifier with optional field projection.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "description": "Unique identifier of the post to retrieve, as a numeric ID or UGC post URN (e.g., '1' or 'urn:li:ugcPost:1').",
+          "type": "string",
+          "nullable": false
+        },
+        "projection": {
+          "description": "Field projection syntax to control which fields are returned.\n- Accepts a comma-separated list of fields (e.g., \"id,author,visibility\").\n- Can optionally be enclosed in parentheses (e.g., \"(id,author)\").\n- Only these field names are accepted: 'id', 'author', 'commentary', 'visibility', 'createdAt', 'lastModifiedAt', 'likes', 'tags', 'meta'\n- If omitted, all fields are returned.",
+          "type": "string",
+          "nullable": true,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    }
+  },
+  {
+    "name": "update_my_profile",
+    "description": "Updates the authenticated member's profile data in the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "person_data": {
+          "description": "Dictionary containing updated member profile data to be applied.",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "localizedFirstName": {
+              "description": "Updated first name.",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1
+            },
+            "localizedLastName": {
+              "description": "Updated last name.",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "vanityName": {
+              "description": "URL-friendly version of the member's name.",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "firstName": {
+              "description": "Localized first name with keys:",
+              "type": "object",
+              "nullable": false,
+              "properties": {
+                "localized": {
+                  "description": "Dictionary mapping locale codes to localized first names. Keys are locale codes in format '<language>_<COUNTRY>' (e.g., 'en_US', 'fr_FR', 'de_DE', 'ja_JP'). Values are the corresponding localized first names.",
+                  "type": "object",
+                  "nullable": false,
+                  "additionalProperties": {
+                    "description": "Localized first name for the given locale",
+                    "type": "string"
+                  }
+                },
+                "preferredLocale": {
+                  "description": "Dictionary with keys:",
+                  "type": "object",
+                  "nullable": false,
+                  "properties": {
+                    "country": {
+                      "description": "Country code (e.g., 'US').",
+                      "type": "string",
+                      "nullable": false,
+                      "minLength": 2,
+                      "maxLength": 2,
+                      "pattern": "^[A-Z]{2}$"
+                    },
+                    "language": {
+                      "description": "Language code (e.g., 'en').",
+                      "type": "string",
+                      "nullable": false,
+                      "minLength": 2,
+                      "maxLength": 2,
+                      "pattern": "^[a-z]{2}$"
+                    }
+                  },
+                  "required": [
+                    "country",
+                    "language"
+                  ]
+                }
+              },
+              "required": [
+                "localized",
+                "preferredLocale"
+              ]
+            },
+            "lastName": {
+              "description": "Localized last name with keys:",
+              "type": "object",
+              "nullable": false,
+              "properties": {
+                "localized": {
+                  "description": "Dictionary mapping locale codes to localized last names. Keys are locale codes in format '<language>_<COUNTRY>' (e.g., 'en_US', 'fr_FR', 'de_DE', 'ja_JP'). Values are the corresponding localized last names.",
+                  "type": "object",
+                  "nullable": false,
+                  "additionalProperties": {
+                    "description": "Localized last name for the given locale",
+                    "type": "string"
+                  }
+                },
+                "preferredLocale": {
+                  "description": "Dictionary with keys:",
+                  "type": "object",
+                  "nullable": false,
+                  "properties": {
+                    "country": {
+                      "description": "Country code (e.g., 'US').",
+                      "type": "string",
+                      "nullable": false,
+                      "minLength": 2,
+                      "maxLength": 2,
+                      "pattern": "^[A-Z]{2}$"
+                    },
+                    "language": {
+                      "description": "Language code (e.g., 'en').",
+                      "type": "string",
+                      "nullable": false,
+                      "minLength": 2,
+                      "maxLength": 2,
+                      "pattern": "^[a-z]{2}$"
+                    }
+                  },
+                  "required": [
+                    "country",
+                    "language"
+                  ]
+                }
+              },
+              "required": [
+                "localized",
+                "preferredLocale"
+              ]
+            }
+          },
+          "required": [
+            "localizedFirstName",
+            "localizedLastName",
+            "vanityName",
+            "firstName",
+            "lastName"
+          ]
+        }
+      },
+      "required": [
+        "person_data"
+      ]
+    }
+  },
+  {
+    "name": "update_organization_acl",
+    "description": "Updates an existing organization ACL record in the database. All fields in acl_data are required and will replace the existing values.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "acl_id": {
+          "description": "Unique identifier of the ACL record to update. Must be a non-empty string.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "acl_data": {
+          "description": "Dictionary representing the updated ACL record. All fields are required.",
+          "type": "object",
+          "nullable": false,
+          "properties": {
+            "roleAssignee": {
+              "description": "Updated URN of the person assigned the role. Must be valid person URN format (e.g., 'urn:li:person:1').",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "role": {
+              "description": "Updated role assigned to the person. Must be one of: 'ADMINISTRATOR', 'DIRECT_SPONSORED_CONTENT_POSTER', 'RECRUITING_POSTER', 'LEAD_CAPTURE_ADMINISTRATOR', 'LEAD_GEN_FORMS_MANAGER', 'ANALYST', 'CURATOR', 'CONTENT_ADMINISTRATOR', 'EDITOR', 'VIEWER'.",
+              "type": "string",
+              "nullable": false,
+              "enum": [
+                "ADMINISTRATOR",
+                "ANALYST",
+                "CONTENT_ADMINISTRATOR",
+                "CURATOR",
+                "DIRECT_SPONSORED_CONTENT_POSTER",
+                "EDITOR",
+                "LEAD_CAPTURE_ADMINISTRATOR",
+                "LEAD_GEN_FORMS_MANAGER",
+                "RECRUITING_POSTER",
+                "VIEWER"
+              ]
+            },
+            "organization": {
+              "description": "Updated URN of the organization. Must be valid organization URN format (e.g., 'urn:li:organization:1').",
+              "type": "string",
+              "nullable": false,
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "state": {
+              "description": "Updated state of the ACL. Must be one of: 'ACTIVE', 'REJECTED', 'REQUESTED', 'REVOKED' (alphabetical order).",
+              "type": "string",
+              "nullable": false,
+              "enum": [
+                "ACTIVE",
+                "REJECTED",
+                "REQUESTED",
+                "REVOKED"
+              ]
+            }
+          },
+          "required": [
+            "roleAssignee",
+            "role",
+            "organization",
+            "state"
+          ]
+        }
+      },
+      "required": [
+        "acl_id",
+        "acl_data"
+      ]
+    }
+  },
+  {
+    "name": "update_organization_by_id",
+    "description": "Updates an existing organization's data in the database.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "organization_id": {
+          "description": "Unique identifier of the organization to update.",
+          "type": "string",
+          "minLength": 1
+        },
+        "organization_data": {
+          "description": "Dictionary containing fields to update for an existing organization. All fields are optional - only provided fields will be updated. Supports partial updates including public name, type, and localization settings:",
+          "type": "object",
+          "properties": {
+            "vanityName": {
+              "description": "Optional. Updated vanity name (e.g., 'global-tech'). Contain only lowercase letters, numbers, hyphens, and underscores, minimum 3 characters, maximum 100 characters. Note: null values are ignored and will not update the field.",
+              "type": "string",
+              "nullable": true
+            },
+            "name": {
+              "description": "Optional. Updated localized organization name with keys. Note: null values are ignored and will not update the field.",
+              "type": "object",
+              "nullable": true,
+              "default": null,
+              "properties": {
+                "localized": {
+                  "description": "Dictionary mapping locale codes to localized names. Keys are locale codes in format '<language>_<COUNTRY>' (e.g., 'en_US', 'fr_FR', 'de_DE', 'ja_JP'). Values are the corresponding localized names.",
+                  "type": "object",
+                  "nullable": true,
+                  "additionalProperties": {
+                    "description": "Localized organization name for the given locale",
+                    "type": "string"
+                  }
+                },
+                "preferredLocale": {
+                  "description": "Optional. Tells you which language/country version Linkedup considers the 'main' or 'default'. If provided, the 'localized' dictionary MUST contain a matching locale key (e.g., 'en_US'). Dictionary with keys:",
+                  "type": "object",
+                  "nullable": true,
+                  "properties": {
+                    "country": {
+                      "description": "Country code (e.g., 'US'). Must be exactly 2 characters.",
+                      "type": "string",
+                      "nullable": false,
+                      "minLength": 2,
+                      "maxLength": 2,
+                      "pattern": "^[A-Z]{2}$"
+                    },
+                    "language": {
+                      "description": "Language code (e.g., 'en'). Must be exactly 2 characters.",
+                      "type": "string",
+                      "nullable": false,
+                      "minLength": 2,
+                      "maxLength": 2,
+                      "pattern": "^[a-z]{2}$"
+                    }
+                  },
+                  "required": [
+                    "country",
+                    "language"
+                  ]
+                }
+              },
+              "required": []
+            },
+            "primaryOrganizationType": {
+              "description": "Optional. Updated type of organization. Must be one of: 'COMPANY' or 'SCHOOL'. Note: null values are ignored and will not update the field.",
+              "type": "string",
+              "nullable": true,
+              "enum": [
+                "COMPANY",
+                "SCHOOL"
+              ]
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "organization_id",
+        "organization_data"
+      ]
+    }
+  },
+  {
+    "name": "update_post",
+    "description": "Updates an existing post in the database. Only provided fields will be updated (patch behavior); omit optional fields instead of passing null. The lastModifiedAt timestamp is automatically updated. Requires the authenticated member to be the post's author (for person-authored posts) or an active ADMINISTRATOR on the owning organization (for organization-authored posts). The 'author' field cannot be changed via update and is silently stripped from the payload.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "description": "Unique identifier of the post to update. Must be a non-empty string (minimum 1 character). Whitespace is automatically stripped.",
+          "type": "string",
+          "nullable": false
+        },
+        "post_data": {
+          "description": "Dictionary containing updated UGC post fields. Optional patch: omit a field to leave it unchanged. Do not pass null for included keys.",
+          "type": "object",
+          "properties": {
+            "commentary": {
+              "description": "User-generated commentary text for the post. Must be a non-empty string (minimum 1 character) if provided. Whitespace is automatically stripped. Omit the field to leave unchanged; null is not allowed.",
+              "type": "string",
+              "default": null,
+              "nullable": true
+            },
+            "lifecycleState": {
+              "description": "Content lifecycle state. Must be 'PUBLISHED' for updates. Only 'PUBLISHED' is allowed for updates. Omit the field to leave unchanged; null is not allowed.",
+              "type": "string",
+              "enum": [
+                "PUBLISHED"
+              ],
+              "default": null,
+              "nullable": true
+            },
+            "contentLandingPage": {
+              "description": "URL opened when the member clicks on the content. Must be a valid HTTP/HTTPS URL if provided. Required if the campaign creative has the 'WEBSITE_VISIT' objective. Omit the field to leave unchanged; null is not allowed.",
+              "type": "string",
+              "default": null,
+              "nullable": true
+            },
+            "adContext": {
+              "description": "The advertising context representing the ads specific metadata (which is related to ads or viral tracking, rendering, etc.), associated with the post. Omit the field to leave unchanged; null is not allowed.",
+              "type": "object",
+              "default": null,
+              "nullable": true,
+              "properties": {
+                "dscName": {
+                  "description": "Plain text name of the Direct Sponsored Content post. Omit to leave unchanged; null is not allowed.",
+                  "type": "string",
+                  "default": null,
+                  "nullable": true
+                },
+                "dscStatus": {
+                  "description": "The status of the advertising content, indicating whether it's usable as a Direct Sponsored Content. Omit to leave unchanged; null is not allowed.",
+                  "type": "string",
+                  "default": null,
+                  "nullable": true,
+                  "enum": [
+                    "ACTIVE",
+                    "ARCHIVED"
+                  ]
+                }
+              },
+              "required": []
+            },
+            "contentCallToActionLabel": {
+              "description": "Call-to-action label displayed on the creative. Must be one of: 'APPLY', 'DOWNLOAD', 'VIEW_QUOTE', 'LEARN_MORE', 'SIGN_UP', 'SUBSCRIBE', 'REGISTER', 'JOIN', 'ATTEND', 'REQUEST_DEMO', 'SEE_MORE', 'BUY_NOW', 'SHOP_NOW'. Omit the field to leave unchanged; null is not allowed. Note: 'BUY_NOW' and 'SHOP_NOW' are supported only in API versions 202504 and later.",
+              "type": "string",
+              "enum": [
+                "APPLY",
+                "DOWNLOAD",
+                "VIEW_QUOTE",
+                "LEARN_MORE",
+                "SIGN_UP",
+                "SUBSCRIBE",
+                "REGISTER",
+                "JOIN",
+                "ATTEND",
+                "REQUEST_DEMO",
+                "SEE_MORE",
+                "BUY_NOW",
+                "SHOP_NOW"
+              ],
+              "default": null,
+              "nullable": true
+            }
+          },
+          "nullable": false,
+          "required": []
+        }
+      },
+      "required": [
+        "post_id",
+        "post_data"
+      ]
+    }
+  }
+]

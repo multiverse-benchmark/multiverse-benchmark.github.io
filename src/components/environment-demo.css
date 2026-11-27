@@ -1,0 +1,603 @@
+/*
+ * The worked example: a header, the guided walkthrough (styled in
+ * task-showcase.css), the embedded MultiVerse desktop, and a caption.
+ * Colors and type come from the tokens in ./paper/paper.css.
+ *
+ * Layout: one column below 1100px (walkthrough, then desktop); from 1100px the
+ * walkthrough sits beside the desktop, which stays in view while a long step
+ * is read.
+ */
+
+.environment-demo {
+  min-width: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-body);
+}
+
+.environment-demo a:focus-visible,
+.environment-demo button:focus-visible,
+.environment-demo summary:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+/* ---- header: title, chips, scope note -------------------------------- */
+
+.environment-example {
+  margin-bottom: 22px;
+}
+
+.environment-example-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+.environment-example-heading h3 {
+  margin: 0;
+  font-family: var(--mv-display);
+  font-size: 24px;
+  font-weight: 550;
+  letter-spacing: -0.6px;
+  line-height: 1.25;
+}
+
+.environment-example-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.environment-example-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  margin-left: auto;
+  color: var(--mv-green);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.environment-example-link:hover {
+  color: var(--mv-green-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.environment-example-note {
+  max-width: 92ch;
+  margin: 8px 0 0;
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ---- layout ----------------------------------------------------------- */
+
+.environment-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.environment-walkthrough,
+.environment-desktop {
+  min-width: 0;
+}
+
+/* The desktop column: the card, then its caption. */
+.environment-desktop {
+  display: grid;
+  gap: 14px;
+  /* One column: set the desktop apart from the walkthrough above it. */
+  margin-top: 12px;
+}
+
+/*
+ * Two columns. The desktop column sticks below the 88px site header, level
+ * with a walkthrough scrolled to the page's scroll padding (95px), so the
+ * desktop stays in view while a long step is read.
+ */
+@media (min-width: 1100px) {
+  .environment-layout {
+    grid-template-columns: 380px minmax(0, 1fr);
+    align-items: start;
+    gap: 20px;
+  }
+
+  .environment-desktop {
+    position: sticky;
+    top: 95px;
+    margin-top: 0;
+  }
+}
+
+@media (min-width: 1240px) {
+  .environment-layout {
+    grid-template-columns: 392px minmax(0, 1fr);
+    gap: 24px;
+  }
+}
+
+@media (min-width: 1450px) {
+  .environment-layout {
+    grid-template-columns: 412px minmax(0, 1fr);
+    gap: 28px;
+  }
+}
+
+/* ---- desktop card ----------------------------------------------------- */
+
+.environment-native {
+  container: environment-native / inline-size;
+  overflow: hidden;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: var(--mv-radius);
+  background: var(--mv-sunken);
+  box-shadow: var(--mv-shadow);
+  scroll-margin-top: 8px;
+}
+
+.environment-native:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
+.environment-native-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 14px;
+  min-height: 48px;
+  padding: 4px 12px 4px 14px;
+  border-bottom: 1px solid var(--mv-line);
+  background: var(--mv-band);
+}
+
+.environment-native-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  color: var(--mv-ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.environment-native-title > svg {
+  flex: none;
+  color: var(--mv-green);
+}
+
+.environment-native-title small {
+  display: block;
+  color: var(--mv-ink-3);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.environment-native-controls {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Two-state switch: the pressed option is the raised one. */
+.environment-native-phase {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: 8px;
+  background: var(--mv-tint);
+}
+
+.environment-native-phase button {
+  min-height: 32px;
+  padding: 4px 11px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--mv-ink-2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.environment-native-phase button:hover {
+  background: var(--mv-sunken);
+}
+
+.environment-native-phase button[aria-pressed='true'] {
+  background: var(--mv-card);
+  color: var(--mv-ink);
+  box-shadow: 0 1px 4px #35204f2b;
+}
+
+.environment-native-reload {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: var(--mv-radius-sm);
+  background: transparent;
+  color: var(--mv-ink-2);
+  cursor: pointer;
+}
+
+.environment-native-reload:hover {
+  background: var(--mv-tint);
+}
+
+/* The icon-only reload button shows its name on hover and on keyboard focus. */
+.environment-native-reload::after {
+  position: absolute;
+  top: calc(100% + 7px);
+  right: 0;
+  z-index: 2;
+  padding: 3px 8px;
+  border-radius: var(--mv-radius-sm);
+  background: var(--mv-ink);
+  color: var(--mv-on-fill);
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.5;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+  content: attr(aria-label);
+}
+
+.environment-native-reload:hover::after,
+.environment-native-reload:focus-visible::after {
+  opacity: 1;
+}
+
+.environment-native-expand {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 32px;
+  min-height: 32px;
+  color: var(--mv-green);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.environment-native-expand:hover {
+  color: var(--mv-green-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* What the desktop shows now, and the way back to the walkthrough. */
+.showcase-desktop-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 16px;
+  min-height: 52px;
+  padding: 7px 12px 7px 14px;
+  border-bottom: 1px solid var(--mv-line);
+  background: var(--mv-card);
+}
+
+.environment-context-now {
+  display: flex;
+  flex: 1 1 280px;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.environment-context-now .showcase-app-tile {
+  margin-top: 1px;
+}
+
+/* Fixed line height: one or two lines of text fit the strip's minimum height, so the frame below does not move. */
+.environment-context-now p {
+  margin: 0;
+  color: var(--mv-ink-2);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.environment-context-now strong {
+  margin-right: 4px;
+  color: var(--mv-ink);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 18px;
+}
+
+.environment-context-phase {
+  margin-right: 5px;
+  padding: 1px 7px;
+  border: 1px solid var(--mv-line-strong);
+  border-radius: 999px;
+  color: var(--mv-ink-2);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.environment-context-back {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 5px;
+  min-height: 32px;
+  margin-left: auto;
+  padding: 0 2px;
+  border: 0;
+  background: none;
+  color: var(--mv-green);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.environment-context-back:hover {
+  color: var(--mv-green-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* The walkthrough is above the desktop in one column and to its left in two. */
+.environment-context-back-left {
+  display: none;
+}
+
+@media (min-width: 1100px) {
+  .environment-context-back-up {
+    display: none;
+  }
+
+  .environment-context-back-left {
+    display: block;
+  }
+}
+
+.environment-native-mobile-hint {
+  display: none;
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--mv-ink-3);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/*
+ * The frame. From 761px the desktop canvas is scaled to the frame's width
+ * (--environment-scale is measured in EnvironmentDemo.tsx): the iframe is laid
+ * out larger by the inverse factor and scaled back down, so the GUI always
+ * gets a canvas wide enough for its apps.
+ */
+.environment-native-frame-wrap {
+  /* The desktop GUI's own backdrop color, so that a reloading frame does not flash light. */
+  --environment-backdrop: #1a1736;
+  position: relative;
+  height: 700px;
+  /* clip, not hidden: the iframe's unscaled layout box must not become scrollable. */
+  overflow: hidden;
+  overflow: clip;
+  background: var(--environment-backdrop);
+}
+
+.environment-native-frame-wrap:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: -3px;
+}
+
+.environment-native-frame {
+  display: block;
+  width: calc(100% / var(--environment-scale, 1));
+  height: calc(100% / var(--environment-scale, 1));
+  border: 0;
+  background: var(--environment-backdrop);
+  transform: scale(var(--environment-scale, 1));
+  transform-origin: 0 0;
+}
+
+.environment-native-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: var(--environment-backdrop);
+  color: #e3e6f3;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.environment-native-loading > svg {
+  color: #a9afd0;
+}
+
+/*
+ * Two columns: the whole desktop card stays below the site header while it is
+ * stuck (95px offset, 102px of toolbar, context strip and borders, 3px to
+ * spare), so the frame gives up height on windows shorter than 900px.
+ */
+@media (min-width: 1100px) {
+  .environment-native-frame-wrap {
+    height: clamp(560px, calc(100vh - 200px), 740px);
+  }
+}
+
+/*
+ * A narrow card: the full-screen link shows only its icon. Its text stays in
+ * place as the link's name and appears, like the reload button's, on hover
+ * and on keyboard focus.
+ */
+@container environment-native (max-width: 659px) {
+  .environment-native-expand {
+    border: 1px solid var(--mv-line-strong);
+    border-radius: var(--mv-radius-sm);
+  }
+
+  .environment-native-expand:hover {
+    background: var(--mv-tint);
+    text-decoration: none;
+  }
+
+  .environment-native-expand > span {
+    position: absolute;
+    top: calc(100% + 7px);
+    right: 0;
+    z-index: 2;
+    padding: 3px 8px;
+    border-radius: var(--mv-radius-sm);
+    background: var(--mv-ink);
+    color: var(--mv-on-fill);
+    font-weight: 550;
+    line-height: 1.5;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 120ms ease;
+  }
+
+  .environment-native-expand:hover > span,
+  .environment-native-expand:focus-visible > span {
+    opacity: 1;
+  }
+}
+
+/* A phone-width card: title with reload and full screen on one row, the state switch below. */
+@container environment-native (max-width: 479px) {
+  .environment-native-toolbar {
+    flex-wrap: wrap;
+    padding-top: 8px;
+    padding-bottom: 10px;
+  }
+
+  .environment-native-controls {
+    display: contents;
+  }
+
+  .environment-native-title {
+    flex: 1 1 0;
+    order: 1;
+  }
+
+  .environment-native-reload {
+    order: 2;
+  }
+
+  .environment-native-expand {
+    order: 3;
+  }
+
+  .environment-native-phase {
+    flex: 1 0 100%;
+    order: 4;
+  }
+
+  .environment-native-phase button {
+    flex: 1 1 0;
+    padding-right: 6px;
+    padding-left: 6px;
+    white-space: normal;
+  }
+}
+
+/* Phones: the GUI keeps a usable canvas and scrolls sideways inside the frame. */
+@media (max-width: 760px) {
+  .environment-native-frame-wrap {
+    height: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+  }
+
+  .environment-native-frame {
+    width: 100%;
+    min-width: 1024px;
+    height: 700px;
+    transform: none;
+  }
+
+  .environment-native-mobile-hint {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .environment-native-reload::after,
+  .environment-native-expand > span {
+    transition: none;
+  }
+}
+
+/* ---- highlight above the desktop: every service has a usable GUI ------ */
+
+.environment-gui-highlight {
+  display: flex;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--mv-trust-line);
+  border-left: 4px solid var(--mv-green);
+  border-radius: var(--mv-radius);
+  background: var(--mv-green-tint);
+}
+
+.environment-gui-highlight-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--mv-card);
+  color: var(--mv-green);
+}
+
+.environment-gui-highlight h3 {
+  margin: 0;
+  color: var(--mv-ink);
+  font-family: var(--mv-display);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.environment-gui-highlight p {
+  max-width: 84ch;
+  margin: 6px 0 0;
+  color: var(--mv-ink-2);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.environment-gui-highlight strong {
+  color: var(--mv-ink);
+  font-weight: 650;
+}

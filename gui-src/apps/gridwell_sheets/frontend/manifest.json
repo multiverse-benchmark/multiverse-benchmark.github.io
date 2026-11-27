@@ -1,0 +1,12 @@
+{
+  "id": "gridwell_sheets",
+  "name": "GridwellSheets",
+  "icon": "./icons/gridwell_sheets.svg",
+  "iconBackground": "linear-gradient(135deg, #059669 0%, #047857 100%)",
+  "description": "Spreadsheet application",
+  "backendService": "gridwell_sheets",
+  "defaultWindow": {
+    "width": 1100,
+    "height": 700
+  }
+}

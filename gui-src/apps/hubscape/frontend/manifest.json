@@ -1,0 +1,12 @@
+{
+  "id": "hubscape",
+  "name": "Hubscape",
+  "icon": "./icons/hubscape.svg",
+  "iconBackground": "linear-gradient(135deg, #38BDF8 0%, #1F2937 100%)",
+  "description": "Marketing automation dashboard for templates, forms, events, campaigns, emails, and subscriptions",
+  "backendService": "hubscape",
+  "defaultWindow": {
+    "width": 1100,
+    "height": 700
+  }
+}

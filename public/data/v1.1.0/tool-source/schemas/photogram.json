@@ -1,0 +1,197 @@
+[
+  {
+    "name": "add_comment_to_media",
+    "description": "Adds a comment to a media post.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "media_id": {
+          "description": "The ID of the media post being commented on. Leading/trailing whitespace is trimmed.",
+          "type": "string",
+          "minLength": 1
+        },
+        "user_id": {
+          "description": "The ID of the user making the comment. Can only contain letters, numbers, periods, and underscores. Leading/trailing whitespace is trimmed.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "message": {
+          "description": "The comment text. Leading/trailing whitespace is trimmed. Must be between 1-300 characters after trimming.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      },
+      "required": [
+        "media_id",
+        "user_id",
+        "message"
+      ]
+    }
+  },
+  {
+    "name": "create_media_post",
+    "description": "Creates a new media post associated with a user",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "The ID of the user who owns the media. Must be a non-empty string. Can only contain letters, numbers, periods, and underscores.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1
+        },
+        "image_url": {
+          "description": "URL of the media image. Must be a valid URL format.",
+          "type": "string",
+          "nullable": false,
+          "minLength": 1,
+          "maxLength": 2083
+        },
+        "caption": {
+          "description": "Optional text caption or description for the media post. Users typically use captions to describe their post, add hashtags (#), or mention other users (@username). If not provided, defaults to an empty string. Maximum length constraints are enforced by the underlying database model.",
+          "type": "string",
+          "nullable": false,
+          "default": ""
+        }
+      },
+      "required": [
+        "user_id",
+        "image_url"
+      ]
+    }
+  },
+  {
+    "name": "create_user",
+    "description": "Creates a new user with a given ID, name, and username. Leading/trailing whitespace is trimmed from user_id, name, and username.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "The unique identifier for the user. Leading/trailing whitespace is trimmed. Can only contain letters, numbers, periods, and underscores.",
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "description": "The name of the user. Leading/trailing whitespace is trimmed.",
+          "type": "string",
+          "minLength": 1
+        },
+        "username": {
+          "description": "The username of the user. Leading/trailing whitespace is trimmed.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "user_id",
+        "name",
+        "username"
+      ]
+    }
+  },
+  {
+    "name": "delete_media_post",
+    "description": "Deletes a specified media post from the system along with all associated comments (cascade delete).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "media_id": {
+          "description": "The unique identifier of the media post to delete.\nMust be a non-empty string.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "media_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_user",
+    "description": "Deletes a specified user from the system along with all associated data. This performs a cascading delete that removes: (1) the user profile, (2) all media posts created by the user, (3) all comments on those media posts (regardless of author), and (4) all comments made by the user on any post. Leading/trailing whitespace is trimmed from user_id.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "The unique identifier of the user to delete. Leading/trailing whitespace is trimmed. Can only contain letters, numbers, periods, and underscores.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "user_id"
+      ]
+    }
+  },
+  {
+    "name": "get_user_details",
+    "description": "Retrieves information about a specific user. Leading/trailing whitespace is trimmed from user_id.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "description": "The unique identifier of the user to retrieve. Leading/trailing whitespace is trimmed. Cannot be empty. Can only contain letters, numbers, periods, and underscores.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "user_id"
+      ]
+    }
+  },
+  {
+    "name": "get_user_id_by_username",
+    "description": "Searches for a user by their username and returns the corresponding user ID. The '@' prefix is optional and handled automatically - you can search with or without it regardless of how the username was originally stored. Leading/trailing whitespace is trimmed from username.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "description": "The username to look up in the system. The search is case-insensitive using casefold() for robust Unicode case-folding comparison. The '@' prefix is optional and will be handled automatically - you can search with or without it regardless of how the username was originally stored (e.g., searching \"username\" will find a user created with \"@username\" and vice versa). Leading/trailing whitespace is trimmed. This field cannot be an empty string or contain only whitespace.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "username"
+      ]
+    }
+  },
+  {
+    "name": "list_all_media_posts",
+    "description": "Lists all media posts in the system.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "list_all_users",
+    "description": "Lists all users in the system.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "list_media_comments",
+    "description": "Lists all comments on a specific media post.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "media_id": {
+          "description": "The ID of the media post to retrieve comments for.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "media_id"
+      ]
+    }
+  }
+]

@@ -1,0 +1,118 @@
+{
+  "O.a.1": {
+    "MV": "Some text assertions reject semantically equivalent wording. For example, a controlled test of the v1.1.0 delivery-tracker check accepts “ON TRACK” but rejects “On schedule”, although the task requires a positive delivery status without prescribing those exact words.",
+    "AW": "The inspected answer comparator rejects some equivalent representations after normalization. For example, “$23” does not match numeric 23, although “23.00” and “twenty-three” normalize successfully.",
+    "G2": "The write-action evaluator in released Harbor/ARE 1.2.0 runs rejected some semantically equivalent arguments. For example, it rejected “2000” against “2000 square feet” when the task requested only the square footage.",
+    "TA": "The inspected text comparators reject some semantically equivalent wording. For example, the license checks reject “Open Data Commons Attribution (ODC-By)” while accepting “ODC-By”.",
+    "AB": "The public task assertions reject semantically equivalent text in some cases. For example, the refund-notification check rejects “You qualify for a refund” despite correctly conveying eligibility.",
+    "HB": "Some rubric text checkers reject semantically equivalent representations. For example, a financial-summary check rejects amounts written with “USD” instead of a dollar sign, although no such format is required."
+  },
+  "O.a.2": {
+    "MV": "Some text assertions reject harmless extra words. For example, a controlled test of the v1.1.0 delivery-tracker check accepts “ON TRACK” but rejects “CURRENTLY ON TRACK”. Adding “currently” preserves the meaning, and the task does not require a bare status label.",
+    "AW": "The answer-equality check in released AppWorld v0.1.0 ReAct/GPT-4o runs rejected harmless added detail. For example, it rejected “Eliana Harper with 29 followers” against “Eliana Harper”, although that prompt did not require bare names.",
+    "G2": "The write-action evaluator in released Harbor/ARE 1.2.0 runs rejected harmless additional wording. For example, it rejected “Walk with Alessia Ramseyer” against “Walk”, although no exact title was required.",
+    "TA": "The inspected text comparators reject some correct content with harmless additional wording. For example, adding the expanded license name before “(ODC-By)” makes the comment and README checks fail.",
+    "AB": "The public task assertions reject some correct messages with harmless additional wording. For example, inserting “under our refund policy” breaks the refund-eligibility check without changing the meaning.",
+    "HB": "Some email-content checks reject harmless extra words. For example, a logistics email criterion accepts “enhanced expiry monitoring” but rejects “enhanced expiry date monitoring”."
+  },
+  "O.b.1": {
+    "MV": "Some text assertions reject valid expressions containing negation. For example, a controlled test of the v1.1.0 milestone check accepts “Confirmed” but rejects “Confirmed — no longer at risk”. It rejects the substring “at risk” even when the statement explicitly negates it.",
+    "AW": "The inspected movie-recommendation content checks accept required movie titles even when prefixed with “Do not watch”, reversing the intended recommendation.",
+    "TA": "Inspected researcher-name and subway-route checks accept matching text even when the output explicitly negates the recommendation or route.",
+    "AB": "A constructed public-task scoring check gives full credit to an invoice summary that explicitly denies the required total.",
+    "HB": "The inspected Slack-announcement criterion accepts required employee details even when the announcement begins “The following is NOT TRUE”."
+  },
+  "O.b.2": {
+    "TA": "The inspected text checkers accept unresolved candidate lists containing the required names or routes.",
+    "AB": "The public invoice task’s scoring accepts an unresolved choice between zero and the correct total, rather than requiring a definite answer.",
+    "HB": "The inspected Slack-announcement criterion accepts competing roles, dates or announcements joined by “OR” without requiring one definite announcement."
+  },
+  "O.c.1": {
+    "G2": "Human agreement and accuracy are reported, but repeated-call self-consistency of the judge is not established; the item requires all three."
+  },
+  "O.g.1": {
+    "G2": "The filesystem path checker rejects some alternative actions that produce the same valid final state. For example, it rejects a destination directory when the reference uses the full filename, although both moves produce the same file.",
+    "TA": "The workbook checker rejects some valid representations of the requested final state. For example, 0.043 displayed as 4.3% fails because it compares raw values without considering Excel’s percentage formatting."
+  },
+  "O.g.2": {
+    "TA": "The published evaluation does not establish systematic checks for unintended changes to unrelated state alongside the requested outputs.",
+    "AB": "The rubric checks declared assertions rather than all state changes; unrelated QuickBooks changes can leave the inspected Sheets/Gmail task’s score unchanged.",
+    "HB": "The checks miss required parts of the final state. For example, the onboarding task requires orientation-request emails with instructions and two attachments, but the email criterion can pass with empty bodies and no attachments if the recipients and subjects match."
+  },
+  "O.h.1": {
+    "AW": "General minimal-answer instructions do not disclose every task-specific parser assumption, such as the numeric type expected by the inspected Venmo-total evaluator."
+  },
+  "T.1": {
+    "G2": "The released CLI build uses a mutable Python image and unpinned system and Python dependencies, so tool versions are not fully specified.",
+    "TA": "Setup clones MCP repositories without commit pins and uses a mutable container tag, so not all tool versions are fixed.",
+    "HB": "The evaluator image uses a mutable Python base, unpinned system packages, and unversioned verifier dependencies."
+  },
+  "T.2": {
+    "TA": "Required tools include live external services whose availability cannot be held constant across evaluations."
+  },
+  "T.3": {
+    "TA": "Transient errors are handled, but sustained API outages still count as task failures rather than being excluded from scoring."
+  },
+  "T.5": {
+    "AW": "In the default same-process runtime, agents share host filesystem permissions, so ground-truth and evaluation files are not fully isolated."
+  },
+  "T.6": {
+    "TA": "Tasks depend on live services and dynamically retrieved information, so the task environment can change between evaluations."
+  },
+  "T.8": {
+    "AB": "Hinted models reach 80–100% success, but sampled reviews and expected model improvements do not verify that every task is solvable."
+  },
+  "T.9": {
+    "TA": "Reference artifacts and evaluation scripts are provided, but no automatic oracle solver is released for all tasks.",
+    "AB": "Hint sheets help model agents, but no automatic oracle solver is provided for every task.",
+    "HB": "Expert review checks task solvability, but no automatic solver or reference execution is provided for all challenges."
+  },
+  "T.10": {
+    "AW": "The default same-process runtime lacks a reliable security boundary around answer and evaluator files; its safety guards are not guaranteed to be foolproof."
+  },
+  "R.3": {
+    "TA": "Task prompts, ground truths, and evaluators are public; hiding them during a run does not prevent training-data contamination.",
+    "HB": "Mutated handbooks reduce prior memorization, but the exact tasks and rubrics are public and no held-out test set is reported."
+  },
+  "R.4": {
+    "MV": "No recurring task refresh is planned.",
+    "AW": "A future hidden set is mentioned, but no recurring task-refresh plan or update mechanism is specified.",
+    "G2": "Bug fixes and improvements are planned, but no recurring challenge refresh to prevent overfitting is specified.",
+    "TA": "The Verified release corrects issues, but no recurring challenge-refresh plan to prevent overfitting is specified.",
+    "HB": "No recurring plan to refresh challenges over time and reduce overfitting is reported."
+  },
+  "R.8": {
+    "TA": "The report analyzes model failures, but does not explain the potential impact of unavoidable evaluator or ground-truth flaws.",
+    "HB": "Failure analysis and relaxed-score comparisons do not discuss the potential impact of unavoidable evaluator or ground-truth flaws."
+  },
+  "R.9": {
+    "AW": "Limitations are discussed, but no quantitative estimate of evaluator or ground-truth error is reported.",
+    "TA": "Tool-call error analysis measures agent mistakes; no quantitative estimate of evaluator or ground-truth error is reported.",
+    "AB": "Audits and reward-hacking fixes are described, but no quantitative estimate of evaluator or ground-truth error is reported.",
+    "HB": "No quantitative analysis estimates how evaluator or ground-truth flaws affect the reported results."
+  },
+  "R.10": {
+    "AW": "Reported performance scores have no confidence intervals, standard errors, or comparable uncertainty statistics.",
+    "AB": "Single-run scores and an informal variability statement are reported, without a defined confidence interval, standard error, or standard deviation.",
+    "HB": "Four trials are run per task, but no confidence interval, standard error, or other uncertainty statistic is reported."
+  },
+  "R.11": {
+    "AW": "The report discusses limitations but gives no concrete guidance on how evaluator flaws should affect interpretation of its scores.",
+    "AB": "Potential task bugs are acknowledged, but no guidance explains how those flaws should affect interpretation of the scores.",
+    "HB": "Deployment advice discusses model mistakes, but gives no guidance on interpreting scores in light of evaluator errors."
+  },
+  "R.12": {
+    "MV": "No unaided human baseline was measured.",
+    "AW": "No human or other non-AI performance baseline is reported alongside the agent results.",
+    "TA": "Expert task review is reported, but no measured human or other non-AI performance baseline is given.",
+    "AB": "The simple-domain baseline uses an AI model; no human or other non-AI performance baseline is reported.",
+    "HB": "Expert-authored tasks are described, but no measured human or other non-AI performance baseline is reported."
+  },
+  "R.13": {
+    "AW": "Some assertions detect no-op behavior, but no aggregate result for a do-nothing or comparable trivial agent is reported.",
+    "G2": "Model and verifier baselines are reported, but no do-nothing or comparable trivial-agent result is given.",
+    "TA": "No benchmark result is reported for a do-nothing or comparable trivial agent.",
+    "AB": "The easier-domain baseline still uses model agents; no do-nothing or comparable trivial-agent result is reported.",
+    "HB": "No benchmark result is reported for a do-nothing or comparable trivial agent."
+  }
+}
