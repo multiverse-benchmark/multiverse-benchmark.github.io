@@ -66,6 +66,14 @@ export interface ModelSettings {
   openrouter_provider_pin?: string[];
   openrouter_quantization_pin?: string[];
   vllm_profile?: string;
+  /** How a self-hosted model was served, where the invocation recorded it. */
+  repository?: string;
+  revision?: string;
+  quantization?: string;
+  dtype?: string;
+  tool_call_parser?: string;
+  reasoning_parser?: string;
+  vllm_version?: string;
 }
 
 /** The settings an entry was run under that can affect its result (scripts/build_board.py). */
@@ -90,6 +98,8 @@ export interface MultiverseModel {
   modelKey?: string; // shared by a model's runs on different harnesses
   name: string;
   provider: string;
+  /** A page about the model, which its name links to. */
+  modelUrl?: string;
   scaffold: string;
   harnessType?: string | null;
   isOpenWeights: boolean;
@@ -122,7 +132,6 @@ export interface MultiverseModel {
     id: string;
     submitter: string;
     submitterUrl?: string;
-    modelUrl?: string;
     submittedOn: string;
     trajectories: string;
     scoreFile: string;

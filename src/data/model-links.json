@@ -1,0 +1,24 @@
+{
+ "note": "The page that the name of each baseline model links to on the leaderboard, for the models of every result set: the developer's page or announcement of the model, or its model card. A submitted model brings its own (entry.model.url in its score file).",
+ "models": {
+  "gemini_4_argon": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/",
+  "claude_fable_5_1": "https://www.anthropic.com/claude-fable-and-mythos-5-1",
+  "claude_opus_5_5": "https://www.anthropic.com/claude-opus-5-5",
+  "claude_sonnet_5_5": "https://www.anthropic.com/claude-sonnet-5-5",
+  "gpt_6_astra": "https://openai.com/index/gpt-6-astra/",
+  "gpt_6_1_sol": "https://openai.com/index/introducing-gpt-6-1-sol/",
+  "gpt_5_6_sol": "https://openai.com/index/gpt-5-6/",
+  "gemini_3_8_flash_thinking": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/3-8-flash-and-3-8-flash-cyber/",
+  "gemini_3_5_flash_thinking": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-5/",
+  "deepseek_v4_1_flash": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash",
+  "kimi_k3": "https://huggingface.co/moonshotai/Kimi-K3",
+  "glm_5_3": "https://huggingface.co/zai-org/GLM-5.3",
+  "claude_fable_5": "https://www.anthropic.com/news/claude-fable-5-mythos-5",
+  "claude_sonnet_5": "https://www.anthropic.com/news/claude-sonnet-5",
+  "claude_opus_4_6": "https://www.anthropic.com/news/claude-opus-4-6",
+  "gpt_5_4": "https://openai.com/index/introducing-gpt-5-4/",
+  "gemini_3_1_pro_thinking": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro/",
+  "glm_5_2": "https://huggingface.co/zai-org/GLM-5.2",
+  "deepseek_v4_flash": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash"
+ }
+}

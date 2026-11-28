@@ -29,8 +29,12 @@
 import paperData from '../data/paper/leaderboard.json';
 import releaseData from '../data/leaderboard.v1.1.0.json';
 import validationBoard from '../data/leaderboard.v1.1.0.validation.json';
+import modelLinks from '../data/model-links.json';
 import type { RunDetails } from '../types/platform';
 import { releaseOf, useResultSet, type Release, type ResultSet } from './release';
+
+/** The page of each baseline model, by model id. */
+const MODEL_LINKS: Record<string, string | undefined> = modelLinks.models;
 
 export type SettingId = 'Average' | 'ST' | 'IF' | 'MT' | 'MTIF';
 export type TaskSettingId = Exclude<SettingId, 'Average'>;
@@ -45,6 +49,8 @@ export interface Model {
   access: Access;
   /** One of the three reference models used to select tasks during construction. */
   reference: boolean;
+  /** A page about the model, which its name links to: its developer's page or announcement, or its model card. */
+  url?: string;
 }
 export interface Harness { id: HarnessId; name: string; abbr: string; kind: 'bare' | 'end-user' }
 /**
@@ -81,7 +87,6 @@ export interface Submission {
   id: string;
   submitter: string;
   submitterUrl?: string;
-  modelUrl?: string;
   /** The day the entry was submitted, as YYYY-MM-DD. */
   submittedOn: string;
   /** Address of the archive with the trajectory and the verifier votes of every task. */
@@ -218,7 +223,8 @@ export class Results {
   constructor(set: ResultSet, file: ResultFile) {
     this.set = set;
     this.release = releaseOf(set);
-    this.models = file.models;
+    // The page of a baseline model is in the committed list; a submitted model brings its own.
+    this.models = file.models.map(model => ({ ...model, url: MODEL_LINKS[model.id] ?? model.url }));
     this.harnesses = file.harnesses;
     this.settings = file.settings;
     this.settingIds = file.settings.map(setting => setting.id);

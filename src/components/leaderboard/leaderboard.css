@@ -728,8 +728,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
     'name access'
-    'dev dev'
-    'details details';
+    'dev dev';
   column-gap: 12px;
   align-items: center;
 }
@@ -760,6 +759,25 @@
   text-underline-offset: 3px;
 }
 
+/* The model name links to the page of the model. It reads as the name until it is pointed at. */
+.lb-model-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lb-model-link:hover,
+.lb-model-link:focus-visible {
+  color: var(--mv-link, var(--mv-green));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.lb-model-link:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
 .lb-model-meta {
   display: contents;
 }
@@ -774,28 +792,6 @@
 .lb-model-access {
   display: inline-flex;
   grid-area: access;
-}
-
-/* a submitted entry: its submitter and the link to its trajectories, under the developer */
-.lb-model-submission {
-  display: block;
-}
-
-.lb-model-submission a {
-  border-radius: 3px;
-  color: var(--mv-green-dark);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
-}
-
-.lb-model-submission a:hover {
-  color: var(--mv-ink);
-}
-
-.lb-model-submission a:focus-visible {
-  outline: 3px solid var(--mv-focus);
-  outline-offset: 2px;
 }
 
 /* result cells: the rate, and a bar on a 0 to 100% track */
@@ -890,49 +886,55 @@
 }
 
 /* ---- run details, on request ------------------------------------------ */
-/* The button under a model that opens the settings its entry was run under. */
-.lb-details-toggle {
-  grid-area: details;
+/* The two marks beside a model's name: a warning before it where the run differs from the default,
+   and the mark after it that opens the settings the entry was run under. */
+.lb-mark {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  justify-self: start;
-  margin-top: 2px;
-  padding: 2px 0;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  margin: -2px 0;
+  padding: 0 2px;
   border: 0;
-  border-radius: 3px;
+  border-radius: 5px;
   background: transparent;
-  color: var(--mv-green-dark);
   font: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.45;
+  font-size: 13px;
+  line-height: 1;
+  vertical-align: baseline;
   cursor: pointer;
 }
 
-.lb-details-toggle:hover {
-  color: var(--mv-ink);
-  text-decoration: underline;
-  text-underline-offset: 2px;
+.lb-mark-warning {
+  margin-right: 3px;
+  margin-left: -3px;
 }
 
-.lb-details-toggle:focus-visible {
+.lb-mark-details {
+  margin-left: 3px;
+  opacity: 0.62;
+}
+
+/* The end of the name holds the room of the mark and the mark moves into it: the line cannot break between the two. */
+.lb-model-label.has-mark {
+  padding-right: 25px;
+}
+
+.lb-model-label.has-mark + .lb-mark-details {
+  margin-left: -22px;
+}
+
+.lb-mark:hover,
+.lb-mark[aria-expanded='true'] {
+  background: var(--mv-tint);
+  opacity: 1;
+}
+
+.lb-mark:focus-visible {
   outline: 3px solid var(--mv-focus);
-  outline-offset: 2px;
-}
-
-.lb-details-toggle svg {
-  transition: transform 0.15s ease;
-}
-
-.lb-details-toggle[aria-expanded='true'] svg {
-  transform: rotate(180deg);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .lb-details-toggle svg {
-    transition: none;
-  }
+  outline-offset: 1px;
+  opacity: 1;
 }
 
 .lb-details-row > td {
@@ -956,6 +958,35 @@
   color: var(--mv-ink);
   font-size: 13px;
   font-weight: 650;
+}
+
+/* why the entry carries the warning mark */
+.lb-run-warnings {
+  display: grid;
+  gap: 3px;
+  margin: 0 0 10px;
+  padding: 0;
+  color: var(--mv-ink);
+  font-size: 13px;
+  line-height: 1.45;
+  list-style: none;
+}
+
+.lb-run a {
+  border-radius: 3px;
+  color: var(--mv-green-dark);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.lb-run a:hover {
+  color: var(--mv-ink);
+}
+
+.lb-run a:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
 }
 
 .lb-run {

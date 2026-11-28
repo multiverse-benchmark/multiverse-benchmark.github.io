@@ -10,25 +10,50 @@ import type { ModelSettings, RunDetails } from '../types/platform';
 
 export interface RunDetailLine { key: string; label: string; values: string[] }
 
-/** How the page names the route of a model's requests. Another provider is shown as recorded. */
+/** How the page names the provider the requests of a run went to. Another provider is shown as recorded. */
 const PROVIDER: Record<string, string> = {
   google: 'Google',
   openai: 'OpenAI',
   anthropic: 'Anthropic',
   openrouter: 'OpenRouter',
-  vllm: 'a self-hosted vLLM server',
 };
 const NOT_RECORDED = 'not recorded';
 
 const tokens = (count: number): string => `${count.toLocaleString('en-US')} tokens`;
 const tasksText = (count: number): string => `${count} ${count === 1 ? 'task' : 'tasks'}`;
 
-function modelText(settings: ModelSettings): string {
-  const route = settings.provider ? PROVIDER[settings.provider] ?? settings.provider : '';
-  const servedBy = settings.openrouter_provider_pin?.length ? `, served by ${settings.openrouter_provider_pin.join(', ')}` : '';
-  const precision = settings.openrouter_quantization_pin?.length ? `, precision ${settings.openrouter_quantization_pin.join(', ')}` : '';
-  return `${settings.name ?? NOT_RECORDED}${route ? ` through ${route}` : ''}${servedBy}${precision}`;
+/** The name the requests were sent under. */
+const modelText = (settings: ModelSettings): string => settings.name ?? NOT_RECORDED;
+
+/**
+ * Who answered the requests: the API of a provider, the provider that
+ * OpenRouter was pinned to, or the submitter's own vLLM server with its
+ * version. A client library between the run and the provider is named too.
+ */
+function providerText(settings: ModelSettings): string {
+  if (!settings.provider) return NOT_RECORDED;
+  const parts = [
+    settings.provider === 'vllm'
+      ? `self-hosted with vLLM${settings.vllm_version ? ` ${settings.vllm_version}` : ''}`
+      : PROVIDER[settings.provider] ?? settings.provider,
+    settings.openrouter_provider_pin?.length ? `served by ${settings.openrouter_provider_pin.join(', ')}` : '',
+    settings.transport === 'litellm' ? 'requests sent with LiteLLM' : '',
+  ];
+  return parts.filter(Boolean).join(', ');
 }
+
+/** The precision the model ran at: what a self-hosted server was started with, or the precisions an OpenRouter route was pinned to. */
+function quantizationText(settings: ModelSettings): string {
+  const parts = [settings.quantization, settings.openrouter_quantization_pin?.join(', '), settings.dtype ? `dtype ${settings.dtype}` : ''];
+  return parts.filter(Boolean).join(', ') || NOT_RECORDED;
+}
+
+const filesText = (settings: ModelSettings): string =>
+  (settings.repository ? `${settings.repository}${settings.revision ? ` at ${settings.revision.slice(0, 12)}` : ''}` : NOT_RECORDED);
+const recorded = (value: string | undefined): string => value ?? NOT_RECORDED;
+/** Whether any case of the run recorded the setting: a line for a setting no case recorded is left out. */
+const anyRecorded = (details: RunDetails, has: (settings: ModelSettings) => unknown): boolean =>
+  details.modelSettings.some(group => Boolean(has(group.settings)));
 
 function windowText(settings: ModelSettings): string {
   if (settings.context_window == null) return NOT_RECORDED;
@@ -65,14 +90,52 @@ function spread(details: RunDetails, read: (settings: ModelSettings) => string):
   return [...tasks].map(([text, count]) => `${text} (${tasksText(count)})`);
 }
 
+/** The defaults of the leaderboard's baselines for the settings a run can change. */
+export const DEFAULT_REQUEST_LIMIT_SECONDS = 240;
+export const DEFAULT_INSTRUCTION_PLACEMENT = 'system';
+
+/**
+ * What a reader should know before comparing the entry with the others: tasks
+ * that were run again after they had a scored result, and run settings that
+ * are not the leaderboard's defaults. Empty for a run under the defaults.
+ */
+export function runWarnings(details: RunDetails): string[] {
+  const warnings: string[] = [];
+  const rerun = details.rerunTasks ?? 0;
+  if (rerun > 0) warnings.push(`${tasksText(rerun)} ${rerun === 1 ? 'was' : 'were'} run again after a scored result; the newest result counts.`);
+  if (details.instructionPlacement && details.instructionPlacement !== DEFAULT_INSTRUCTION_PLACEMENT) {
+    warnings.push(`The developer instructions were placed in the ${details.instructionPlacement} message; the default is the ${DEFAULT_INSTRUCTION_PLACEMENT} message.`);
+  }
+  const limits = details.requestLimitsSeconds ?? [];
+  if (limits.some(seconds => seconds !== DEFAULT_REQUEST_LIMIT_SECONDS)) {
+    warnings.push(`The limit on one model request was ${limits.map(seconds => `${seconds} s`).join(' and ')}; the default is ${DEFAULT_REQUEST_LIMIT_SECONDS} s.`);
+  }
+  if (details.modelSettings.length > 1) warnings.push('The tasks did not all run under the same settings of the model.');
+  return warnings;
+}
+
 export function runDetailLines(details: RunDetails): RunDetailLine[] {
   const lines: RunDetailLine[] = [
     { key: 'model', label: 'Model', values: spread(details, modelText) },
+    { key: 'provider', label: 'Provider', values: spread(details, providerText) },
     { key: 'context', label: 'Context window', values: spread(details, windowText) },
     { key: 'output', label: 'Output limit', values: spread(details, outputText) },
     { key: 'temperature', label: 'Temperature', values: spread(details, temperatureText) },
     { key: 'reasoning', label: 'Reasoning', values: spread(details, reasoningText) },
   ];
+  // Shown where a run recorded them: the precision of the model, and for a self-hosted model its files and parsers.
+  if (anyRecorded(details, settings => settings.quantization || settings.dtype || settings.openrouter_quantization_pin?.length)) {
+    lines.push({ key: 'quantization', label: 'Quantization', values: spread(details, quantizationText) });
+  }
+  if (anyRecorded(details, settings => settings.tool_call_parser)) {
+    lines.push({ key: 'tool-parser', label: 'Tool-call parser', values: spread(details, settings => recorded(settings.tool_call_parser)) });
+  }
+  if (anyRecorded(details, settings => settings.reasoning_parser)) {
+    lines.push({ key: 'reasoning-parser', label: 'Reasoning parser', values: spread(details, settings => recorded(settings.reasoning_parser)) });
+  }
+  if (anyRecorded(details, settings => settings.repository)) {
+    lines.push({ key: 'files', label: 'Model files', values: spread(details, filesText) });
+  }
   if (details.modelCallLimit != null) lines.push({ key: 'calls', label: 'Model calls', values: [`at most ${details.modelCallLimit} per task`] });
   if (details.requestLimitsSeconds?.length) {
     lines.push({ key: 'request', label: 'Limit on one model request', values: details.requestLimitsSeconds.map(seconds => `${seconds} s`) });

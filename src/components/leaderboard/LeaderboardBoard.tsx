@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from "react";
 import { LeaderboardControls, type UnavailableHarnessCopy } from "./LeaderboardControls";
 import { LeaderboardTable, type AccessFilter } from "./LeaderboardTable";
+import { runWarnings } from "@/lib/runDetails";
 import "./leaderboard.css";
 import {
   AVERAGE_HARNESS,
@@ -113,10 +114,14 @@ function boardColumns(
   ];
 }
 
-/** The key entry for a board that names who ran its entries: what "Submitted by" under a model says. */
-const SUBMITTED_KEY = {
-  label: "Submitted by",
-  text: "Who ran the evaluation of the entry. An entry with a trajectory link was sent in with multiverse submit: its scores are checked against the verifier votes in its trajectories, and the run is not repeated. Where tasks were run again after a scored result, the entry says how many; the newest result of a task counts.",
+/** The key entries for the two marks beside a model's name. */
+const DETAILS_KEY = {
+  label: "⚙️",
+  text: "Run details: the settings of the run and who submitted it",
+};
+const WARNING_KEY = {
+  label: "⚠️",
+  text: "The run differs from the default; the run details say how",
 };
 
 /** The key under the table: what each column is. The end-user harnesses share one entry. */
@@ -290,7 +295,7 @@ export function LeaderboardBoard({
         onSelectColumn={selectColumn}
         axis={axis}
         caption={caption}
-        keyItems={[...columnKey(axis, columns), ...(models.some((model) => model.submitter) ? [SUBMITTED_KEY] : [])]}
+        keyItems={[...columnKey(axis, columns), ...(models.some((model) => model.runDetails) ? [DETAILS_KEY] : []), ...(models.some((model) => model.runDetails && runWarnings(model.runDetails).length > 0) ? [WARNING_KEY] : [])]}
         harnesses={harnessesWithResults}
         filters={filters}
         onFiltersChange={setFilters}

@@ -69,6 +69,7 @@ function build(results: Results): Board {
       ...(submitter ? { submitter } : {}),
       ...(runDetails ? { runDetails } : {}),
       ...(submission ? { submission } : {}),
+      ...(model.url ? { modelUrl: model.url } : {}),
       rank: average.rank,
       modelKey: `${results.set}/${model.id}`,
       name: model.name,

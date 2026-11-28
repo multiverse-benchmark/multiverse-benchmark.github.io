@@ -50,6 +50,7 @@ BASELINES = ROOT / "src" / "data" / f"leaderboard.{RELEASE}.json"
 PAPER = ROOT / "src" / "data" / "paper" / "leaderboard.json"
 RUN_INDEX = ROOT / "public" / "data" / RELEASE / "runs" / "index.json"
 RUN_DETAILS = ROOT / "src" / "data" / f"leaderboard.{RELEASE}.run-details.json"
+MODEL_LINKS = ROOT / "src" / "data" / "model-links.json"
 OUT = ROOT / "src" / "data" / f"leaderboard.{RELEASE}.{SPLIT}.json"
 METRIC_SEVERAL_HARNESSES = "Success rate (%) for one scored trajectory per model, harness and task"
 
@@ -125,8 +126,6 @@ def entry_info(relative: str, document: dict) -> dict:
     }
     if "url" in entry["submitter"]:
         info["submitterUrl"] = entry["submitter"]["url"]
-    if "url" in entry["model"]:
-        info["modelUrl"] = entry["model"]["url"]
     return info
 
 
@@ -163,7 +162,8 @@ def build(submissions: list[tuple[str, dict]]) -> dict:
         entry = document["entry"]
         model, harness = entry["model"], entry["harness"]
         if model["id"] not in models:
-            models[model["id"]] = {"id": model["id"], "name": model["name"], "developer": model["developer"], "access": model["access"], "reference": False}
+            # A model the baselines do not have: its name on the board links to the page its submitter gave.
+            models[model["id"]] = {"id": model["id"], "name": model["name"], "developer": model["developer"], "access": model["access"], "reference": False, "url": model["url"]}
         if harness not in {item["id"] for item in board["harnesses"]}:
             board["harnesses"].append(known_harnesses[harness])
         for setting, cell in cells_of(document, board["taskCounts"]).items():
@@ -219,6 +219,11 @@ def validate(board: dict, submissions: list[tuple[str, dict]]) -> None:
     assert {(model, harness) for model, harnesses in board["runDetails"].items() for harness in harnesses} == {
         (model, harness) for model, cells in board["results"]["Average"].items() for harness in cells
     }, "the run details and the entries of the board differ"
+    # The name of every model links to a page about it: a baseline's from the committed list, a submitted model's from its score file.
+    links = json.loads(MODEL_LINKS.read_text())["models"]
+    for model in board["models"]:
+        url = links.get(model["id"], model.get("url"))
+        assert isinstance(url, str) and url.startswith("https://"), f"{model['id']} has no page to link its name to"
     submitted = {(document["entry"]["model"]["id"], document["entry"]["harness"]) for _, document in submissions}
     assert {(model, harness) for model, harnesses in board["entries"].items() for harness in harnesses} == submitted
     for setting in TASK_SETTINGS:

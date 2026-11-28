@@ -74,6 +74,20 @@ MAX_CHANGED_PATHS = 500
 # They decide what the model is asked to do, so a reader needs them to compare
 # two entries: the limits on input and output, sampling, reasoning, and the
 # route the requests take.
+# How a self-hosted model was served: the model files, their precision, and
+# the parsers that turn the model's output into tool calls and reasoning, as
+# the model configuration declares them, and the version the server reports.
+# An invocation records them in its run metadata, and a submission states them
+# with the settings of the action model.
+SERVING_FIELDS = (
+    "repository",
+    "revision",
+    "quantization",
+    "dtype",
+    "tool_call_parser",
+    "reasoning_parser",
+    "vllm_version",
+)
 MODEL_SETTING_FIELDS = (
     "name",
     "provider",
@@ -91,6 +105,7 @@ MODEL_SETTING_FIELDS = (
     "openrouter_provider_pin",
     "openrouter_quantization_pin",
     "vllm_profile",
+    *SERVING_FIELDS,
 )
 # Which message carries the developer instructions of a task.
 INSTRUCTION_PLACEMENTS = ("system", "user")
@@ -688,8 +703,8 @@ def _check_entry(entry: Any, errors: list[str]) -> None:
   if _keys(
       model,
       "entry.model",
-      ("id", "name", "developer", "access"),
-      ("url",),
+      ("id", "name", "developer", "access", "url"),
+      (),
       errors,
   ):
     if not is_model_id(model["id"]):
@@ -703,8 +718,10 @@ def _check_entry(entry: Any, errors: list[str]) -> None:
         )
     if model["access"] not in ACCESS:
       errors.append("entry.model.access must be 'open' or 'closed'")
-    if "url" in model and not _url(model["url"]):
-      errors.append("entry.model.url must be an https address")
+    if not _url(model["url"]):
+      errors.append(
+          "entry.model.url must be the https address of a page about the model"
+      )
   if _keys(submitter, "entry.submitter", ("name",), ("url",), errors):
     if not _text(submitter["name"], 80):
       errors.append("entry.submitter.name must be 1 to 80 printable characters")

@@ -5,7 +5,7 @@
  */
 
 import { useId, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
-import { ArrowDown, ChevronDown, Search, SlidersHorizontal, X } from "lucide-react";
+import { ArrowDown, Search, SlidersHorizontal, X } from "lucide-react";
 import { AccessBadge, Segmented, type SegmentedOption } from "@/components/paper/shared";
 import {
   BEST_HARNESS,
@@ -18,7 +18,7 @@ import {
   type RankedRow,
 } from "@/lib/leaderboardFilters";
 import { formatContext, formatParams } from "@/lib/modelSize";
-import { runDetailLines } from "@/lib/runDetails";
+import { runDetailLines, runWarnings } from "@/lib/runDetails";
 import { HARNESS_ABBR } from "@/lib/taskSettingStyle";
 import type {
   ContextLengthRange,
@@ -234,7 +234,7 @@ export function LeaderboardTable({
       model.contextLength ? `${formatContext(model.contextLength)} context` : "",
       harnesses.length > 1 && evaluatedOn < harnesses.length ? `${evaluatedOn} of ${harnesses.length} harnesses` : "",
     ].filter(Boolean);
-    // Who ran the evaluation, and for a submitted entry the link to its trajectories: of the entry behind the number that ranks the model.
+    // The entry behind the number that ranks the model: who ran it and, for a submitted entry, where its trajectories are. Both are part of its run details.
     const shown = ranking?.run ?? model;
     const submission = shown.submission;
     const submitter = shown.submitter;
@@ -242,6 +242,11 @@ export function LeaderboardTable({
     const runDetails = shown.runDetails;
     const detailsOpen = Boolean(runDetails) && openDetails === row.key;
     const detailsId = `${captionId}-details-${row.key.replace(/[^A-Za-z0-9_-]/g, "-")}`;
+    const warnings = runDetails ? runWarnings(runDetails) : [];
+    const toggleDetails = (event: { stopPropagation: () => void }) => {
+      event.stopPropagation();
+      setOpenDetails(detailsOpen ? null : row.key);
+    };
     const stay = (event: { stopPropagation: () => void }) => event.stopPropagation();
     const main = (
       <tr
@@ -256,77 +261,72 @@ export function LeaderboardTable({
         <th scope="row" className="lb-model">
           <div className="lb-model-inner">
             <div className="lb-model-name">
-              {open ? (
+              {/* A mark before the name where the run differs from the default; the reasons are its tooltip and open with the run details. */}
+              {warnings.length > 0 && (
                 <button
                   type="button"
-                  className="lb-model-open"
-                  title={`Open the results of ${model.name}`}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    open();
-                  }}
+                  className="lb-mark lb-mark-warning"
+                  title={warnings.join(" ")}
+                  aria-label={`Notes on the run of ${model.name}: ${warnings.join(" ")}`}
+                  aria-expanded={detailsOpen}
+                  aria-controls={detailsId}
+                  data-lb-warning={row.key}
+                  onClick={toggleDetails}
                 >
-                  {model.name}
+                  <span aria-hidden="true">⚠️</span>
                 </button>
-              ) : (
-                model.name
+              )}
+              {/* The label keeps room for the mark that follows it, so the mark never wraps to a line of its own. */}
+              <span className={`lb-model-label${runDetails ? " has-mark" : ""}`}>
+                {open ? (
+                  <button
+                    type="button"
+                    className="lb-model-open"
+                    title={`Open the results of ${model.name}`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      open();
+                    }}
+                  >
+                    {model.name}
+                  </button>
+                ) : model.modelUrl ? (
+                  // The name leads to the page of the model: its developer's page or announcement, or its model card.
+                  <a
+                    className="lb-model-link"
+                    href={model.modelUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    title={`The page of ${model.name}`}
+                    data-lb-model-link={row.key}
+                    onClick={stay}
+                  >
+                    {model.name}
+                  </a>
+                ) : (
+                  model.name
+                )}
+              </span>
+              {runDetails && (
+                <button
+                  type="button"
+                  className="lb-mark lb-mark-details"
+                  title="Run details"
+                  aria-label={`Run details of ${model.name}`}
+                  aria-expanded={detailsOpen}
+                  aria-controls={detailsId}
+                  data-lb-details-toggle={row.key}
+                  onClick={toggleDetails}
+                >
+                  <span aria-hidden="true">⚙️</span>
+                </button>
               )}
             </div>
             <div className="lb-model-meta">
               <span className="lb-model-dev">
                 {model.provider}
                 {details.length > 0 && <span className="lb-model-size"> · {details.join(" · ")}</span>}
-                {submitter && (
-                  <span className="lb-model-submission" data-lb-submitter={submitter} data-lb-submission={submission?.id}>
-                    Submitted by{" "}
-                    {submission?.submitterUrl ? (
-                      <a href={submission.submitterUrl} target="_blank" rel="noreferrer" onClick={stay}>
-                        {submitter}
-                      </a>
-                    ) : (
-                      submitter
-                    )}
-                    {submission && (
-                      <>
-                        {" · "}
-                        <a
-                          href={submission.trajectories}
-                          rel="noreferrer"
-                          title={`Download the trajectories and verifier votes of ${model.name}`}
-                          onClick={stay}
-                        >
-                          trajectories
-                        </a>
-                        {submission.rerunTasks > 0 && (
-                          <span
-                            data-lb-reruns={submission.rerunTasks}
-                            title="Tasks that were run again after they had a scored result. The newest result of a task counts."
-                          >
-                            {" · "}
-                            {submission.rerunTasks} {submission.rerunTasks === 1 ? "task" : "tasks"} re-run after a scored result
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </span>
-                )}
               </span>
-              {runDetails && (
-                <button
-                  type="button"
-                  className="lb-details-toggle"
-                  aria-expanded={detailsOpen}
-                  aria-controls={detailsId}
-                  data-lb-details-toggle={row.key}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setOpenDetails(detailsOpen ? null : row.key);
-                  }}
-                >
-                  Run details
-                  <ChevronDown size={12} strokeWidth={2.2} aria-hidden="true" />
-                </button>
-              )}
               <span className="lb-model-access">
                 <AccessBadge access={model.isOpenWeights ? "open" : "closed"} />
               </span>
@@ -417,6 +417,15 @@ export function LeaderboardTable({
               Run details of {model.name}
               {harnesses.length > 1 && ` under ${harnessLabel(shown.harnessType || "none")}`}
             </p>
+            {warnings.length > 0 && (
+              <ul className="lb-run-warnings" data-lb-run-warnings>
+                {warnings.map((warning) => (
+                  <li key={warning}>
+                    <span aria-hidden="true">⚠️</span> {warning}
+                  </li>
+                ))}
+              </ul>
+            )}
             <dl className="lb-run">
               {runDetailLines(runDetails).map((line) => (
                 <div key={line.key} data-lb-run-line={line.key}>
@@ -428,6 +437,30 @@ export function LeaderboardTable({
                   </dd>
                 </div>
               ))}
+              {submitter && (
+                <div data-lb-run-line="submitter">
+                  <dt>Submitted by</dt>
+                  <dd>
+                    {submission?.submitterUrl ? (
+                      <a href={submission.submitterUrl} target="_blank" rel="noreferrer" onClick={stay}>
+                        {submitter}
+                      </a>
+                    ) : (
+                      <span>{submitter}</span>
+                    )}
+                  </dd>
+                </div>
+              )}
+              {submission && (
+                <div data-lb-run-line="trajectories">
+                  <dt>Trajectories</dt>
+                  <dd>
+                    <a href={submission.trajectories} rel="noreferrer" onClick={stay}>
+                      Download the archive
+                    </a>
+                  </dd>
+                </div>
+              )}
             </dl>
           </div>
         </td>

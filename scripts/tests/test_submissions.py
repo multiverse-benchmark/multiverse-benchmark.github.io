@@ -18,6 +18,8 @@ ROOT = Path(__file__).resolve().parents[2]
 REFERENCE = check_submission.reference_for("v1.1.0")
 INDEX = json.loads((ROOT / "public" / "data" / "v1.1.0" / "runs" / "index.json").read_text())
 BASELINES = json.loads((ROOT / "src" / "data" / "leaderboard.v1.1.0.json").read_text())["sets"]["validation"]
+# The page about the model that the trial submissions give.
+MODEL_URL = "https://example.org/trial-model"
 # The settings of the action model that the trial submissions state.
 MODEL_SETTINGS = {"name": "trial-model-001", "provider": "vllm", "transport": "vllm", "context_window": 262144, "max_tokens": 32768, "supports_sampling": True, "default_temperature": 1.0, "supports_thinking": True, "thinking_level": "HIGH", "vllm_profile": "local"}
 # The verifiers of the run index, in the order of a score file's checks.
@@ -57,7 +59,7 @@ def submission_like(baseline: str, *, model_id="trial_model", name="Trial Model"
         "format": fmt.FORMAT, "schema_version": fmt.SCHEMA_VERSION, "release": "v1.1.0", "split": "validation",
         "entry": {
             "id": fmt.entry_id_of(model_id, harness),
-            "model": {"id": model_id, "name": name, "developer": "Trial Lab", "access": "open"},
+            "model": {"id": model_id, "name": name, "developer": "Trial Lab", "access": "open", "url": MODEL_URL},
             "harness": harness, "submitter": {"name": "Trial Lab"}, "submitted_on": "2026-11-28",
         },
         "run": {
@@ -237,6 +239,22 @@ class BoardTests(unittest.TestCase):
             self.assertEqual(sum(group["tasks"] for group in harnesses["bare"]["modelSettings"]), 400)
         self.assertEqual(board, BASELINES)
 
+    def test_every_baseline_model_of_every_result_set_has_a_page_to_link_to(self):
+        links = json.loads(build_board.MODEL_LINKS.read_text())["models"]
+        release = json.loads(build_board.BASELINES.read_text())["sets"]
+        models = {model["id"] for result_set in release.values() for model in result_set["models"]}
+        models |= {model["id"] for model in json.loads(build_board.PAPER.read_text())["models"]}
+        self.assertEqual(sorted(links), sorted(models))
+        for model, url in links.items():
+            self.assertRegex(url, r"^https://[^\s/]+/\S+$", model)
+
+    def test_a_score_file_without_the_page_of_its_model_is_refused(self):
+        document, _ = submission_like("kimi_k3")
+        document["entry"]["model"]["url"] = "http://example.org/trial-model"
+        self.assertIn("entry.model.url must be the https address of a page about the model", " ".join(fmt.check_submission(document, REFERENCE)))
+        del document["entry"]["model"]["url"]
+        self.assertIn("entry.model lacks url", " ".join(fmt.check_submission(document, REFERENCE)))
+
     def test_an_entry_gets_the_cells_its_task_results_give_among_the_baselines(self):
         document, _ = submission_like("kimi_k3")
         submissions = [("submissions/v1.1.0/trial_model-bare.json", document)]
@@ -249,6 +267,8 @@ class BoardTests(unittest.TestCase):
             self.assertEqual(board["results"][setting]["trial_model"]["bare"], board["results"][setting]["kimi_k3"]["bare"], setting)
         order = [model["id"] for model in board["models"]]
         self.assertEqual(order.index("trial_model"), order.index("kimi_k3") + 1)
+        # The name of the model links to the page its score file gives.
+        self.assertEqual(board["models"][order.index("trial_model")]["url"], MODEL_URL)
         self.assertEqual(board["entries"]["trial_model"]["bare"]["submitter"], "Trial Lab")
         self.assertEqual(board["entries"]["trial_model"]["bare"]["rerunTasks"], 0)
         self.assertEqual(board["runDetails"]["trial_model"]["bare"], {
