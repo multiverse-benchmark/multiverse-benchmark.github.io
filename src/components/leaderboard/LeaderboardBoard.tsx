@@ -113,10 +113,10 @@ function boardColumns(
   ];
 }
 
-/** The key entry for a board with submitted entries: what "Submitted by" under a model says about its numbers. */
+/** The key entry for a board that names who ran its entries: what "Submitted by" under a model says. */
 const SUBMITTED_KEY = {
   label: "Submitted by",
-  text: "Results reported by the named submitter with multiverse submit. The scores are checked against the verifier votes in the entry’s trajectories; the run is not repeated. Where tasks were run again after a scored result, the entry says how many; the newest result of a task counts.",
+  text: "Who ran the evaluation of the entry. An entry with a trajectory link was sent in with multiverse submit: its scores are checked against the verifier votes in its trajectories, and the run is not repeated. Where tasks were run again after a scored result, the entry says how many; the newest result of a task counts.",
 };
 
 /** The key under the table: what each column is. The end-user harnesses share one entry. */
@@ -290,7 +290,7 @@ export function LeaderboardBoard({
         onSelectColumn={selectColumn}
         axis={axis}
         caption={caption}
-        keyItems={[...columnKey(axis, columns), ...(models.some((model) => model.submission) ? [SUBMITTED_KEY] : [])]}
+        keyItems={[...columnKey(axis, columns), ...(models.some((model) => model.submitter) ? [SUBMITTED_KEY] : [])]}
         harnesses={harnessesWithResults}
         filters={filters}
         onFiltersChange={setFilters}

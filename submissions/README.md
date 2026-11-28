@@ -7,7 +7,7 @@ submissions/<release>/<entry>.json        for example submissions/v1.1.0/my_mode
 submissions/reference/<release>.validation.json   what a score file is checked against
 ```
 
-The leaderboard on the site is the baselines of the paper plus the score files in this folder. `scripts/build_board.py` puts them together whenever the site is built, so merging a score file is all it takes to add an entry.
+The leaderboard on the site is the baselines of the paper plus the score files in this folder. Every entry names who ran its evaluation: the baselines, and any other entry the maintainers add themselves, carry the submitter "MultiVerse admin". `scripts/build_board.py` puts them together whenever the site is built, so merging a score file is all it takes to add an entry.
 
 ## How to submit
 

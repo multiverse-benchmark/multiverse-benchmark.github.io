@@ -77,6 +77,8 @@ export interface MultiverseModel {
   samplesSkipped?: number;
   samplesUnscored?: number;
   taskSettings?: Partial<Record<TaskSettingId, TaskSettingStats>>;
+  /** Who ran the evaluation of the entry, where the result set names it. */
+  submitter?: string;
   /** Present on a submitted entry: who submitted it, and where its trajectories are. */
   submission?: {
     id: string;

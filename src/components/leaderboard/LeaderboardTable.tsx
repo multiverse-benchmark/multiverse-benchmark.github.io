@@ -231,8 +231,10 @@ export function LeaderboardTable({
       model.contextLength ? `${formatContext(model.contextLength)} context` : "",
       harnesses.length > 1 && evaluatedOn < harnesses.length ? `${evaluatedOn} of ${harnesses.length} harnesses` : "",
     ].filter(Boolean);
-    // A submitted entry names its submitter and links to its trajectories: the entry behind the number that ranks the model.
-    const submission = (ranking?.run ?? model).submission;
+    // Who ran the evaluation, and for a submitted entry the link to its trajectories: of the entry behind the number that ranks the model.
+    const shown = ranking?.run ?? model;
+    const submission = shown.submission;
+    const submitter = shown.submitter;
     const stay = (event: { stopPropagation: () => void }) => event.stopPropagation();
     return (
       <tr
@@ -267,33 +269,37 @@ export function LeaderboardTable({
               <span className="lb-model-dev">
                 {model.provider}
                 {details.length > 0 && <span className="lb-model-size"> · {details.join(" · ")}</span>}
-                {submission && (
-                  <span className="lb-model-submission" data-lb-submission={submission.id}>
+                {submitter && (
+                  <span className="lb-model-submission" data-lb-submitter={submitter} data-lb-submission={submission?.id}>
                     Submitted by{" "}
-                    {submission.submitterUrl ? (
+                    {submission?.submitterUrl ? (
                       <a href={submission.submitterUrl} target="_blank" rel="noreferrer" onClick={stay}>
-                        {submission.submitter}
+                        {submitter}
                       </a>
                     ) : (
-                      submission.submitter
+                      submitter
                     )}
-                    {" · "}
-                    <a
-                      href={submission.trajectories}
-                      rel="noreferrer"
-                      title={`Download the trajectories and verifier votes of ${model.name}`}
-                      onClick={stay}
-                    >
-                      trajectories
-                    </a>
-                    {submission.rerunTasks > 0 && (
-                      <span
-                        data-lb-reruns={submission.rerunTasks}
-                        title="Tasks that were run again after they had a scored result. The newest result of a task counts."
-                      >
+                    {submission && (
+                      <>
                         {" · "}
-                        {submission.rerunTasks} {submission.rerunTasks === 1 ? "task" : "tasks"} re-run after a scored result
-                      </span>
+                        <a
+                          href={submission.trajectories}
+                          rel="noreferrer"
+                          title={`Download the trajectories and verifier votes of ${model.name}`}
+                          onClick={stay}
+                        >
+                          trajectories
+                        </a>
+                        {submission.rerunTasks > 0 && (
+                          <span
+                            data-lb-reruns={submission.rerunTasks}
+                            title="Tasks that were run again after they had a scored result. The newest result of a task counts."
+                          >
+                            {" · "}
+                            {submission.rerunTasks} {submission.rerunTasks === 1 ? "task" : "tasks"} re-run after a scored result
+                          </span>
+                        )}
+                      </>
                     )}
                   </span>
                 )}

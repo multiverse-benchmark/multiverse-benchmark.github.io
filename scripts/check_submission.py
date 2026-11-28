@@ -43,6 +43,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SUBMISSIONS = ROOT / "submissions"
 SCORE_FILE = re.compile(r"submissions/(?P<release>v\d+\.\d+\.\d+)/(?P<entry>[a-z0-9_]+-[a-z]+)\.json")
 BASELINES = {"v1.1.0": ROOT / "src" / "data" / "leaderboard.v1.1.0.json"}
+# The submitter of the baselines and of every other entry the maintainers add themselves.
+BASELINE_SUBMITTER = "MultiVerse admin"
 SPLIT = "validation"
 
 
@@ -188,6 +190,8 @@ def report_of(relative: str, document: dict | None, errors: list[str], downloade
         "| " + " | ".join("---" for _ in names) + " |",
         "| " + " | ".join(f"{rate(summary[name])} ({summary[name]['passed']}/{summary[name]['scored']})" for name in names) + " |",
     ]
+    if entry["submitter"]["name"].casefold() == BASELINE_SUBMITTER.casefold():
+        lines += ["", f"The submitter is {BASELINE_SUBMITTER}, the name of the maintainers' own entries. Merge this only if the pull request comes from the maintainers."]
     changed = document["run"]["code"].get("changed_paths")
     if changed:
         lines += ["", "Paths in which the code of the run differs from the public code:", "", "```text", *(safe(path) for path in changed[:50]), "```"]

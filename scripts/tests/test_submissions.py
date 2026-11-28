@@ -196,6 +196,14 @@ class CheckFileTests(unittest.TestCase):
         self.assertEqual(len(errors), 1)
         self.assertIn("the score file disagrees with the trajectory on", errors[0])
 
+    def test_the_report_points_out_an_entry_under_the_maintainers_name(self):
+        document, _ = submission_like("kimi_k3")
+        relative = "submissions/v1.1.0/trial_model-bare.json"
+        note = "Merge this only if the pull request comes from the maintainers."
+        self.assertNotIn(note, check_submission.report_of(relative, document, [], downloaded=True))
+        document["entry"]["submitter"]["name"] = "multiverse ADMIN"
+        self.assertIn(note, check_submission.report_of(relative, document, [], downloaded=True))
+
     def test_the_report_keeps_submitted_text_inside_code_blocks(self):
         document, _ = submission_like("kimi_k3", name="Trial `@someone` Model")
         report = check_submission.report_of("submissions/v1.1.0/trial_model-bare.json", document, [], downloaded=True)
@@ -215,6 +223,7 @@ class BoardTests(unittest.TestCase):
         board = build_board.build([])
         build_board.validate(board, [])
         self.assertEqual(board.pop("entries"), {})
+        self.assertEqual(board.pop("baselineSubmitter"), "MultiVerse admin")
         self.assertEqual(board, BASELINES)
 
     def test_an_entry_gets_the_cells_its_task_results_give_among_the_baselines(self):

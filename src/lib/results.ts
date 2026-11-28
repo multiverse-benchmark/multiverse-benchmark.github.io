@@ -94,6 +94,8 @@ export interface ResultRow {
   model: Model;
   harness: RowHarness;
   cells: Record<SettingId, Cell>;
+  /** Who ran the evaluation, where the result set names it. */
+  submitter?: string;
   /** Present on a submitted entry; a baseline has none. */
   submission?: Submission;
 }
@@ -112,6 +114,8 @@ interface ResultFile {
   results: Record<string, Record<string, Record<string, Cell>>>;
   /** The submitted entries, by model and harness. */
   entries?: Record<string, Record<string, Submission>>;
+  /** Who ran the entries of the set that are not submitted ones: its baselines. */
+  baselineSubmitter?: string;
   /** Each model's rate averaged over the harnesses, computed per run by the export (not printed in the paper). */
   harnessAverage?: Record<string, Record<string, Omit<Cell, 'rank' | 'harness'>>>;
 }
@@ -204,6 +208,7 @@ export class Results {
   readonly scopes: HarnessScope[];
   private readonly cells: ResultFile['results'];
   private readonly entries: NonNullable<ResultFile['entries']>;
+  private readonly baselineSubmitter: string | undefined;
   private readonly harnessAverage: ResultFile['harnessAverage'];
 
   constructor(set: ResultSet, file: ResultFile) {
@@ -218,6 +223,7 @@ export class Results {
     this.runs = file.runs;
     this.cells = file.results;
     this.entries = file.entries ?? {};
+    this.baselineSubmitter = file.baselineSubmitter;
     this.harnessAverage = file.harnessAverage;
     this.hasSpread = file.runs > 1;
     this.scopes = [...file.harnesses.map(harness => harness.id), ...(file.harnessAverage && file.harnesses.length > 1 ? ['average', 'best'] as const : [])];
@@ -235,14 +241,17 @@ export class Results {
   has(modelId: string, harness: HarnessId): boolean { return this.cells.Average[modelId]?.[harness] !== undefined; }
   /** The submission behind a model's results under a harness; undefined for a baseline. */
   submissionOf(modelId: string, harness: HarnessId): Submission | undefined { return this.entries[modelId]?.[harness]; }
-  /** The set has submitted entries. */
-  get hasSubmissions(): boolean { return Object.keys(this.entries).length > 0; }
+  /** Who ran a model's evaluation under a harness: the submitter of a submitted entry, or the one of the baselines where the set names it. */
+  submitterOf(modelId: string, harness: HarnessId): string | undefined { return this.submissionOf(modelId, harness)?.submitter ?? this.baselineSubmitter; }
+  /** The set names who ran its entries. */
+  get hasSubmitters(): boolean { return this.baselineSubmitter !== undefined || Object.keys(this.entries).length > 0; }
   tasksFor(setting: SettingId): number { return setting === 'Average' ? this.totalTasks : this.taskCounts[setting]; }
 
   private rowFor(model: Model, harness: Harness): ResultRow {
     const cells = Object.fromEntries(this.settingIds.map(setting => [setting, this.cellFor(setting, model.id, harness.id)])) as Record<SettingId, Cell>;
     const submission = this.submissionOf(model.id, harness.id);
-    return submission ? { model, harness, cells, submission } : { model, harness, cells };
+    const submitter = this.submitterOf(model.id, harness.id);
+    return { model, harness, cells, ...(submitter ? { submitter } : {}), ...(submission ? { submission } : {}) };
   }
 
   /** The models with results under one harness, in the row order of the export. */
@@ -339,13 +348,13 @@ export class Results {
       ...(this.hasSpread ? ['mean', 'sd', 'rank'] : ['success_rate', 'passed', 'tasks', 'rank']),
       ...(withIntervals ? ['ci95_low', 'ci95_high'] : []),
     ];
-    // A set with submitted entries names the submitter of each; a baseline has none.
+    // A set that names who ran its entries has a column for it.
     const quoted = (text: string) => (/[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text);
-    const header = ['model', 'developer', 'access', 'harness', ...(this.hasSubmissions ? ['submitted_by'] : []),
+    const header = ['model', 'developer', 'access', 'harness', ...(this.hasSubmitters ? ['submitted_by'] : []),
       ...this.settingIds.flatMap(setting => columns.map(column => `${setting}_${column}`))];
     const lines = rows.map(row => [
       quoted(row.model.name), quoted(row.model.developer), ACCESS_LABEL[row.model.access], row.harness.name,
-      ...(this.hasSubmissions ? [quoted(row.submission?.submitter ?? '')] : []),
+      ...(this.hasSubmitters ? [quoted(row.submitter ?? '')] : []),
       ...this.settingIds.flatMap(setting => {
         const cell = row.cells[setting];
         const values = this.hasSpread

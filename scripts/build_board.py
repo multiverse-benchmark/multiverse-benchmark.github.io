@@ -133,6 +133,8 @@ def build(submissions: list[tuple[str, dict]]) -> dict:
     baselines = json.loads(BASELINES.read_text())["sets"][SPLIT]
     board = copy.deepcopy(baselines)
     board["entries"] = {}
+    # Who ran the baselines; a submitted entry names its own submitter.
+    board["baselineSubmitter"] = check_submission.BASELINE_SUBMITTER
     if submissions:
         confirm_baseline_intervals(baselines)
     known_harnesses = {harness["id"]: harness for harness in json.loads(PAPER.read_text())["harnesses"]}
