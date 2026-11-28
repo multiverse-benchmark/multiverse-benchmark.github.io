@@ -77,6 +77,16 @@ export interface MultiverseModel {
   samplesSkipped?: number;
   samplesUnscored?: number;
   taskSettings?: Partial<Record<TaskSettingId, TaskSettingStats>>;
+  /** Present on a submitted entry: who submitted it, and where its trajectories are. */
+  submission?: {
+    id: string;
+    submitter: string;
+    submitterUrl?: string;
+    modelUrl?: string;
+    submittedOn: string;
+    trajectories: string;
+    scoreFile: string;
+  };
 }
 
 export interface LeaderboardFilters {

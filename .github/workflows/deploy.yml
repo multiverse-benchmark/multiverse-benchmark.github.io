@@ -1,6 +1,13 @@
 name: Deploy to GitHub Pages
+# Started by hand for changes of the site. A change of the leaderboard's
+# submissions on main (a merged submission pull request) starts it by itself,
+# so that the board on the site always equals the committed submissions.
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'submissions/v*/**'
 permissions:
   contents: read
   pages: write
@@ -22,10 +29,13 @@ jobs:
           python-version: '3.12'
       - run: npm ci
       - run: npm --prefix gui-src ci
-      # The unit tests of the leaderboard's confidence intervals need NumPy.
+      # The unit tests of the leaderboard's confidence intervals need NumPy, and so does the build
+      # once the leaderboard has submitted entries (scripts/build_board.py).
       - run: python3 -m pip install numpy
       - run: PYTHONPATH=scripts python3 -m unittest discover -s scripts/tests
       - run: npm run validate:data
+      # The submitted entries of the leaderboard; their confidence intervals need NumPy too.
+      - run: npm run validate:submissions
       - run: npm run validate:tools
       - run: npm run validate:showcase
       - run: npm run test:calendar

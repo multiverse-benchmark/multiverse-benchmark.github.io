@@ -231,6 +231,9 @@ export function LeaderboardTable({
       model.contextLength ? `${formatContext(model.contextLength)} context` : "",
       harnesses.length > 1 && evaluatedOn < harnesses.length ? `${evaluatedOn} of ${harnesses.length} harnesses` : "",
     ].filter(Boolean);
+    // A submitted entry names its submitter and links to its trajectories: the entry behind the number that ranks the model.
+    const submission = (ranking?.run ?? model).submission;
+    const stay = (event: { stopPropagation: () => void }) => event.stopPropagation();
     return (
       <tr
         key={row.key}
@@ -264,6 +267,27 @@ export function LeaderboardTable({
               <span className="lb-model-dev">
                 {model.provider}
                 {details.length > 0 && <span className="lb-model-size"> · {details.join(" · ")}</span>}
+                {submission && (
+                  <span className="lb-model-submission" data-lb-submission={submission.id}>
+                    Submitted by{" "}
+                    {submission.submitterUrl ? (
+                      <a href={submission.submitterUrl} target="_blank" rel="noreferrer" onClick={stay}>
+                        {submission.submitter}
+                      </a>
+                    ) : (
+                      submission.submitter
+                    )}
+                    {" · "}
+                    <a
+                      href={submission.trajectories}
+                      rel="noreferrer"
+                      title={`Download the trajectories and verifier votes of ${model.name}`}
+                      onClick={stay}
+                    >
+                      trajectories
+                    </a>
+                  </span>
+                )}
               </span>
               <span className="lb-model-access">
                 <AccessBadge access={model.isOpenWeights ? "open" : "closed"} />

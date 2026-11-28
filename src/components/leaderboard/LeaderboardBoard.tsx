@@ -113,6 +113,12 @@ function boardColumns(
   ];
 }
 
+/** The key entry for a board with submitted entries: what "Submitted by" under a model says about its numbers. */
+const SUBMITTED_KEY = {
+  label: "Submitted by",
+  text: "Results reported by the named submitter with multiverse submit. The scores are checked against the verifier votes in the entry’s trajectories; the run is not repeated.",
+};
+
 /** The key under the table: what each column is. The end-user harnesses share one entry. */
 function columnKey(axis: ColumnAxis, columns: BoardColumn[]): { label: string; text: string }[] {
   if (axis === "settings") return columns.map((column) => ({ label: column.label, text: column.title }));
@@ -284,7 +290,7 @@ export function LeaderboardBoard({
         onSelectColumn={selectColumn}
         axis={axis}
         caption={caption}
-        keyItems={columnKey(axis, columns)}
+        keyItems={[...columnKey(axis, columns), ...(models.some((model) => model.submission) ? [SUBMITTED_KEY] : [])]}
         harnesses={harnessesWithResults}
         filters={filters}
         onFiltersChange={setFilters}

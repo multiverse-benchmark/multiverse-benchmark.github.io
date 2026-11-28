@@ -775,6 +775,28 @@
   grid-area: access;
 }
 
+/* a submitted entry: its submitter and the link to its trajectories, under the developer */
+.lb-model-submission {
+  display: block;
+}
+
+.lb-model-submission a {
+  border-radius: 3px;
+  color: var(--mv-green-dark);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.lb-model-submission a:hover {
+  color: var(--mv-ink);
+}
+
+.lb-model-submission a:focus-visible {
+  outline: 3px solid var(--mv-focus);
+  outline-offset: 2px;
+}
+
 /* result cells: the rate, and a bar on a 0 to 100% track */
 .lb-value {
   display: flex;

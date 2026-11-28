@@ -8,3 +8,6 @@ __pycache__/
 public/gui/
 .env.local
 .env.*.local
+
+# The validation leaderboard with the submitted entries: written by scripts/build_board.py when the site is built.
+src/data/leaderboard.v1.1.0.validation.json
