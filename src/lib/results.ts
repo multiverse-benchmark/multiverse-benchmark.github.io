@@ -87,6 +87,8 @@ export interface Submission {
   trajectories: string;
   /** The score file in the site's repository. */
   scoreFile: string;
+  /** Tasks that were run again after a scored result, as the submitter counted them; the newest result of a task counts. */
+  rerunTasks: number;
 }
 export interface ResultRow {
   model: Model;

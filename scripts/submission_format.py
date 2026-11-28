@@ -69,6 +69,10 @@ MAX_UNPACKED_BYTES = 4 * 1024 * 1024 * 1024
 MAX_SCORE_FILE_BYTES = 2 * 1024 * 1024
 # A longer list of changed paths ends with one entry that counts the rest.
 MAX_CHANGED_PATHS = 500
+# The attempts of a task that a score file counts: those that reached a
+# score, and those that were skipped for an infrastructure failure.
+ATTEMPT_KINDS = ("scored", "skipped")
+MAX_ATTEMPTS = 1000
 # The limit on one model request, in seconds: the one a case ran under when
 # its result file states none, and the range a stated one lies in.
 DEFAULT_MODEL_CALL_TIMEOUT_SECONDS = 240
@@ -538,6 +542,27 @@ def _keys(
   return not missing and not unknown
 
 
+def attempt_totals(tasks: dict[str, dict]) -> dict[str, int]:
+  """Count the tasks that were run again, by the reason.
+
+  `rerun_after_score`: tasks with more than one attempt that reached a score.
+  `retried_after_skip`: tasks with an attempt that was skipped.
+  """
+  attempts = [
+      task.get("attempts")
+      for task in tasks.values()
+      if isinstance(task, dict) and isinstance(task.get("attempts"), dict)
+  ]
+  return {
+      "rerun_after_score": sum(
+          1 for counts in attempts if (_count(counts.get("scored")) or 0) > 1
+      ),
+      "retried_after_skip": sum(
+          1 for counts in attempts if (_count(counts.get("skipped")) or 0) > 0
+      ),
+  }
+
+
 def summary_of(tasks: dict[str, dict]) -> dict[str, dict[str, int]]:
   """Count the passed and scored tasks per setting and over all of them."""
   summary = {
@@ -769,11 +794,24 @@ def _check_tasks(tasks: Any, reference: dict, errors: list[str]) -> None:
             "tool_calls",
             "turns",
             "trajectory_sha256",
+            "attempts",
         ),
         (),
         found,
     ):
       checks = task["checks"]
+      attempts = task["attempts"]
+      if not (
+          isinstance(attempts, dict)
+          and set(attempts) == set(ATTEMPT_KINDS)
+          and all(_count(number) is not None for number in attempts.values())
+          and 1 <= attempts["scored"] <= MAX_ATTEMPTS
+          and attempts["skipped"] <= MAX_ATTEMPTS
+      ):
+        found.append(
+            f"{where}.attempts must count the scored attempts (at least 1)"
+            " and the skipped attempts of the task"
+        )
       if task["setting"] not in SETTINGS:
         found.append(f"{where}.setting is not a task setting")
       if not (
@@ -1001,10 +1039,11 @@ def check_archive(
               f" {verifier_vote_count(record, verifier)} votes; the"
               f" leaderboard requires {reference['verifier_votes']}"
           )
-      if derived != expected:
-        differing = sorted(
-            field for field in derived if derived[field] != expected.get(field)
-        )
+      # The attempts of a task are no part of its trajectory.
+      differing = sorted(
+          field for field in derived if derived[field] != expected.get(field)
+      )
+      if differing:
         problem(
             f"{task_id}: the score file disagrees with the trajectory on"
             f" {', '.join(differing)}"

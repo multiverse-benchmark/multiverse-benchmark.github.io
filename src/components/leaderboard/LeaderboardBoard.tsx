@@ -116,7 +116,7 @@ function boardColumns(
 /** The key entry for a board with submitted entries: what "Submitted by" under a model says about its numbers. */
 const SUBMITTED_KEY = {
   label: "Submitted by",
-  text: "Results reported by the named submitter with multiverse submit. The scores are checked against the verifier votes in the entry’s trajectories; the run is not repeated.",
+  text: "Results reported by the named submitter with multiverse submit. The scores are checked against the verifier votes in the entry’s trajectories; the run is not repeated. Where tasks were run again after a scored result, the entry says how many; the newest result of a task counts.",
 };
 
 /** The key under the table: what each column is. The end-user harnesses share one entry. */

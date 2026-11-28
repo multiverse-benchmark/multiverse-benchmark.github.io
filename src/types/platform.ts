@@ -86,6 +86,7 @@ export interface MultiverseModel {
     submittedOn: string;
     trajectories: string;
     scoreFile: string;
+    rerunTasks: number;
   };
 }
 

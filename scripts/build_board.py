@@ -119,6 +119,8 @@ def entry_info(relative: str, document: dict) -> dict:
         "submittedOn": entry["submitted_on"],
         "trajectories": trajectories["url"],
         "scoreFile": relative,
+        # Tasks with more than one attempt that reached a score, as the submitter counted them.
+        "rerunTasks": fmt.attempt_totals(document["tasks"])["rerun_after_score"],
     }
     if "url" in entry["submitter"]:
         info["submitterUrl"] = entry["submitter"]["url"]

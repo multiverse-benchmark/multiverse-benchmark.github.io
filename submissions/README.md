@@ -32,6 +32,8 @@ The same checks run in `multiverse submit` and on the pull request (`scripts/che
 - The trajectory archive at the given address is the file the score file names by sha256. For every task, the verifier votes in the archive give the verdicts in the score file.
 - The entry does not collide with a baseline or with another submission.
 
+For every task the score file also counts the attempts in its evaluation: those that reached a score and those that were skipped for an infrastructure failure. Retrying a skipped case is part of a normal run. A task with more than one scored attempt was run again after it had a result; the newest result is the one submitted. The comment on the pull request shows both totals, and the leaderboard shows with an entry how many of its tasks were run again after a scored result. The counts come from the submitter's own run records, like the scores.
+
 The scores are the submitter's own: the run is not repeated. The checks establish that the numbers follow from the published trajectories and verifier votes, and the trajectory archive lets anyone inspect them.
 
 ## For maintainers

@@ -167,6 +167,7 @@ def report_of(relative: str, document: dict | None, errors: list[str], downloade
         lines += ["**Not accepted.**", "", "```text", *(safe(error) for error in errors), "```"]
         return "\n".join(lines) + "\n"
     entry, summary = document["entry"], document["summary"]
+    attempts = fmt.attempt_totals(document["tasks"])
     rate = lambda cell: f"{100 * cell['passed'] / cell['scored']:.1f}"
     names = ("Average", *fmt.SETTINGS)
     lines += [
@@ -178,6 +179,9 @@ def report_of(relative: str, document: dict | None, errors: list[str], downloade
         f"submitter  {safe(entry['submitter']['name'])}",
         # A request that runs past the limit ends a case as skipped, so a longer limit lets a slow model finish.
         f"request limit  {', '.join(f'{limit} s' for limit in document['run']['model_call_timeout_seconds'])}",
+        # The submitter's own count of repeated attempts. The newest result of a task is the one submitted.
+        f"tasks run again after a scored result  {attempts['rerun_after_score']}",
+        f"tasks retried after an infrastructure failure  {attempts['retried_after_skip']}",
         "```",
         "",
         "| " + " | ".join(names) + " |",

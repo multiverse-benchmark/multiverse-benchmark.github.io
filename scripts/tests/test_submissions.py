@@ -49,6 +49,7 @@ def submission_like(baseline: str, *, model_id="trial_model", name="Trial Model"
         record = record_of(task_id, reference["setting"], INDEX["cells"][task_id][column])
         members[task_id] = fmt.canonical_json(record)
         tasks[task_id] = fmt.task_entry(record, reference["setting"], members[task_id])
+        tasks[task_id]["attempts"] = {"scored": 1, "skipped": 0}
     document = {
         "format": fmt.FORMAT, "schema_version": fmt.SCHEMA_VERSION, "release": "v1.1.0", "split": "validation",
         "entry": {
@@ -202,6 +203,8 @@ class CheckFileTests(unittest.TestCase):
         self.assertNotIn("`@someone`", report)
         self.assertIn("50.5 (202/400)", report)
         self.assertIn("request limit  240 s", report)
+        self.assertIn("tasks run again after a scored result  0", report)
+        self.assertIn("tasks retried after an infrastructure failure  0", report)
         failed = check_submission.report_of("submissions/v1.1.0/trial_model-bare.json", document, ["a `problem`"], downloaded=True)
         self.assertIn("Not accepted", failed)
         self.assertIn("a 'problem'", failed)
@@ -227,8 +230,24 @@ class BoardTests(unittest.TestCase):
         order = [model["id"] for model in board["models"]]
         self.assertEqual(order.index("trial_model"), order.index("kimi_k3") + 1)
         self.assertEqual(board["entries"]["trial_model"]["bare"]["submitter"], "Trial Lab")
+        self.assertEqual(board["entries"]["trial_model"]["bare"]["rerunTasks"], 0)
         # A model below the tie moves down by one place.
         self.assertEqual(board["results"]["Average"]["glm_5_3"]["bare"]["rank"], BASELINES["results"]["Average"]["glm_5_3"]["bare"]["rank"] + 1)
+
+    def test_an_entry_states_how_many_tasks_were_run_again_after_a_scored_result(self):
+        document, _ = submission_like("kimi_k3")
+        first, second, third = sorted(document["tasks"])[:3]
+        document["tasks"][first]["attempts"] = {"scored": 2, "skipped": 0}
+        document["tasks"][second]["attempts"] = {"scored": 3, "skipped": 1}
+        # A retry after an infrastructure failure is not a re-run of a scored task.
+        document["tasks"][third]["attempts"] = {"scored": 1, "skipped": 4}
+        submissions = [("submissions/v1.1.0/trial_model-bare.json", document)]
+        board = build_board.build(submissions)
+        build_board.validate(board, submissions)
+        self.assertEqual(board["entries"]["trial_model"]["bare"]["rerunTasks"], 2)
+        report = check_submission.report_of("submissions/v1.1.0/trial_model-bare.json", document, [], downloaded=True)
+        self.assertIn("tasks run again after a scored result  2", report)
+        self.assertIn("tasks retried after an infrastructure failure  2", report)
 
     def test_an_entry_under_another_harness_adds_that_harness_for_its_model_only(self):
         baseline = BASELINES["models"][0]

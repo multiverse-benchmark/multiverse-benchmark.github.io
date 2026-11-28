@@ -286,6 +286,15 @@ export function LeaderboardTable({
                     >
                       trajectories
                     </a>
+                    {submission.rerunTasks > 0 && (
+                      <span
+                        data-lb-reruns={submission.rerunTasks}
+                        title="Tasks that were run again after they had a scored result. The newest result of a task counts."
+                      >
+                        {" · "}
+                        {submission.rerunTasks} {submission.rerunTasks === 1 ? "task" : "tasks"} re-run after a scored result
+                      </span>
+                    )}
                   </span>
                 )}
               </span>
