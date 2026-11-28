@@ -48,7 +48,7 @@ function installAnalyticsControls() {
   panel.className = 'analytics-consent';
   panel.setAttribute('aria-labelledby', 'analytics-consent-title');
   panel.innerHTML = '<p class="analytics-consent-title" id="analytics-consent-title">Cookies</p>'
-    + '<p>We\'d like to set optional analytics cookies to understand how this site is used and improve it. We will not set them unless you accept. You can change your choice at any time from Cookie settings.</p>'
+    + '<p>We\'d like to set optional analytics cookies to understand how this site is used and improve it. We will not set them unless you accept. You can change your choice at any time.</p>'
     + '<details><summary>Details</summary><p>These cookies are set by Google Analytics, which receives usage data such as the pages you visit. No advertising features are used.</p></details>'
     + '<div class="analytics-consent-actions"><button type="button" data-consent="granted">Accept</button><button type="button" data-consent="denied">Decline</button></div>';
 
