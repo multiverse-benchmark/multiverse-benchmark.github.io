@@ -22,6 +22,12 @@ BASELINES = json.loads((ROOT / "src" / "data" / "leaderboard.v1.1.0.json").read_
 MODEL_URL = "https://example.org/trial-model"
 # The settings of the action model that the trial submissions state.
 MODEL_SETTINGS = {"name": "trial-model-001", "provider": "vllm", "transport": "vllm", "context_window": 262144, "max_tokens": 32768, "supports_sampling": True, "default_temperature": 1.0, "supports_thinking": True, "thinking_level": "HIGH", "vllm_profile": "local"}
+# The shortest trajectory a run has: the check of an archive converts every trajectory for the task explorer.
+MESSAGES = [
+    {"type": "system", "data": {"content": "You are an assistant."}},
+    {"type": "human", "data": {"content": "Please do the task."}},
+    {"type": "ai", "data": {"content": "Done."}},
+]
 # The verifiers of the run index, in the order of a score file's checks.
 MARK = {"p": fmt.PASS, "f": fmt.FAIL, "n": fmt.NOT_APPLICABLE}
 
@@ -31,7 +37,7 @@ def record_of(task_id: str, setting: str, code: str) -> dict:
     record = {
         "schema_version": 1, "task_id": task_id, "setting": setting, "sample_id": f"00001_{task_id}",
         "api_version": REFERENCE["api_version"], "user_simulator_model": REFERENCE["user_simulator_model"],
-        "verifier_model": REFERENCE["verifier_model"], "model_logs": [], "termination_reason": "completed",
+        "verifier_model": REFERENCE["verifier_model"], "model_logs": [dict(message) for message in MESSAGES], "termination_reason": "completed",
         "action_model_behavior": dict(MODEL_SETTINGS), "developer_instruction_placement": "system",
         "number_of_model_calls": 3, "number_of_api_calls": 2, "number_of_turns": 1,
         "final_assertion_outcome": code[1] == "p", "autorater_dimension_status": {},

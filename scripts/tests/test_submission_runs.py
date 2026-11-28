@@ -171,6 +171,65 @@ class SubmissionRunsTests(unittest.TestCase):
         self.assertIn(f"trial_model-bare: {task}: the trajectory is not the one the score file names", str(stopped.exception))
         self.assert_site_untouched()
 
+    def test_for_a_deployment_a_fetched_file_that_is_not_the_named_archive_leaves_its_entry_out(self):
+        document, _, _ = entry_like("kimi_k3", self.folder)
+        differs = lambda url, size, sha256, target: "the file at trajectories.url is not the archive the score file names (size or sha256 differs)"
+        said = []
+        done = runs.export(self.site, [("submissions/v1.1.0/trial_model-bare.json", document)], {}, fetch=differs, say=said.append, keep_going=True)
+        self.assertEqual(done["entries"], [])
+        self.assertIn("is not the archive the score file names", done["skipped"][0]["reason"])
+        self.assertIn("trial_model-bare: left out", " ".join(said))
+        self.assert_site_untouched()
+
+    def test_for_a_deployment_an_archive_that_fails_its_check_leaves_only_its_entry_out(self):
+        good, good_archive, _ = entry_like("kimi_k3", self.folder)
+        bad, _, members = entry_like("glm_5_3", self.folder, model_id="other_model", name="Other Model")
+        task = next(iter(members))
+        record = json.loads(members[task])
+        record["contamination_canary"] = CANARIES[next(other for other in members if other != task)]
+        members[task] = fmt.canonical_json(record)
+        bad["tasks"][task] = {**fmt.task_entry(record, record["setting"], members[task]), "attempts": bad["tasks"][task]["attempts"]}
+        bad_archive = pack(bad, members, self.folder)
+        submissions = [("submissions/v1.1.0/other_model-bare.json", bad), ("submissions/v1.1.0/trial_model-bare.json", good)]
+        archives = {"other_model-bare": bad_archive, "trial_model-bare": good_archive}
+        with self.assertRaises(SystemExit) as stopped:
+            runs.export(self.site, submissions, archives, say=quiet)
+        self.assertIn("the record carries the canary of another task", str(stopped.exception))
+        self.assert_site_untouched()
+        done = runs.export(self.site, submissions, archives, say=quiet, keep_going=True)
+        self.assertEqual(done["entries"], ["trial_model-bare"])
+        self.assertEqual([entry["id"] for entry in done["skipped"]], ["other_model-bare"])
+        self.assertEqual([model["id"] for model in self.index()["models"][len(BASE["models"]):]], ["trial_model-bare"])
+
+    def test_the_check_of_a_pull_request_converts_the_archive(self):
+        document, _, members = entry_like("kimi_k3", self.folder)
+        with open(pack(document, members, self.folder), "rb") as archive:
+            self.assertEqual(check_submission.archive_errors(document, archive, REFERENCE), [])
+        task = next(iter(members))
+        record = json.loads(members[task])
+        record["model_logs"] = []
+        members[task] = fmt.canonical_json(record)
+        document["tasks"][task] = {**fmt.task_entry(record, record["setting"], members[task]), "attempts": document["tasks"][task]["attempts"]}
+        with open(pack(document, members, self.folder), "rb") as archive:
+            self.assertEqual(check_submission.archive_errors(document, archive, REFERENCE), [f"{task}: no trajectory"])
+
+    def test_as_a_step_of_the_deployment_a_wrong_archive_is_a_warning_and_no_failure(self):
+        document, archive, _ = entry_like("kimi_k3", self.folder)
+        archive.write_bytes(archive.read_bytes() + b"\0")
+        printed = []
+        with mock.patch.dict(os.environ, {"GITHUB_ACTIONS": "true"}):
+            summary = self.command(document, "--archive", f"trial_model-bare={archive}", "--keep-going", printed=printed)
+        self.assertIn("trial_model-bare: left out", summary)
+        self.assertTrue(any(line.startswith("::warning title=Submitted entry without trajectories::trial_model-bare:") for line in printed))
+        self.assert_site_untouched()
+
+    def test_as_a_step_of_the_deployment_an_unexpected_error_is_a_warning_and_no_failure(self):
+        document, archive, _ = entry_like("kimi_k3", self.folder)
+        with mock.patch.object(runs, "index_with", side_effect=RuntimeError("unexpected")):
+            summary = self.command(document, "--archive", f"trial_model-bare={archive}", "--keep-going")
+        self.assertIn("The runs of the submitted entries were not added: RuntimeError: unexpected", summary)
+        self.assertEqual(os.stat(self.runs / "index.json").st_ino, os.stat(self.source).st_ino)
+
     def test_an_archive_that_cannot_be_fetched_leaves_its_entry_out(self):
         document, _, _ = entry_like("kimi_k3", self.folder)
         unreachable = lambda url, size, sha256, target: f"{check_submission.UNREACHABLE} (HTTPError)"
@@ -186,12 +245,13 @@ class SubmissionRunsTests(unittest.TestCase):
             problem = check_submission.download_archive("https://example.org/a.tar.gz", 1, "0" * 64, target)
         self.assertTrue(problem.startswith(check_submission.UNREACHABLE))
 
-    def command(self, document: dict, *arguments: str) -> str:
+    def command(self, document: dict, *arguments: str, printed: list | None = None) -> str:
         """Run the script as a step of a workflow does, with one committed score file; returns the summary of the step."""
         summary = self.folder / "summary.md"
+        collect = (lambda *values, **_: printed.append(" ".join(str(value) for value in values))) if printed is not None else None
         with mock.patch.object(runs, "read_submissions", return_value=[("submissions/v1.1.0/trial_model-bare.json", document)]), \
                 mock.patch.object(sys, "argv", ["export_submission_runs.py", "--site", str(self.site), *arguments]), \
-                mock.patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": str(summary)}), mock.patch("builtins.print"):
+                mock.patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": str(summary)}), mock.patch("builtins.print", side_effect=collect):
             try:
                 runs.main()
             finally:
@@ -286,6 +346,10 @@ class SubmissionRunsTests(unittest.TestCase):
 
     def test_a_trajectory_without_messages_is_a_problem_of_the_archive(self):
         document, members = submission_like("kimi_k3")
+        for task, data in members.items():
+            record = {**json.loads(data), "model_logs": []}
+            members[task] = fmt.canonical_json(record)
+            document["tasks"][task] = {**fmt.task_entry(record, record["setting"], members[task]), "attempts": document["tasks"][task]["attempts"]}
         archive = pack(document, members, self.folder)
         with self.assertRaises(SystemExit) as stopped:
             runs.export(self.site, [("submissions/v1.1.0/trial_model-bare.json", document)], {"trial_model-bare": archive}, say=quiet)

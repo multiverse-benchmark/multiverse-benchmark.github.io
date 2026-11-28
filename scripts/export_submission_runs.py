@@ -39,6 +39,14 @@ the site is left as it was. With no committed score file the script does
 nothing. In a workflow, what it prints is also written to the summary of the
 step.
 
+The deployment runs it with --keep-going: an entry whose archive is no longer
+the file its score file names, fails a check, or cannot be converted is then
+left out in the same way, with a warning on the workflow run, and nothing
+about a submitted entry's trajectories stops the site from being deployed.
+The check of a submission pull request converts the archive too
+(scripts/check_submission.py), so such a problem shows before the entry is
+merged.
+
 It needs the Python standard library only, and is meant to run right after
 the site is built.
 
@@ -136,10 +144,12 @@ def run_file(record: dict, row: dict, canary: str, harness: str) -> tuple[bytes,
     return gzip.compress(text.encode("utf-8"), compresslevel=9, mtime=0), code
 
 
-def convert_archive(document: dict, archive, reference: dict, canaries: dict[str, str], folder: Path) -> tuple[dict[str, str], int, list[str]]:
+def convert_archive(document: dict, archive, reference: dict, canaries: dict[str, str] | None, folder: Path) -> tuple[dict[str, str], int, list[str]]:
     """Check an archive against its score file and write the run of every task into `folder`.
 
     Returns the cell of every task, the size of the run files, and every problem found.
+    `canaries` is the canary of every task from the page's task list; a record that carries
+    another one is a problem. Without the list (None), each run keeps the canary of its record.
     """
     entry = document["entry"]
     model_id, harness = entry["model"]["id"], entry["harness"]
@@ -151,7 +161,8 @@ def convert_archive(document: dict, archive, reference: dict, canaries: dict[str
         nonlocal size
         task = document["tasks"][task_id]
         try:
-            data, code = run_file(record, row_of(task_id, task, model_id), canaries[task_id], harness)
+            canary = canaries[task_id] if canaries is not None else (record.get("contamination_canary") or "")
+            data, code = run_file(record, row_of(task_id, task, model_id), canary, harness)
             assert code == code_of(task), "the run does not give the verdicts of the score file"
         except (AssertionError, ValueError, KeyError, TypeError, AttributeError) as error:
             if len(problems) < 40:
@@ -162,7 +173,9 @@ def convert_archive(document: dict, archive, reference: dict, canaries: dict[str
         size += len(data)
 
     errors = fmt.check_archive(document, archive, reference, on_member=convert)
-    return codes, size, errors + problems
+    # A task that the check of the archive reports is reported once, with that problem.
+    reported = {error.split(":", 1)[0] for error in errors}
+    return codes, size, errors + [problem for problem in problems if problem.split(":", 1)[0] not in reported]
 
 
 def local_archive_problem(path: Path, size: int, sha256: str) -> str | None:
@@ -230,10 +243,14 @@ def validate(index: dict, base: dict, entries: list[dict], reference: dict, stag
         assert task in tasks and all(name in {*ids, *base["models"]} for name in by_entry), f"termination of {task}"
 
 
-def export(site: Path, submissions: list[tuple[str, dict]], archives: dict[str, Path], *, fetch: Fetch = check_submission.download_archive, say=print) -> dict | None:
+def export(
+    site: Path, submissions: list[tuple[str, dict]], archives: dict[str, Path], *,
+    fetch: Fetch = check_submission.download_archive, say=print, keep_going: bool = False,
+) -> dict | None:
     """Convert the archives of the given checked score files into `site`. Returns what was done, or None with no submissions.
 
     Exits with the problems of an archive that was fetched and fails a check; the site is then as it was.
+    With `keep_going`, such an entry is left out like one whose archive cannot be fetched, and nothing stops the export.
     """
     if not submissions:
         say(NO_ENTRIES)
@@ -258,6 +275,12 @@ def export(site: Path, submissions: list[tuple[str, dict]], archives: dict[str, 
     staging = Path(tempfile.mkdtemp(prefix=".submission-runs-", dir=runs.parent))
     try:
         entries, skipped, failures = [], [], []
+
+        def leave_out(entry_id: str, reasons: list[str]) -> None:
+            more = f" (and {len(reasons) - 1} more)" if len(reasons) > 1 else ""
+            skipped.append({"id": entry_id, "reason": reasons[0] + more})
+            say(f"  {entry_id}: left out, {reasons[0]}{more}. Its row on the leaderboard links to the archive.")
+
         for relative, document in submissions:
             entry, trajectories = document["entry"], document["trajectories"]
             started = time.monotonic()
@@ -269,9 +292,8 @@ def export(site: Path, submissions: list[tuple[str, dict]], archives: dict[str, 
                     problem = local_archive_problem(local, trajectories["bytes"], trajectories["sha256"])
                 else:
                     problem = fetch(trajectories["url"], trajectories["bytes"], trajectories["sha256"], fetched)
-                if problem and local is None and problem.startswith(check_submission.UNREACHABLE):
-                    skipped.append({"id": entry["id"], "reason": problem})
-                    say(f"  {entry['id']}: left out, {problem}. Its row on the leaderboard links to the archive.")
+                if problem and (keep_going or (local is None and problem.startswith(check_submission.UNREACHABLE))):
+                    leave_out(entry["id"], [problem])
                     continue
                 if problem:
                     failures.append(f"{entry['id']}: {problem}")
@@ -282,6 +304,9 @@ def export(site: Path, submissions: list[tuple[str, dict]], archives: dict[str, 
                 else:
                     fetched.seek(0)
                     codes, size, problems = convert_archive(document, fetched, reference, canaries, folder)
+            if problems and keep_going:
+                leave_out(entry["id"], problems)
+                continue
             if problems:
                 failures += [f"{entry['id']}: {problem}" for problem in problems]
                 continue
@@ -295,13 +320,17 @@ def export(site: Path, submissions: list[tuple[str, dict]], archives: dict[str, 
         if failures:
             sys.exit("Trajectory archives that fail their check:\n" + "\n".join(f"  - {line}" for line in failures))
         if not entries:
-            say("No archive could be fetched: the site is unchanged.")
+            say("No entry could be added: the site is unchanged.")
             return {"entries": [], "skipped": skipped}
         index = index_with(base, entries)
         try:
             validate(index, base, entries, reference, staging)
         except AssertionError as error:
-            sys.exit(f"The run index with the submitted entries is not valid: {error}")
+            problem = f"The run index with the submitted entries is not valid: {error}"
+            if not keep_going:
+                sys.exit(problem)
+            say(f"{problem}. The site is unchanged.")
+            return {"entries": [], "skipped": skipped + [{"id": entry["id"], "reason": problem} for entry in entries]}
 
         # The run folders first, then the index that names them. Folders of an earlier run of this script go.
         kept = {entry["id"] for entry in entries}
@@ -353,6 +382,10 @@ def main() -> None:
         "--archive", action="append", default=[], metavar="ENTRY=FILE",
         help="read the trajectory archive of an entry from a local file instead of its address (may be repeated)",
     )
+    parser.add_argument(
+        "--keep-going", action="store_true",
+        help="leave out an entry whose archive fails a check or cannot be converted, with a warning, instead of stopping (for the deployment)",
+    )
     args = parser.parse_args()
     archives = {}
     for item in args.archive:
@@ -366,12 +399,24 @@ def main() -> None:
         print(line)
         lines.append(line)
 
+    def warn(text: str) -> None:
+        # In a workflow, a warning of the run; one line, so that it cannot start another command.
+        if os.environ.get("GITHUB_ACTIONS"):
+            print("::warning title=Submitted entry without trajectories::" + " ".join(text.split()).replace("::", ": :"))
+
     try:
-        export(args.site, read_submissions(), archives, say=say)
+        done = export(args.site, read_submissions(), archives, say=say, keep_going=args.keep_going)
+        for entry in (done or {}).get("skipped", []):
+            warn(f"{entry['id']}: {entry['reason']}")
     except SystemExit as stopped:
         if isinstance(stopped.code, str):
             lines.append(stopped.code)
         raise
+    except Exception as error:  # A deployment is not stopped by the trajectories of a submitted entry.
+        if not args.keep_going:
+            raise
+        say(f"The runs of the submitted entries were not added: {type(error).__name__}: {error}")
+        warn(lines[-1])
     finally:
         summarize(lines)
 

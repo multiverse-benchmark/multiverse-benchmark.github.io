@@ -162,7 +162,26 @@ def check_file(relative: str, candidates: Path, *, download: bool) -> tuple[dict
         if problem:
             return document, [problem]
         archive.seek(0)
-        return document, fmt.check_archive(document, archive, reference)
+        return document, archive_errors(document, archive, reference)
+
+
+def archive_errors(document: dict, archive, reference: dict) -> list[str]:
+    """Check a fetched archive against its score file, and that the task explorer can show every trajectory in it.
+
+    The deployment converts the archive of a merged entry into the run files of the task explorer
+    (scripts/export_submission_runs.py). The same conversion runs here, into a folder that is
+    thrown away, so that a trajectory it cannot convert is a problem of the pull request and not
+    of a later deployment. Where the checkout has the page's task list, a record must also carry
+    the canary of its own task.
+    """
+    # Imported here: both modules import this one.
+    import export_runs
+    import export_submission_runs
+
+    canaries = export_runs.page_canaries() if (export_runs.DATA / "tasks.json").is_file() else None
+    with tempfile.TemporaryDirectory() as folder:
+        _, _, problems = export_submission_runs.convert_archive(document, archive, reference, canaries, Path(folder))
+    return problems
 
 
 def report_of(relative: str, document: dict | None, errors: list[str], downloaded: bool) -> str:

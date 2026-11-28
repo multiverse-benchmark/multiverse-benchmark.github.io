@@ -17,7 +17,7 @@ Submissions are made with the `multiverse submit` command of the [code repositor
 2. Run `multiverse submit` on the four finished evaluations. It checks them and writes two files: the score file, and a trajectory archive with the trajectory and the verifier votes of every task.
 3. Run it again with `--publish`. It uploads the trajectory archive, or takes the public address you uploaded it to, and opens a pull request here that adds the score file.
 
-The pull request is checked automatically and the result is posted as a comment. A maintainer then merges it, and the site is rebuilt with the new entry.
+The pull request is checked automatically and the result is posted as a comment. A maintainer then merges it, and the site is rebuilt with the new entry. Its trajectories are then in the task explorer like those of the baselines: the entry has a column in the result explorer, and the "Trajectories" tab of every validation task shows its run with the verifier results.
 
 ## What is checked
 
@@ -30,6 +30,7 @@ The same checks run in `multiverse submit` and on the pull request (`scripts/che
 - Every check that applies to a task has a verdict. Which checks apply is a property of the task, so a failed check cannot be reported as not applicable.
 - A task counts as passed exactly when the final assertion and the DB-level check pass and no other applicable check fails. The summary equals the counts of the task results.
 - The trajectory archive at the given address is the file the score file names by sha256. For every task, the verifier votes in the archive give the verdicts in the score file.
+- Every trajectory in the archive can be converted for the task explorer. This part runs on the pull request only.
 - The entry does not collide with a baseline or with another submission.
 
 A score file names a page about its model: the developer's page or announcement of the model, its model card, or its paper, whichever represents the model best. The name of the model on the leaderboard links to it. The pages of the baseline models are in `src/data/model-links.json`.
@@ -46,6 +47,7 @@ The scores are the submitter's own: the run is not repeated. The checks establis
 
 - Read the comment of the check on the pull request. It lists the entry, its success rates, and the paths in which the code of the run differs from the public code. A submission of a new model normally differs by its model configuration only.
 - Merge the pull request when the check passes and the entry is in order. The merge starts the deployment (`.github/workflows/deploy.yml`), which checks every score file again and rebuilds the leaderboard.
+- The deployment also fetches the trajectory archive of every entry and converts it into the run files of the task explorer (`scripts/export_submission_runs.py`). The run files are part of the built site only, not of this repository. An entry whose archive cannot be fetched, is no longer the file its score file names, or cannot be converted stays on the leaderboard without trajectories in the explorer, and its run details link to the archive. The deployment goes on and shows a warning on its workflow run.
 - To withdraw an entry, remove its score file. To correct one, the submitter runs `multiverse submit --publish` again: the pull request then changes the existing file.
 - `python3 scripts/check_submission.py` checks every committed score file, including its trajectory archive; `npm run validate:submissions` checks them without the download and builds the board.
 
