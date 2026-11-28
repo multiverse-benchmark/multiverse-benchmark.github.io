@@ -47,15 +47,14 @@
 /* The last lines of the footer can scroll above the switch. */
 .site-footer { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
 
+/* On a phone: the same corner, without the word "Release", so that the switch covers less of the page. */
 @media (max-width: 600px) {
   .release-switch {
-    right: auto;
-    left: 50%;
+    right: 16px;
     bottom: max(12px, env(safe-area-inset-bottom));
-    transform: translateX(-50%);
   }
   .release-switch button { min-height: 40px; padding-inline: 12px; }
-  .release-switch-label { padding-inline: 8px; }
+  .release-switch-label { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
