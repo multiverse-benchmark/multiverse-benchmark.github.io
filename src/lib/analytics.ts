@@ -46,13 +46,16 @@ function installAnalyticsControls() {
 
   const panel = document.createElement('section');
   panel.className = 'analytics-consent';
-  panel.setAttribute('aria-label', 'Optional analytics');
-  panel.innerHTML = '<p>Allow Google Analytics to measure visits? This uses analytics cookies and shares usage data with Google. No advertising features.</p><div class="analytics-consent-actions"><button type="button" data-consent="granted">Allow analytics</button><button type="button" data-consent="denied">Decline</button></div>';
+  panel.setAttribute('aria-labelledby', 'analytics-consent-title');
+  panel.innerHTML = '<p class="analytics-consent-title" id="analytics-consent-title">Cookies</p>'
+    + '<p>We\'d like to set optional analytics cookies to understand how this site is used and improve it. We will not set them unless you accept. You can change your choice at any time from Cookie settings.</p>'
+    + '<details><summary>Details</summary><p>These cookies are set by Google Analytics, which receives usage data such as the pages you visit. No advertising features are used.</p></details>'
+    + '<div class="analytics-consent-actions"><button type="button" data-consent="granted">Accept</button><button type="button" data-consent="denied">Decline</button></div>';
 
   const settings = document.createElement('button');
   settings.type = 'button';
   settings.className = 'analytics-settings';
-  settings.textContent = 'Analytics settings';
+  settings.textContent = 'Cookie settings';
   settings.addEventListener('click', () => {
     settings.hidden = true;
     panel.hidden = false;

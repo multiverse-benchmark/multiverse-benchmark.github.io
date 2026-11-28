@@ -12,10 +12,16 @@
 }
 .analytics-consent { width: min(25rem, calc(100vw - 2rem)); padding: 1rem; font-size: 1rem; line-height: 1.5; }
 .analytics-consent p { margin: 0 0 .75rem; }
+.analytics-consent .analytics-consent-title { margin-bottom: .25rem; font-weight: 700; }
+.analytics-consent details { margin: 0 0 .75rem; font-size: .875rem; }
+.analytics-consent summary { width: fit-content; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; list-style: none; }
+.analytics-consent summary::-webkit-details-marker { display: none; }
+.analytics-consent summary:focus-visible { outline: 2px solid #7143bd; outline-offset: 3px; }
+.analytics-consent details p { margin: .35rem 0 0; }
 .analytics-consent-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
 .analytics-consent-actions button, .analytics-settings {
-  padding: .5rem .75rem;
-  font-size: .875rem;
+  padding: .3rem .7rem;
+  font-size: .8125rem;
   font-weight: 600;
   cursor: pointer;
 }

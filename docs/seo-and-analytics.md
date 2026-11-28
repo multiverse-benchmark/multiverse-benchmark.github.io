@@ -39,13 +39,14 @@ tag loads and the analytics consent controls are not displayed.
    ID. For the GitHub Actions deployment, set the repository Actions variable of
    the same name under **Settings → Secrets and variables → Actions → Variables**.
 4. Rebuild and deploy.
-5. Visit the final domain, choose **Allow analytics**, and check Analytics'
+5. Visit the final domain, choose **Accept**, and check Analytics'
    **Realtime** report or [Tag Assistant](https://tagassistant.google.com/).
    Google's setup guide notes that collection can take up to 30 minutes to start.
 
-When configured, a compact consent panel offers **Allow analytics** and
-**Decline**. No Google code or requests are made before opt-in. **Analytics
-settings** lets visitors change their choice; declining after opting in stops
+When configured, a compact cookie panel offers **Accept** and **Decline**, with
+a **Details** link that names Google Analytics as the recipient of the usage
+data. No Google code or requests are made before opt-in. **Cookie settings**
+lets visitors change their choice; declining after opting in stops
 collection and clears the usual GA cookies. Advertising consent stays denied,
 and Google signals and ad-personalization signals are disabled. Analytics is
 restricted to the configured production origin and site path, so a local
