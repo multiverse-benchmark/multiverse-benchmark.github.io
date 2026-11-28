@@ -1,0 +1,54 @@
+name: Leaderboard submission check
+# Checks the score files a pull request adds under submissions/ and comments the result.
+#
+# It runs on pull_request_target, so that the workflow and the scripts are those of
+# the base branch and a pull request cannot change its own check. Nothing a pull
+# request brings is executed: its score files are read as data through the API
+# (scripts/read_pull_request.py), and the base branch is checked out, never the head.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'submissions/**'
+permissions:
+  contents: read
+  pull-requests: write
+concurrency:
+  group: submission-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      GH_TOKEN: ${{ github.token }}
+      PULL_REQUEST: ${{ github.event.pull_request.number }}
+      WORK: ${{ runner.temp }}/submission
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+          sparse-checkout: |
+            scripts
+            submissions
+            src/data
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Read the score files of the pull request
+        run: |
+          mkdir -p "$WORK/candidates"
+          python3 scripts/read_pull_request.py --repository "$GITHUB_REPOSITORY" --number "$PULL_REQUEST" \
+            --out "$WORK/candidates" --list "$WORK/files.txt" --report "$WORK/report.md"
+      - name: Check the score files and their trajectory archives
+        run: |
+          mapfile -t files < "$WORK/files.txt"
+          python3 scripts/check_submission.py --candidates "$WORK/candidates" --report "$WORK/report.md" "${files[@]}"
+      - name: Comment the result on the pull request
+        if: always()
+        run: |
+          test -s "$WORK/report.md" || printf '## Leaderboard submission check\n\nThe check did not finish. See the workflow run.\n' > "$WORK/report.md"
+          gh pr comment "$PULL_REQUEST" --repo "$GITHUB_REPOSITORY" --edit-last --body-file "$WORK/report.md" \
+            || gh pr comment "$PULL_REQUEST" --repo "$GITHUB_REPOSITORY" --body-file "$WORK/report.md"
