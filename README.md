@@ -127,7 +127,7 @@ python3 scripts/export_dataset_stats.py --release v1.1.0
 
 The remaining exports read files that are not part of this repository:
 
-- `scripts/export_leaderboard.py` and `scripts/export_runs.py` read the result files and the run records of an evaluation of v1.1.0. Only aggregates of the test set are written.
+- `scripts/export_leaderboard.py`, `scripts/export_runs.py` and `scripts/export_run_details.py` read the result files and the run records of an evaluation of v1.1.0. Only aggregates of the test set are written.
 - `scripts/export_paper.py` reads the paper's source for the results of v1.0.0, the benchmark comparison, and the checklist assessment.
 - `scripts/export_demo.py` and `scripts/export_showcase.py` read the simulator snapshot of the worked example.
 
@@ -136,6 +136,8 @@ How a submitted model's runs are added to the run data is described in [docs/run
 ## Leaderboard submissions
 
 The validation set leaderboard of v1.1.0 shows the baselines (`src/data/leaderboard.v1.1.0.json`) and the submitted entries, one score file each under `submissions/v1.1.0/`. `scripts/build_board.py` puts them together into `src/data/leaderboard.v1.1.0.validation.json`, which is generated and not committed: `npm run build`, `npm run build:linked`, and the development server write it before anything else. An entry's confidence intervals are computed there with the baselines' procedure, which needs NumPy once there is a submission.
+
+Every entry of that leaderboard has run details, which the page shows on request under the model: the settings of the action model (context window, output limit, temperature, reasoning, and the route of its requests), the limit on model calls, and which message carried the developer instructions. A submitted entry states them in its score file. For the baselines they are in `src/data/leaderboard.v1.1.0.run-details.json`, which `scripts/export_run_details.py` writes from the settings every result file of the baselines' run records holds.
 
 A submission arrives as a pull request that adds one score file, opened by the `multiverse submit` command of the code repository. `.github/workflows/submission-check.yml` checks it and comments the result. [submissions/README.md](submissions/README.md) describes what is checked and what a maintainer does.
 

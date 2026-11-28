@@ -49,6 +49,7 @@ SPLIT = "validation"
 BASELINES = ROOT / "src" / "data" / f"leaderboard.{RELEASE}.json"
 PAPER = ROOT / "src" / "data" / "paper" / "leaderboard.json"
 RUN_INDEX = ROOT / "public" / "data" / RELEASE / "runs" / "index.json"
+RUN_DETAILS = ROOT / "src" / "data" / f"leaderboard.{RELEASE}.run-details.json"
 OUT = ROOT / "src" / "data" / f"leaderboard.{RELEASE}.{SPLIT}.json"
 METRIC_SEVERAL_HARNESSES = "Success rate (%) for one scored trajectory per model, harness and task"
 
@@ -129,12 +130,31 @@ def entry_info(relative: str, document: dict) -> dict:
     return info
 
 
+def run_details(run: dict, tasks: int, **more) -> dict:
+    """The settings of a run that the page shows on request, from a score file's `run` or a baseline's record of them."""
+    details = {
+        "tasks": tasks,
+        # The settings of the action model under the names the result files use, each record with its number of tasks.
+        "modelSettings": run["action_model_behavior"],
+        "instructionPlacement": run.get("developer_instruction_placement"),
+        "modelCallLimit": run.get("max_model_calls_allowed"),
+        "requestLimitsSeconds": run.get("model_call_timeout_seconds"),
+        **more,
+    }
+    return {name: value for name, value in details.items() if value is not None}
+
+
 def build(submissions: list[tuple[str, dict]]) -> dict:
     baselines = json.loads(BASELINES.read_text())["sets"][SPLIT]
     board = copy.deepcopy(baselines)
     board["entries"] = {}
     # Who ran the baselines; a submitted entry names its own submitter.
     board["baselineSubmitter"] = check_submission.BASELINE_SUBMITTER
+    # The settings each entry was run under, by model and harness.
+    board["runDetails"] = {
+        model: {harness: run_details(run, run["tasks"]) for harness, run in harnesses.items()}
+        for model, harnesses in json.loads(RUN_DETAILS.read_text())["models"].items()
+    }
     if submissions:
         confirm_baseline_intervals(baselines)
     known_harnesses = {harness["id"]: harness for harness in json.loads(PAPER.read_text())["harnesses"]}
@@ -151,6 +171,12 @@ def build(submissions: list[tuple[str, dict]]) -> dict:
             assert harness not in column, f"{entry['id']} has results on the board already"
             column[harness] = cell
         board["entries"].setdefault(model["id"], {})[harness] = entry_info(relative, document)
+        attempts = fmt.attempt_totals(document["tasks"])
+        board["runDetails"].setdefault(model["id"], {})[harness] = run_details(
+            document["run"], len(document["tasks"]),
+            completedOn=document["run"]["completed_at"][:10],
+            rerunTasks=attempts["rerun_after_score"], retriedTasks=attempts["retried_after_skip"],
+        )
 
     # The harnesses in the paper's order; the models by their average under the first harness they have.
     order = list(known_harnesses)
@@ -189,6 +215,10 @@ def validate(board: dict, submissions: list[tuple[str, dict]]) -> None:
             for harness, cell in baselines["results"][setting][model["id"]].items():
                 merged = board["results"][setting][model["id"]][harness]
                 assert {key: value for key, value in merged.items() if key != "rank"} == {key: value for key, value in cell.items() if key != "rank"}, f"The baseline {model['id']} changed"
+    # Every entry of the board has its run details, and nothing else has.
+    assert {(model, harness) for model, harnesses in board["runDetails"].items() for harness in harnesses} == {
+        (model, harness) for model, cells in board["results"]["Average"].items() for harness in cells
+    }, "the run details and the entries of the board differ"
     submitted = {(document["entry"]["model"]["id"], document["entry"]["harness"]) for _, document in submissions}
     assert {(model, harness) for model, harnesses in board["entries"].items() for harness in harnesses} == submitted
     for setting in TASK_SETTINGS:

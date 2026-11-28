@@ -5,7 +5,7 @@
  */
 
 import { useId, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
-import { ArrowDown, Search, SlidersHorizontal, X } from "lucide-react";
+import { ArrowDown, ChevronDown, Search, SlidersHorizontal, X } from "lucide-react";
 import { AccessBadge, Segmented, type SegmentedOption } from "@/components/paper/shared";
 import {
   BEST_HARNESS,
@@ -18,6 +18,7 @@ import {
   type RankedRow,
 } from "@/lib/leaderboardFilters";
 import { formatContext, formatParams } from "@/lib/modelSize";
+import { runDetailLines } from "@/lib/runDetails";
 import { HARNESS_ABBR } from "@/lib/taskSettingStyle";
 import type {
   ContextLengthRange,
@@ -104,6 +105,8 @@ export function LeaderboardTable({
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [tier, setTier] = useState<Tier>("wide");
   const [scrollable, setScrollable] = useState(false);
+  // The row whose run details are open. One at a time, so the table stays short.
+  const [openDetails, setOpenDetails] = useState<string | null>(null);
   const captionId = useId();
   const advancedId = useId();
   const root = useRef<HTMLDivElement>(null);
@@ -235,8 +238,12 @@ export function LeaderboardTable({
     const shown = ranking?.run ?? model;
     const submission = shown.submission;
     const submitter = shown.submitter;
+    // The settings the entry was run under are shown on request, in a row of their own under the model.
+    const runDetails = shown.runDetails;
+    const detailsOpen = Boolean(runDetails) && openDetails === row.key;
+    const detailsId = `${captionId}-details-${row.key.replace(/[^A-Za-z0-9_-]/g, "-")}`;
     const stay = (event: { stopPropagation: () => void }) => event.stopPropagation();
-    return (
+    const main = (
       <tr
         key={row.key}
         className={`lb-row${open ? " is-link" : ""}`}
@@ -304,6 +311,22 @@ export function LeaderboardTable({
                   </span>
                 )}
               </span>
+              {runDetails && (
+                <button
+                  type="button"
+                  className="lb-details-toggle"
+                  aria-expanded={detailsOpen}
+                  aria-controls={detailsId}
+                  data-lb-details-toggle={row.key}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setOpenDetails(detailsOpen ? null : row.key);
+                  }}
+                >
+                  Run details
+                  <ChevronDown size={12} strokeWidth={2.2} aria-hidden="true" />
+                </button>
+              )}
               <span className="lb-model-access">
                 <AccessBadge access={model.isOpenWeights ? "open" : "closed"} />
               </span>
@@ -384,6 +407,32 @@ export function LeaderboardTable({
         })}
       </tr>
     );
+    if (!runDetails || !detailsOpen) return [main];
+    return [
+      main,
+      <tr key={`${row.key}:details`} className="lb-details-row" data-lb-details={row.key}>
+        <td colSpan={columnCount}>
+          <div className="lb-details-inner" id={detailsId}>
+            <p className="lb-details-title">
+              Run details of {model.name}
+              {harnesses.length > 1 && ` under ${harnessLabel(shown.harnessType || "none")}`}
+            </p>
+            <dl className="lb-run">
+              {runDetailLines(runDetails).map((line) => (
+                <div key={line.key} data-lb-run-line={line.key}>
+                  <dt>{line.label}</dt>
+                  <dd>
+                    {line.values.map((value) => (
+                      <span key={value}>{value}</span>
+                    ))}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </td>
+      </tr>,
+    ];
   }
 
   return (
@@ -536,7 +585,7 @@ export function LeaderboardTable({
                   </tr>
                 ) : (
                   pageRows.flatMap((entry) =>
-                    entry.row.key === markerKey ? [markerRow, renderRow(entry)] : [renderRow(entry)],
+                    entry.row.key === markerKey ? [markerRow, ...renderRow(entry)] : renderRow(entry),
                   )
                 )}
               </tbody>

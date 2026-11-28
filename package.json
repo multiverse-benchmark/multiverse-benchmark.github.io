@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "validate:data": "python3 scripts/validate_export.py && python3 scripts/validate_export.py public/data/v1.1.0",
     "validate:leaderboard": "python3 scripts/export_leaderboard.py --validate-only",
-    "validate:submissions": "python3 scripts/export_submission_reference.py --check && python3 scripts/build_board.py --check",
+    "validate:submissions": "python3 scripts/export_submission_reference.py --check && python3 scripts/export_run_details.py --validate-only && python3 scripts/build_board.py --check",
     "validate:runs": "python3 scripts/export_runs.py --validate-only",
     "test:runs": "node tests/runs.browser.mjs",
     "test:task-views": "node tests/task-views.browser.mjs",

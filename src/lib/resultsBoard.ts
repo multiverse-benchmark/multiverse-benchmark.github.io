@@ -15,7 +15,7 @@
  * of them still names it, with no models: the leaderboard shows such a harness
  * as not available yet.
  */
-import type { HarnessOption, MultiverseModel, TaskSettingId, TaskSettingOption, TaskSettingStats } from '../types/platform';
+import type { HarnessOption, MultiverseModel, RunDetails, TaskSettingId, TaskSettingOption, TaskSettingStats } from '../types/platform';
 import { AVERAGE_HARNESS } from './leaderboardFilters';
 import type { ResultSet } from './release';
 import { AGGREGATES, RESULTS, type Cell, type Harness, type Model, type Results, type Submission, type TaskSettingId as SettingCode } from './results';
@@ -63,10 +63,11 @@ function stats(cell: Cell, tasks: number): TaskSettingStats {
 
 function build(results: Results): Board {
   /** One entry of the board: a model's cells under a harness, or its cells averaged over the harnesses. */
-  const entry = (model: Model, scaffold: string, harnessType: string | null, cellOf: (setting: SettingCode | 'Average') => Cell, submission?: Submission, submitter?: string): MultiverseModel => {
+  const entry = (model: Model, scaffold: string, harnessType: string | null, cellOf: (setting: SettingCode | 'Average') => Cell, submission?: Submission, submitter?: string, runDetails?: RunDetails): MultiverseModel => {
     const average = cellOf('Average');
     return {
       ...(submitter ? { submitter } : {}),
+      ...(runDetails ? { runDetails } : {}),
       ...(submission ? { submission } : {}),
       rank: average.rank,
       modelKey: `${results.set}/${model.id}`,
@@ -97,7 +98,7 @@ function build(results: Results): Board {
   const models = [
     // A model has an entry under each harness it has results for.
     ...results.harnesses.flatMap(harness => results.models.filter(model => results.has(model.id, harness.id)).map(model =>
-      entry(model, harness.name, harness.kind === 'bare' ? null : harness.id, setting => results.cellFor(setting, model.id, harness.id), results.submissionOf(model.id, harness.id), results.submitterOf(model.id, harness.id)))),
+      entry(model, harness.name, harness.kind === 'bare' ? null : harness.id, setting => results.cellFor(setting, model.id, harness.id), results.submissionOf(model.id, harness.id), results.submitterOf(model.id, harness.id), results.runDetailsOf(model.id, harness.id)))),
     // A set with results under several harnesses also has each model's rate averaged over them.
     ...(results.scopes.includes('average')
       ? results.rowsForScope('average').map(row => entry(row.model, AGGREGATES.average.name, AVERAGE_HARNESS, setting => row.cells[setting]))

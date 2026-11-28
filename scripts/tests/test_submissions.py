@@ -18,6 +18,8 @@ ROOT = Path(__file__).resolve().parents[2]
 REFERENCE = check_submission.reference_for("v1.1.0")
 INDEX = json.loads((ROOT / "public" / "data" / "v1.1.0" / "runs" / "index.json").read_text())
 BASELINES = json.loads((ROOT / "src" / "data" / "leaderboard.v1.1.0.json").read_text())["sets"]["validation"]
+# The settings of the action model that the trial submissions state.
+MODEL_SETTINGS = {"name": "trial-model-001", "provider": "vllm", "transport": "vllm", "context_window": 262144, "max_tokens": 32768, "supports_sampling": True, "default_temperature": 1.0, "supports_thinking": True, "thinking_level": "HIGH", "vllm_profile": "local"}
 # The verifiers of the run index, in the order of a score file's checks.
 MARK = {"p": fmt.PASS, "f": fmt.FAIL, "n": fmt.NOT_APPLICABLE}
 
@@ -28,6 +30,7 @@ def record_of(task_id: str, setting: str, code: str) -> dict:
         "schema_version": 1, "task_id": task_id, "setting": setting, "sample_id": f"00001_{task_id}",
         "api_version": REFERENCE["api_version"], "user_simulator_model": REFERENCE["user_simulator_model"],
         "verifier_model": REFERENCE["verifier_model"], "model_logs": [], "termination_reason": "completed",
+        "action_model_behavior": dict(MODEL_SETTINGS), "developer_instruction_placement": "system",
         "number_of_model_calls": 3, "number_of_api_calls": 2, "number_of_turns": 1,
         "final_assertion_outcome": code[1] == "p", "autorater_dimension_status": {},
         "autorater_votes": [{"pass": n} for n in (1, 2, 3)],
@@ -63,6 +66,8 @@ def submission_like(baseline: str, *, model_id="trial_model", name="Trial Model"
             "verifier_model": REFERENCE["verifier_model"], "verifier_votes": REFERENCE["verifier_votes"],
             "max_model_calls_allowed": REFERENCE["max_model_calls_allowed"],
             "model_call_timeout_seconds": [fmt.DEFAULT_MODEL_CALL_TIMEOUT_SECONDS],
+            "action_model_behavior": [{"tasks": len(tasks), "settings": dict(MODEL_SETTINGS)}],
+            "developer_instruction_placement": "system",
             "code": {"commits": ["0" * 40], "dirty": False, "changed_paths": []},
             "datasets": {setting: REFERENCE["datasets"][setting]["sha256"] for setting in fmt.SETTINGS},
             "completed_at": "2026-11-28T00:00:00Z",
@@ -224,6 +229,12 @@ class BoardTests(unittest.TestCase):
         build_board.validate(board, [])
         self.assertEqual(board.pop("entries"), {})
         self.assertEqual(board.pop("baselineSubmitter"), "MultiVerse admin")
+        details = board.pop("runDetails")
+        self.assertEqual(sorted(details), sorted(model["id"] for model in BASELINES["models"]))
+        for harnesses in details.values():
+            self.assertEqual(list(harnesses), ["bare"])
+            self.assertEqual(harnesses["bare"]["tasks"], 400)
+            self.assertEqual(sum(group["tasks"] for group in harnesses["bare"]["modelSettings"]), 400)
         self.assertEqual(board, BASELINES)
 
     def test_an_entry_gets_the_cells_its_task_results_give_among_the_baselines(self):
@@ -240,6 +251,16 @@ class BoardTests(unittest.TestCase):
         self.assertEqual(order.index("trial_model"), order.index("kimi_k3") + 1)
         self.assertEqual(board["entries"]["trial_model"]["bare"]["submitter"], "Trial Lab")
         self.assertEqual(board["entries"]["trial_model"]["bare"]["rerunTasks"], 0)
+        self.assertEqual(board["runDetails"]["trial_model"]["bare"], {
+            "tasks": 400,
+            "modelSettings": [{"tasks": 400, "settings": MODEL_SETTINGS}],
+            "instructionPlacement": "system",
+            "modelCallLimit": 320,
+            "requestLimitsSeconds": [240],
+            "completedOn": "2026-11-28",
+            "rerunTasks": 0,
+            "retriedTasks": 0,
+        })
         # A model below the tie moves down by one place.
         self.assertEqual(board["results"]["Average"]["glm_5_3"]["bare"]["rank"], BASELINES["results"]["Average"]["glm_5_3"]["bare"]["rank"] + 1)
 

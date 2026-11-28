@@ -29,6 +29,7 @@
 import paperData from '../data/paper/leaderboard.json';
 import releaseData from '../data/leaderboard.v1.1.0.json';
 import validationBoard from '../data/leaderboard.v1.1.0.validation.json';
+import type { RunDetails } from '../types/platform';
 import { releaseOf, useResultSet, type Release, type ResultSet } from './release';
 
 export type SettingId = 'Average' | 'ST' | 'IF' | 'MT' | 'MTIF';
@@ -116,6 +117,8 @@ interface ResultFile {
   entries?: Record<string, Record<string, Submission>>;
   /** Who ran the entries of the set that are not submitted ones: its baselines. */
   baselineSubmitter?: string;
+  /** The settings each entry was run under, by model and harness. */
+  runDetails?: Record<string, Record<string, RunDetails>>;
   /** Each model's rate averaged over the harnesses, computed per run by the export (not printed in the paper). */
   harnessAverage?: Record<string, Record<string, Omit<Cell, 'rank' | 'harness'>>>;
 }
@@ -209,6 +212,7 @@ export class Results {
   private readonly cells: ResultFile['results'];
   private readonly entries: NonNullable<ResultFile['entries']>;
   private readonly baselineSubmitter: string | undefined;
+  private readonly runDetails: NonNullable<ResultFile['runDetails']>;
   private readonly harnessAverage: ResultFile['harnessAverage'];
 
   constructor(set: ResultSet, file: ResultFile) {
@@ -224,6 +228,7 @@ export class Results {
     this.cells = file.results;
     this.entries = file.entries ?? {};
     this.baselineSubmitter = file.baselineSubmitter;
+    this.runDetails = file.runDetails ?? {};
     this.harnessAverage = file.harnessAverage;
     this.hasSpread = file.runs > 1;
     this.scopes = [...file.harnesses.map(harness => harness.id), ...(file.harnessAverage && file.harnesses.length > 1 ? ['average', 'best'] as const : [])];
@@ -243,6 +248,8 @@ export class Results {
   submissionOf(modelId: string, harness: HarnessId): Submission | undefined { return this.entries[modelId]?.[harness]; }
   /** Who ran a model's evaluation under a harness: the submitter of a submitted entry, or the one of the baselines where the set names it. */
   submitterOf(modelId: string, harness: HarnessId): string | undefined { return this.submissionOf(modelId, harness)?.submitter ?? this.baselineSubmitter; }
+  /** The settings a model was run under with a harness, where the set records them. */
+  runDetailsOf(modelId: string, harness: HarnessId): RunDetails | undefined { return this.runDetails[modelId]?.[harness]; }
   /** The set names who ran its entries. */
   get hasSubmitters(): boolean { return this.baselineSubmitter !== undefined || Object.keys(this.entries).length > 0; }
   tasksFor(setting: SettingId): number { return setting === 'Average' ? this.totalTasks : this.taskCounts[setting]; }

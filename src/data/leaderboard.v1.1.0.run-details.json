@@ -1,0 +1,306 @@
+{
+ "schemaVersion": 1,
+ "release": "v1.1.0",
+ "split": "validation",
+ "generatedBy": "scripts/export_run_details.py",
+ "input": {
+  "file": "manifest.jsonl",
+  "sha256": "4a9e8a48be46bc9fa0aafdd9b15a996393c362442c9a84081fcc529707546e7e"
+ },
+ "models": {
+  "claude_fable_5_1": {
+   "bare": {
+    "tasks": 400,
+    "action_model_behavior": [
+     {
+      "tasks": 400,
+      "settings": {
+       "context_window": 1000000,
+       "max_tokens": 128000,
+       "name": "claude-fable-5-1",
+       "provider": "anthropic",
+       "supports_sampling": false,
+       "supports_thinking": true,
+       "thinking_contract": "adaptive",
+       "thinking_level": "HIGH",
+       "transport": "native",
+       "whole_toolset_discovery": true
+      }
+     }
+    ],
+    "developer_instruction_placement": "system",
+    "max_model_calls_allowed": 320
+   }
+  },
+  "claude_opus_5_5": {
+   "bare": {
+    "tasks": 400,
+    "action_model_behavior": [
+     {
+      "tasks": 400,
+      "settings": {
+       "context_window": 1000000,
+       "max_tokens": 128000,
+       "name": "claude-opus-5-5",
+       "provider": "anthropic",
+       "supports_sampling": false,
+       "supports_thinking": true,
+       "thinking_contract": "adaptive",
+       "thinking_level": "HIGH",
+       "transport": "native",
+       "whole_toolset_discovery": true
+      }
+     }
+    ],
+    "developer_instruction_placement": "system",
+    "max_model_calls_allowed": 320
+   }
+  },
+  "claude_sonnet_5_5": {
+   "bare": {
+    "tasks": 400,
+    "action_model_behavior": [
+     {
+      "tasks": 400,
+      "settings": {
+       "context_window": 1000000,
+       "max_tokens": 128000,
+       "name": "claude-sonnet-5-5",
+       "provider": "anthropic",
+       "supports_sampling": false,
+       "supports_thinking": true,
+       "thinking_contract": "adaptive",
+       "thinking_level": "HIGH",
+       "transport": "native",
+       "whole_toolset_discovery": true
+      }
+     }
+    ],
+    "developer_instruction_placement": "system",
+    "max_model_calls_allowed": 320
+   }
+  },
+  "deepseek_v4_1_flash": {
+   "bare": {
+    "tasks": 400,
+    "action_model_behavior": [
+     {
+      "tasks": 400,
+      "settings": {
+       "context_window": 1000000,
+       "max_tokens": 131072,
+       "name": "deepseek/deepseek-v4.1-flash",
+       "openrouter_provider_pin": [
+        "deepinfra"
+       ],
+       "provider": "openrouter",
+       "supports_sampling": false,
+       "supports_thinking": true,
+       "thinking_level": "HIGH",
+       "transport": "native",
+       "whole_toolset_discovery": true
+      }
+     }
+    ],
+    "developer_instruction_placement": "system",
+    "max_model_calls_allowed": 320
+   }
+  },
+  "gemini_3_5_flash_thinking": {
+   "bare": {
+    "tasks": 400,
+    "action_model_behavior": [
+     {
+      "tasks": 400,
+      "settings": {
+       "context_window": 1048576,
+       "default_temperature": 1.0,
+       "max_tokens": 65536,
+       "name": "gemini-3.5-flash",
+       "provider": "google",
+       "supports_sampling": true,
+       "supports_thinking": true,
+       "thinking_level": "HIGH",
+       "transport": "native",
+       "whole_toolset_discovery": true
+      }
+     }
+    ],
+    "developer_instruction_placement": "system",
+    "max_model_calls_allowed": 320
+   }
+  },
+  "gemini_3_8_flash_thinking": {
+   "bare": {
+    "tasks": 400,
+    "action_model_behavior": [
+     {
+      "tasks": 400,
+      "settings": {
+       "context_window": 1048576,
+       "max_tokens": 65536,
+       "name": "gemini-3.8-flash",
+       "provider": "google",
+       "supports_sampling": false,
+       "supports_thinking": true,
+       "thinking_level": "HIGH",
+       "transport": "native",
+       "whole_toolset_discovery": true
+      }
+     }
+    ],
+    "developer_instruction_placement": "system",
+    "max_model_calls_allowed": 320
+   }
+  },
+  "gemini_4_argon": {
+   "bare": {
+    "tasks": 400,
+    "action_model_behavior": [
+     {
+      "tasks": 400,
+      "settings": {
+       "context_window": 1048576,
+       "max_tokens": 65536,
+       "name": "gemini-4-argon",
+       "provider": "google",
+       "supports_sampling": false,
+       "supports_thinking": true,
+       "thinking_level": "HIGH",
+       "transport": "native",
+       "whole_toolset_discovery": true
+      }
+     }
+    ],
+    "developer_instruction_placement": "system",
+    "max_model_calls_allowed": 320
+   }
+  },
+  "glm_5_3": {
+   "bare": {
+    "tasks": 400,
+    "action_model_behavior": [
+     {
+      "tasks": 400,
+      "settings": {
+       "context_window": 1000000,
+       "default_temperature": 1.0,
+       "max_tokens": 131072,
+       "name": "z-ai/glm-5.3",
+       "openrouter_provider_pin": [
+        "z-ai"
+       ],
+       "provider": "openrouter",
+       "supports_sampling": true,
+       "supports_thinking": true,
+       "thinking_level": "HIGH",
+       "transport": "native",
+       "whole_toolset_discovery": true
+      }
+     }
+    ],
+    "developer_instruction_placement": "system",
+    "max_model_calls_allowed": 320
+   }
+  },
+  "gpt_5_6_sol": {
+   "bare": {
+    "tasks": 400,
+    "action_model_behavior": [
+     {
+      "tasks": 400,
+      "settings": {
+       "context_window": 1050000,
+       "max_input_tokens": 922000,
+       "max_tokens": 128000,
+       "name": "gpt-5.6-sol",
+       "provider": "openai",
+       "supports_sampling": false,
+       "supports_thinking": true,
+       "thinking_level": "HIGH",
+       "transport": "native",
+       "whole_toolset_discovery": true
+      }
+     }
+    ],
+    "developer_instruction_placement": "system",
+    "max_model_calls_allowed": 320
+   }
+  },
+  "gpt_6_1_sol": {
+   "bare": {
+    "tasks": 400,
+    "action_model_behavior": [
+     {
+      "tasks": 400,
+      "settings": {
+       "context_window": 1050000,
+       "max_input_tokens": 922000,
+       "max_tokens": 128000,
+       "name": "gpt-6.1-sol",
+       "provider": "openai",
+       "supports_sampling": false,
+       "supports_thinking": true,
+       "thinking_level": "HIGH",
+       "transport": "native",
+       "whole_toolset_discovery": true
+      }
+     }
+    ],
+    "developer_instruction_placement": "system",
+    "max_model_calls_allowed": 320
+   }
+  },
+  "gpt_6_astra": {
+   "bare": {
+    "tasks": 400,
+    "action_model_behavior": [
+     {
+      "tasks": 400,
+      "settings": {
+       "context_window": 1050000,
+       "max_input_tokens": 922000,
+       "max_tokens": 128000,
+       "name": "gpt-6-astra",
+       "provider": "openai",
+       "supports_sampling": false,
+       "supports_thinking": true,
+       "thinking_level": "HIGH",
+       "transport": "native",
+       "whole_toolset_discovery": true
+      }
+     }
+    ],
+    "developer_instruction_placement": "system",
+    "max_model_calls_allowed": 320
+   }
+  },
+  "kimi_k3": {
+   "bare": {
+    "tasks": 400,
+    "action_model_behavior": [
+     {
+      "tasks": 400,
+      "settings": {
+       "context_window": 1048576,
+       "default_temperature": 1.0,
+       "max_tokens": 65535,
+       "name": "moonshotai/kimi-k3",
+       "openrouter_provider_pin": [
+        "moonshotai"
+       ],
+       "provider": "openrouter",
+       "supports_sampling": true,
+       "supports_thinking": true,
+       "thinking_level": "HIGH",
+       "transport": "native",
+       "whole_toolset_discovery": true
+      }
+     }
+    ],
+    "developer_instruction_placement": "system",
+    "max_model_calls_allowed": 320
+   }
+  }
+ }
+}

@@ -69,6 +69,31 @@ MAX_UNPACKED_BYTES = 4 * 1024 * 1024 * 1024
 MAX_SCORE_FILE_BYTES = 2 * 1024 * 1024
 # A longer list of changed paths ends with one entry that counts the rest.
 MAX_CHANGED_PATHS = 500
+# The settings of the action model that a submission states, under the names
+# the result files use (`multiverse_inference_identity.action_model_behavior`).
+# They decide what the model is asked to do, so a reader needs them to compare
+# two entries: the limits on input and output, sampling, reasoning, and the
+# route the requests take.
+MODEL_SETTING_FIELDS = (
+    "name",
+    "provider",
+    "transport",
+    "context_window",
+    "max_input_tokens",
+    "max_tokens",
+    "supports_sampling",
+    "default_temperature",
+    "supports_thinking",
+    "thinking_level",
+    "thinking_contract",
+    "thinking_budget_tokens",
+    "whole_toolset_discovery",
+    "openrouter_provider_pin",
+    "openrouter_quantization_pin",
+    "vllm_profile",
+)
+# Which message carries the developer instructions of a task.
+INSTRUCTION_PLACEMENTS = ("system", "user")
 # The attempts of a task that a score file counts: those that reached a
 # score, and those that were skipped for an infrastructure failure.
 ATTEMPT_KINDS = ("scored", "skipped")
@@ -111,6 +136,8 @@ TRAJECTORY_FIELDS = (
     "agent_token_usage",
     "time_taken_minutes",
     "model_call_timeout_seconds",
+    "developer_instruction_placement",
+    "action_model_behavior",
     "db_diff",
     "final_assertion_outcome",
     "final_assertion_errors",
@@ -256,6 +283,76 @@ def case_passed(verdicts: dict[str, str]) -> bool:
 
 def _count(value: Any) -> int | None:
   return value if type(value) is int and value >= 0 else None
+
+
+def _setting_value(value: Any) -> bool:
+  if value is None or type(value) in (bool, int):
+    return True
+  if type(value) is float:
+    return value == value and abs(value) != float("inf")
+  if isinstance(value, str):
+    return len(value) <= 200 and value.isprintable()
+  return (
+      isinstance(value, list)
+      and len(value) <= 16
+      and all(
+          isinstance(item, str) and 0 < len(item) <= 200 and item.isprintable()
+          for item in value
+      )
+  )
+
+
+def is_model_settings(value: Any) -> bool:
+  """Whether a value states settings of an action model, and only those."""
+  return (
+      isinstance(value, dict)
+      and all(key in MODEL_SETTING_FIELDS for key in value)
+      and all(_setting_value(item) for item in value.values())
+  )
+
+
+def model_settings_of(record: dict) -> dict:
+  """Return the action model settings that a result file records.
+
+  The settings with a value, in the order of MODEL_SETTING_FIELDS. A result
+  file records them in its inference identity; a trajectory record carries
+  them as `action_model_behavior`.
+  """
+  identity = record.get("multiverse_inference_identity")
+  behavior = (
+      identity.get("action_model_behavior")
+      if isinstance(identity, dict)
+      else record.get("action_model_behavior")
+  )
+  behavior = behavior if isinstance(behavior, dict) else {}
+  return {
+      field: behavior[field]
+      for field in MODEL_SETTING_FIELDS
+      if behavior.get(field) is not None
+  }
+
+
+def settings_groups(counts: dict[str, int]) -> list[dict]:
+  """Return the settings of a run as a score file lists them.
+
+  `counts` maps settings, as canonical JSON text, to their number of tasks.
+  The result has one entry per distinct settings, the most frequent first.
+  """
+  return [
+      {"tasks": number, "settings": json.loads(text)}
+      for text, number in sorted(
+          counts.items(), key=lambda item: (-item[1], item[0])
+      )
+  ]
+
+
+def _group_counts(groups: list[dict]) -> dict[str, int]:
+  counts: dict[str, int] = {}
+  for group in groups:
+    key = canonical_json(group["settings"]).decode("ascii")
+    # Two entries with the same settings are one entry too many.
+    counts[key] = -1 if key in counts else group["tasks"]
+  return counts
 
 
 def is_model_call_timeout(value: Any) -> bool:
@@ -434,6 +531,7 @@ def trajectory_record(
   }
   kept["task_id"] = task_id
   kept["setting"] = setting
+  kept["action_model_behavior"] = model_settings_of(record)
   logs = record.get("model_logs")
   kept["model_logs"] = [
       message
@@ -658,6 +756,8 @@ def _check_run(
           "verifier_votes",
           "max_model_calls_allowed",
           "model_call_timeout_seconds",
+          "action_model_behavior",
+          "developer_instruction_placement",
           "code",
           "datasets",
           "completed_at",
@@ -666,6 +766,28 @@ def _check_run(
       errors,
   ):
     return
+  groups = run["action_model_behavior"]
+  if not (
+      isinstance(groups, list)
+      and 0 < len(groups) <= 8
+      and all(
+          isinstance(group, dict)
+          and set(group) == {"tasks", "settings"}
+          and (_count(group["tasks"]) or 0) > 0
+          and is_model_settings(group["settings"])
+          for group in groups
+      )
+      and groups == settings_groups(_group_counts(groups))
+  ):
+    errors.append(
+        "run.action_model_behavior must list the settings of the action model"
+        " that the cases ran under, each with its number of tasks, the most"
+        " frequent first"
+    )
+  if run["developer_instruction_placement"] not in INSTRUCTION_PLACEMENTS:
+    errors.append(
+        "run.developer_instruction_placement must be 'system' or 'user'"
+    )
   limits = run["model_call_timeout_seconds"]
   if not (
       isinstance(limits, list)
@@ -930,6 +1052,20 @@ def check_submission(
   ):
     if document["summary"] != summary_of(document["tasks"]):
       errors.append("summary does not equal the counts of the task results")
+    groups = (
+        document["run"].get("action_model_behavior")
+        if isinstance(document["run"], dict)
+        else None
+    )
+    if isinstance(groups, list) and all(
+        isinstance(group, dict) and _count(group.get("tasks")) is not None
+        for group in groups
+    ):
+      if sum(group["tasks"] for group in groups) != len(document["tasks"]):
+        errors.append(
+            "run.action_model_behavior does not cover the tasks of the score"
+            " file: its numbers of tasks must add up to their number"
+        )
   trajectories = document["trajectories"]
   if _keys(
       trajectories, "trajectories", ("url", "sha256", "bytes"), (), errors
@@ -974,6 +1110,7 @@ def check_archive(
   entry_id = document["entry"]["id"]
   seen = set()
   limits = set()
+  behaviors: dict[str, int] = {}
 
   def problem(message: str) -> None:
     if len(errors) < 40:
@@ -1025,6 +1162,19 @@ def check_archive(
         problem(f"{task_id}: model_call_timeout_seconds is not a limit")
       else:
         limits.add(limit)
+      settings = record.get("action_model_behavior")
+      if is_model_settings(settings):
+        key = canonical_json(settings).decode("ascii")
+        behaviors[key] = behaviors.get(key, 0) + 1
+      else:
+        problem(f"{task_id}: action_model_behavior states no model settings")
+      if record.get("developer_instruction_placement") != document["run"].get(
+          "developer_instruction_placement"
+      ):
+        problem(
+            f"{task_id}: developer_instruction_placement differs from the one"
+            " the score file states for the run"
+        )
       try:
         derived = task_entry(record, record.get("setting"), data)
       except SubmissionError as error:
@@ -1064,5 +1214,12 @@ def check_archive(
     errors.append(
         "run.model_call_timeout_seconds does not list the limits the"
         f" trajectories ran under ({', '.join(map(str, sorted(limits)))})"
+    )
+  if not errors and settings_groups(behaviors) != document["run"].get(
+      "action_model_behavior"
+  ):
+    errors.append(
+        "run.action_model_behavior does not list the settings the"
+        " trajectories ran under, with the number of tasks of each"
     )
   return errors

@@ -48,6 +48,42 @@ export interface HarnessOption {
 }
 
 /** One run: a model under one harness on one result set. */
+/** The settings of an action model, under the names the result files use (action_model_behavior). */
+export interface ModelSettings {
+  name?: string;
+  provider?: string;
+  transport?: string;
+  context_window?: number;
+  max_input_tokens?: number;
+  max_tokens?: number;
+  supports_sampling?: boolean;
+  default_temperature?: number;
+  supports_thinking?: boolean;
+  thinking_level?: string;
+  thinking_contract?: string;
+  thinking_budget_tokens?: number;
+  whole_toolset_discovery?: boolean;
+  openrouter_provider_pin?: string[];
+  openrouter_quantization_pin?: string[];
+  vllm_profile?: string;
+}
+
+/** The settings an entry was run under that can affect its result (scripts/build_board.py). */
+export interface RunDetails {
+  tasks: number;
+  /** Each settings record of the action model with its number of tasks, the most frequent first. */
+  modelSettings: { tasks: number; settings: ModelSettings }[];
+  /** The message that carried the developer instructions. */
+  instructionPlacement?: "system" | "user";
+  modelCallLimit?: number;
+  /** The limits on one model request that the cases ran under, in seconds. */
+  requestLimitsSeconds?: number[];
+  /** A submitted entry: the day its last case was scored, and how many tasks were run again. */
+  completedOn?: string;
+  rerunTasks?: number;
+  retriedTasks?: number;
+}
+
 export interface MultiverseModel {
   id?: number;
   rank: number;
@@ -79,6 +115,8 @@ export interface MultiverseModel {
   taskSettings?: Partial<Record<TaskSettingId, TaskSettingStats>>;
   /** Who ran the evaluation of the entry, where the result set names it. */
   submitter?: string;
+  /** The settings the entry was run under, where the result set records them. */
+  runDetails?: RunDetails;
   /** Present on a submitted entry: who submitted it, and where its trajectories are. */
   submission?: {
     id: string;
