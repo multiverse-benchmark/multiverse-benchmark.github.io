@@ -90,14 +90,17 @@ function spread(details: RunDetails, read: (settings: ModelSettings) => string):
   return [...tasks].map(([text, count]) => `${text} (${tasksText(count)})`);
 }
 
-/** The defaults of the leaderboard's baselines for the settings a run can change. */
-export const DEFAULT_REQUEST_LIMIT_SECONDS = 240;
+/** The message that carried the developer instructions in the runs of the leaderboard's baselines. */
 export const DEFAULT_INSTRUCTION_PLACEMENT = 'system';
 
 /**
  * What a reader should know before comparing the entry with the others: tasks
- * that were run again after they had a scored result, and run settings that
- * are not the leaderboard's defaults. Empty for a run under the defaults.
+ * that were run again after they had a scored result, developer instructions
+ * outside the default message, and tasks that ran under other settings of the
+ * model than the rest of the entry (for example with a larger context
+ * window). Empty for a run under the defaults. The limit on one model request
+ * is a line of the run details and raises no warning: a slow self-hosted
+ * model needs a longer one.
  */
 export function runWarnings(details: RunDetails): string[] {
   const warnings: string[] = [];
@@ -106,11 +109,12 @@ export function runWarnings(details: RunDetails): string[] {
   if (details.instructionPlacement && details.instructionPlacement !== DEFAULT_INSTRUCTION_PLACEMENT) {
     warnings.push(`The developer instructions were placed in the ${details.instructionPlacement} message; the default is the ${DEFAULT_INSTRUCTION_PLACEMENT} message.`);
   }
-  const limits = details.requestLimitsSeconds ?? [];
-  if (limits.some(seconds => seconds !== DEFAULT_REQUEST_LIMIT_SECONDS)) {
-    warnings.push(`The limit on one model request was ${limits.map(seconds => `${seconds} s`).join(' and ')}; the default is ${DEFAULT_REQUEST_LIMIT_SECONDS} s.`);
+  // The settings records are listed with the most frequent first: the tasks of the others ran under different settings.
+  const [most, ...others] = details.modelSettings;
+  if (others.length > 0) {
+    const differing = others.reduce((sum, group) => sum + group.tasks, 0);
+    warnings.push(`${tasksText(differing)} ran under different model settings than the other ${most.tasks}; each value below has its number of tasks.`);
   }
-  if (details.modelSettings.length > 1) warnings.push('The tasks did not all run under the same settings of the model.');
   return warnings;
 }
 
