@@ -58,7 +58,38 @@ submission key and whose `modelId` and `harness` preserve the source identities.
 `RunIndex.cell(taskId, entryId)` returns `undefined` when a result is unavailable;
 `scoredCount(taskId)` and `passedCount(taskId)` count submitted results only.
 
-This describes what the viewer reads. `scripts/export_runs.py` writes and
-checks the runs of the baselines under the bare harness, and it replaces the
-whole runs directory: an export that adds submissions has to write every
-submission, because files added by hand do not survive it.
+This describes what the viewer reads. Two scripts write it.
+
+`scripts/export_runs.py` writes and checks the runs of the baselines under the
+bare harness, into `public/data/v1.1.0/runs/`. It replaces the whole runs
+directory, so files added there by hand do not survive it.
+
+`scripts/export_submission_runs.py` adds the runs of the submitted entries. It
+works on a built site, never on `public/`:
+
+```sh
+python3 scripts/export_submission_runs.py --site dist
+```
+
+For every score file under `submissions/v1.1.0/` it fetches the trajectory
+archive the score file names, checks it against the score file, converts every
+trajectory to a run file at `<site>/data/v1.1.0/runs/<entry.id>/<taskId>.json.gz`,
+and replaces the site's index with the baselines' index plus one object entry
+and one column per submitted entry, after the baselines and in the order of the
+score files. The cell of a run is the verdicts of its score file. The run
+files are written with the functions of `scripts/export_runs.py`, so a
+submitted run has the fields of a baseline's run. The differences are its
+`harness` and a `termination` that need not be one the baselines ended with.
+
+- An archive that cannot be fetched leaves its entry out of the index and is
+  not a failure. The entry stays on the leaderboard, and its run details link
+  to the archive instead of the result explorer.
+- An archive that was fetched and fails a check is a failure, and the site is
+  left as it was.
+- With no score file the script does nothing.
+- `--archive <entry.id>=<file>` reads the archive of an entry from a local
+  file, which must have the size and the sha256 the score file names. It is
+  for previews and tests.
+
+The index of a site with submitted entries also names them under
+`submissions`, with the sha256 of each archive.

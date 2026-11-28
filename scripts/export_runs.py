@@ -226,7 +226,16 @@ def assertion_verifier(record: dict, row: dict, replayed: dict | None) -> dict:
     return entry
 
 
-def run_of(record: dict, row: dict, replayed: dict | None, canary: str) -> dict:
+def run_of(
+    record: dict, row: dict, replayed: dict | None, canary: str, *, harness: str = HARNESS,
+    terminations: tuple[str, ...] | None = TERMINATIONS,
+) -> dict:
+    """One run as the page shows it. The baselines ran under the bare harness and ended in one of TERMINATIONS.
+
+    scripts/export_submission_runs.py converts the runs of a submitted entry with the same function: it
+    names the harness of the entry and passes no list of terminations, because the check of a score file
+    has already decided what a termination may be.
+    """
     # A result record that carries a canary carries the one of its task.
     assert record.get("contamination_canary") in (None, canary), "the record carries the canary of another task"
     status = row["judgeDimensionStatus"]
@@ -243,7 +252,7 @@ def run_of(record: dict, row: dict, replayed: dict | None, canary: str) -> dict:
             verifiers.append(llm_verifier(record, verifier, dimension, verdict))
     passed = all(entry["passed"] for entry in verifiers if entry["applicable"])
     assert passed is row["passed"], "the verdicts do not give the outcome of the result export"
-    assert row["terminationReason"] in TERMINATIONS, f"unknown termination {row['terminationReason']!r}"
+    assert terminations is None or row["terminationReason"] in terminations, f"unknown termination {row['terminationReason']!r}"
     steps = steps_of(record.get("model_logs") or [])
     assert steps, "no trajectory"
 
@@ -258,7 +267,7 @@ def run_of(record: dict, row: dict, replayed: dict | None, canary: str) -> dict:
         "contaminationCanary": canary,
         "modelId": row["modelId"],
         "setting": row["setting"],
-        "harness": HARNESS,
+        "harness": harness,
         "passed": passed,
         "termination": row["terminationReason"],
         "verifiers": verifiers,

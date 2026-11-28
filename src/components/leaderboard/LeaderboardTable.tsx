@@ -20,6 +20,7 @@ import {
 import { formatContext, formatParams } from "@/lib/modelSize";
 import { runDetailLines, runWarnings } from "@/lib/runDetails";
 import { HARNESS_ABBR } from "@/lib/taskSettingStyle";
+import { EntryTrajectories } from "./EntryTrajectories";
 import type {
   ContextLengthRange,
   HarnessOption,
@@ -455,9 +456,8 @@ export function LeaderboardTable({
                 <div data-lb-run-line="trajectories">
                   <dt>Trajectories</dt>
                   <dd>
-                    <a href={submission.trajectories} rel="noreferrer" onClick={stay}>
-                      Download the archive
-                    </a>
+                    {/* In the result explorer once the entry's runs are in the run viewer; the archive until then. */}
+                    <EntryTrajectories entryId={submission.id} archiveUrl={submission.trajectories} />
                   </dd>
                 </div>
               )}

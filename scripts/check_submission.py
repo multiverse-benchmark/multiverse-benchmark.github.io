@@ -106,6 +106,10 @@ def board_errors(document: dict, baselines: dict[str, dict], others: list[dict])
     return errors
 
 
+# How the problem of an archive that could not be fetched begins. Any other problem is about a file that was fetched.
+UNREACHABLE = "the trajectory archive cannot be downloaded without signing in"
+
+
 def download_archive(url: str, size: int, sha256: str, target) -> str | None:
     """Stream the archive into `target`; return why it is not the named file, or None."""
     request = urllib.request.Request(url, headers={"User-Agent": "multiverse-leaderboard-check"})
@@ -121,7 +125,7 @@ def download_archive(url: str, size: int, sha256: str, target) -> str | None:
                 digest.update(chunk)
                 target.write(chunk)
     except (urllib.error.URLError, OSError, ValueError) as error:
-        return f"the trajectory archive cannot be downloaded without signing in ({type(error).__name__})"
+        return f"{UNREACHABLE} ({type(error).__name__})"
     if received != size or digest.hexdigest() != sha256:
         return "the file at trajectories.url is not the archive the score file names (size or sha256 differs)"
     return None
