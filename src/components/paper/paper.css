@@ -94,11 +94,11 @@
   --mv-partial-tint: #fbf1d8;
 
   /* model groups: proprietary (closed) vs open-weight (open) */
-  --mv-closed: #0b7350;
-  --mv-closed-tint: #e2f1ea;
-  --mv-open: #e2702a;
-  --mv-open-tint: #fdecdd;
-  --mv-open-ink: #9a4a12;
+  --mv-closed: #5b4b8a;
+  --mv-closed-tint: #f2eff9;
+  --mv-open: #1492d6;
+  --mv-open-tint: #e3f2fc;
+  --mv-open-ink: #0b5e91;
 
   /* type: one family for headings, text, and columns of numbers (loaded in index.css) */
   --mv-display: 'Google Sans Flex', Arial, Helvetica, sans-serif;
@@ -186,11 +186,11 @@
   --mv-partial: #e0b356;
   --mv-partial-tint: #2b230f;
 
-  --mv-closed: #4fc79d;
-  --mv-closed-tint: #10261e;
-  --mv-open: #f0935a;
-  --mv-open-tint: #33200f;
-  --mv-open-ink: #f3ad7f;
+  --mv-closed: #7a68b8;
+  --mv-closed-tint: #1f1b30;
+  --mv-open: #30a8e8;
+  --mv-open-tint: #0f2533;
+  --mv-open-ink: #8fd3f5;
 
   --mv-shadow: 0 10px 30px -16px #000000cc;
 }
