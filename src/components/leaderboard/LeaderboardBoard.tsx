@@ -116,7 +116,7 @@ function boardColumns(
 
 /** The key entries for the two marks beside a model's name. */
 const DETAILS_KEY = {
-  label: "⚙️",
+  label: "ℹ️",
   text: "Run details: the settings of the run and who submitted it",
 };
 const WARNING_KEY = {

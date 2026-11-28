@@ -318,7 +318,7 @@ export function LeaderboardTable({
                   data-lb-details-toggle={row.key}
                   onClick={toggleDetails}
                 >
-                  <span aria-hidden="true">⚙️</span>
+                  <span aria-hidden="true">ℹ️</span>
                 </button>
               )}
             </div>
