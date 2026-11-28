@@ -24,8 +24,12 @@ jobs:
       GITHUB_TOKEN: ${{ github.token }}
       GH_TOKEN: ${{ github.token }}
       PULL_REQUEST: ${{ github.event.pull_request.number }}
-      WORK: ${{ runner.temp }}/submission
     steps:
+      # A work folder outside the checkout. The runner's temporary folder is known to the steps only.
+      - name: Choose the work folder
+        run: |
+          mkdir -p "$RUNNER_TEMP/submission/candidates"
+          echo "WORK=$RUNNER_TEMP/submission" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.base.sha }}
@@ -39,7 +43,6 @@ jobs:
           python-version: '3.12'
       - name: Read the score files of the pull request
         run: |
-          mkdir -p "$WORK/candidates"
           python3 scripts/read_pull_request.py --repository "$GITHUB_REPOSITORY" --number "$PULL_REQUEST" \
             --out "$WORK/candidates" --list "$WORK/files.txt" --report "$WORK/report.md"
       - name: Check the score files and their trajectory archives
