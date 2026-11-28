@@ -1,5 +1,5 @@
 import { useId, useRef, type JSX, type KeyboardEvent } from 'react';
-import { ArrowUpRight, Download, Mail } from 'lucide-react';
+import { ArrowUpRight, Download, Mail, Upload } from 'lucide-react';
 import '../paper/paper.css';
 import './results.css';
 import { HARNESS_AVAILABILITY, LEADERBOARD_CONTACT, LEADERBOARD_TABS, RESULTS_COPY } from '../../content/paper';
@@ -78,8 +78,10 @@ function ResultSetTabs({ selected, tabId, panelId }: { selected: ResultSet; tabI
  * The results section below the page's section heading, for the result set
  * selected on the site.
  *
- * v1.1.0 has tabs for the validation set and the test set, with a contact
- * message for the selected split. The paper's release has no contact callout.
+ * v1.1.0 has tabs for the validation set and the test set, with a message
+ * for the selected split: how to submit results to the validation set
+ * leaderboard, or whom to contact about the test set. The paper's release has
+ * no such callout.
  *
  * In both, the leaderboard itself (src/components/leaderboard) is the same:
  * its controls, then its chart, then its ranked table. It draws the result
@@ -91,7 +93,8 @@ function ResultSetTabs({ selected, tabId, panelId }: { selected: ResultSet; tabI
  * note under it says why (HARNESS_AVAILABILITY): the results under them are
  * not available for this release yet, the paper reports them for its own
  * release, and they can be submitted. The note's two actions show the paper's
- * results and lead to the contact for submissions.
+ * results and lead to the submission message. A harness with a submitted
+ * entry can be selected like the bare harness.
  *
  * Under the validation leaderboard of the latest release, a sentence links to
  * the result explorer on the deep-dive page, which shows the same results task
@@ -136,13 +139,22 @@ export function ResultsSection(): JSX.Element {
 
   return <div className="res" data-res data-result-set={results.set}>
     {isLeaderboard && <div ref={contact} className="res-callout res-contact" role="note" aria-label="Leaderboard submissions" tabIndex={-1} data-res-contact>
-      <span className="res-callout-icon" aria-hidden="true"><Mail size={18} strokeWidth={1.8} /></span>
+      <span className="res-callout-icon" aria-hidden="true">{results.set === 'validation' ? <Upload size={18} strokeWidth={1.8} /> : <Mail size={18} strokeWidth={1.8} />}</span>
       <div className="res-callout-text">
-        {results.set === 'validation' ? <p className="res-callout-lead">
-          {LEADERBOARD_CONTACT.validation.lead}{' '}
-          <a className="res-contact-email" href={`mailto:${LEADERBOARD_CONTACT.email}`} data-res-contact-email>{LEADERBOARD_CONTACT.email}</a>{' '}
-          {LEADERBOARD_CONTACT.validation.details}
-        </p> : <>
+        {results.set === 'validation' ? <>
+          <p className="res-callout-lead">
+            {LEADERBOARD_CONTACT.validation.lead}{' '}
+            <code className="res-callout-code" data-res-submit-command>{LEADERBOARD_CONTACT.validation.command}</code>{' '}
+            {LEADERBOARD_CONTACT.validation.details}
+          </p>
+          <p className="res-callout-more">
+            <a className="res-contact-email" href={LEADERBOARD_CONTACT.validation.guideUrl} target="_blank" rel="noreferrer" data-res-submit-guide>
+              {LEADERBOARD_CONTACT.validation.guide}<ArrowUpRight size={13} aria-hidden="true" />
+            </a>{' · '}
+            {LEADERBOARD_CONTACT.validation.questions}{' '}
+            <a className="res-contact-email" href={`mailto:${LEADERBOARD_CONTACT.email}`} data-res-contact-email>{LEADERBOARD_CONTACT.email}</a>.
+          </p>
+        </> : <>
           <p className="res-callout-lead">{LEADERBOARD_CONTACT.test.lead}</p>
           <p className="res-callout-more">
             {LEADERBOARD_CONTACT.test.contact}{' '}

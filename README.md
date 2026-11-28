@@ -34,7 +34,8 @@ The data checks use Python's standard library:
 ```bash
 npm run validate:data          # exported tasks and states of both releases
 npm run validate:tools         # tool source snapshots of both releases
-npm run validate:leaderboard   # leaderboard data of v1.1.0
+npm run validate:leaderboard   # leaderboard data of v1.1.0 (the baselines)
+npm run validate:submissions   # submitted leaderboard entries, and the board built from them
 npm run validate:runs          # runs behind the v1.1.0 validation leaderboard
 npm run validate:showcase      # the worked example
 PYTHONPATH=scripts python3 -m unittest discover -s scripts/tests
@@ -132,9 +133,15 @@ The remaining exports read files that are not part of this repository:
 
 How a submitted model's runs are added to the run data is described in [docs/run-submissions.md](docs/run-submissions.md).
 
+## Leaderboard submissions
+
+The validation set leaderboard of v1.1.0 shows the baselines (`src/data/leaderboard.v1.1.0.json`) and the submitted entries, one score file each under `submissions/v1.1.0/`. `scripts/build_board.py` puts them together into `src/data/leaderboard.v1.1.0.validation.json`, which is generated and not committed: `npm run build`, `npm run build:linked`, and the development server write it before anything else. An entry's confidence intervals are computed there with the baselines' procedure, which needs NumPy once there is a submission.
+
+A submission arrives as a pull request that adds one score file, opened by the `multiverse submit` command of the code repository. `.github/workflows/submission-check.yml` checks it and comments the result. [submissions/README.md](submissions/README.md) describes what is checked and what a maintainer does.
+
 ## Deployment
 
-`.github/workflows/deploy.yml` builds the site and deploys `dist` to GitHub Pages. It is started by hand (**Actions → Deploy to GitHub Pages → Run workflow**), with **Settings → Pages → Source** set to GitHub Actions. The site's public address, the optional Google Analytics measurement ID, and the optional Search Console verification token are build variables; [docs/seo-and-analytics.md](docs/seo-and-analytics.md) describes them.
+`.github/workflows/deploy.yml` builds the site and deploys `dist` to GitHub Pages. It is started by hand (**Actions → Deploy to GitHub Pages → Run workflow**), with **Settings → Pages → Source** set to GitHub Actions. A change under `submissions/` on `main`, such as a merged submission, starts it too. The site's public address, the optional Google Analytics measurement ID, and the optional Search Console verification token are build variables; [docs/seo-and-analytics.md](docs/seo-and-analytics.md) describes them.
 
 ## License
 

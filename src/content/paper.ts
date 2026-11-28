@@ -474,12 +474,22 @@ export const LEADERBOARD_TABS: { set: Exclude<ResultSet, 'paper-validation'>; la
   { set: 'test', label: 'Test set', note: tasks => `${tasks} hidden tasks` },
 ];
 
-/** Above the latest release's results: the contact message for the selected split. */
+/**
+ * Above the latest release's results: how to submit to the validation set
+ * leaderboard, and the contact message for the test set. A submission is made
+ * with the `multiverse submit` command of the code repository, which checks
+ * the finished evaluations and opens a pull request on this site's repository
+ * (submissions/README.md).
+ */
 export const LEADERBOARD_CONTACT = {
   email: CONTACT_EMAIL,
   validation: {
-    lead: 'To add your model’s results to the validation set leaderboard, contact',
-    details: 'with your model name, affiliation, trajectories, and result files from your model.',
+    lead: 'To add your model’s results to the validation set leaderboard, run',
+    command: 'multiverse submit',
+    details: 'on your finished evaluations. The command checks the results and opens a pull request that adds them to the leaderboard.',
+    guide: 'Submission guide',
+    guideUrl: 'https://github.com/google-deepmind/MultiVerse/blob/main/docs/leaderboard-submission.md',
+    questions: 'For questions, contact',
   },
   test: {
     lead: 'A model-submission-based leaderboard for the hidden test set is coming soon in collaboration with MLCommons.',
