@@ -45,8 +45,8 @@ tag loads and the analytics consent controls are not displayed.
 
 When configured, a compact cookie panel offers **Accept** and **Decline**, with
 a **Details** link that names Google Analytics as the recipient of the usage
-data. No Google code or requests are made before opt-in. **Cookie settings**
-lets visitors change their choice; declining after opting in stops
+data. No Google code or requests are made before opt-in. A **Cookie settings**
+link in the footer lets visitors change their choice; declining after opting in stops
 collection and clears the usual GA cookies. Advertising consent stays denied,
 and Google signals and ad-personalization signals are disabled. Analytics is
 restricted to the configured production origin and site path, so a local

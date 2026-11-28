@@ -1,4 +1,4 @@
-.analytics-consent, .analytics-settings {
+.analytics-consent {
   position: fixed;
   bottom: 1rem;
   left: 1rem;
@@ -19,16 +19,18 @@
 .analytics-consent summary:focus-visible { outline: 2px solid #7143bd; outline-offset: 3px; }
 .analytics-consent details p { margin: .35rem 0 0; }
 .analytics-consent-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
-.analytics-consent-actions button, .analytics-settings {
+.analytics-consent-actions button {
   padding: .3rem .7rem;
   font-size: .8125rem;
   font-weight: 600;
   cursor: pointer;
 }
 .analytics-consent-actions button { border: 1px solid #d8d0e4; border-radius: .4rem; color: inherit; background: transparent; }
-.analytics-consent-actions button:hover, .analytics-settings:hover { border-color: #7143bd; }
-.analytics-consent-actions button:focus-visible, .analytics-settings:focus-visible { outline: 2px solid #7143bd; outline-offset: 3px; }
-.analytics-consent[hidden], .analytics-settings[hidden] { display: none; }
-[data-theme="dark"] .analytics-consent, [data-theme="dark"] .analytics-settings { background: #17151c; color: #f4f0fa; border-color: #50465f; }
+.analytics-consent-actions button:hover { border-color: #7143bd; }
+.analytics-consent-actions button:focus-visible { outline: 2px solid #7143bd; outline-offset: 3px; }
+/* On a phone the panel sits exactly over the release switch at the bottom of the window, so no edge of the switch shows below it. */
+@media (max-width: 600px) { .analytics-consent { bottom: max(12px, env(safe-area-inset-bottom)); } }
+.analytics-consent[hidden] { display: none; }
+[data-theme="dark"] .analytics-consent { background: #17151c; color: #f4f0fa; border-color: #50465f; }
 [data-theme="dark"] .analytics-consent-actions button { border-color: #50465f; }
-@media print { .analytics-consent, .analytics-settings { display: none; } }
+@media print { .analytics-consent { display: none; } }

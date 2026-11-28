@@ -211,6 +211,10 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--mv-purple); out
 .footer-main > p { color: var(--mv-footer-ink-2); font-size: 10px; line-height: 1.8; }
 .footer-main > a:last-child { display: flex; align-items: center; gap: 8px; margin-left: auto; color: var(--mv-footer-ink); font-size: 9px; }
 .footer-bottom { display: flex; justify-content: space-between; padding-top: 17px; padding-bottom: 20px; border-top: 1px solid var(--mv-footer-line); color: var(--mv-footer-ink-2); font-size: 8px; }
+/* Reopens the cookie panel. Shown only on a page where the panel is installed (lib/analytics.ts). */
+.footer-cookie-settings { display: none; padding: 0; border: 0; background: none; color: inherit; font: inherit; }
+:root[data-cookie-controls] .footer-cookie-settings { display: inline; }
+.footer-cookie-settings:hover { text-decoration: underline; }
 
 @media (max-width: 800px) {
   .footer-main { gap: 30px; }

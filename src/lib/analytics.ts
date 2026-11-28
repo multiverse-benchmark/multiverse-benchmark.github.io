@@ -52,12 +52,14 @@ function installAnalyticsControls() {
     + '<details><summary>Details</summary><p>These cookies are set by Google Analytics, which receives usage data such as the pages you visit. No advertising features are used.</p></details>'
     + '<div class="analytics-consent-actions"><button type="button" data-consent="granted">Accept</button><button type="button" data-consent="denied">Decline</button></div>';
 
-  const settings = document.createElement('button');
-  settings.type = 'button';
-  settings.className = 'analytics-settings';
-  settings.textContent = 'Cookie settings';
-  settings.addEventListener('click', () => {
-    settings.hidden = true;
+  // The footer's "Cookie settings" link reopens the panel. The footer shows the link only
+  // on a page where these controls are installed.
+  let opener: HTMLElement | null = null;
+  document.documentElement.dataset.cookieControls = '';
+  document.addEventListener('click', event => {
+    const link = (event.target as Element | null)?.closest<HTMLElement>('[data-cookie-settings]');
+    if (!link) return;
+    opener = link;
     panel.hidden = false;
     panel.querySelector<HTMLButtonElement>('button')?.focus();
   });
@@ -66,8 +68,8 @@ function installAnalyticsControls() {
     consent = next;
     try { localStorage.setItem(consentKey, next); } catch { /* Keep this page's choice. */ }
     panel.hidden = true;
-    settings.hidden = false;
-    settings.focus();
+    if (opener?.isConnected) opener.focus();
+    opener = null;
     if (next === 'granted') startAnalytics();
     else if (loaded) {
       // Reload after withdrawal to unload the Google code and stop all later events.
@@ -87,8 +89,7 @@ function installAnalyticsControls() {
     button.addEventListener('click', () => choose(button.dataset.consent as Exclude<Consent, null>));
   });
   panel.hidden = consent !== null;
-  settings.hidden = consent === null;
-  document.body.append(panel, settings);
+  document.body.append(panel);
   if (consent === 'granted') startAnalytics();
 }
 

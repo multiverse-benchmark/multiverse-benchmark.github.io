@@ -105,6 +105,7 @@ export function SiteFooter({ brandHref = '#' }: { brandHref?: string }) {
     <div className="page-width footer-bottom">
       <span>MultiVerse</span>
       <span>{release}: {DATASET_TASK_COUNT} validation tasks · ST / IF / MT / MTIF</span>
+      <button type="button" className="footer-cookie-settings" data-cookie-settings>Cookie settings</button>
       <a href="#">Back to top ↑</a>
     </div>
   </footer>;
